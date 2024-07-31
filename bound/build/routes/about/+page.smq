@@ -1,0 +1,51 @@
+<script>
+//import Semantq from './system/core/semantq.js';
+import Header from './src/components/Header.smq';
+import Todos from './src/components/templates/Todos.smq';
+
+alert("Component Js Worked !!!");
+
+
+let name ='John';
+let age ='45';
+let heading="Hello World";
+</script>
+<style>
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two columns with equal width */
+  grid-gap: 10px; /* Gap between grid items */
+}
+
+/* Example styling for grid items */
+.grid-item {
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+</style>
+<nook name="header"> </nook>
+
+<h1> <span data-bind="heading"> {heading} </span> </h1>
+
+<div class="grid-container">
+  <div class="grid-item">
+
+   My name is <span data-bind="name"> {name} </span>  <br>
+      I am <span data-bind="age"> {age} </span>  years old. 
+
+  </div>
+
+
+
+  <div class="grid-item">
+
+<h3> Change your name and age here </h3>
+<form>
+<input type="text" data-bind="name"  placeholder="Name" required/>
+<input type="text" data-bind="age"  placeholder="Age" required/>
+<input type="text" data-bind="heading"  placeholder="New Heading" required/>
+
+</form>
+
+  </div>
+</div>

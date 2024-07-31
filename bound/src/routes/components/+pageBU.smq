@@ -1,0 +1,89 @@
+script:
+
+/*
+alert("direct alert works");
+
+function handleClick ()
+{
+alert("You clicked me!");
+
+}
+
+*/
+
+
+class ButtonComponent extends HTMLElement {
+  constructor() {
+    super();
+    this.config = {};
+  }
+
+  configure(attrs) {
+    Array.from(attrs).forEach((attr) => {
+      this.config[attr.name] = attr.value;
+    });
+  }
+
+  connectedCallback() {
+    this.configure(this.attributes);
+    const button = this.render();
+    this.replaceWith(button);
+  }
+
+  render() {
+    const template = document.createElement('template');
+    template.innerHTML = `<button class="smq-button ${this.config.size} ${this.config.class}">${this.config.text}</button>`;
+
+    const button = template.content.cloneNode(true).querySelector('button');
+    button.addEventListener('click', () => this.handleClick());
+
+    return button;
+  }
+
+  handleClick() {
+    alert("You clicked me!");
+  }
+}
+
+customElements.define('button-component', ButtonComponent);
+
+
+
+
+style:
+
+.smq-button {
+  color: var(--primary-color);
+  background-color: var(--secondary-color);
+  border-color: var(--tertiary-color);
+
+  /* Additional button styles */
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 0.25rem;
+  border-width: 2px;
+  border-style: solid;
+  cursor: pointer;
+}
+
+.smq-button:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+
+content:
+
+<div>
+<p>Block of text</p>
+
+<button-component
+    size="btn-lg"
+    class="smq-button"
+    text="Click Me"
+    onclick="handleClick()"
+  ></button-component>
+
+</div>
+

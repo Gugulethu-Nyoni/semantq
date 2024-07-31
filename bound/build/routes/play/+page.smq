@@ -1,0 +1,35 @@
+<script>
+let counter = 0;
+</script>
+<style>
+.the-button {
+  display: inline-block;
+  padding: 1em 2em;
+  font-weight: bold;
+  color: #fff;
+  background-color: #ff69b4; /* Pink */
+border: none;
+  border-radius: 0.3em;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out; /* Transition effect */
+}
+
+.the-button:hover {
+  background-color: #4fc3f7; /* Blue */
+}
+
+span {
+  color: red;
+  font-weight: bolder;
+}
+</style>
+<h1> Button has been clicked <span data-bind="counter"> {counter} </span> times. </h1>
+
+<br/>
+<div class="the-button"> I have been clicked <span data-bind="counter"> {counter} times. </span> 
+
+You can update the counter here: 
+<input type="number" data-bind="counter" />
+
+
+</button>

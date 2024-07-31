@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEMANTIQ - WELCOME </title>
+
+<script type="module">
+ 
+const supabaseUrl='http://127.0.0.1:54321';
+const supabaseAnonKey='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
+
+//const { createClient } = require('@supabase/supabase-js');
+
+import { createClient } from '@supabase/supabase-js';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+
+async function getUsers() {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, username, email')
+      .limit(100);
+
+    console.log(data);
+    console.log(error);
+  } catch (error) {
+    console.error('An error occurred:', error);
+  }
+}
+
+getUsers();
+
+
+</script>
+
+</head>
+<body>
+Main Page Content (Must Stick)
+
+<nav>
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="about">About</a></li>
+        <li><a href="portfolio">Portfolio</a></li>
+        <li><a href="contacts">Contacts</a></li>
+        <li><a href="play">Play</a></li>
+        <li><a href="services">Services</a></li>
+        <li><a href="gdhdhd">Ayikho</a></li>
+        <li><a href="https://google.com">Google</a></li>
+    </ul>
+</nav>
+
+
+
+<div id="dynamicComponentPlaceholder"></div>
+
+
+
+
+  <script src="./core_modules/routing/router.js" type="module" defer></script>
+
+
+</body>
+</html>

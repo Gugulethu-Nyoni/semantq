@@ -1,0 +1,28 @@
+{
+  "name": "semantiq",
+  "version": "1.0.0",
+  "description": "Your framework description",
+  "main": "index.js",
+  "bin": {
+    "semantiq": "./cli.js"
+  },
+  "scripts": {
+    "start": "node cli.js",
+    "build": "babel src -d dist",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^8.1.0",
+    "fs-extra": "^10.0.0",
+    "semantq": "^1.0.0"
+  },
+  "devDependencies": {
+    "@babel/generator": "^7.24.1",
+    "@babel/parser": "^7.24.1",
+    "vite": "^5.2.12",
+    "vite-plugin-html": "^3.2.2"
+  }
+}
