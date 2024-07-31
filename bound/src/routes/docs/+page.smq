@@ -1,0 +1,8 @@
+script:
+console.log("in Docs");
+
+style:
+p {font-family:}
+
+content:
+<p> This the official documentation of Semantq! </p> 

@@ -1,0 +1,21 @@
+export default {
+  "/": "/",
+  "home": "/",
+  "about": "about",
+  "components": "components",
+  "contacts": "contacts",
+  "demos": "demos",
+  "docs": "docs",
+  "play": "play",
+  "portfolio": "portfolio",
+  "services": "services",
+  "services/sa": "services/sa",
+  "services/sa/gauteng": "services/sa/gauteng",
+  "slots": "slots",
+  "start": "start",
+  "tailwinder": "tailwinder",
+  "team": "team",
+  "teamb": "teamb",
+  "user": "user",
+  "user/profile": "user/profile"
+};

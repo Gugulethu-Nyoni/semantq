@@ -1,0 +1,43 @@
+{
+    "name": "routing",
+    "version": "1.0.0",
+    "description": "",
+    "type": "module",
+    "main": "src/index.js",
+    "scripts": {
+        "start": "node server.js",
+        "compile": "node core_modules/compiler/compiler.js",
+        "dev": "npm run compile && concurrently \"npm run app-server\" \"vite\"",
+        "semantiq": "node ./core_modules/artisan/cli.js",
+        "app-server": "node ./core_modules/app-node-server/core.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@swc/cli": "^0.3.12",
+        "@swc/core": "^1.4.11",
+        "@types/node": "^20.12.2",
+        "commander": "^9.2.0",
+        "concurrently": "^8.2.2",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.4.3",
+        "vite": "^5.2.7",
+        "vite-plugin-html": "^3.2.2"
+    },
+    "dependencies": {
+        "@supabase/supabase-js": "^2.42.4",
+        "axios": "^1.6.8",
+        "canvas": "^2.11.2",
+        "cheerio": "^1.0.0-rc.12",
+        "cors": "^2.8.5",
+        "express": "^4.19.2",
+        "fs-extra": "^11.2.0",
+        "he": "^1.2.0",
+        "http": "^0.0.1-security",
+        "http-proxy": "^1.18.1",
+        "jsdom": "^24.0.0",
+        "node-fetch": "^3.3.2",
+        "whatwg-url": "^14.0.0"
+    }
+}
