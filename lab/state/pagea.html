@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page A</title>
+</head>
+<body>
+<h1>Page A</h1>
+<button id="increment">Increment on Page 1</button>
+<script>
+  // Get the elements from the DOM
+  const incrementButton = document.getElementById('increment');
+
+  // Load the current value from localStorage or initialize to 0 if not found
+  let value = localStorage.getItem('sharedValue') || 0;
+
+  // Create a reusable render function
+  function renderValue() {
+    document.body.replaceChildren([]);
+    document.body.appendChild(createValueElement(value));
+  }
+
+  // Create a reusable render function
+  function createValueElement(value) {
+    const div = document.createElement('div');
+    div.textContent = `Current value: ${value}`;
+    return div;
+  }
+
+  // Handle the increment button click
+  incrementButton.addEventListener('click', () => {
+    value++;
+    localStorage.setItem('sharedValue', value);
+    renderValue();
+  });
+
+  // Listen for changes in localStorage
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'sharedValue') {
+      value = event.newValue;
+      renderValue();
+    }
+  });
+
+  // Initial render
+  renderValue();
+</script>
+
+</body>
+</html>

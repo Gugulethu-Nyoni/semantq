@@ -1,0 +1,31 @@
+<script>
+
+let counter = 0;
+
+
+function incrementer () {
+
+++counter;
+
+}
+
+
+function decrementer () {
+
+--counter;
+}
+
+</script>
+
+<style>
+
+</style>
+
+<customSyntax>
+
+
+<button @click={incrementer} > Clicked {counter} times </button> <br/>
+<button @click={decrementer} > Clicked {counter} times </button> <br/>
+
+
+</customSyntax>

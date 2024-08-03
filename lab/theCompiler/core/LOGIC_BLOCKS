@@ -1,0 +1,96 @@
+
+// core blocks: 1.condition (expression) 2. CustomSyntax (consequent of blocks) must have a. all custom atrributes possibilities / capabilities b. must take nested logic blocks.i.e. Custom Syntax must allow login blocks within themselves (nestable).e.g. 
+
+@if (condition)
+@if (conditionTwo)
+<table>
+<thead>
+<tr>
+<th> Name </th>
+<th> Surname </th>
+</tr>
+<tbody>
+@each people as person
+<tr>
+<td> {person.name}    </td>
+<td> {person.surname} </td>
+</tr>
+@endeach
+</tbody>
+
+@endif
+@endif
+
+
+
+
+
+
+1. 
+
+IF
+
+@if (condition)
+    // code
+
+@endif
+
+2.
+
+
+@if (condition)
+    
+    @else 
+    
+@endif 
+
+
+3.
+
+
+@if (condition)
+    ...
+    @elseif (condition)
+    ...
+
+@else
+
+
+4.
+
+@each items as item
+    // code
+@endeach
+
+
+5. @each with index
+
+@each items as item, index
+    // code
+@each
+
+
+6. @each with key
+
+@each items as item (item.id)
+    // code
+@each
+
+
+7. Await Block
+
+@await promise
+    // code while waiting
+@then value
+    // code when promise resolves
+@catch error
+    // code when promise rejects
+@endawait
+
+
+
+
+
+    
+
+

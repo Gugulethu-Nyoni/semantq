@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+ <script type="module">
+      import StateOfState from './core.js';
+      //import FormState from './formState.js';
+
+    </script>
+<style>
+  input {width: 20%; padding: 0.5em; border-radius: 10px; margin-top:0.5em }
+
+</style>
+
+
+  </head>
+  <body>
+    <h1 id="header"></h1>
+
+<script>
+
+let name ="John";
+
+let counter=0;
+
+function increment() {
+  counter++;
+  //alert();
+
+const element = document.getElementById('counter');
+    element.value=counter;
+
+    //element.dispatchEvent(new Event('input'));
+  //element.dispatchEvent(new Event('input', { bubbles: true }));
+
+/*
+    const event = new Event('input', {
+    bubbles: true,
+    cancelable: true,
+    //inputType: 'change' // Additional property for identifying the input event type
+  });
+
+  element.dispatchEvent(event);
+*/
+
+}
+
+function decrement() {
+  counter--;
+
+  const element = document.getElementById('counter');
+    element.value=counter;
+
+// form values to be bound
+
+    let firstname ='';
+    let age ='';
+    let mobile='';
+
+
+// get form data 
+
+
+
+
+}
+
+   
+function submitForm(event) {
+
+    event.preventDefault(); // Prevent the form from being submitted and the page from refreshing
+
+//alert("phakathi");
+ 
+ const formData = theFormState();
+
+
+  console.log("here:"+formData);
+
+}
+
+
+</script>
+
+
+<input type="text" data-bind="name" placeholder="Name" />
+
+<h1> My name is <span data-bind="name">{name}</span></h1>
+
+<h3> Counter: <span data-bind="counter"> 0 </span> </h3> <br/>
+
+<input id="counter" type="number" data-bind="counter" placeholder="Enter Number" />
+
+Increment: <button onclick="increment()">+</button> &nbsp;
+Decrement: <button onclick="decrement()">-</button>
+
+<br/>
+
+<!--
+<form onsubmit="submitForm(event)">
+  <input type="text" data-bind="firstname" placeholder="Enter First Name" required> <br/>
+  <input type="number" data-bind="age"  placeholder="Enter Age" required> <br/>
+  <input type="number" data-bind="mobile"  placeholder="Enter Mobile" required> <br/>
+
+<input type="submit"  value="submit">
+</form>
+
+-->
+   
+  </body>
+      <script src="./formState.js"></script>
+
+</html>

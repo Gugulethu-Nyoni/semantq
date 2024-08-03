@@ -1,0 +1,32 @@
+<!-- about.html -->
+<script>
+    let counter =0;
+    const container = getElementById('app');
+    const button = getElementById('btn');
+   
+   button.addEventListener('click', () => {
+
+    counter ++;
+    button.innerText=`I have been clicked ${counter} times`;
+   });
+
+    container.appendChild=`
+
+    <button id="btn"> I have been clicked ${counter} times </button>
+
+    `;
+</script>
+
+<style>
+    .app {
+        width: 100%;
+        background-color: cream;
+    }
+    
+</style>
+
+<div id="app">
+    <h2> About Us </h2>
+    <p> Welcome to our about page! </p>
+</div>
+

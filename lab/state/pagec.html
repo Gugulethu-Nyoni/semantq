@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page C</title>
+</head>
+<body>
+<h1>Page C</h1>
+
+<button id="counterButton">Increase Count</button>
+
+<script type="module">
+
+    import StateManager from './useState.js';
+
+  // Instantiate StateManager
+  const stateManager = new StateManager();
+
+  // Set initial count value in local storage
+  stateManager.setValue('count', 0);
+
+  // Subscribe to state changes
+  stateManager.subscribeToStateChanges((component) => {
+    const count = stateManager.getValue('count');
+    console.log('Current count in pagec.html:', count);
+  });
+
+  // Update count value and trigger re-renders on button click
+  document.getElementById('counterButton').addEventListener('click', () => {
+    const count = stateManager.getValue('count');
+    stateManager.setValue('count', count + 1);
+  });
+</script>
+
+
+
+</body>
+</html>

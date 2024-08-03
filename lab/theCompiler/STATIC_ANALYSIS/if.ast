@@ -1,0 +1,43 @@
+[
+  [],
+  [
+    {
+      type: 'tag',
+      value: '@if',
+      js_eq: 'if'
+    },
+    {
+      type: 'lParens',
+      value: '(',
+      js_eq: '('
+    },
+    [
+      ' '
+    ],
+    {
+      type: 'identifier',
+      value: 'true',
+      js_eq: 'identifier'
+    },
+    [
+      ' '
+    ],
+    {
+      type: 'rParens',
+      value: ')',
+      js_eq: ')'
+    },
+    {
+      type: 'plain_text',
+      value: 'do something here  ',
+      html_eq: 'plain_text'
+    },
+    {
+      type: 'ifClosingTag',
+      value: '@endif',
+      js_eq: 'closingBrace'
+    }
+  ],
+  []
+]
+3

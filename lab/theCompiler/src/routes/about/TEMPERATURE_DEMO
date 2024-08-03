@@ -1,0 +1,51 @@
+script:
+
+let dc =  0;
+let fh = 32;
+
+//const fh = dc * 9 / 5 + 32;
+
+function calculate(event) {
+  const value = event.target.value;
+  const inputId = event.target.id;
+
+  if (isNaN(value)) return;
+
+  if (inputId === "celcius") {
+    dc = value;
+    fh = (dc * 9/5) + 32;
+  } else if (inputId === "fahrenheit") {
+    fh = value;
+    dc = (fh - 32) * 5/9;
+  }
+
+
+
+}
+
+
+
+
+end:
+
+
+style:
+
+
+end: 
+
+
+
+content:
+
+<h3> Degree Celcius to Fahrenheit </h3> 
+
+<label> Degrees Celcius </label> 
+<input id="celcius" type="number" value={dc} @input={calculate} /> <br/> 
+
+<label> Fahrenheit </label> 
+<input id="fahrenheit" type="number" value={fh} @input={calculate} /> 
+
+
+end:
+

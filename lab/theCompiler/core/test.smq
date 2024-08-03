@@ -1,0 +1,59 @@
+import fs from 'fs';
+import peg from './test_grammar.js';
+
+
+// Example input to parse
+const input = `
+// Test 1
+script: console.log("hello world!"); end:
+
+// Test 2
+script:
+  console.log("hello world!");
+end:
+
+// Test 3
+script:
+  console.log("hello world!");
+end:
+
+// Test 4 (invalid input)
+script: console.log("hello world!");
+`;
+
+// Parse the input using the generated parser
+try {
+  const parsed = parser.parse(input);
+  console.log('Parsing successful!');
+  console.log(parsed);
+} catch (error) {
+  console.error('Parsing failed:', error.message);
+}
+
+// Example input to parse
+const input = `
+// Test 1
+script: console.log("hello world!"); end:
+
+// Test 2
+script:
+  console.log("hello world!");
+end:
+
+// Test 3
+script:
+  console.log("hello world!");
+end:
+
+// Test 4 (invalid input)
+script: console.log("hello world!");
+`;
+
+// Parse the input using the generated parser
+try {
+  const parsed = parser.parse(input);
+  console.log('Parsing successful!');
+  console.log(parsed);
+} catch (error) {
+  console.error('Parsing failed:', error.message);
+}

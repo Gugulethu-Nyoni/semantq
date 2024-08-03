@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Counter Example Page 1</title>
+</head>
+<body>
+<div id="count-display"></div>
+<button onclick="counter.increment()">Click me!</button>
+<script>
+    // Counter class definition
+    class Counter {
+      constructor() {
+        this.state = { count: localStorage.getItem("count") || 0 };
+      }
+
+      increment() {
+        this.state.count++;
+        localStorage.setItem("count", this.state.count);
+        updateCountDisplay();
+      }
+    }
+
+    // Create Counter instance
+    const counter = new Counter();
+
+    // Update count display
+    function updateCountDisplay() {
+      document.getElementById("count-display").innerText = counter.state.count;
+    }
+
+    // Initial render
+    updateCountDisplay();
+
+    // Listen for localStorage changes
+    window.addEventListener('storage', updateCountDisplay);
+  </script>
+</body>
+</html>

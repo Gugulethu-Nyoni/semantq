@@ -1,0 +1,102 @@
+Here is the list of Svelte custom syntax elements with actual markup examples:
+
+    Event handlers:
+        <button on:click={handleClick()}>Click me!</button>
+        <input on:input={handleInput(event)} type="text">
+        <div on:mouseover={handleMouseover()}></div>
+
+
+    Bindings:
+        <p>{name}</p> (binds to a variable named name)
+        <p>{obj.prop}</p> (binds to an object property)
+        <p>{arr[0]}</p> (binds to an array element)
+
+
+    Conditional statements:
+        <div @if (isAdmin)>Admin content @endif ></div>
+        <div @if (isAdmin)>Admin content @else Regular content @endif </div>
+
+
+    Loops:
+        <ul>{#each items as item}<li>{item}</li>{/each}</ul>
+        <ul>{#each objects as obj}<li>{obj.key}: {obj.value}</li>{/each}</ul>
+
+
+    Functions:
+        <button on:click={doSomething()}>Click me!</button>
+        <button on:click={doSomething(arg1, arg2)}>Click me!</button>
+
+
+    Object literals:
+        <div>{{ key: 'value' }}</div>
+        <div>{{ key: expression }}</div>
+
+    Array literals:
+        <div>[1, 2, 3]</div>
+        <div>[expression, expression, expression]</div>
+
+    Template literals:
+        <div>`` text ``</div>
+        <div>`` text ${expression} text ``</div>
+    JS expressions:
+        <div>{expression}</div>
+        <div>{expression1} {expression2}</div>
+
+Note that these examples are just a few illustrations of how Svelte's custom syntax can be used. The actual markup will vary depending on your specific use case.
+
+Here is the list of grammar considerations for robust JavaScript expression handling in Svelte's custom syntax, using Svelte's {} syntax:
+
+
+{
+  function createNode(type, properties) {
+    return {type, ...properties, location: {...properties.location, source: ""}};
+  }
+}
+
+start
+= _ programBody:customSyntax _ { return createNode("Program", {body: programBody, sourceType: "module"}) }
+
+customSyntax
+=
+start
+
+
+Expression - all possible types of expressions in js - logical, arithemetic, unary, comparative, etc 
+
+Expressions
+Identifiers
+Literals
+Operators
+FuntionCalls
+Arrays and Objects
+
+
+
+
+
+    Identifiers:
+        {variable} (e.g. {x}, {foo})
+        {function} (e.g. {foo()}, {bar.baz()})
+        {property} (e.g. {foo.bar}, {foo['bar']})
+    Literals:
+        {string} (e.g. {'text'}, {"text"})
+        {number} (e.g. {123}, {4.56})
+        {boolean} (e.g. {true}, {false})
+
+
+    Operators:
+        {arithmetic} (e.g. {+}, {-}, {*}, /)
+        {logical} (e.g. {&&}, {||}, {!})
+        {ternary} (e.g. {cond ? true : false})
+
+    Function Calls:
+        {functionCall} (e.g. {foo()}, {bar()})
+        {methodInvocation} (e.g. {foo.bar()}, {foo.baz.qux()})
+    Template Literals:
+        {templateLiteral} (e.g. {`` text ${expr} text ``})
+    Arrays and Objects:
+        {array} (e.g. {[1, 2, 3]}, {[expr, expr, expr]})
+        {object} (e.g. {key: 'value'}, {key: expr})
+        {nested} (e.g. {key: { nested: 'value' }}, {[1, { key: 'value' }]})
+
+Using these examples, you can build PEG.js rules to match each of these grammar considerations, and create a robust grammar for handling JavaScript expressions in Svelte's custom syntax. Let me know if you need help with specific PEG.js rules for these examples!

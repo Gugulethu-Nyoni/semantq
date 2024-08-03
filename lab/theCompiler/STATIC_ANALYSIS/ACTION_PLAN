@@ -1,0 +1,88 @@
+Certainly! Let's outline the blueprint for building a robust and scalable PEG.js grammar to parse a custom syntax similar to Svelte's, mixed with JavaScript. We'll break down the task into manageable steps and ensure each component is tested and integrated properly to avoid issues such as left recursion and infinite loops.
+
+### Blueprint for Building Custom Syntax Grammar
+
+1. **Setup and Initialization**:
+   - Define the `createNode` function for AST node creation.
+   - Define the `start` rule to parse the entire input and produce a program node.
+
+2. **Whitespace Handling**:
+   - Define rules for handling optional and mandatory whitespace.
+
+3. **Identifiers**:
+   - Parse variables, function names, and properties.
+
+4. **Literals**:
+   - Parse different types of literals: strings, numbers, and booleans.
+
+5. **Expressions**:
+   - Define rules for parsing expressions in a precedence-aware manner:
+     - Primary expressions (identifiers, literals, grouped expressions).
+     - Function calls and method invocations.
+     - Property access.
+     - Array and object literals.
+     - Arithmetic expressions.
+     - Logical expressions.
+     - Ternary expressions.
+
+6. **Operators**:
+   - Define rules for different operators:
+     - Arithmetic operators.
+     - Logical operators.
+     - Ternary operator.
+
+7. **Function Calls**:
+   - Parse function calls and method invocations.
+
+8. **Template Literals**:
+   - Parse template literals with embedded expressions.
+
+9. **Arrays and Objects**:
+   - Parse array literals.
+   - Parse object literals.
+   - Handle nested arrays and objects.
+
+10. **Integration and Testing**:
+   - Incrementally integrate each component into the `customSyntax` rule.
+   - Test each component and the combined syntax to ensure correctness and avoid issues.
+
+### Detailed Action Plan
+
+1. **Setup and Initialization**:
+   - Define the `createNode` function.
+   - Define the `start` rule.
+
+2. **Whitespace Handling**:
+   - Define rules `_` and `__` for optional and mandatory whitespace.
+
+3. **Identifiers**:
+   - Define rules for `identifier`.
+
+4. **Literals**:
+   - Define rules for `stringLiteral`, `numberLiteral`, and `booleanLiteral`.
+
+5. **Expressions**:
+   - Define rules for `primaryExpression`, `functionCall`, `propertyAccess`, `arrayLiteral`, `objectLiteral`, `arithmeticExpression`, `logicalExpression`, and `ternaryExpression`.
+
+6. **Operators**:
+   - Define rules for `arithmeticOperator`, `logicalOperator`, and `ternaryOperator`.
+
+7. **Function Calls**:
+   - Define rules for `functionCall` and `methodInvocation`.
+
+8. **Template Literals**:
+   - Define rules for `templateLiteral`.
+
+9. **Arrays and Objects**:
+   - Define rules for `arrayLiteral` and `objectLiteral`.
+   - Define rules for handling nested arrays and objects.
+
+10. **Integration and Testing**:
+    - Integrate each component step by step into the `customSyntax` rule.
+    - Thoroughly test each component individually and in combination to ensure robustness.
+
+This blueprint provides a structured approach to building the custom syntax grammar. By breaking down the task into individual components and integrating them incrementally, we can ensure the grammar remains robust and scalable.
+
+---
+
+Next, we will start with the **Setup and Initialization** step by defining the `createNode` function and the `start` rule. Let's proceed with that.

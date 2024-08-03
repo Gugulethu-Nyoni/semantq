@@ -1,0 +1,42 @@
+script:
+let theme ='dark';
+
+
+
+function themeWiz () {
+
+
+  
+theme = (theme === 'dark') ? 'light' : 'dark';
+
+
+}
+
+
+// FIX HOW CSS COMES OUT FOR THIS WORKS OTHERWISE 100%
+end:
+
+
+style:
+.dark { background-color: #000; color: #fff; }
+.light { background-color: #fff; color: #000; } 
+
+end: 
+
+
+
+content:
+
+<section class={theme}>
+<h1> TOGGLE THEME - LIGHT AND DARK MODE </h1>
+
+<div>
+<button @click={themeWiz}> Toggle Theme Mode </button> 
+</div>
+
+</section>
+
+
+
+end:
+

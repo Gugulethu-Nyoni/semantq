@@ -1,0 +1,80 @@
+script:
+
+
+
+// Define the task list
+let tasks = [];
+
+// Function to add a new task
+function addTask(task) {
+if (task.trim() !== "") {
+ tasks = tasks.push(task);
+}
+  
+}
+
+// Function to remove a task
+function removeTask(index) {
+ tasks =  tasks.splice(index, 1);
+  
+}
+
+// Function to edit a task
+function editTask(index, newTask) {
+if (newTask.trim() !=="") {
+  tasks[index] = newTask;
+   
+  }
+}
+
+function displayLists (){
+
+ tasks.forEach((task, index) => {
+const targetElement = document.getElementById('task-list');
+ const li = document.createElement('li');
+ li.textContent=task;
+ targetElement.appendChild(li);
+
+
+ })
+  
+
+}
+
+
+// Add event listener to add task button
+document.getElementById('add-task-btn').addEventListener('input', () => {
+  const newTask = document.getElementById('new-task').value;
+  addTask(newTask);
+  document.getElementById('new-task').value = '';
+});
+
+
+
+
+end:
+
+
+style:
+
+
+end: 
+
+
+
+content:
+
+<div id="todo-app">
+
+
+    <h1>To-Do List</h1>
+    <input id="new-task" type="text" placeholder="Add new task" />
+    <button id="add-task-btn" @click={displayLists}>Add</button>
+    <ul id="task-list">
+      {tasks}
+    </ul>
+  </div>
+
+
+end:
+

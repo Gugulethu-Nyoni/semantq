@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page D</title>
+</head>
+<body>
+<h1>Page D</h1>
+<button id="increment">Increment on Page 2</button>
+<p id="counterDisplay"></p>
+
+<script type="module">
+
+    import stateManager from './useState.js';
+  // Instantiate StateManager
+ const stateManagerFlow = new stateManager();
+
+  // Subscribe to state changes and update counter display
+  stateManagerFlow.subscribeToStateChanges((component) => {
+    const count = stateManagerFlow.getValue('count');
+    document.getElementById('counterDisplay').innerText = `Count: ${count}`;
+  });
+</script>
+
+
+
+</body>
+</html>
