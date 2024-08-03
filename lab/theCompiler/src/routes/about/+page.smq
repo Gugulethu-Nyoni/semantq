@@ -1,0 +1,33 @@
+script:
+
+let counter = 0;
+
+
+function incrementer () {
+  
+++counter; 
+
+}
+
+
+function decrementer () {
+  
+  --counter; 
+}
+
+end:
+
+style:
+
+end:
+
+
+
+content:
+
+<button @click={incrementer} > Clicked {counter} times </button> <br/>
+<button @click={decrementer} > Clicked {counter} times </button> <br/>
+
+
+end:
+

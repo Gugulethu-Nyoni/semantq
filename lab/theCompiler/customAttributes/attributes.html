@@ -1,0 +1,178 @@
+
+1. Syntax: Call a function with no arguments.
+
+<button on:click={myFunction}>
+  Click me
+</button>
+
+
+2. Function Call with Arguments
+
+
+<script>
+  function greet(name) {
+    alert(`Hello, ${name}!`);
+  }
+</script>
+
+<button on:click={() => greet('Alice')}>
+  Greet Alice
+</button>
+
+
+3. Passing Variables
+
+<script>
+  let name = 'Bob';
+
+  function greet(name) {
+    alert(`Hello, ${name}!`);
+  }
+</script>
+
+<button on:click={() => greet(name)}>
+  Greet
+</button>
+
+
+4.Function with Multiple Arguments
+
+<script>
+  function greet(firstName, lastName) {
+    alert(`Hello, ${firstName} ${lastName}!`);
+  }
+</script>
+
+<button on:click={() => greet('John', 'Doe')}>
+  Greet John Doe
+</button>
+
+
+5. Function Call with Complex Expressions
+
+<script>
+  let a = 5;
+  let b = 3;
+
+  function calculateSum(x, y) {
+    alert(`Sum: ${x + y}`);
+  }
+</script>
+
+<button on:click={() => calculateSum(a, b)}>
+  Calculate Sum
+</button>
+
+
+6. Using Inline Functions
+
+<button on:click={() => {
+  const message = 'Hello, inline function!';
+  alert(message);
+}}>
+  Click me
+</button>
+
+
+7. Passing Objects or Arrays
+
+<script>
+  let user = { name: 'Alice', age: 30 };
+
+  function showUserInfo(user) {
+    alert(`Name: ${user.name}, Age: ${user.age}`);
+  }
+</script>
+
+<button on:click={() => showUserInfo(user)}>
+  Show User Info
+</button>
+
+
+8. Using Event Parameters
+
+<script>
+  function handleClick(event) {
+    alert(`Button clicked at coordinates (${event.clientX}, ${event.clientY})`);
+  }
+</script>
+
+<button on:click={handleClick}>
+  Click me
+</button>
+
+
+9. Event Modifiers
+
+<script>
+  function handleClick(event) {
+    event.preventDefault();
+    alert('Button clicked');
+  }
+</script>
+
+<!-- Prevent the default action of the click event -->
+<button on:click|preventDefault={handleClick}>
+  Click me
+</button>
+
+<!-- Stop the event from propagating -->
+<button on:click|stopPropagation={handleClick}>
+  Click me
+</button>
+
+
+10. Conditional Function Call
+
+<script>
+  let condition = true;
+
+  function sayHello() {
+    alert('Hello!');
+  }
+</script>
+
+<button on:click={() => condition && sayHello()}>
+  Conditionally Greet
+</button>
+
+
+11. Using Async Functions
+
+<script>
+
+  async function fetchData() {
+    const response = await fetch('https://api.example.com/data');
+    const data = await response.json();
+    console.log(data);
+  }
+
+</script>
+
+<button on:click={fetchData}>
+  Fetch Data
+</button>
+
+
+12.Using Debounced or Throttled Functions
+
+<script>
+  import { debounce } from 'lodash';
+
+  function handleInput(event) {
+    console.log(event.target.value);
+  }
+
+  const debouncedInput = debounce(handleInput, 300);
+</script>
+
+<input type="text" on:input={debouncedInput}>
+
+
+
+
+
+
+
+
+

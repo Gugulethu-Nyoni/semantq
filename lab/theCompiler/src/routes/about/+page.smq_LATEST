@@ -1,0 +1,107 @@
+script:
+
+function adder(a,b) {
+const res = a + b; 
+return res;
+
+}
+
+const a = 4;
+const b = 6;
+const sum = adder(a,b);
+
+
+let name = 'World!'; 
+let counter = 0;
+
+function incrementer () {
+counter++;
+}
+
+
+function decrementer () {
+    counter--;
+}
+
+let day = 'Monday';
+let buttonStatus ='someValue';
+end:
+
+
+style:
+
+.btn{ background-color: blue; border-radius: 25px ;}
+
+end: 
+
+
+
+content:
+
+Total sum is: {sum}
+
+Hello {name}
+
+<div id="5c"> 
+
+<table class="table">
+<thead>
+<tr>
+<th> Name </th>
+<th> Surname </th>
+<th> Email </th> 
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td> Musa  </td>
+<td> Moyo </td>
+<td> mxmoyo@example.com </td>
+</tr>
+
+<tr>
+<td> James  </td>
+<td> Okura </td>
+<td> okfuy@website.com </td>
+</tr>
+
+<tr>
+<td colspan="3">
+
+<button id={counter} @click={incrementer} > + </button> 
+<button @click={decrementer}  > - </button> 
+
+</td> 
+
+</tr>
+
+</tbody>
+</table>
+
+
+<div id="form-div">
+
+<form method="post" action="process.php" class={day}>
+
+<input id="27" type="text" value={counter} data-bind="name" />
+
+<input type="submit" value="Submit" class="btn" />
+
+</form> 
+
+</div>
+
+<p> Example Button Below <br/> 
+
+<button class="btn" disabled> I am a disabled Button. -:) </button>
+
+ </p>
+
+</div>
+
+Thanks a mil, it's an awesome {day}!. 
+
+end:
+

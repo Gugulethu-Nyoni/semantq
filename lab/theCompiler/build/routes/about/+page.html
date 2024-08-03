@@ -1,0 +1,61 @@
+
+<script type="module">
+
+  let counter = 0;
+
+function incrementer() {
+  ++counter;
+  reRenderCounter();
+}
+
+
+function decrementer() {
+  --counter;
+  reRenderCounter();
+}
+
+
+function reRenderCounter() {
+  const M_g_543_rootElement = document.textContent(counter);
+  const target_mustacheidentifier_g = document.getElementById("lzeonjrw");
+  target_mustacheidentifier_g.innerHTML = "";
+  target_mustacheidentifier_g.appendChild(M_g_543_rootElement);
+
+  const M_sX_433_rootElement = document.textContent(counter);
+  const target_mustacheidentifier_sx = document.getElementById("lzesbtdl");
+  target_mustacheidentifier_sx.innerHTML = "";
+  target_mustacheidentifier_sx.appendChild(M_sX_433_rootElement);
+}
+
+  
+reRenderCounter();
+document.addEventListener("DOMContentLoaded", function() {
+    
+ window.incrementer=incrementer;
+ window.decrementer=decrementer;
+ window.reRenderCounter=reRenderCounter;
+
+    });
+
+
+</script>
+
+<style>
+  
+</style>
+
+<customSyntax
+  ><div id="1">
+    <div id="2">
+      <div id="3">
+        <section id="4">
+          <button onclick="incrementer()">
+            Clicked <span id="lzeonjrw"></span> times</button
+          ><br /><button onclick="decrementer()">
+            Clicked <span id="lzesbtdl"></span> times</button
+          ><br />
+        </section>
+      </div>
+    </div></div
+></customSyntax>
+

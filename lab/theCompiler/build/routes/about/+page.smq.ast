@@ -1,0 +1,520 @@
+{
+  "jsAST": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 105,
+      "body": [
+        {
+          "type": "VariableDeclaration",
+          "start": 2,
+          "end": 18,
+          "declarations": [
+            {
+              "type": "VariableDeclarator",
+              "start": 6,
+              "end": 17,
+              "id": {
+                "type": "Identifier",
+                "start": 6,
+                "end": 13,
+                "name": "counter"
+              },
+              "init": {
+                "type": "Literal",
+                "start": 16,
+                "end": 17,
+                "value": 0,
+                "raw": "0"
+              }
+            }
+          ],
+          "kind": "let"
+        },
+        {
+          "type": "FunctionDeclaration",
+          "start": 21,
+          "end": 61,
+          "id": {
+            "type": "Identifier",
+            "start": 30,
+            "end": 41,
+            "name": "incrementer"
+          },
+          "expression": false,
+          "generator": false,
+          "async": false,
+          "params": [],
+          "body": {
+            "type": "BlockStatement",
+            "start": 45,
+            "end": 61,
+            "body": [
+              {
+                "type": "ExpressionStatement",
+                "start": 48,
+                "end": 58,
+                "expression": {
+                  "type": "UpdateExpression",
+                  "start": 48,
+                  "end": 57,
+                  "operator": "++",
+                  "prefix": true,
+                  "argument": {
+                    "type": "Identifier",
+                    "start": 50,
+                    "end": 57,
+                    "name": "counter"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "FunctionDeclaration",
+          "start": 64,
+          "end": 103,
+          "id": {
+            "type": "Identifier",
+            "start": 73,
+            "end": 84,
+            "name": "decrementer"
+          },
+          "expression": false,
+          "generator": false,
+          "async": false,
+          "params": [],
+          "body": {
+            "type": "BlockStatement",
+            "start": 88,
+            "end": 103,
+            "body": [
+              {
+                "type": "ExpressionStatement",
+                "start": 91,
+                "end": 101,
+                "expression": {
+                  "type": "UpdateExpression",
+                  "start": 91,
+                  "end": 100,
+                  "operator": "--",
+                  "prefix": true,
+                  "argument": {
+                    "type": "Identifier",
+                    "start": 93,
+                    "end": 100,
+                    "name": "counter"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "sourceType": "script"
+    }
+  },
+  "cssAST": {
+    "type": "CSS",
+    "content": {
+      "raws": {
+        "after": "\n\n"
+      },
+      "type": "root",
+      "nodes": [],
+      "source": {
+        "end": {
+          "column": 1,
+          "line": 3,
+          "offset": 2
+        },
+        "inputId": 0,
+        "start": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        }
+      },
+      "lastEach": 1,
+      "indexes": {},
+      "inputs": [
+        {
+          "hasBOM": false,
+          "css": "\n\n",
+          "file": "/Users/gugulethu/code/semantiq/lab/theCompiler/core_modules/compiler/style"
+        }
+      ]
+    }
+  },
+  "customAST": {
+    "type": "Custom",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 264,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 264,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "start": 15,
+                    "end": 248,
+                    "type": "Element",
+                    "name": "div",
+                    "attributes": [
+                      {
+                        "start": 20,
+                        "end": 26,
+                        "type": "Attribute",
+                        "name": "id",
+                        "value": [
+                          {
+                            "start": 24,
+                            "end": 25,
+                            "type": "Text",
+                            "raw": "1",
+                            "data": "1"
+                          }
+                        ]
+                      }
+                    ],
+                    "children": [
+                      [
+                        {
+                          "start": 28,
+                          "end": 241,
+                          "type": "Element",
+                          "name": "div",
+                          "attributes": [
+                            {
+                              "start": 33,
+                              "end": 39,
+                              "type": "Attribute",
+                              "name": "id",
+                              "value": [
+                                {
+                                  "start": 37,
+                                  "end": 38,
+                                  "type": "Text",
+                                  "raw": "2",
+                                  "data": "2"
+                                }
+                              ]
+                            }
+                          ],
+                          "children": [
+                            [
+                              {
+                                "start": 41,
+                                "end": 234,
+                                "type": "Element",
+                                "name": "div",
+                                "attributes": [
+                                  {
+                                    "start": 46,
+                                    "end": 52,
+                                    "type": "Attribute",
+                                    "name": "id",
+                                    "value": [
+                                      {
+                                        "start": 50,
+                                        "end": 51,
+                                        "type": "Text",
+                                        "raw": "3",
+                                        "data": "3"
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "children": [
+                                  [
+                                    {
+                                      "start": 54,
+                                      "end": 227,
+                                      "type": "Element",
+                                      "name": "section",
+                                      "attributes": [
+                                        {
+                                          "start": 63,
+                                          "end": 69,
+                                          "type": "Attribute",
+                                          "name": "id",
+                                          "value": [
+                                            {
+                                              "start": 67,
+                                              "end": 68,
+                                              "type": "Text",
+                                              "raw": "4",
+                                              "data": "4"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "start": 73,
+                                            "end": 137,
+                                            "type": "Element",
+                                            "name": "button",
+                                            "attributes": [
+                                              {
+                                                "start": 81,
+                                                "end": 102,
+                                                "type": "Attribute",
+                                                "name": {
+                                                  "start": 81,
+                                                  "end": 87,
+                                                  "type": "EventHandler",
+                                                  "name": "click",
+                                                  "modifiers": [],
+                                                  "expression": {
+                                                    "type": "CallExpression",
+                                                    "start": 81,
+                                                    "end": 87
+                                                  }
+                                                },
+                                                "value": [
+                                                  {
+                                                    "start": 89,
+                                                    "end": 100,
+                                                    "type": "MustacheAttribute",
+                                                    "name": {
+                                                      "type": "Identifier",
+                                                      "start": {
+                                                        "offset": 89,
+                                                        "line": 4,
+                                                        "column": 17
+                                                      },
+                                                      "end": {
+                                                        "offset": 100,
+                                                        "line": 4,
+                                                        "column": 28
+                                                      },
+                                                      "name": "incrementer"
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Clicked ",
+                                                  "data": "Clicked "
+                                                },
+                                                {
+                                                  "type": "MustacheIdentifier",
+                                                  "start": {
+                                                    "offset": 112,
+                                                    "line": 4,
+                                                    "column": 40
+                                                  },
+                                                  "end": {
+                                                    "offset": 121,
+                                                    "line": 4,
+                                                    "column": 49
+                                                  },
+                                                  "expression": {
+                                                    "type": "Identifier",
+                                                    "start": {
+                                                      "offset": 112,
+                                                      "line": 4,
+                                                      "column": 40
+                                                    },
+                                                    "end": {
+                                                      "offset": 121,
+                                                      "line": 4,
+                                                      "column": 49
+                                                    },
+                                                    "name": {
+                                                      "type": "Identifier",
+                                                      "start": {
+                                                        "offset": 113,
+                                                        "line": 4,
+                                                        "column": 41
+                                                      },
+                                                      "end": {
+                                                        "offset": 120,
+                                                        "line": 4,
+                                                        "column": 48
+                                                      },
+                                                      "name": "counter"
+                                                    },
+                                                    "loc": {
+                                                      "start": {
+                                                        "line": 1,
+                                                        "column": 2
+                                                      },
+                                                      "end": {
+                                                        "line": 1,
+                                                        "column": 3
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "Text",
+                                                  "raw": " times ",
+                                                  "data": " times "
+                                                }
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "start": 138,
+                                            "end": 144,
+                                            "type": "Element",
+                                            "name": "br",
+                                            "attributes": null,
+                                            "children": []
+                                          },
+                                          {
+                                            "start": 144,
+                                            "end": 208,
+                                            "type": "Element",
+                                            "name": "button",
+                                            "attributes": [
+                                              {
+                                                "start": 152,
+                                                "end": 173,
+                                                "type": "Attribute",
+                                                "name": {
+                                                  "start": 152,
+                                                  "end": 158,
+                                                  "type": "EventHandler",
+                                                  "name": "click",
+                                                  "modifiers": [],
+                                                  "expression": {
+                                                    "type": "CallExpression",
+                                                    "start": 152,
+                                                    "end": 158
+                                                  }
+                                                },
+                                                "value": [
+                                                  {
+                                                    "start": 160,
+                                                    "end": 171,
+                                                    "type": "MustacheAttribute",
+                                                    "name": {
+                                                      "type": "Identifier",
+                                                      "start": {
+                                                        "offset": 160,
+                                                        "line": 5,
+                                                        "column": 17
+                                                      },
+                                                      "end": {
+                                                        "offset": 171,
+                                                        "line": 5,
+                                                        "column": 28
+                                                      },
+                                                      "name": "decrementer"
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Clicked ",
+                                                  "data": "Clicked "
+                                                },
+                                                {
+                                                  "type": "MustacheIdentifier",
+                                                  "start": {
+                                                    "offset": 183,
+                                                    "line": 5,
+                                                    "column": 40
+                                                  },
+                                                  "end": {
+                                                    "offset": 192,
+                                                    "line": 5,
+                                                    "column": 49
+                                                  },
+                                                  "expression": {
+                                                    "type": "Identifier",
+                                                    "start": {
+                                                      "offset": 183,
+                                                      "line": 5,
+                                                      "column": 40
+                                                    },
+                                                    "end": {
+                                                      "offset": 192,
+                                                      "line": 5,
+                                                      "column": 49
+                                                    },
+                                                    "name": {
+                                                      "type": "Identifier",
+                                                      "start": {
+                                                        "offset": 184,
+                                                        "line": 5,
+                                                        "column": 41
+                                                      },
+                                                      "end": {
+                                                        "offset": 191,
+                                                        "line": 5,
+                                                        "column": 48
+                                                      },
+                                                      "name": "counter"
+                                                    },
+                                                    "loc": {
+                                                      "start": {
+                                                        "line": 1,
+                                                        "column": 2
+                                                      },
+                                                      "end": {
+                                                        "line": 1,
+                                                        "column": 3
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "Text",
+                                                  "raw": " times ",
+                                                  "data": " times "
+                                                }
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "start": 209,
+                                            "end": 217,
+                                            "type": "Element",
+                                            "name": "br",
+                                            "attributes": null,
+                                            "children": []
+                                          }
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                ]
+                              }
+                            ]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

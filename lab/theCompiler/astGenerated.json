@@ -1,0 +1,339 @@
+{
+  "type": "Program",
+  "start": 0,
+  "end": 373,
+  "body": [
+    {
+      "type": "VariableDeclaration",
+      "start": 144,
+      "end": 160,
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "start": 148,
+          "end": 159,
+          "id": {
+            "type": "Identifier",
+            "start": 148,
+            "end": 155,
+            "name": "counter"
+          },
+          "init": {
+            "type": "Literal",
+            "start": 158,
+            "end": 159,
+            "value": 5,
+            "raw": "5"
+          }
+        }
+      ],
+      "kind": "let"
+    },
+    {
+      "type": "VariableDeclaration",
+      "start": 163,
+      "end": 175,
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "start": 167,
+          "end": 174,
+          "id": {
+            "type": "Identifier",
+            "start": 167,
+            "end": 170,
+            "name": "foo"
+          },
+          "init": {
+            "type": "Literal",
+            "start": 173,
+            "end": 174,
+            "value": 5,
+            "raw": "5"
+          }
+        }
+      ],
+      "kind": "let"
+    },
+    {
+      "type": "VariableDeclaration",
+      "start": 178,
+      "end": 212,
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "start": 184,
+          "end": 211,
+          "id": {
+            "type": "Identifier",
+            "start": 184,
+            "end": 193,
+            "name": "increment"
+          },
+          "init": {
+            "type": "ArrowFunctionExpression",
+            "start": 196,
+            "end": 211,
+            "id": null,
+            "expression": true,
+            "generator": false,
+            "async": false,
+            "params": [],
+            "body": {
+              "type": "UpdateExpression",
+              "start": 202,
+              "end": 211,
+              "operator": "++",
+              "prefix": false,
+              "argument": {
+                "type": "Identifier",
+                "start": 202,
+                "end": 209,
+                "name": "counter"
+              }
+            }
+          }
+        }
+      ],
+      "kind": "const"
+    },
+    {
+      "type": "VariableDeclaration",
+      "start": 215,
+      "end": 249,
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "start": 221,
+          "end": 248,
+          "id": {
+            "type": "Identifier",
+            "start": 221,
+            "end": 230,
+            "name": "decrement"
+          },
+          "init": {
+            "type": "ArrowFunctionExpression",
+            "start": 233,
+            "end": 248,
+            "id": null,
+            "expression": true,
+            "generator": false,
+            "async": false,
+            "params": [],
+            "body": {
+              "type": "UpdateExpression",
+              "start": 239,
+              "end": 248,
+              "operator": "--",
+              "prefix": false,
+              "argument": {
+                "type": "Identifier",
+                "start": 239,
+                "end": 246,
+                "name": "counter"
+              }
+            }
+          }
+        }
+      ],
+      "kind": "const"
+    },
+    {
+      "type": "VariableDeclaration",
+      "start": 252,
+      "end": 285,
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "start": 258,
+          "end": 284,
+          "id": {
+            "type": "Identifier",
+            "start": 258,
+            "end": 270,
+            "name": "incrementFoo"
+          },
+          "init": {
+            "type": "ArrowFunctionExpression",
+            "start": 273,
+            "end": 284,
+            "id": null,
+            "expression": true,
+            "generator": false,
+            "async": false,
+            "params": [],
+            "body": {
+              "type": "UpdateExpression",
+              "start": 279,
+              "end": 284,
+              "operator": "++",
+              "prefix": false,
+              "argument": {
+                "type": "Identifier",
+                "start": 279,
+                "end": 282,
+                "name": "foo"
+              }
+            }
+          }
+        }
+      ],
+      "kind": "const"
+    },
+    {
+      "type": "LabeledStatement",
+      "start": 291,
+      "end": 317,
+      "body": {
+        "type": "ExpressionStatement",
+        "start": 294,
+        "end": 317,
+        "expression": {
+          "type": "AssignmentExpression",
+          "start": 294,
+          "end": 316,
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "start": 294,
+            "end": 303,
+            "name": "quadruple"
+          },
+          "right": {
+            "type": "BinaryExpression",
+            "start": 306,
+            "end": 316,
+            "left": {
+              "type": "Identifier",
+              "start": 306,
+              "end": 312,
+              "name": "double"
+            },
+            "operator": "*",
+            "right": {
+              "type": "Literal",
+              "start": 315,
+              "end": 316,
+              "value": 2,
+              "raw": "2"
+            }
+          }
+        }
+      },
+      "label": {
+        "type": "Identifier",
+        "start": 291,
+        "end": 292,
+        "name": "$"
+      }
+    },
+    {
+      "type": "LabeledStatement",
+      "start": 320,
+      "end": 350,
+      "body": {
+        "type": "ExpressionStatement",
+        "start": 323,
+        "end": 350,
+        "expression": {
+          "type": "AssignmentExpression",
+          "start": 323,
+          "end": 349,
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "start": 323,
+            "end": 329,
+            "name": "double"
+          },
+          "right": {
+            "type": "BinaryExpression",
+            "start": 332,
+            "end": 349,
+            "left": {
+              "type": "BinaryExpression",
+              "start": 332,
+              "end": 343,
+              "left": {
+                "type": "Identifier",
+                "start": 332,
+                "end": 339,
+                "name": "counter"
+              },
+              "operator": "*",
+              "right": {
+                "type": "Literal",
+                "start": 342,
+                "end": 343,
+                "value": 2,
+                "raw": "2"
+              }
+            },
+            "operator": "+",
+            "right": {
+              "type": "Identifier",
+              "start": 346,
+              "end": 349,
+              "name": "bar"
+            }
+          }
+        }
+      },
+      "label": {
+        "type": "Identifier",
+        "start": 320,
+        "end": 321,
+        "name": "$"
+      }
+    },
+    {
+      "type": "LabeledStatement",
+      "start": 356,
+      "end": 373,
+      "body": {
+        "type": "ExpressionStatement",
+        "start": 359,
+        "end": 373,
+        "expression": {
+          "type": "AssignmentExpression",
+          "start": 359,
+          "end": 372,
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "start": 359,
+            "end": 362,
+            "name": "bar"
+          },
+          "right": {
+            "type": "BinaryExpression",
+            "start": 365,
+            "end": 372,
+            "left": {
+              "type": "Identifier",
+              "start": 365,
+              "end": 368,
+              "name": "foo"
+            },
+            "operator": "+",
+            "right": {
+              "type": "Literal",
+              "start": 371,
+              "end": 372,
+              "value": 5,
+              "raw": "5"
+            }
+          }
+        }
+      },
+      "label": {
+        "type": "Identifier",
+        "start": 356,
+        "end": 357,
+        "name": "$"
+      }
+    }
+  ],
+  "sourceType": "module"
+}

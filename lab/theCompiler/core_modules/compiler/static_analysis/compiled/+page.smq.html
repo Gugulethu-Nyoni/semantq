@@ -1,0 +1,94 @@
+
+<script type="module">
+  let weatherData = null;
+function weatherWiz() {
+  const data = {
+    "New York": {
+      temperature: 25,
+      humidity: 60,
+      description: "Sunny",
+      windSpeed: 15,
+      forecast: [
+        {
+          day: "Monday",
+          temperature: 27,
+          description: "Partly Cloudy",
+        },
+        {
+          day: "Tuesday",
+          temperature: 26,
+          description: "Sunny",
+        },
+        {
+          day: "Wednesday",
+          temperature: 24,
+          description: "Rain",
+        },
+      ],
+    },
+    "Los Angeles": {
+      temperature: 30,
+      humidity: 50,
+      description: "Clear Sky",
+      windSpeed: 10,
+      forecast: [
+        {
+          day: "Monday",
+          temperature: 29,
+          description: "Sunny",
+        },
+        {
+          day: "Tuesday",
+          temperature: 31,
+          description: "Sunny",
+        },
+        {
+          day: "Wednesday",
+          temperature: 32,
+          description: "Sunny",
+        },
+      ],
+    },
+  };
+  const selector = document.getElementById("city-select");
+  selector.addEventListener("change", function () {
+    weatherData = data[selector.value];
+  });
+  reRenderWeatherData();
+}
+function reRenderWeatherData() {
+  const d_nb_868_rootElement = document.createElement("div");
+  d_nb_868_rootElement.setAttribute("id", "weather-info");
+  d_nb_868_rootElement.setAttribute("class", "weather-info");
+  const mustacheExpr_248_3f9 = weatherData;
+  d_nb_868_rootElement.appendChild(
+    document.createTextNode(mustacheExpr_248_3f9),
+  );
+  const textNode_472_1pk = document.createTextNode("  ");
+  d_nb_868_rootElement.appendChild(textNode_472_1pk);
+  const target_div_nb = document.getElementById("lz15at6i");
+  target_div_nb.innerHTML = "";
+  target_div_nb.appendChild(d_nb_868_rootElement);
+}
+reRenderWeatherData();
+
+</script>
+
+<customSyntax>
+
+  <h3>Interactive Weather Data</h3>
+  <div>
+    <h1>Weather Data</h1>
+    <label for="city-select">Select a city:</label
+    ><select id="city-select" onchange="weatherWiz()">
+      <option value="">--Select a city--</option>
+      <option value="New York">New York</option>
+      <option value="Los Angeles">Los Angeles</option>
+      </select
+    >
+    <span id="lz15at6i"></span>
+
+  </div>
+
+</customSyntax>
+
