@@ -1602,7 +1602,7 @@ const randomNumber = () => {
   const mustacheVar = `mustacheExpr_${randomNumber()}_${randomText()}`;
   const mustacheTagName = node.expression.name.name || node.expression.name;
   //jsCode += `const ${mustacheVar} = ${mustacheTagName};\n`;
-  jsCode +=`const ${rootElementName} = document.textContent(${mustacheTagName});`
+  jsCode +=`const ${rootElementName} = document.createTextNode(${mustacheTagName});`
   //console.log("BUG", parentStack);
 /*
   if (parentStack.length > 0) {

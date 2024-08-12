@@ -1,43 +1,48 @@
 
 <script type="module">
-
   let counter = 0;
-
-function incrementer() {
-  ++counter;
+let num = 1;
+function increment() {
+  counter += 1;
   reRenderCounter();
 }
-
-
-function decrementer() {
-  --counter;
+function doubler() {
+  num = counter * 2;
   reRenderCounter();
+  reRenderNum();
 }
-
-
 function reRenderCounter() {
-  const M_g_543_rootElement = document.textContent(counter);
-  const target_mustacheidentifier_g = document.getElementById("lzeonjrw");
-  target_mustacheidentifier_g.innerHTML = "";
-  target_mustacheidentifier_g.appendChild(M_g_543_rootElement);
-
-  const M_sX_433_rootElement = document.textContent(counter);
-  const target_mustacheidentifier_sx = document.getElementById("lzesbtdl");
-  target_mustacheidentifier_sx.innerHTML = "";
-  target_mustacheidentifier_sx.appendChild(M_sX_433_rootElement);
+  const M_Y_472_rootElement = document.createTextNode(counter);
+  const target_mustacheidentifier_y = document.getElementById("lzrgfaru");
+  target_mustacheidentifier_y.innerHTML = "";
+  target_mustacheidentifier_y.appendChild(M_Y_472_rootElement);
+  const M_e_529_rootElement = document.createTextNode(counter);
+  const target_mustacheidentifier_e = document.getElementById("lzrvuj6p");
+  target_mustacheidentifier_e.innerHTML = "";
+  target_mustacheidentifier_e.appendChild(M_e_529_rootElement);
+  const i_MO_971_rootElement = document.createElement("input");
+  i_MO_971_rootElement.setAttribute("type", "text");
+  i_MO_971_rootElement.setAttribute("value", counter);
+  const target_element_mo = document.getElementById("lzrz56jz");
+  target_element_mo.innerHTML = "";
+  target_element_mo.appendChild(i_MO_971_rootElement);
+}
+function reRenderNum() {
+  const M_cG_924_rootElement = document.createTextNode(num);
+  const target_mustacheidentifier_cg = document.getElementById("lzr9ytqk");
+  target_mustacheidentifier_cg.innerHTML = "";
+  target_mustacheidentifier_cg.appendChild(M_cG_924_rootElement);
 }
 
   
-reRenderCounter();
-document.addEventListener("DOMContentLoaded", function() {
+    reRenderCounter();reRenderNum();
+    document.addEventListener("DOMContentLoaded", function() {
     
- window.incrementer=incrementer;
- window.decrementer=decrementer;
+ window.increment=increment;
+ window.doubler=doubler;
  window.reRenderCounter=reRenderCounter;
-
+ window.reRenderNum=reRenderNum;
     });
-
-
 </script>
 
 <style>
@@ -49,11 +54,14 @@ document.addEventListener("DOMContentLoaded", function() {
     <div id="2">
       <div id="3">
         <section id="4">
-          <button onclick="incrementer()">
-            Clicked <span id="lzeonjrw"></span> times</button
-          ><br /><button onclick="decrementer()">
-            Clicked <span id="lzesbtdl"></span> times</button
+          <button onclick="increment()">
+            Button Clicked <span id="lzrgfaru"></span> times</button
           ><br />
+          <p onclick="doubler()">
+            Counter: <span id="lzrvuj6p"></span> and Num:
+            <span id="lzr9ytqk"></span>
+          </p>
+          <span id="lzrz56jz"></span>
         </section>
       </div>
     </div></div

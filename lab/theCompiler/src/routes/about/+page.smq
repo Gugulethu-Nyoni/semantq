@@ -1,33 +1,25 @@
 script:
+  let counter = 0;
+  let num = 1; 
 
-let counter = 0;
+  function increment() {
+    counter += 1;
+  }
 
-
-function incrementer () {
-  
-++counter; 
-
-}
-
-
-function decrementer () {
-  
-  --counter; 
-}
-
-end:
-
-style:
-
-end:
+  function doubler () {
+   
+   num = counter * 2;
 
 
-
-content:
-
-<button @click={incrementer} > Clicked {counter} times </button> <br/>
-<button @click={decrementer} > Clicked {counter} times </button> <br/>
+  }
 
 
 end:
 
+<button @click={increment}>
+  Button Clicked {counter} times
+</button>
+
+<br/> 
+<p @click={doubler}> Counter: {counter} and Num: {num} </p>
+<input type="text" value={counter} />

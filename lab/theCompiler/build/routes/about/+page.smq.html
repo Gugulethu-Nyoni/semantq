@@ -1,31 +1,29 @@
 <script>
-
 let counter = 0;
+let num = 1;
 
+function increment() {
+counter += 1;
+}
 
-function incrementer () {
+function doubler () {
 
-++counter;
+num = counter * 2;
+
 
 }
 
-
-function decrementer () {
-
---counter;
-}
 
 </script>
 
-<style>
 
-</style>
 
 <customSyntax>
+<button @click={increment}>
+Button Clicked {counter} times
+</button>
 
-
-<button @click={incrementer} > Clicked {counter} times </button> <br/>
-<button @click={decrementer} > Clicked {counter} times </button> <br/>
-
-
+<br/>
+<p @click={doubler}> Counter: {counter} and Num: {num} </p>
+<input type="text" value={counter} />
 </customSyntax>
