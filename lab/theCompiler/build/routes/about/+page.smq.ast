@@ -4,27 +4,27 @@
     "content": {
       "type": "Program",
       "start": 0,
-      "end": 105,
+      "end": 120,
       "body": [
         {
           "type": "VariableDeclaration",
-          "start": 2,
-          "end": 18,
+          "start": 1,
+          "end": 17,
           "declarations": [
             {
               "type": "VariableDeclarator",
-              "start": 6,
-              "end": 17,
+              "start": 5,
+              "end": 16,
               "id": {
                 "type": "Identifier",
-                "start": 6,
-                "end": 13,
+                "start": 5,
+                "end": 12,
                 "name": "counter"
               },
               "init": {
                 "type": "Literal",
-                "start": 16,
-                "end": 17,
+                "start": 15,
+                "end": 16,
                 "value": 0,
                 "raw": "0"
               }
@@ -33,14 +33,40 @@
           "kind": "let"
         },
         {
+          "type": "VariableDeclaration",
+          "start": 18,
+          "end": 30,
+          "declarations": [
+            {
+              "type": "VariableDeclarator",
+              "start": 22,
+              "end": 29,
+              "id": {
+                "type": "Identifier",
+                "start": 22,
+                "end": 25,
+                "name": "num"
+              },
+              "init": {
+                "type": "Literal",
+                "start": 28,
+                "end": 29,
+                "value": 1,
+                "raw": "1"
+              }
+            }
+          ],
+          "kind": "let"
+        },
+        {
           "type": "FunctionDeclaration",
-          "start": 21,
-          "end": 61,
+          "start": 32,
+          "end": 70,
           "id": {
             "type": "Identifier",
-            "start": 30,
-            "end": 41,
-            "name": "incrementer"
+            "start": 41,
+            "end": 50,
+            "name": "increment"
           },
           "expression": false,
           "generator": false,
@@ -48,24 +74,30 @@
           "params": [],
           "body": {
             "type": "BlockStatement",
-            "start": 45,
-            "end": 61,
+            "start": 53,
+            "end": 70,
             "body": [
               {
                 "type": "ExpressionStatement",
-                "start": 48,
-                "end": 58,
+                "start": 55,
+                "end": 68,
                 "expression": {
-                  "type": "UpdateExpression",
-                  "start": 48,
-                  "end": 57,
-                  "operator": "++",
-                  "prefix": true,
-                  "argument": {
+                  "type": "AssignmentExpression",
+                  "start": 55,
+                  "end": 67,
+                  "operator": "+=",
+                  "left": {
                     "type": "Identifier",
-                    "start": 50,
-                    "end": 57,
+                    "start": 55,
+                    "end": 62,
                     "name": "counter"
+                  },
+                  "right": {
+                    "type": "Literal",
+                    "start": 66,
+                    "end": 67,
+                    "value": 1,
+                    "raw": "1"
                   }
                 }
               }
@@ -74,13 +106,13 @@
         },
         {
           "type": "FunctionDeclaration",
-          "start": 64,
-          "end": 103,
+          "start": 72,
+          "end": 117,
           "id": {
             "type": "Identifier",
-            "start": 73,
-            "end": 84,
-            "name": "decrementer"
+            "start": 81,
+            "end": 88,
+            "name": "doubler"
           },
           "expression": false,
           "generator": false,
@@ -88,24 +120,42 @@
           "params": [],
           "body": {
             "type": "BlockStatement",
-            "start": 88,
-            "end": 103,
+            "start": 92,
+            "end": 117,
             "body": [
               {
                 "type": "ExpressionStatement",
-                "start": 91,
-                "end": 101,
+                "start": 95,
+                "end": 113,
                 "expression": {
-                  "type": "UpdateExpression",
-                  "start": 91,
-                  "end": 100,
-                  "operator": "--",
-                  "prefix": true,
-                  "argument": {
+                  "type": "AssignmentExpression",
+                  "start": 95,
+                  "end": 112,
+                  "operator": "=",
+                  "left": {
                     "type": "Identifier",
-                    "start": 93,
-                    "end": 100,
-                    "name": "counter"
+                    "start": 95,
+                    "end": 98,
+                    "name": "num"
+                  },
+                  "right": {
+                    "type": "BinaryExpression",
+                    "start": 101,
+                    "end": 112,
+                    "left": {
+                      "type": "Identifier",
+                      "start": 101,
+                      "end": 108,
+                      "name": "counter"
+                    },
+                    "operator": "*",
+                    "right": {
+                      "type": "Literal",
+                      "start": 111,
+                      "end": 112,
+                      "value": 2,
+                      "raw": "2"
+                    }
                   }
                 }
               }
@@ -120,15 +170,15 @@
     "type": "CSS",
     "content": {
       "raws": {
-        "after": "\n\n"
+        "after": ""
       },
       "type": "root",
       "nodes": [],
       "source": {
         "end": {
           "column": 1,
-          "line": 3,
-          "offset": 2
+          "line": 1,
+          "offset": 0
         },
         "inputId": 0,
         "start": {
@@ -142,7 +192,7 @@
       "inputs": [
         {
           "hasBOM": false,
-          "css": "\n\n",
+          "css": "",
           "file": "/Users/gugulethu/code/semantiq/lab/theCompiler/core_modules/compiler/style"
         }
       ]
@@ -154,12 +204,12 @@
       {
         "html": {
           "start": 0,
-          "end": 264,
+          "end": 292,
           "type": "Fragment",
           "children": [
             {
               "start": 0,
-              "end": 264,
+              "end": 292,
               "type": "Element",
               "name": "customSyntax",
               "attributes": null,
@@ -167,7 +217,7 @@
                 [
                   {
                     "start": 15,
-                    "end": 248,
+                    "end": 276,
                     "type": "Element",
                     "name": "div",
                     "attributes": [
@@ -191,7 +241,7 @@
                       [
                         {
                           "start": 28,
-                          "end": 241,
+                          "end": 269,
                           "type": "Element",
                           "name": "div",
                           "attributes": [
@@ -215,7 +265,7 @@
                             [
                               {
                                 "start": 41,
-                                "end": 234,
+                                "end": 262,
                                 "type": "Element",
                                 "name": "div",
                                 "attributes": [
@@ -239,7 +289,7 @@
                                   [
                                     {
                                       "start": 54,
-                                      "end": 227,
+                                      "end": 255,
                                       "type": "Element",
                                       "name": "section",
                                       "attributes": [
@@ -262,45 +312,45 @@
                                       "children": [
                                         [
                                           {
-                                            "start": 73,
-                                            "end": 137,
+                                            "start": 71,
+                                            "end": 139,
                                             "type": "Element",
                                             "name": "button",
                                             "attributes": [
                                               {
-                                                "start": 81,
-                                                "end": 102,
+                                                "start": 79,
+                                                "end": 97,
                                                 "type": "Attribute",
                                                 "name": {
-                                                  "start": 81,
-                                                  "end": 87,
+                                                  "start": 79,
+                                                  "end": 85,
                                                   "type": "EventHandler",
                                                   "name": "click",
                                                   "modifiers": [],
                                                   "expression": {
                                                     "type": "CallExpression",
-                                                    "start": 81,
-                                                    "end": 87
+                                                    "start": 79,
+                                                    "end": 85
                                                   }
                                                 },
                                                 "value": [
                                                   {
-                                                    "start": 89,
-                                                    "end": 100,
+                                                    "start": 87,
+                                                    "end": 96,
                                                     "type": "MustacheAttribute",
                                                     "name": {
                                                       "type": "Identifier",
                                                       "start": {
-                                                        "offset": 89,
-                                                        "line": 4,
+                                                        "offset": 87,
+                                                        "line": 2,
                                                         "column": 17
                                                       },
                                                       "end": {
-                                                        "offset": 100,
-                                                        "line": 4,
-                                                        "column": 28
+                                                        "offset": 96,
+                                                        "line": 2,
+                                                        "column": 26
                                                       },
-                                                      "name": "incrementer"
+                                                      "name": "increment"
                                                     }
                                                   }
                                                 ]
@@ -310,44 +360,44 @@
                                               [
                                                 {
                                                   "type": "Text",
-                                                  "raw": "Clicked ",
-                                                  "data": "Clicked "
+                                                  "raw": "Button Clicked ",
+                                                  "data": "Button Clicked "
                                                 },
                                                 {
                                                   "type": "MustacheIdentifier",
                                                   "start": {
-                                                    "offset": 112,
-                                                    "line": 4,
-                                                    "column": 40
+                                                    "offset": 114,
+                                                    "line": 3,
+                                                    "column": 16
                                                   },
                                                   "end": {
-                                                    "offset": 121,
-                                                    "line": 4,
-                                                    "column": 49
+                                                    "offset": 123,
+                                                    "line": 3,
+                                                    "column": 25
                                                   },
                                                   "expression": {
                                                     "type": "Identifier",
                                                     "start": {
-                                                      "offset": 112,
-                                                      "line": 4,
-                                                      "column": 40
+                                                      "offset": 114,
+                                                      "line": 3,
+                                                      "column": 16
                                                     },
                                                     "end": {
-                                                      "offset": 121,
-                                                      "line": 4,
-                                                      "column": 49
+                                                      "offset": 123,
+                                                      "line": 3,
+                                                      "column": 25
                                                     },
                                                     "name": {
                                                       "type": "Identifier",
                                                       "start": {
-                                                        "offset": 113,
-                                                        "line": 4,
-                                                        "column": 41
+                                                        "offset": 115,
+                                                        "line": 3,
+                                                        "column": 17
                                                       },
                                                       "end": {
-                                                        "offset": 120,
-                                                        "line": 4,
-                                                        "column": 48
+                                                        "offset": 122,
+                                                        "line": 3,
+                                                        "column": 24
                                                       },
                                                       "name": "counter"
                                                     },
@@ -365,60 +415,60 @@
                                                 },
                                                 {
                                                   "type": "Text",
-                                                  "raw": " times ",
-                                                  "data": " times "
+                                                  "raw": " times\n",
+                                                  "data": " times\n"
                                                 }
                                               ]
                                             ]
                                           },
                                           {
-                                            "start": 138,
-                                            "end": 144,
+                                            "start": 141,
+                                            "end": 147,
                                             "type": "Element",
                                             "name": "br",
                                             "attributes": null,
                                             "children": []
                                           },
                                           {
-                                            "start": 144,
-                                            "end": 208,
+                                            "start": 147,
+                                            "end": 206,
                                             "type": "Element",
-                                            "name": "button",
+                                            "name": "p",
                                             "attributes": [
                                               {
-                                                "start": 152,
-                                                "end": 173,
+                                                "start": 150,
+                                                "end": 166,
                                                 "type": "Attribute",
                                                 "name": {
-                                                  "start": 152,
-                                                  "end": 158,
+                                                  "start": 150,
+                                                  "end": 156,
                                                   "type": "EventHandler",
                                                   "name": "click",
                                                   "modifiers": [],
                                                   "expression": {
                                                     "type": "CallExpression",
-                                                    "start": 152,
-                                                    "end": 158
+                                                    "start": 150,
+                                                    "end": 156
                                                   }
                                                 },
                                                 "value": [
                                                   {
-                                                    "start": 160,
-                                                    "end": 171,
+                                                    "start": 158,
+                                                    "end": 165,
                                                     "type": "MustacheAttribute",
                                                     "name": {
                                                       "type": "Identifier",
                                                       "start": {
-                                                        "offset": 160,
-                                                        "line": 5,
-                                                        "column": 17
+                                                        "offset": 158,
+                                                        "line": 7,
+                                                        "column": 12
                                                       },
                                                       "end": {
-                                                        "offset": 171,
-                                                        "line": 5,
-                                                        "column": 28
+                                                        "offset": 165,
+                                                        "line": 7,
+                                                        "column": 19
                                                       },
-                                                      "name": "decrementer"
+                                                      "name": "doubler"
                                                     }
                                                   }
                                                 ]
@@ -428,44 +478,44 @@
                                               [
                                                 {
                                                   "type": "Text",
-                                                  "raw": "Clicked ",
-                                                  "data": "Clicked "
+                                                  "raw": "Counter: ",
+                                                  "data": "Counter: "
                                                 },
                                                 {
                                                   "type": "MustacheIdentifier",
                                                   "start": {
-                                                    "offset": 183,
-                                                    "line": 5,
-                                                    "column": 40
+                                                    "offset": 177,
+                                                    "line": 7,
+                                                    "column": 31
                                                   },
                                                   "end": {
-                                                    "offset": 192,
-                                                    "line": 5,
-                                                    "column": 49
+                                                    "offset": 186,
+                                                    "line": 7,
+                                                    "column": 40
                                                   },
                                                   "expression": {
                                                     "type": "Identifier",
                                                     "start": {
-                                                      "offset": 183,
-                                                      "line": 5,
-                                                      "column": 40
+                                                      "offset": 177,
+                                                      "line": 7,
+                                                      "column": 31
                                                     },
                                                     "end": {
-                                                      "offset": 192,
-                                                      "line": 5,
-                                                      "column": 49
+                                                      "offset": 186,
+                                                      "line": 7,
+                                                      "column": 40
                                                     },
                                                     "name": {
                                                       "type": "Identifier",
                                                       "start": {
-                                                        "offset": 184,
-                                                        "line": 5,
-                                                        "column": 41
+                                                        "offset": 178,
+                                                        "line": 7,
+                                                        "column": 32
                                                       },
                                                       "end": {
-                                                        "offset": 191,
-                                                        "line": 5,
-                                                        "column": 48
+                                                        "offset": 185,
+                                                        "line": 7,
+                                                        "column": 39
                                                       },
                                                       "name": "counter"
                                                     },
@@ -483,18 +533,116 @@
                                                 },
                                                 {
                                                   "type": "Text",
-                                                  "raw": " times ",
-                                                  "data": " times "
+                                                  "raw": " and Num: ",
+                                                  "data": " and Num: "
+                                                },
+                                                {
+                                                  "type": "MustacheIdentifier",
+                                                  "start": {
+                                                    "offset": 196,
+                                                    "line": 7,
+                                                    "column": 50
+                                                  },
+                                                  "end": {
+                                                    "offset": 201,
+                                                    "line": 7,
+                                                    "column": 55
+                                                  },
+                                                  "expression": {
+                                                    "type": "Identifier",
+                                                    "start": {
+                                                      "offset": 196,
+                                                      "line": 7,
+                                                      "column": 50
+                                                    },
+                                                    "end": {
+                                                      "offset": 201,
+                                                      "line": 7,
+                                                      "column": 55
+                                                    },
+                                                    "name": {
+                                                      "type": "Identifier",
+                                                      "start": {
+                                                        "offset": 197,
+                                                        "line": 7,
+                                                        "column": 51
+                                                      },
+                                                      "end": {
+                                                        "offset": 200,
+                                                        "line": 7,
+                                                        "column": 54
+                                                      },
+                                                      "name": "num"
+                                                    },
+                                                    "loc": {
+                                                      "start": {
+                                                        "line": 1,
+                                                        "column": 2
+                                                      },
+                                                      "end": {
+                                                        "line": 1,
+                                                        "column": 3
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "Text",
+                                                  "raw": " ",
+                                                  "data": " "
                                                 }
                                               ]
                                             ]
                                           },
                                           {
-                                            "start": 209,
-                                            "end": 217,
+                                            "start": 207,
+                                            "end": 245,
                                             "type": "Element",
-                                            "name": "br",
-                                            "attributes": null,
+                                            "name": "input",
+                                            "attributes": [
+                                              {
+                                                "start": 214,
+                                                "end": 226,
+                                                "type": "Attribute",
+                                                "name": "type",
+                                                "value": [
+                                                  {
+                                                    "start": 220,
+                                                    "end": 224,
+                                                    "type": "Text",
+                                                    "raw": "text",
+                                                    "data": "text"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "start": 226,
+                                                "end": 242,
+                                                "type": "Attribute",
+                                                "name": "value",
+                                                "value": [
+                                                  {
+                                                    "start": 233,
+                                                    "end": 240,
+                                                    "type": "MustacheAttribute",
+                                                    "name": {
+                                                      "type": "Identifier",
+                                                      "start": {
+                                                        "offset": 233,
+                                                        "line": 8,
+                                                        "column": 27
+                                                      },
+                                                      "end": {
+                                                        "offset": 240,
+                                                        "line": 8,
+                                                        "column": 34
+                                                      },
+                                                      "name": "counter"
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            ],
                                             "children": []
                                           }
                                         ]
