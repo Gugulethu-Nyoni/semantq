@@ -1,2 +1,4 @@
 archive/
 testserver/
+node_modules/
+../formique/
