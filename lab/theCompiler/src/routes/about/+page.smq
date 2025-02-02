@@ -1,25 +1,50 @@
 script:
-  let counter = 0;
-  let num = 1; 
 
-  function increment() {
-    counter += 1;
-  }
-
-  function doubler () {
-   
-   num = counter * 2;
+let name = 'World!'; 
 
 
-  }
+let counter = 0;
 
+
+function incrementer () {
+  
+counter++;
+
+}
+
+
+
+function decrementer () {
+  
+
+  counter--;
+}
+
+let day = 'Monday';
 
 end:
 
-<button @click={increment}>
-  Button Clicked {counter} times
-</button>
 
-<br/> 
-<p @click={doubler}> Counter: {counter} and Num: {num} </p>
-<input type="text" value={counter} />
+content:
+
+Test number {counter} this one!
+
+<button @click={incrementer} id="btnId" class="btn"> Increment </button> <br/> 
+
+<button @click={decrementer} id="btnId" class="btn"> Decrement </button> <br/> 
+
+<p class="main"> Counter value is: {counter} </p>
+
+
+<div> The button has been clicked {counter} times! </div>
+
+
+<span> Yesterday was not a: {day} </span>
+
+
+<h3> Today is a: {day} </h3>
+
+Thanks {name}
+
+end:
+

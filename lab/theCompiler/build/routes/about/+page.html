@@ -1,47 +1,59 @@
-
 <script type="module">
-  let counter = 0;
-let num = 1;
-function increment() {
-  counter += 1;
+
+let name = "World!";
+let counter = 0;
+function incrementer() {
+  counter++;
   reRenderCounter();
 }
-function doubler() {
-  num = counter * 2;
+function decrementer() {
+  counter--;
   reRenderCounter();
-  reRenderNum();
 }
+let day = "Monday";
 function reRenderCounter() {
-  const M_Y_472_rootElement = document.createTextNode(counter);
-  const target_mustacheidentifier_y = document.getElementById("lzrgfaru");
-  target_mustacheidentifier_y.innerHTML = "";
-  target_mustacheidentifier_y.appendChild(M_Y_472_rootElement);
-  const M_e_529_rootElement = document.createTextNode(counter);
-  const target_mustacheidentifier_e = document.getElementById("lzrvuj6p");
-  target_mustacheidentifier_e.innerHTML = "";
-  target_mustacheidentifier_e.appendChild(M_e_529_rootElement);
-  const i_MO_971_rootElement = document.createElement("input");
-  i_MO_971_rootElement.setAttribute("type", "text");
-  i_MO_971_rootElement.setAttribute("value", counter);
-  const target_element_mo = document.getElementById("lzrz56jz");
-  target_element_mo.innerHTML = "";
-  target_element_mo.appendChild(i_MO_971_rootElement);
+  const M_Erh_615_rootElement = document.createTextNode(counter);
+  const target_mustacheidentifier_erh = document.getElementById("m3xv9egm");
+  target_mustacheidentifier_erh.innerHTML = "";
+  target_mustacheidentifier_erh.appendChild(M_Erh_615_rootElement);
+  const M_Pc_994_rootElement = document.createTextNode(counter);
+  const target_mustacheidentifier_pc = document.getElementById("m3x69pyp");
+  target_mustacheidentifier_pc.innerHTML = "";
+  target_mustacheidentifier_pc.appendChild(M_Pc_994_rootElement);
+  const M_h_397_rootElement = document.createTextNode(counter);
+  const target_mustacheidentifier_h = document.getElementById("m3xnkecn");
+  target_mustacheidentifier_h.innerHTML = "";
+  target_mustacheidentifier_h.appendChild(M_h_397_rootElement);
 }
-function reRenderNum() {
-  const M_cG_924_rootElement = document.createTextNode(num);
-  const target_mustacheidentifier_cg = document.getElementById("lzr9ytqk");
-  target_mustacheidentifier_cg.innerHTML = "";
-  target_mustacheidentifier_cg.appendChild(M_cG_924_rootElement);
-}
+const M_kD_378_rootElement = document.createTextNode(day);
+const target_mustacheidentifier_kd = document.getElementById("m3x6sewy");
+target_mustacheidentifier_kd.innerHTML = "";
+target_mustacheidentifier_kd.insertBefore(
+  M_kD_378_rootElement,
+  target_mustacheidentifier_kd.firstChild,
+);
+const M_bez_342_rootElement = document.createTextNode(day);
+const target_mustacheidentifier_bez = document.getElementById("m3xdszu0");
+target_mustacheidentifier_bez.innerHTML = "";
+target_mustacheidentifier_bez.insertBefore(
+  M_bez_342_rootElement,
+  target_mustacheidentifier_bez.firstChild,
+);
+const M_JI_949_rootElement = document.createTextNode(name);
+const target_mustacheidentifier_ji = document.getElementById("m3x77qno");
+target_mustacheidentifier_ji.innerHTML = "";
+target_mustacheidentifier_ji.insertBefore(
+  M_JI_949_rootElement,
+  target_mustacheidentifier_ji.firstChild,
+);
 
   
-    reRenderCounter();reRenderNum();
+    reRenderCounter();
     document.addEventListener("DOMContentLoaded", function() {
     
- window.increment=increment;
- window.doubler=doubler;
+ window.incrementer=incrementer;
+ window.decrementer=decrementer;
  window.reRenderCounter=reRenderCounter;
- window.reRenderNum=reRenderNum;
     });
 </script>
 
@@ -54,14 +66,20 @@ function reRenderNum() {
     <div id="2">
       <div id="3">
         <section id="4">
-          <button onclick="increment()">
-            Button Clicked <span id="lzrgfaru"></span> times</button
+          Test number <span id="m3xv9egm"></span> this one!
+
+          <button onclick="incrementer()" id="btnId" class="btn">
+            Increment</button
+          ><br /><button onclick="decrementer()" id="btnId" class="btn">
+            Decrement</button
           ><br />
-          <p onclick="doubler()">
-            Counter: <span id="lzrvuj6p"></span> and Num:
-            <span id="lzr9ytqk"></span>
-          </p>
-          <span id="lzrz56jz"></span>
+          <p class="main">Counter value is: <span id="m3x69pyp"></span></p>
+          <div>
+            The button has been clicked <span id="m3xnkecn"></span> times!
+          </div>
+          <span>Yesterday was not a: <span id="m3x6sewy"></span> </span>
+          <h3>Today is a: <span id="m3xdszu0"></span></h3>
+          Thanks <span id="m3x77qno"></span>
         </section>
       </div>
     </div></div

@@ -15,10 +15,13 @@ import fs from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+//
 const sourceDir = path.resolve(__dirname, '../src/routes');
 const destDir = path.resolve(__dirname, '../build/routes');
 const extension = 'smq';
+
+
+// clean up - empty the target build directory to ensure clean build
 
 async function cleanupDirectory(directory) {
   try {
@@ -46,6 +49,8 @@ async function cleanupDirectory(directory) {
     }
   }
 }
+
+
 
 async function compileCustomTags() {
   try {

@@ -9,7 +9,7 @@
         "compile": "node core_modules/compiler/compiler.js",
         "dev": "npm run compile && concurrently \"npm run app-server\" \"vite\"",
         "app-server": "node ./core_modules/app-node-server/core.js",
-        "semantiq": "./core_modules/artisan/cli.js"
+        "semantq": "./core_modules/artisan/cli.js"
     },
     "keywords": [],
     "author": "",

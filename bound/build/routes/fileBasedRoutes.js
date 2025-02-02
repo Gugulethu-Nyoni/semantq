@@ -10,7 +10,6 @@ export default {
   "portfolio": "portfolio",
   "services": "services",
   "services/sa": "services/sa",
-  "services/sa/gauteng": "services/sa/gauteng",
   "slots": "slots",
   "start": "start",
   "tailwinder": "tailwinder",
