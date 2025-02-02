@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 function readSMQFiles(directory) {
   fs.readdir(directory, (err, files) => {
     if (err) {
-      console.error('Error reading directory:', err);
+     // console.error('Error reading directory:', err);
       return;
     }
 
@@ -39,19 +39,12 @@ async function readAndCompileSMQFile(filePath) {
         }
 
 
-        //console.log(filePath);
-
-
-
+        //console.log("HERE",filePath);
         const buildPath= filePath.replace('src','build');
 
-
-            fs.promises.mkdir(path.dirname(buildPath), { recursive: true });
-    //console.log(`Directory created or already exists: ${path.dirname(buildPath)}`);
-
-
-        
-        //console.log(buildPath);
+        fs.promises.mkdir(path.dirname(buildPath), { recursive: true });
+        //console.log(`Directory created or already exists: ${path.dirname(buildPath)}`);
+        //console.log("BP",buildPath);
 
         
         let compiledContent = compileSMQContent(data, buildPath);
@@ -179,7 +172,7 @@ compiledContent = scriptContent + '\n\n' + styleContent + '\n\n' + wrappedHtmlCo
 
 /// write html into own file 
 
-        //console.log(compiledContent);
+        //console.log("HERE",compiledContent);
 
 
         fs.writeFile(outputFilePath, compiledContent, 'utf8', (err) => {
@@ -287,10 +280,10 @@ i++;
 
 
 // Main function
-function compileSMQFiles() {
-    const directory = '../../src/routes'; // src directory
-    readSMQFiles(directory);
+export function compileSMQFiles(sourceDir) {
+   // const directory = '../../src/routes'; // src directory
+    readSMQFiles(sourceDir);
 }
 
 // Compile .smq files
-compileSMQFiles();
+//compileSMQFiles(sourceDir);
