@@ -4,15 +4,35 @@ const fs = require('fs-extra');
 const path = require('path');
 const { execSync } = require('child_process');
 
+// Utility function for safely copying directories
+const safeCopySync = (source, destination) => {
+  try {
+    fs.copySync(source, destination, { recursive: true, overwrite: true });
+  } catch (error) {
+    console.error(`Error copying ${source} to ${destination}:`, error.message);
+  }
+};
+
+// Utility function to copy files only if they exist
+const copyIfExists = async (source, destination) => {
+  if (await fs.pathExists(source)) {
+    await fs.copyFile(source, destination);
+  } else {
+    console.warn(`Warning: ${source} does not exist, skipping.`);
+  }
+};
+
 // Define the command to generate the project structure
 program
   .command('create <projectName>')
   .description('Generate the project structure')
   .action(async (projectName) => {
     const projectPath = path.join(process.cwd(), projectName);
+    const templateDirectory = path.resolve(__dirname, './templates');
+    const configDirectory = path.resolve(__dirname, './configs');
 
     try {
-      // Create parent directories
+      // Define directories to create
       const directories = [
         'src/components',
         'src/routes',
@@ -23,58 +43,34 @@ program
         'tests',
         'docs',
         'examples',
-        'public'
+        'public',
       ];
-      
       await Promise.all(directories.map(dir => fs.mkdir(path.join(projectPath, dir), { recursive: true })));
-      
 
-      // Define template and config paths
-      const templateDirectory = path.resolve(__dirname, './templates');
-      const configDirectory = path.resolve(__dirname, './configs');
+      // Copy essential files and directories
+      safeCopySync(path.resolve(__dirname, './core_modules'), path.join(projectPath, 'core_modules'));
+      safeCopySync(templateDirectory, projectPath);
 
-      // Copy core_modules directory to the project directory
-      fs.copySync(path.resolve(__dirname, './core_modules'), path.join(projectPath, 'core_modules'), {
-        recursive: true,
-        overwrite: true,
-      });
+      // Copy specific template files
+      await copyIfExists(path.join(templateDirectory, 'Button.smq'), path.join(projectPath, 'src/components/Button.smq'));
+      await copyIfExists(path.join(templateDirectory, '+404.smq'), path.join(projectPath, 'src/routes/+404.smq'));
 
-      // Copy template files to the project directory
-      fs.copySync(templateDirectory, projectPath, {
-        recursive: true,
-        overwrite: true,
-      });
+      // Create empty routes.js
+      await fs.writeFile(path.join(projectPath, 'build/routes/routes.js'), 'export default [];');
 
-      // Copy Button.smq from templates folder to src/components directory
-      const buttonSmqSource = path.join(templateDirectory, 'Button.smq');
-      const buttonSmqDestination = path.join(projectPath, 'src', 'components', 'Button.smq');
-      await fs.copyFile(buttonSmqSource, buttonSmqDestination);
-
-      // Copy +404.smq from templates folder to src/routes directory
-      const errorPageSmqSource = path.join(templateDirectory, '+404.smq');
-      const errorPageSmqDestination = path.join(projectPath, 'src', 'routes', '+404.smq');
-      await fs.copyFile(errorPageSmqSource, errorPageSmqDestination);
-
-      // Create routes.js in build/routes directory
-      await fs.writeFile(
-        path.join(projectPath, 'build', 'routes', 'routes.js'),
-        'export default [];'
+      // Copy config files
+      ['package.json', 'tsconfig.json', 'vite.config.js'].forEach(file =>
+        safeCopySync(path.join(configDirectory, file), path.join(projectPath, file))
       );
 
-      // Copy config files (package.json, tsconfig.json, vite.config.js, etc.)
-      fs.copySync(path.join(configDirectory, 'package.json'), path.join(projectPath, 'package.json'));
-      fs.copySync(path.join(configDirectory, 'tsconfig.json'), path.join(projectPath, 'tsconfig.json'));
-      fs.copySync(path.join(configDirectory, 'vite.config.js'), path.join(projectPath, 'vite.config.js'));
+      // Install dependencies
+      console.log('Installing dependencies...');
+      execSync('npm install', { cwd: projectPath, stdio: 'inherit' });
+      execSync('npm install --save-dev vite@latest vite-plugin-html@latest', { cwd: projectPath, stdio: 'inherit' });
 
-      // Install Vite and the HTML plugin
-      execSync('npm install --save-dev vite@latest vite-plugin-html@latest', {
-        cwd: projectPath,
-        stdio: 'inherit',
-      });
-
-      console.log(`Project structure generated successfully at ${projectPath}`);
+      console.log(`✅ Project structure generated successfully at ${projectPath}`);
     } catch (error) {
-      console.error('Error generating project:', error.message);
+      console.error('❌ Error generating project:', error.message);
       console.error('Stack trace:', error.stack);
     }
   });
