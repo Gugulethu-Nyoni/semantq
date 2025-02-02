@@ -1,67 +1,86 @@
 "use strict";
 
-// Clear all cached modules
-/*
-Object.keys(require.cache).forEach((key) => {
-  delete require.cache[key];
-});
-*/
-
-
-
 import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs/promises';
+//import { fileURLToPath } from 'url';
+import fs from 'fs/promises'; 
+import fse from 'fs-extra';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-//
-const sourceDir = path.resolve(__dirname, '../src/routes');
-const destDir = path.resolve(__dirname, '../build/routes');
-const extension = 'smq';
+
+const rootDir = process.cwd();
+
+//console.log("HERE",rootDir);
+
+// Construct paths to key source and dest directories 
+const sourceDir = path.join(rootDir, 'src/routes');
+const destDir = path.join(rootDir, 'build/routes');
+const destDirBase = path.join(rootDir, 'build');
+const componentsDest = path.join(rootDir, 'build/components');
 
 
 // clean up - empty the target build directory to ensure clean build
 
+/*
 async function cleanupDirectory(directory) {
-  try {
-    const files = await fs.readdir(directory);
-    for (const file of files) {
-      const filePath = path.join(directory, file);
-      const stats = await fs.stat(filePath);
+  console.log("Cleaning out build dir:", directory);
 
-      if (stats.isDirectory()) {
-        await cleanupDirectory(filePath);
-        await fs.rmdir(filePath);
-        //console.log(`Removed directory: ${filePath}`);
-      } else {
-        await fs.unlink(filePath);
-        //console.log(`Removed file: ${filePath}`);
-      }
-    }
-    await fs.rmdir(directory);
-    //console.log(`Removed directory: ${directory}`);
+  try {
+    // Use fse.rm with recursive and force options to delete the directory and its contents
+    await fse.rm(directory, { recursive: true, force: true });
+    console.log(`Successfully removed directory: ${directory}`);
   } catch (err) {
     if (err.code !== 'ENOENT') {
       console.error('Error cleaning directory:', err);
     } else {
-      //console.log(`Directory does not exist: ${directory}`);
+      console.log(`Directory does not exist: ${directory}`);
     }
+  }
+}
+*/
+
+
+async function cleanupDirectory(directory) {
+  //console.log("Cleaning out build dir:", directory);
+
+  try {
+    // Check if the directory exists
+    const dirExists = await fse.pathExists(directory);
+    if (!dirExists) {
+      //console.log(`Directory does not exist: ${directory}`);
+      return;
+    }
+
+    // Read the contents of the directory
+    const files = await fse.readdir(directory);
+
+    // Delete each file or subdirectory
+    for (const file of files) {
+      const filePath = path.join(directory, file);
+      await fse.remove(filePath); // fs.remove deletes files and directories recursively
+      //console.log(`Removed: ${filePath}`);
+    }
+
+    //console.log(`Successfully cleaned directory: ${directory}`);
+  } catch (err) {
+    console.error('Error cleaning directory:', err);
   }
 }
 
 
 
-async function compileCustomTags() {
+
+async function compileCustomTags(sourceDir) {
   try {
+    //console.log("Passed", sourceDir);
     //console.log("Compiling Custom Tags ...");
     const tagCompiler = await import('./compileCustomTags.js');
+    tagCompiler.compileSMQFiles(sourceDir);
     //console.log("Custom tags compiled");
   } catch (error) {
     throw error;
   }
 }
 
+/*
 async function validateIfSyntax() {
   try {
     //console.log("Validating all Syntax ...");
@@ -71,71 +90,73 @@ async function validateIfSyntax() {
     throw error;
   }
 }
+*/
 
-async function componentParser() {
+async function componentParser(destDir) {
   try {
     //console.log("Component parsing");
-    const ifSyntax = await import('./componentParser.js');
+    const validate = await import('./componentParser.mjs');
+    validate.compileSMQFiles(destDir)// = await import('./componentParser.js');
     //console.log("Done: component parsing");
   } catch (error) {
     throw error;
   }
 }
 
-async function transformer() {
+async function transformer(destDir) {
   try {
     //console.log("Transforming Components");
-    const ifSyntax = await import('./transformer.js');
+    const trans = await import('./transformer.js');
+    trans.transformSMQFiles(destDir); 
     //console.log("Done: Transforming Components");
   } catch (error) {
     throw error;
   }
 }
 
-async function main() {
-  const dirPath = '/Users/gugulethu/code/semantiq/lab/theCompiler/build/routes';
 
-  // Wait for the directory cleanup to finish before proceeding
-  await cleanupDirectory(dirPath);
-  
-  // Run the tasks sequentially
-  await compileCustomTags();
-  await validateIfSyntax();  // Uncomment if needed
-  await componentParser();
-  await transformer();
+
+async function routesGenerator(sourceDir,destDir) {
+  try {
+    console.log('Generating route based files');
+    // Dynamic import of the bundler module
+    const routesModule = await import('./fileBasedRouteGenerator.js');
+    // Traverse the directory and generate routes
+    routesModule.generateFileBasedRoutes(destDir);
+    console.log('Route generation completed');
+   // Copy routes.json from sourceDir to destDir
+    const sourceRoutesFile = path.join(sourceDir, 'routes.json');
+    const destRoutesFile = path.join(destDir, 'routes.json');
+
+    await fse.copy(sourceRoutesFile, destRoutesFile);
+    console.log(`Copied routes.json from ${sourceDir} to ${destDir}`);
+
+
+
+
+  } catch (error) {
+    throw error; // Re-throw the error for the caller to handle
+  }
 }
 
-main()
+async function main(sourceDir,destDir, destDirBase) {
+  //const dirPath = '/Users/gugulethu/code/semantiq/lab/theCompiler/build/routes';
+
+  // Wait for the directory cleanup to finish before proceeding
+  await cleanupDirectory(destDirBase);
+  // Run the tasks sequentially
+  await compileCustomTags(sourceDir);
+  //await validateIfSyntax();  // Uncomment if needed
+  await componentParser(destDir);
+  await transformer(destDir);
+  await routesGenerator(sourceDir,destDir);
+
+}
+
+main(sourceDir,destDir, destDirBase)
   .then(() => {
     console.log('\x1b[32mCompilation completed successfully!\x1b[0m');
   })
   .catch((error) => {
     console.error('\x1b[31m' + error + '\x1b[0m');
   });
-
-
-
-
-  async function routesGenerator() {
-    return Promise.resolve()
-        .then(async () => {
-            console.log('Generating route based files');
-            // Dynamic import of the bundler module
-            const routesModule = await import('./fileBasedRouteGenerator.js');
-            // Traverse the directory
-            routesModule.generateFileBasedRoutes(routesDest);
-            //return "Files bound successfully";
-        })
-        .then(() => {
-            console.log("Route generation completed");
-            //addScripts();
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-
-
-
-
-}
-
