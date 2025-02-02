@@ -112,3 +112,30 @@ main()
   .catch((error) => {
     console.error('\x1b[31m' + error + '\x1b[0m');
   });
+
+
+
+
+  async function routesGenerator() {
+    return Promise.resolve()
+        .then(async () => {
+            console.log('Generating route based files');
+            // Dynamic import of the bundler module
+            const routesModule = await import('./fileBasedRouteGenerator.js');
+            // Traverse the directory
+            routesModule.generateFileBasedRoutes(routesDest);
+            //return "Files bound successfully";
+        })
+        .then(() => {
+            console.log("Route generation completed");
+            //addScripts();
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+
+
+
+
+}
+
