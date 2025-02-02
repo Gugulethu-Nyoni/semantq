@@ -1099,7 +1099,7 @@ class Transpiler extends NodeVisitor {
    transformStatic(block) {
     const identifier=block.identifier; 
 
-    console.log("STATIC");
+    //console.log("STATIC");
 
     const targetNode=block.activeNode;
     const parentNode = block.parentNode;
@@ -1166,7 +1166,7 @@ class Transpiler extends NodeVisitor {
   transformReactive(block) {
 
     const identifier=block.identifier; 
-        console.log("REACTIVE");
+        //console.log("REACTIVE");
      // Generate unique ID and placeholder span node
     const targetNode=block.activeNode;
     const parentNode = block.parentNode;
@@ -1862,7 +1862,7 @@ function getActiveNodes(customSyntaxAST, customSyntaxObject, jsAST, nodeStatus, 
 
   if (identifiers && handlers) {
     identifiersInFunctions = visitor.getIdentifiersInFunctions(identifiersOnly, handlers, customSyntaxAST[0], jsAST);
-    console.log("Funcs", identifiersInFunctions);
+    // console.log("Funcs", identifiersInFunctions);
 
   }
 
@@ -2080,7 +2080,7 @@ if ( Array.isArray(staticNode.identifiersInFunctions) && staticNode.identifiersI
 
 
 
-console.log("FDF"<transformedASTs);
+//console.log("FDF"<transformedASTs);
 
  
   let newJsAST; 
@@ -2146,7 +2146,7 @@ console.log("FDF"<transformedASTs);
   
   if (jsCode && parsedHTML) {
 
-    console.log('DONE!');
+    //console.log('DONE!');
  
   writeCodeToFile(jsCode, parsedHTML, appendtoJsScriptTag);
 

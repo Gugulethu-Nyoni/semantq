@@ -98,9 +98,9 @@ async function readSMQHTMLFiles(directory) {
 /**
  * Start the transformation process.
  */
-function transformSMQFiles() {
-  const directory = '../../build/routes'; // src directory
-  return readSMQHTMLFiles(directory);
+export function transformSMQFiles(destDir) {
+  //const directory = '../../build/routes'; // src directory
+  return readSMQHTMLFiles(destDir);
 }
 
-transformSMQFiles();
+//transformSMQFiles();
