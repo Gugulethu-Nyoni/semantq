@@ -1,5 +1,11 @@
 <script>
-let counter = 0;
+let counter = 0; 
+
+
+function incrementer () {
+  
+  counter ++; 
+}
 </script>
 <style>
 .the-button {
@@ -23,13 +29,7 @@ span {
   font-weight: bolder;
 }
 </style>
-<h1> Button has been clicked <span data-bind="counter"> {counter} </span> times. </h1>
-
-<br/>
 <div class="the-button"> I have been clicked <span data-bind="counter"> {counter} times. </span> 
-
-You can update the counter here: 
-<input type="number" data-bind="counter" />
 
 
 </button>
