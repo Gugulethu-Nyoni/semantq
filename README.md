@@ -17,10 +17,23 @@ To install **semantq**, run the following command:
 npm install semantq
 ```
 
+Install Globally (for use anywhere on your system)
+
+To install semantq globally, so that the semantq command is available anywhere in your terminal, run:
+
+```bash
+npm install -g semantq
+```
+
 ## Create a New Project
 
 After installing, create a new project by running:
 
+```bash
+npx semantq create myapp
+```
+
+If you installed semantq globally, you can simply run:
 ```bash
 semantq create myapp
 ```
@@ -36,4 +49,4 @@ cd myapp
 npm run dev
 ```
 
-Your app will be available in the browser at http://localhost:3000 (or the default port).
+Your app will be available in the browser at http://localhost:5173 (or the default port).
