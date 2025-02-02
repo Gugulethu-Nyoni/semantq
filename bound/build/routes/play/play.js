@@ -1,7 +1,13 @@
 
     // Function to create the component markup
     function createComponentMarkup() {
-      let counter = 0;
+      let counter = 0; 
+
+
+function incrementer () {
+  
+  counter ++; 
+}
     }
 
     // Immediately-invoked function expression (IIFE) to execute the createComponentMarkup function
@@ -41,12 +47,7 @@ span {
       const container = document.createElement('div');
       container.id = 'componentContainer';
       document.body.appendChild(container);
-      componentContainer.innerHTML = `<h1> Button has been clicked <span data-bind="counter">0</span> times. </h1>
-<br>
-<div class="the-button"> I have been clicked <span data-bind="counter">0</span> 
-
-You can update the counter here: 
-<input type="number" data-bind="counter" value="0">
+      componentContainer.innerHTML = `<div class="the-button"> I have been clicked <span data-bind="counter">0</span> 
 
 
 
