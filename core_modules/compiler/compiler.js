@@ -14,6 +14,7 @@ const rootDir = process.cwd();
 const sourceDir = path.join(rootDir, 'src/routes');
 const destDir = path.join(rootDir, 'build/routes');
 const destDirBase = path.join(rootDir, 'build');
+const componentsSrc = path.join(rootDir, 'src/components');
 const componentsDest = path.join(rootDir, 'build/components');
 
 
@@ -103,6 +104,23 @@ async function componentParser(destDir) {
   }
 }
 
+
+
+async function importsResolution(destDir) {
+  try {
+    //console.log("Component parsing");
+    const resolver = await import('./resolve_imports.js');
+    const res = resolver.importsResolver(destDir)
+    //console.log("Resolved", res);
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+
+
+
 async function transformer(destDir) {
   try {
     //console.log("Transforming Components");
@@ -118,20 +136,18 @@ async function transformer(destDir) {
 
 async function routesGenerator(sourceDir,destDir) {
   try {
-    console.log('Generating route based files');
+    //console.log('Generating route based files');
     // Dynamic import of the bundler module
     const routesModule = await import('./fileBasedRouteGenerator.js');
     // Traverse the directory and generate routes
     routesModule.generateFileBasedRoutes(destDir);
-    console.log('Route generation completed');
+    //console.log('Route generation completed');
    // Copy routes.json from sourceDir to destDir
     const sourceRoutesFile = path.join(sourceDir, 'routes.json');
     const destRoutesFile = path.join(destDir, 'routes.json');
 
     await fse.copy(sourceRoutesFile, destRoutesFile);
-    console.log(`Copied routes.json from ${sourceDir} to ${destDir}`);
-
-
+   // console.log(`Copied routes.json from ${sourceDir} to ${destDir}`);
 
 
   } catch (error) {
@@ -145,10 +161,23 @@ async function main(sourceDir,destDir, destDirBase) {
   // Wait for the directory cleanup to finish before proceeding
   await cleanupDirectory(destDirBase);
   // Run the tasks sequentially
-  await compileCustomTags(sourceDir);
+  await compileCustomTags(sourceDir); // routes
+  await compileCustomTags(componentsSrc); // components
+
   //await validateIfSyntax();  // Uncomment if needed
+
+  // generate page and components ASTs
   await componentParser(destDir);
+  await componentParser(componentsDest);
+
+/// 
+  await importsResolution(destDir);
+
+
+
   await transformer(destDir);
+  await transformer(componentsDest);
+
   await routesGenerator(sourceDir,destDir);
 
 }
