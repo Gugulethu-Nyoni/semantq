@@ -424,8 +424,10 @@ class AnyVisitor extends NodeVisitor {
     if (results) {
       results.forEach(result => {
 
+        //console.log("HERE",result.targetNode.value[0].raw);
+
        // console.log("HERE", result); return;
-        const handler = result.targetNode.value[0].name.name.replace('()','');
+        const handler = result.targetNode.value[0].raw.replace('()','');
         if (handler) {
           handlersObject.push(handler);
         }
@@ -599,16 +601,20 @@ class TransformEventHandlerNodes extends NodeVisitor {
   
     const node=subRootNodeChildren.children[0];
     function _walk(node) {
+      //console.warn(node.type);
     if (!node) return; // Return if the node is null or undefined
 
     // Process node if it matches the criteria
     if (node.type && node.type === 'Attribute') {
         if (typeof node.name === 'object' && node.name.type === 'EventHandler') {
 
-          //console.log(node.value[0].name.name);
-        const tranformedfunctionIdentifier = node.value[0].name.name + "()";
-        //console.log(tranformedfunctionIdentifier);
-        node.value[0].name.name = tranformedfunctionIdentifier; 
+          //console.log("THIS",node.value[0].raw);
+          //return;
+
+        const functionIdentifier= node.value[0].raw.replace(/{|}/g, '');
+        const tranformedfunctionIdentifier = functionIdentifier + "()";
+        //console.log("ANY",tranformedfunctionIdentifier);
+        node.value[0].raw = tranformedfunctionIdentifier; 
         const transformOnEvent= 'on'+node.name.name;
         node.name.name = transformOnEvent;
 
