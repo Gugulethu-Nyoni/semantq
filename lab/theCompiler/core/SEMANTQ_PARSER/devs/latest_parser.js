@@ -4807,7 +4807,7 @@ function peg$parse(input, options) {
   }
 }
 
-export default {
+module.exports = {
   StartRules: ["start"],
   SyntaxError: peg$SyntaxError,
   parse: peg$parse
