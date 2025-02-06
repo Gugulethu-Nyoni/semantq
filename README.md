@@ -48,5 +48,8 @@ cd myapp
 ```bash
 npm run dev
 ```
+## Documentation
+
+For a detailed syntax guide, check out the [Semantq Syntax Guide](docs/Semantq-Syntax.md).
 
 Your app will be available in the browser at http://localhost:5173 (or the default port).
