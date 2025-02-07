@@ -203,11 +203,6 @@ const result = parser.parse(template);
 console.log(result);
 ```
 
----
-
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
 
 
 # Semantq Grammar Blocks RoadMap 
@@ -291,4 +286,12 @@ Semantq simplifies templating and dynamic HTML generation with:
 - Slot-based scoped props
 
 This makes it ideal for creating structured, dynamic content efficiently. 
+
+
+---
+
+## License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+
 
