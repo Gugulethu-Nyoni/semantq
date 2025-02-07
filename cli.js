@@ -22,7 +22,9 @@ const copyIfExists = async (source, destination) => {
   }
 };
 
-// Define the command to generate the project structure
+// ===============================
+//  CREATE NEW PROJECT COMMAND
+// ===============================
 program
   .command('create <projectName>')
   .description('Generate the project structure')
@@ -75,4 +77,71 @@ program
     }
   });
 
+// ===============================
+//  INSTALL TAILWIND COMMAND
+// ===============================
+program
+  .command('install:tailwind')
+  .description('Install and configure Tailwind CSS for Semantq')
+  .action(() => {
+    try {
+      console.log('📦 Installing Tailwind CSS...');
+      execSync('npm install --save-dev tailwindcss postcss autoprefixer', { stdio: 'inherit' });
+      execSync('npx tailwindcss init -p', { stdio: 'inherit' });
+
+      const tailwindConfigPath = path.join(process.cwd(), 'tailwind.config.js');
+      const globalCSSPath = path.join(process.cwd(), 'src/styles/global.css');
+
+      // Modify Tailwind config
+      fs.writeFileSync(tailwindConfigPath, `module.exports = {
+  content: ["./src/**/*.{html,js,svelte,smq}"],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};`);
+
+      // Append Tailwind directives to global CSS
+      fs.appendFileSync(globalCSSPath, '\n@tailwind base;\n@tailwind components;\n@tailwind utilities;');
+
+      console.log('✅ Tailwind CSS installed and configured successfully!');
+    } catch (error) {
+      console.error('❌ Error installing Tailwind CSS:', error.message);
+    }
+  });
+
+// ===============================
+//  CREATE ROUTE COMMAND
+// ===============================
+program
+  .command('make:route <routeName>')
+  .description('Create a new route in src/routes')
+  .action((routeName) => {
+    const routesDir = path.join(process.cwd(), 'src/routes');
+    const routePath = path.join(routesDir, routeName);
+
+    try {
+      if (!fs.existsSync(routesDir)) {
+        fs.mkdirSync(routesDir, { recursive: true });
+      }
+
+      if (fs.existsSync(routePath)) {
+        console.warn(`⚠️ Route '${routeName}' already exists.`);
+        return;
+      }
+
+      fs.mkdirSync(routePath, { recursive: true });
+
+      // Create necessary files
+      fs.writeFileSync(path.join(routePath, '+page.smq'), '// Page logic here', 'utf-8');
+      fs.writeFileSync(path.join(routePath, '+layout.smq'), '// Layout logic here', 'utf-8');
+      fs.writeFileSync(path.join(routePath, '+server.js'), '// Server-side logic here\nmodule.exports = {};', 'utf-8');
+
+      console.log(`✅ Route '${routeName}' created successfully!`);
+    } catch (error) {
+      console.error(`❌ Error creating route '${routeName}':`, error.message);
+    }
+  });
+
+// Parse CLI arguments
 program.parse(process.argv);
