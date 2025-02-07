@@ -1,0 +1,252 @@
+{
+  "jsAST": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 28,
+      "body": [
+        {
+          "type": "ExpressionStatement",
+          "start": 1,
+          "end": 27,
+          "expression": {
+            "type": "CallExpression",
+            "start": 1,
+            "end": 26,
+            "callee": {
+              "type": "MemberExpression",
+              "start": 1,
+              "end": 12,
+              "object": {
+                "type": "Identifier",
+                "start": 1,
+                "end": 8,
+                "name": "console"
+              },
+              "property": {
+                "type": "Identifier",
+                "start": 9,
+                "end": 12,
+                "name": "log"
+              },
+              "computed": false,
+              "optional": false
+            },
+            "arguments": [
+              {
+                "type": "Literal",
+                "start": 13,
+                "end": 25,
+                "value": "testing...",
+                "raw": "\"testing...\""
+              }
+            ],
+            "optional": false
+          }
+        }
+      ],
+      "sourceType": "module"
+    }
+  },
+  "cssAST": {
+    "type": "CSS",
+    "content": {
+      "raws": {
+        "after": "\n"
+      },
+      "type": "root",
+      "nodes": [],
+      "source": {
+        "end": {
+          "column": 1,
+          "line": 2,
+          "offset": 1
+        },
+        "inputId": 0,
+        "start": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        }
+      },
+      "lastEach": 1,
+      "indexes": {},
+      "inputs": [
+        {
+          "hasBOM": false,
+          "css": "\n",
+          "file": "/Users/gugulethu/code/play/semantq_tests/dd/schoolapp/style"
+        }
+      ]
+    }
+  },
+  "customAST": {
+    "type": "Custom",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 154,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 154,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "start": 15,
+                    "end": 138,
+                    "type": "Element",
+                    "name": "div",
+                    "attributes": [
+                      {
+                        "start": 20,
+                        "end": 26,
+                        "type": "Attribute",
+                        "name": "id",
+                        "value": [
+                          {
+                            "start": 24,
+                            "end": 25,
+                            "type": "Text",
+                            "raw": "1",
+                            "data": "1"
+                          }
+                        ]
+                      }
+                    ],
+                    "children": [
+                      [
+                        {
+                          "start": 28,
+                          "end": 131,
+                          "type": "Element",
+                          "name": "div",
+                          "attributes": [
+                            {
+                              "start": 33,
+                              "end": 39,
+                              "type": "Attribute",
+                              "name": "id",
+                              "value": [
+                                {
+                                  "start": 37,
+                                  "end": 38,
+                                  "type": "Text",
+                                  "raw": "2",
+                                  "data": "2"
+                                }
+                              ]
+                            }
+                          ],
+                          "children": [
+                            [
+                              {
+                                "start": 41,
+                                "end": 124,
+                                "type": "Element",
+                                "name": "div",
+                                "attributes": [
+                                  {
+                                    "start": 46,
+                                    "end": 52,
+                                    "type": "Attribute",
+                                    "name": "id",
+                                    "value": [
+                                      {
+                                        "start": 50,
+                                        "end": 51,
+                                        "type": "Text",
+                                        "raw": "3",
+                                        "data": "3"
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "children": [
+                                  [
+                                    {
+                                      "start": 54,
+                                      "end": 117,
+                                      "type": "Element",
+                                      "name": "section",
+                                      "attributes": [
+                                        {
+                                          "start": 63,
+                                          "end": 69,
+                                          "type": "Attribute",
+                                          "name": "id",
+                                          "value": [
+                                            {
+                                              "start": 67,
+                                              "end": 68,
+                                              "type": "Text",
+                                              "raw": "4",
+                                              "data": "4"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "start": 72,
+                                            "end": 106,
+                                            "type": "Element",
+                                            "name": "div",
+                                            "attributes": [
+                                              {
+                                                "start": 77,
+                                                "end": 89,
+                                                "type": "Attribute",
+                                                "name": "class",
+                                                "value": [
+                                                  {
+                                                    "start": 84,
+                                                    "end": 88,
+                                                    "type": "Text",
+                                                    "raw": "card",
+                                                    "data": "card"
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              [
+                                                {
+                                                  "start": 91,
+                                                  "end": 100,
+                                                  "type": "Element",
+                                                  "name": "slot",
+                                                  "attributes": null,
+                                                  "children": []
+                                                }
+                                              ]
+                                            ]
+                                          }
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                ]
+                              }
+                            ]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

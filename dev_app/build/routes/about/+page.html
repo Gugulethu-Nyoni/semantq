@@ -1,0 +1,37 @@
+
+<script type="module">
+  import Button from "$components/Button.smq";
+import Card from "$components/Card.smq";
+function handleClick() {
+  console.log("Button clicked!");
+}
+
+  
+    
+    document.addEventListener("DOMContentLoaded", function() {
+    
+ window.handleClick=handleClick;
+    });
+</script>
+
+<style>
+  
+</style>
+
+<customSyntax
+  ><div id="1">
+    <div id="2">
+      <div id="3">
+        <section id="4">
+          <Card
+            ><button
+              label="Inside Card"
+              [object
+              Object]="{handleClick}"
+            ></button
+          ></Card>
+        </section>
+      </div>
+    </div></div
+></customSyntax>
+
