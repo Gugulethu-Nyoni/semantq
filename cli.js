@@ -74,6 +74,8 @@ program
       execSync('npm install --save-dev vite@latest vite-plugin-html@latest', { cwd: projectPath, stdio: 'inherit' });
 
       console.log(`✅ Project structure generated successfully at ${projectPath}`);
+      console.log(`Now you can run this command to go to ${projectName} project directory: cd ${projectName}`);
+
     } catch (error) {
       console.error('❌ Error generating project:', error.message);
       console.error('Stack trace:', error.stack);
