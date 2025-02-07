@@ -3,6 +3,9 @@ const { program } = require('commander');
 const fs = require('fs-extra');
 const path = require('path');
 const { execSync } = require('child_process');
+const packageJson = require('./package.json'); // Import package.json
+
+program.version(packageJson.version, '-v, --version', 'Output the current version of semantq');
 
 // Utility function for safely copying directories
 const safeCopySync = (source, destination) => {
