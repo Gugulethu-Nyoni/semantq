@@ -1,13 +1,12 @@
 import parser from './devs/latest_parser.js';
 
 const template = `
-  <div>
-    <p>{message}</p>
-    @if(showButton)
-      <button @click={handleClick}>Click Me</button>
-    @endif
-  </div>
+ <div>
+  <slot let:name let:age>
+    <p>{name} is {age} years old.</p>
+  </slot>
+</div>
 `;
 
 const result = parser.parse(template);
-console.log(result);
+console.log(JSON.stringify(result,null,2));
