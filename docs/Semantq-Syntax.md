@@ -254,6 +254,13 @@ Semantq allows event handlers using the `@event` syntax:
 <button @click={incrementer}> + </button>
 ```
 
+## Event Handler Function Calls with Parameters
+Functions can be called with parameters inside event handlers.
+
+```html
+<button @click={incrementer(34)}> + </button>
+```
+
 ## Mustache Attributes
 Attributes can use mustache syntax to bind dynamic values.
 
@@ -261,12 +268,6 @@ Attributes can use mustache syntax to bind dynamic values.
 <input type="text" value={userInput} />
 ```
 
-## Event Handler Function Calls with Parameters
-Functions can be called with parameters inside event handlers.
-
-```html
-<button @click={incrementer(34)}> + </button>
-```
 
 ## Slot Prop Attributes
 Slots can expose props using `let:propName`, allowing dynamic content inside slots.
