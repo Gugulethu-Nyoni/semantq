@@ -207,6 +207,8 @@ console.log(result);
 
 # Semantq Grammar Blocks RoadMap 
 
+## Existing Blocks
+
 Semantq provides a simple yet powerful syntax for handling HTML, templating, event handling, and slot composition. Below are key features with examples:
 
 ## Basic HTML Structure
