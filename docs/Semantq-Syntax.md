@@ -208,3 +208,87 @@ console.log(result);
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
+
+
+# Semantq Grammar Blocks RoadMap 
+
+Semantq provides a simple yet powerful syntax for handling HTML, templating, event handling, and slot composition. Below are key features with examples:
+
+## Basic HTML Structure
+Semantq supports standard HTML syntax, including nested elements.
+
+```html
+<table>
+  <tr>
+    <td>Row 1, Column 1</td>
+    <td>Row 1, Column 2</td>
+  </tr>
+  <tr>
+    <td>Row 2, Column 1</td>
+    <td>Row 2, Column 2</td>
+  </tr>
+</table>
+```
+
+## Self-Closing Tags
+Semantq supports self-closing tags similar to HTML:
+
+```html
+<br/>
+<hr/>
+<input type="text" name="age" required />
+```
+
+## Mustache Tags
+Mustache syntax allows for dynamic content insertion inside elements or as standalone expressions.
+
+```html
+<h1>Hello {name}</h1>
+```
+
+```html
+{name}
+```
+
+## Event Handlers
+Semantq allows event handlers using the `@event` syntax:
+
+```html
+<button @click={incrementer}> + </button>
+```
+
+## Mustache Attributes
+Attributes can use mustache syntax to bind dynamic values.
+
+```html
+<input type="text" value={userInput} />
+```
+
+## Event Handler Function Calls with Parameters
+Functions can be called with parameters inside event handlers.
+
+```html
+<button @click={incrementer(34)}> + </button>
+```
+
+## Slot Prop Attributes
+Slots can expose props using `let:propName`, allowing dynamic content inside slots.
+
+```html
+<div>
+  <slot let:name let:age>
+    <p>{name} is {age} years old.</p>
+  </slot>
+</div>
+```
+
+## Summary
+Semantq simplifies templating and dynamic HTML generation with:
+- Standard HTML elements
+- Self-closing tags
+- Mustache syntax for data binding
+- Event handlers and function calls with parameters
+- Slot-based scoped props
+
+This makes it ideal for creating structured, dynamic content efficiently. 
+
