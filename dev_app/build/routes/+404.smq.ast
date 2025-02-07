@@ -153,7 +153,7 @@
         {
           "hasBOM": false,
           "css": "\n\n.error-div {\nborder: 1px dashed red;\npadding: 10px;\nborder-radius: 25px;\nbackground-color: #fff;\n}\n\n",
-          "file": "/Users/gugulethu/code/play/semantq_tests/dd/schoolapp/style"
+          "file": "/Users/gugulethu/code/semantq/dev_app/style"
         }
       ]
     }
