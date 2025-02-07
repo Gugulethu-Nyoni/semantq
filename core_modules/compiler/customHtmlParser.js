@@ -425,7 +425,11 @@ function processAttributes(attributes) {
       attribute.value[0].name.type === 'Identifier'
     ) {
       attrString = ` ${attrName}='{${attribute.value[0].name.name}}'`;
-    } else if (attrName.toLowerCase().startsWith('smq-'.toLowerCase())) {
+    } else if (attribute.smqtype && attribute.smqtype === 'SlotPropAttribute') {
+      attrString = ` ${attribute.name}:${attribute.value} `
+    }
+
+    else if (attrName.toLowerCase().startsWith('smq-'.toLowerCase())) {
       attrString = ` ${attrName}`;
     }
 
