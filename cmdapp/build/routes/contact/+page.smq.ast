@@ -4,7 +4,7 @@
     "content": {
       "type": "Program",
       "start": 0,
-      "end": 26,
+      "end": 48,
       "body": [
         {
           "type": "ExpressionStatement",
@@ -44,6 +44,32 @@
             ],
             "optional": false
           }
+        },
+        {
+          "type": "VariableDeclaration",
+          "start": 26,
+          "end": 46,
+          "declarations": [
+            {
+              "type": "VariableDeclarator",
+              "start": 30,
+              "end": 45,
+              "id": {
+                "type": "Identifier",
+                "start": 30,
+                "end": 34,
+                "name": "name"
+              },
+              "init": {
+                "type": "Literal",
+                "start": 37,
+                "end": 45,
+                "value": "World!",
+                "raw": "\"World!\""
+              }
+            }
+          ],
+          "kind": "let"
         }
       ],
       "sourceType": "script"
@@ -138,12 +164,12 @@
       {
         "html": {
           "start": 0,
-          "end": 146,
+          "end": 160,
           "type": "Fragment",
           "children": [
             {
               "start": 0,
-              "end": 146,
+              "end": 160,
               "type": "Element",
               "name": "customSyntax",
               "attributes": null,
@@ -151,7 +177,7 @@
                 [
                   {
                     "start": 15,
-                    "end": 130,
+                    "end": 144,
                     "type": "Element",
                     "name": "div",
                     "attributes": [
@@ -175,7 +201,7 @@
                       [
                         {
                           "start": 28,
-                          "end": 123,
+                          "end": 137,
                           "type": "Element",
                           "name": "div",
                           "attributes": [
@@ -199,7 +225,7 @@
                             [
                               {
                                 "start": 41,
-                                "end": 116,
+                                "end": 130,
                                 "type": "Element",
                                 "name": "div",
                                 "attributes": [
@@ -223,7 +249,7 @@
                                   [
                                     {
                                       "start": 54,
-                                      "end": 109,
+                                      "end": 123,
                                       "type": "Element",
                                       "name": "section",
                                       "attributes": [
@@ -247,7 +273,7 @@
                                         [
                                           {
                                             "start": 71,
-                                            "end": 98,
+                                            "end": 112,
                                             "type": "Element",
                                             "name": "h1",
                                             "attributes": [
@@ -269,7 +295,68 @@
                                               }
                                             ],
                                             "children": [
-                                              []
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Hello ",
+                                                  "data": "Hello "
+                                                },
+                                                {
+                                                  "type": "MustacheIdentifier",
+                                                  "start": {
+                                                    "offset": 100,
+                                                    "line": 2,
+                                                    "column": 30
+                                                  },
+                                                  "end": {
+                                                    "offset": 106,
+                                                    "line": 2,
+                                                    "column": 36
+                                                  },
+                                                  "expression": {
+                                                    "type": "Identifier",
+                                                    "start": {
+                                                      "offset": 100,
+                                                      "line": 2,
+                                                      "column": 30
+                                                    },
+                                                    "end": {
+                                                      "offset": 106,
+                                                      "line": 2,
+                                                      "column": 36
+                                                    },
+                                                    "name": {
+                                                      "type": "Identifier",
+                                                      "start": {
+                                                        "offset": 101,
+                                                        "line": 2,
+                                                        "column": 31
+                                                      },
+                                                      "end": {
+                                                        "offset": 105,
+                                                        "line": 2,
+                                                        "column": 35
+                                                      },
+                                                      "name": "name"
+                                                    },
+                                                    "loc": {
+                                                      "start": {
+                                                        "line": 1,
+                                                        "column": 2
+                                                      },
+                                                      "end": {
+                                                        "line": 1,
+                                                        "column": 3
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "Text",
+                                                  "raw": " ",
+                                                  "data": " "
+                                                }
+                                              ]
                                             ]
                                           }
                                         ]

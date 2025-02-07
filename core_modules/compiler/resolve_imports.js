@@ -117,7 +117,7 @@ export async function importsResolver(destDir) {
 
       // If no imports are found, skip this file
       if (imports.length === 0) {
-        console.log(`No imports found in ${astFile}. Skipping.`);
+        //console.log(`No imports found in ${astFile}. Skipping.`);
         return null; // Return null if no imports
       }
 
