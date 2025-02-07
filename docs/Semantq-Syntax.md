@@ -291,11 +291,6 @@ Semantq simplifies templating and dynamic HTML generation with:
 This makes it ideal for creating structured, dynamic content efficiently. 
 
 
----
-
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
 
 
 # Syntax Blocks to Be Added
@@ -411,6 +406,13 @@ For async blocks, you can provide a fallback UI while waiting for data.
 ### Semantq Syntax Philosophy:
 
 Consistency, intuition, flexibility, elegance and efficiency. 
+
+
+---
+
+## License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
 
 
 
