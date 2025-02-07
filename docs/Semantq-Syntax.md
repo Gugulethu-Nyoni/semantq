@@ -298,3 +298,119 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 
 
+# Syntax Blocks to Be Added
+
+
+### 1. **Logic Blocks (Loops and Conditionals)**
+
+
+
+```html
+<ul>
+  {@for item in items}
+    <li>{item.name}</li>
+  {@endfor}
+</ul>
+```
+
+
+#### @if Logic Block 
+
+
+```html
+{@if user.loggedIn}
+  <p>Welcome back, {user.name}!</p>
+{@else}
+  <p>Please log in.</p>
+{@endif}
+```
+
+### 2. **Async/Await Support**
+
+
+
+```html
+{@await fetchData()}
+  <p>Loading...</p>
+{@then data}
+  <p>{data}</p>
+{@catch error}
+  <p>Error: {error.message}</p>
+{@endawait}
+```
+
+
+### 3. **Combining Logic Blocks**
+
+You can combine these logic blocks for more complex scenarios. For example:
+
+```html
+{@if items.length > 0}
+  <ul>
+    {@for item in items}
+      <li>{item.name}</li>
+    {@endfor}
+  </ul>
+{@else}
+  <p>No items found.</p>
+{@endif}
+```
+
+### 4. @Each Logic Block
+
+
+```html
+<ul>
+  {@for item, index in items}
+    <li>{index + 1}. {item.name}</li>
+  {@endfor}
+</ul>
+```
+
+
+### 5. **Keyed Lists**
+
+For performance optimization, Semantq offers a `key` attribute for lists, in a fashion similar to React or SolidJS.
+
+```html
+<ul>
+  {@for item in items key="id"}
+    <li>{item.name}</li>
+  {@endfor}
+</ul>
+```
+
+- **Rationale?**
+  - Helps with efficient DOM updates by tracking items by a unique key.
+  - Keeps the syntax simple and declarative.
+
+
+
+### 6. **Async Blocks with Fallbacks**
+
+For async blocks, you can provide a fallback UI while waiting for data.
+
+#### Proposed Syntax:
+```html
+{@await fetchData()}
+  <p>Loading...</p>
+{@then data}
+  <p>{data}</p>
+{@catch error}
+  <p>Error: {error.message}</p>
+{@else}
+  <p>No data available.</p>
+{@endawait}
+```
+
+- **Rationale**
+  - Adds an optional `@else` block for cases where no data is returned.
+  - Makes it easy to handle all possible states (loading, success, error, empty).
+
+
+### Semantq Syntax Philosophy:
+
+Consistency, intuition, flexibility, elegance and efficiency. 
+
+
+
