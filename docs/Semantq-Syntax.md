@@ -189,7 +189,7 @@ The grammar is defined using Peggy.js and supports the following constructs:
 To use the Semantq grammar, include the Peggy.js parser in your project and parse templates using the provided grammar rules.
 
 ```javascript
-const parser = require('./semantq-grammar');
+import parser from './semantq-grammar.js';
 const template = `
   <div>
     <p>{message}</p>
