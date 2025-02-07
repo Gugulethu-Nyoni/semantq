@@ -1,5 +1,5 @@
 {
-    "name": "routing",
+    "name": "myapp",
     "version": "1.0.0",
     "description": "",
     "type": "module",
@@ -15,8 +15,6 @@
     "author": "",
     "license": "ISC",
     "devDependencies": {
-        "@swc/cli": "^0.3.12",
-        "@swc/core": "^1.4.11",
         "@types/node": "^20.12.2",
         "autoprefixer": "^10.4.19",
         "commander": "^9.2.0",
@@ -34,6 +32,7 @@
         "canvas": "^2.11.2",
         "cheerio": "^1.0.0-rc.12",
         "cors": "^2.8.5",
+        "escodegen": "^2.1.0",
         "express": "^4.19.2",
         "fs-extra": "^11.2.0",
         "he": "^1.2.0",

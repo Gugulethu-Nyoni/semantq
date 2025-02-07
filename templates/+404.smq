@@ -1,5 +1,6 @@
 <script>
-//alert('Page not found!');
+alert('Page not found!');
+console.log("Page not found!");
 </script>
 
 <style>
