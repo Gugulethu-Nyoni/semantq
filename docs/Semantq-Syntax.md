@@ -168,8 +168,8 @@ Slot prop attributes are used to pass data to slots in custom components. The sy
 
 ### Example 3: Slot Prop Attributes
 ```html
-<div let:age>
-  <p>Age: {age}</p>
+<div let:name let:age>
+  <p> Name: {name} Age: {age} </p>
 </div>
 ```
 
@@ -202,7 +202,6 @@ const template = `
 const result = parser.parse(template);
 console.log(result);
 ```
-
 
 
 # Semantq Grammar Blocks RoadMap 
