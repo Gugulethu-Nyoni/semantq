@@ -1,0 +1,12 @@
+script:
+console.log("testing...");
+end:
+
+style:
+end:
+
+html:
+  <div class="card">
+    <slot />
+  </div>
+end:

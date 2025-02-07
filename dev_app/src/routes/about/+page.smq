@@ -1,0 +1,14 @@
+script:
+  import Button from "$components/Button.smq";
+  import Card from "$components/Card.smq";
+
+  function handleClick() {
+    console.log("Button clicked!");
+  }
+end:
+
+html:
+  <Card>
+    <Button label="Inside Card" @click="{handleClick}" />
+  </Card>
+end:
