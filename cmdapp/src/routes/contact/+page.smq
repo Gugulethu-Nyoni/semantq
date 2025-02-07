@@ -2,6 +2,8 @@ script:
 
 console.log("within");
 
+let name = "World!";
+
 end: 
 
 style:
@@ -10,4 +12,4 @@ h1 {color: red}
 
 end: 
 
-<h1 let:name let:age> </h1> 
+<h1 let:name let:age>  Hello {name} </h1> 

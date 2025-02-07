@@ -96,7 +96,7 @@ async function validateIfSyntax() {
 async function componentParser(destDir) {
   try {
     //console.log("Component parsing");
-    const validate = await import('./componentParser.mjs');
+    const validate = await import('./componentParser.js');
     validate.compileSMQFiles(destDir)// = await import('./componentParser.js');
     //console.log("Done: component parsing");
   } catch (error) {
