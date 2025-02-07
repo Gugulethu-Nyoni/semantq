@@ -24,9 +24,8 @@ Follow these steps to fix the issue: <br/>
 <li> Go to your termial and cd to project route </li>
 <li> run this command to create a new route: npm run semantiq make:route nameofroute
  </li>
- <li> Your new route will be created in src/routes with required files and you can add contents as you need. 
- </li> 
+ <li> Your new route will be created in src/routes with required files and you can add contents as you need.  
 </ol>
 
 
-</div> 
+<div> 
