@@ -237,7 +237,7 @@
         {
           "hasBOM": false,
           "css": "\nbutton {\npadding: 8px 12px;\nbackground: blue;\ncolor: white;\nborder: none;\ncursor: pointer;\n}\n",
-          "file": "/Users/gugulethu/code/play/semantq_tests/dd/schoolapp/style"
+          "file": "/Users/gugulethu/code/semantq/dev_app/style"
         }
       ]
     }
@@ -542,7 +542,7 @@
         {
           "hasBOM": false,
           "css": "\n",
-          "file": "/Users/gugulethu/code/play/semantq_tests/dd/schoolapp/style"
+          "file": "/Users/gugulethu/code/semantq/dev_app/style"
         }
       ]
     }
