@@ -1,141 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title> SEMANTQ - Build with SEMANTQ </title>
-
-
-
-<link rel="stylesheet" href="global.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SemantQ - Welcome to the Future</title>
+  <meta name="description" content="SemantQ is a revolutionary JavaScript framework for building modern, semantic, and high-performance web applications.">
+  <link rel="stylesheet" type="text/css" href="./global.css" semantq-css>
 </head>
-<body>
+<body class="dark-mode"> <!-- Set default theme to dark-mode here -->
+  <!-- Theme Toggle Button -->
+  <button id="theme-toggle" class="theme-toggle">☀️</button>
 
-<div id="theme-toggle" class="icon">
-<!-- <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-<path d="M16 30C8.28 30 2 23.72 2 16C2 8.28 8.28 2 16 2C23.72 2 30 8.28 30 16C30 23.72 23.72 30 16 30Z" />
-</svg> 
+  <div id="semantqComponent"></div>
 
-<button id="theme-toggle">Dark Theme</button>
-
--->
-
-<a href="/" style="float: right; margin-right: 100px; margin-top: 2px;"> Home </a>
-
-
-
-
-</div>
-
-<div id="dynamicComponentPlaceholder">
-
-
-<!-- YOU REPLACE CONTENT IN THE BLOCK BELOW WITH YOUR CONTENT -->
-
-<main>
-<div class="grid-container">
-<div class="grid-item">
-
-    <h1> Hooray! your first app in </h1>
-
-    <div style="display: block; margin-top: -70px;">
-
-    <h1 style="font-size: 5rem;"> <span style="color:#0C1A53;" class="bordered-text">SEMA</span><span style="color:#60A5FA">NTQ</span> </h1>
-
-<!--
-<div style="text-align: center; margin-top: -80px;">
-<img src="logo.png" width="200" height="230">
-</div>
-
---> 
-
-</div>
-
-    
-
-
-
-   
-
-
-        <div style="display: block; margin-top: -20px; width: 40%; text-align: justify;">
-
-           <!--
-
-           <p>
-            SEMANTQ is a disruptive JavaScript Framework that simplifies and accelerates digital transformation across industry, business, and governance through Machine Learning, IoT, Blockchain, AI, Robotics, and Big Data. <br/> 
-            <p> 
-
-            -->
-
-
-            <h3 style="text-align: center;"> Now start building something cool.  </h3>
-
-
- </div>
-
-
-  <div style="display: block; margin-top: -10px;">
-
-<br/> 
-
-Navigation
-
-
-        <nav>
-            <ul style="list-style: none; text-align: center; text-decoration: none!important;">
-              <li> <a href="/">  Home </a> </li>
-                
-                <!-- <li> <a href="/start">  START HERE </a> </li>
-                <li> <a href="/docs"> DOCUMENTATION </a> </li>
-                <li> <a href="/demos"> DEMOS </a> </li>
-                <li> <a href=""> SUPPORT </a> </li>
-                <li> <a href="/user/:16/profile?product=shirt&color=blue&newuser&size=m"> Test Declared Search Params </a> </li> 
-
-                <li> <a href="/start?product=shirt&color=blue&newuser&size=m"> Test File Based with Search Params </a> </li> 
-
-                <li> <a href="https://google.com"> Test Canonical  </a> </li> 
-                <li> <a href="/tailwinder"> Test TailWind </a> </li>
-                <li> <a href="/components"> ReUsable Components </a> </li>
-              --> 
-
-
-
-                <!--<li> <a href=""> </a> </li> --> 
-            </ul>
-        </nav>
-
-
-        
+  <div class="container">
+    <h1>Welcome to SemantQ</h1>
+    <h2>The Future of Modern Web Development</h2>
+    <div class="cta-buttons">
+      <a href="#" class="btn btn-primary">Get Started</a>
+      <a href="#" class="btn btn-secondary">Learn More</a>
     </div>
+    <div class="features">
+      <div class="feature">
+        <h3>Lightning Fast</h3>
+        <p>Built for performance, SemantQ ensures your apps run at blazing speeds.</p>
+      </div>
+      <div class="feature">
+        <h3>Intuitive Syntax</h3>
+        <p>Write clean, semantic code with ease using SemantQ's intuitive API.</p>
+      </div>
+      <div class="feature">
+        <h3>Fully Responsive</h3>
+        <p>Create apps that look stunning on any device, from mobile to desktop.</p>
+      </div>
+    </div>
+    <footer>
+      <p>© <span id="year"></span> SemantQ. All rights reserved. | <a href="#">Privacy Policy</a></p>
+    </footer>
+  </div>
 
+  <script>
+    // Set the current year in the footer
+    document.getElementById("year").textContent = new Date().getFullYear();
 
-</div>
+    // Theme Toggle Logic
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
 
+    // Check for saved theme in localStorage
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      body.classList.add(savedTheme);
+      themeToggle.textContent = savedTheme === 'dark-mode' ? '☀️' : '🌙';
+    } else {
+      // Default to dark mode if no theme is set in localStorage
+      body.classList.add('dark-mode');
+      themeToggle.textContent = '☀️'; // Display the sun icon for switching to light mode
+    }
 
-<!-- <div class="grid-item">Grid Item 2</div>
-<div class="grid-item">Grid Item 3</div>
-<div class="grid-item">Grid Item 4</div>
-<div class="grid-item">Grid Item 5</div> -->
-
-
-
-</div>
-</main>
-
-<!-- END OF CUSTOMISABLE BOX --> 
-
-
-
-
-
-<script src="global.js"></script>
-
-
-
-<script src="./core_modules/routing/router.js" type="module" defer>
-    </script>
-
-
+    // Toggle Theme
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+      const isDarkMode = body.classList.contains('dark-mode');
+      themeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+      localStorage.setItem('theme', isDarkMode ? 'dark-mode' : 'light-mode');
+    });
+  </script>
 </body>
 </html>
