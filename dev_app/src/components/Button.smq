@@ -1,0 +1,18 @@
+script:
+  export let label = "Click me";
+  export let onClick;
+end:
+
+style:
+  button {
+    padding: 8px 12px;
+    background: blue;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+end:
+
+html:
+  <button @click="{incrementer}">{label}</button>
+end:
