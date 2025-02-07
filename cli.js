@@ -51,6 +51,12 @@ program
         'public',
       ];
       await Promise.all(directories.map(dir => fs.mkdir(path.join(projectPath, dir), { recursive: true })));
+ 
+
+     // Create empty routes.json in src/routes
+      await fs.writeFile(path.join(projectPath, 'src/routes/routes.json'), '[]');
+
+  
 
       // Copy essential files and directories
       safeCopySync(path.resolve(__dirname, './core_modules'), path.join(projectPath, 'core_modules'));
@@ -99,7 +105,7 @@ program
 
       // Modify Tailwind config
       fs.writeFileSync(tailwindConfigPath, `module.exports = {
-  content: ["./src/**/*.{html,js,svelte,smq}"],
+  content: ["./src/**/*.{html,js,smq}"],
   theme: {
     extend: {},
   },
