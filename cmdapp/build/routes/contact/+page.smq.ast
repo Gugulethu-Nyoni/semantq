@@ -1,0 +1,295 @@
+{
+  "jsAST": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 26,
+      "body": [
+        {
+          "type": "ExpressionStatement",
+          "start": 2,
+          "end": 24,
+          "expression": {
+            "type": "CallExpression",
+            "start": 2,
+            "end": 23,
+            "callee": {
+              "type": "MemberExpression",
+              "start": 2,
+              "end": 13,
+              "object": {
+                "type": "Identifier",
+                "start": 2,
+                "end": 9,
+                "name": "console"
+              },
+              "property": {
+                "type": "Identifier",
+                "start": 10,
+                "end": 13,
+                "name": "log"
+              },
+              "computed": false,
+              "optional": false
+            },
+            "arguments": [
+              {
+                "type": "Literal",
+                "start": 14,
+                "end": 22,
+                "value": "within",
+                "raw": "\"within\""
+              }
+            ],
+            "optional": false
+          }
+        }
+      ],
+      "sourceType": "script"
+    }
+  },
+  "cssAST": {
+    "type": "CSS",
+    "content": {
+      "raws": {
+        "semicolon": false,
+        "after": "\n\n"
+      },
+      "type": "root",
+      "nodes": [
+        {
+          "raws": {
+            "before": "\n\n",
+            "between": " ",
+            "semicolon": false,
+            "after": ""
+          },
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": {
+                "before": "",
+                "between": ": "
+              },
+              "type": "decl",
+              "source": {
+                "end": {
+                  "column": 14,
+                  "line": 3,
+                  "offset": 16
+                },
+                "inputId": 0,
+                "start": {
+                  "column": 5,
+                  "line": 3,
+                  "offset": 6
+                }
+              },
+              "prop": "color",
+              "value": "red"
+            }
+          ],
+          "source": {
+            "end": {
+              "column": 15,
+              "line": 3,
+              "offset": 17
+            },
+            "inputId": 0,
+            "start": {
+              "column": 1,
+              "line": 3,
+              "offset": 2
+            }
+          },
+          "selector": "h1",
+          "lastEach": 1,
+          "indexes": {}
+        }
+      ],
+      "source": {
+        "end": {
+          "column": 1,
+          "line": 5,
+          "offset": 19
+        },
+        "inputId": 0,
+        "start": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        }
+      },
+      "lastEach": 1,
+      "indexes": {},
+      "inputs": [
+        {
+          "hasBOM": false,
+          "css": "\n\nh1 {color: red}\n\n",
+          "file": "/Users/gugulethu/code/semantq/cmdapp/style"
+        }
+      ]
+    }
+  },
+  "customAST": {
+    "type": "Custom",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 146,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 146,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "start": 15,
+                    "end": 130,
+                    "type": "Element",
+                    "name": "div",
+                    "attributes": [
+                      {
+                        "start": 20,
+                        "end": 26,
+                        "type": "Attribute",
+                        "name": "id",
+                        "value": [
+                          {
+                            "start": 24,
+                            "end": 25,
+                            "type": "Text",
+                            "raw": "1",
+                            "data": "1"
+                          }
+                        ]
+                      }
+                    ],
+                    "children": [
+                      [
+                        {
+                          "start": 28,
+                          "end": 123,
+                          "type": "Element",
+                          "name": "div",
+                          "attributes": [
+                            {
+                              "start": 33,
+                              "end": 39,
+                              "type": "Attribute",
+                              "name": "id",
+                              "value": [
+                                {
+                                  "start": 37,
+                                  "end": 38,
+                                  "type": "Text",
+                                  "raw": "2",
+                                  "data": "2"
+                                }
+                              ]
+                            }
+                          ],
+                          "children": [
+                            [
+                              {
+                                "start": 41,
+                                "end": 116,
+                                "type": "Element",
+                                "name": "div",
+                                "attributes": [
+                                  {
+                                    "start": 46,
+                                    "end": 52,
+                                    "type": "Attribute",
+                                    "name": "id",
+                                    "value": [
+                                      {
+                                        "start": 50,
+                                        "end": 51,
+                                        "type": "Text",
+                                        "raw": "3",
+                                        "data": "3"
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "children": [
+                                  [
+                                    {
+                                      "start": 54,
+                                      "end": 109,
+                                      "type": "Element",
+                                      "name": "section",
+                                      "attributes": [
+                                        {
+                                          "start": 63,
+                                          "end": 69,
+                                          "type": "Attribute",
+                                          "name": "id",
+                                          "value": [
+                                            {
+                                              "start": 67,
+                                              "end": 68,
+                                              "type": "Text",
+                                              "raw": "4",
+                                              "data": "4"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "start": 71,
+                                            "end": 98,
+                                            "type": "Element",
+                                            "name": "h1",
+                                            "attributes": [
+                                              {
+                                                "start": 75,
+                                                "end": 84,
+                                                "type": "Attribute",
+                                                "smqtype": "SlotPropAttribute",
+                                                "name": "let",
+                                                "value": "name"
+                                              },
+                                              {
+                                                "start": 84,
+                                                "end": 91,
+                                                "type": "Attribute",
+                                                "smqtype": "SlotPropAttribute",
+                                                "name": "let",
+                                                "value": "age"
+                                              }
+                                            ],
+                                            "children": [
+                                              []
+                                            ]
+                                          }
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                ]
+                              }
+                            ]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

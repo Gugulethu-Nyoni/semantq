@@ -1,0 +1,13 @@
+script: 
+
+console.log("within");
+
+end: 
+
+style:
+
+h1 {color: red}
+
+end: 
+
+<h1 let:name let:age> </h1> 
