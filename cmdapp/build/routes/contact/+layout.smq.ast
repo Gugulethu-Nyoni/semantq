@@ -1,0 +1,182 @@
+{
+  "jsAST": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 0,
+      "body": [],
+      "sourceType": "script"
+    }
+  },
+  "cssAST": {
+    "type": "CSS",
+    "content": {
+      "raws": {
+        "after": ""
+      },
+      "type": "root",
+      "nodes": [],
+      "source": {
+        "end": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        },
+        "inputId": 0,
+        "start": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        }
+      },
+      "lastEach": 1,
+      "indexes": {},
+      "inputs": [
+        {
+          "hasBOM": false,
+          "css": "",
+          "file": "/Users/gugulethu/code/semantq/cmdapp/style"
+        }
+      ]
+    }
+  },
+  "customAST": {
+    "type": "Custom",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 139,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 139,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "start": 15,
+                    "end": 123,
+                    "type": "Element",
+                    "name": "div",
+                    "attributes": [
+                      {
+                        "start": 20,
+                        "end": 26,
+                        "type": "Attribute",
+                        "name": "id",
+                        "value": [
+                          {
+                            "start": 24,
+                            "end": 25,
+                            "type": "Text",
+                            "raw": "1",
+                            "data": "1"
+                          }
+                        ]
+                      }
+                    ],
+                    "children": [
+                      [
+                        {
+                          "start": 28,
+                          "end": 116,
+                          "type": "Element",
+                          "name": "div",
+                          "attributes": [
+                            {
+                              "start": 33,
+                              "end": 39,
+                              "type": "Attribute",
+                              "name": "id",
+                              "value": [
+                                {
+                                  "start": 37,
+                                  "end": 38,
+                                  "type": "Text",
+                                  "raw": "2",
+                                  "data": "2"
+                                }
+                              ]
+                            }
+                          ],
+                          "children": [
+                            [
+                              {
+                                "start": 41,
+                                "end": 109,
+                                "type": "Element",
+                                "name": "div",
+                                "attributes": [
+                                  {
+                                    "start": 46,
+                                    "end": 52,
+                                    "type": "Attribute",
+                                    "name": "id",
+                                    "value": [
+                                      {
+                                        "start": 50,
+                                        "end": 51,
+                                        "type": "Text",
+                                        "raw": "3",
+                                        "data": "3"
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "children": [
+                                  [
+                                    {
+                                      "start": 54,
+                                      "end": 102,
+                                      "type": "Element",
+                                      "name": "section",
+                                      "attributes": [
+                                        {
+                                          "start": 63,
+                                          "end": 69,
+                                          "type": "Attribute",
+                                          "name": "id",
+                                          "value": [
+                                            {
+                                              "start": 67,
+                                              "end": 68,
+                                              "type": "Text",
+                                              "raw": "4",
+                                              "data": "4"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "type": "Text",
+                                            "raw": "// Layout logic here\n",
+                                            "data": "// Layout logic here\n"
+                                          }
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                ]
+                              }
+                            ]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
