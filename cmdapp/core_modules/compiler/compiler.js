@@ -109,8 +109,21 @@ async function componentParser(destDir) {
 async function importsResolution(destDir) {
   try {
     //console.log("Component parsing");
-    const resolver = await import('./resolve_imports.js');
-    const res = resolver.importsResolver(destDir)
+    const resolve = await import('./resolve_imports.js');
+    const res = resolve.importsResolver(destDir);
+    //console.log("Resolved", res);
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+
+async function slotsResolution(destDir) {
+  try {
+    //console.log("Component parsing");
+    const slotResolver = await import('./slotResolver.js');
+    const slotResolved = slotResolver.processMergedFiles(destDir);
     //console.log("Resolved", res);
   } catch (error) {
     throw error;
@@ -120,10 +133,9 @@ async function importsResolution(destDir) {
 
 
 
-
 async function transformer(destDir) {
   try {
-    //console.log("Transforming Components");
+    console.log("Transforming Components");
     const trans = await import('./transformer.js');
     trans.transformSMQFiles(destDir); 
     //console.log("Done: Transforming Components");
@@ -170,13 +182,18 @@ async function main(sourceDir,destDir, destDirBase) {
   await componentParser(destDir);
   await componentParser(componentsDest);
 
-/// 
+/// resolve component imports and slots 
+// so that when we resolve page imports these are sorted
+   await importsResolution(componentsDest);
+   await slotsResolution(componentsDest);
+
   await importsResolution(destDir);
+  //await slotsResolution(destDir);
 
 
 
-  await transformer(destDir);
-  await transformer(componentsDest);
+  //await transformer(destDir);
+  //await transformer(componentsDest);
 
   await routesGenerator(sourceDir,destDir);
 

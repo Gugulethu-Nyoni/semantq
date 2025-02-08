@@ -2,3 +2,4 @@ ignores/
 .DS_Store
 node_modules/
 ARCHIVE/
+cmdapp/

@@ -2193,7 +2193,7 @@ if ( Array.isArray(staticNode.identifiersInFunctions) && staticNode.identifiersI
 ${formattedHTML}
 `;
 
-    const newFilePath = filePath.replace('.smq.ast', '.html');              
+    const newFilePath = filePath.replace('.resolved.ast', '.html');              
 
     fs.unlink(newFilePath, (err) => {
       if (err && err.code !== 'ENOENT') {

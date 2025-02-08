@@ -4,302 +4,9 @@
     "content": {
       "type": "Program",
       "start": 0,
-      "end": 231,
-      "body": [
-        {
-          "type": "VariableDeclaration",
-          "start": 2,
-          "end": 52,
-          "declarations": [
-            {
-              "type": "VariableDeclarator",
-              "start": 8,
-              "end": 51,
-              "id": {
-                "type": "Identifier",
-                "start": 8,
-                "end": 14,
-                "name": "button"
-              },
-              "init": {
-                "type": "CallExpression",
-                "start": 16,
-                "end": 51,
-                "callee": {
-                  "type": "MemberExpression",
-                  "start": 16,
-                  "end": 39,
-                  "object": {
-                    "type": "Identifier",
-                    "start": 16,
-                    "end": 24,
-                    "name": "document"
-                  },
-                  "property": {
-                    "type": "Identifier",
-                    "start": 25,
-                    "end": 39,
-                    "name": "getElementById"
-                  },
-                  "computed": false,
-                  "optional": false
-                },
-                "arguments": [
-                  {
-                    "type": "Literal",
-                    "start": 40,
-                    "end": 50,
-                    "value": "myButton",
-                    "raw": "'myButton'"
-                  }
-                ],
-                "optional": false
-              }
-            }
-          ],
-          "kind": "const"
-        },
-        {
-          "type": "VariableDeclaration",
-          "start": 53,
-          "end": 68,
-          "declarations": [
-            {
-              "type": "VariableDeclarator",
-              "start": 57,
-              "end": 67,
-              "id": {
-                "type": "Identifier",
-                "start": 57,
-                "end": 64,
-                "name": "counter"
-              },
-              "init": {
-                "type": "Literal",
-                "start": 66,
-                "end": 67,
-                "value": 0,
-                "raw": "0"
-              }
-            }
-          ],
-          "kind": "let"
-        },
-        {
-          "type": "ExpressionStatement",
-          "start": 70,
-          "end": 105,
-          "expression": {
-            "type": "AssignmentExpression",
-            "start": 70,
-            "end": 104,
-            "operator": "=",
-            "left": {
-              "type": "MemberExpression",
-              "start": 70,
-              "end": 86,
-              "object": {
-                "type": "Identifier",
-                "start": 70,
-                "end": 76,
-                "name": "button"
-              },
-              "property": {
-                "type": "Identifier",
-                "start": 77,
-                "end": 86,
-                "name": "innerText"
-              },
-              "computed": false,
-              "optional": false
-            },
-            "right": {
-              "type": "Literal",
-              "start": 87,
-              "end": 104,
-              "value": "Clicked 0 times",
-              "raw": "\"Clicked 0 times\""
-            }
-          }
-        },
-        {
-          "type": "ExpressionStatement",
-          "start": 107,
-          "end": 229,
-          "expression": {
-            "type": "CallExpression",
-            "start": 107,
-            "end": 228,
-            "callee": {
-              "type": "MemberExpression",
-              "start": 107,
-              "end": 130,
-              "object": {
-                "type": "Identifier",
-                "start": 107,
-                "end": 113,
-                "name": "button"
-              },
-              "property": {
-                "type": "Identifier",
-                "start": 114,
-                "end": 130,
-                "name": "addEventListener"
-              },
-              "computed": false,
-              "optional": false
-            },
-            "arguments": [
-              {
-                "type": "Literal",
-                "start": 131,
-                "end": 138,
-                "value": "click",
-                "raw": "'click'"
-              },
-              {
-                "type": "ArrowFunctionExpression",
-                "start": 140,
-                "end": 227,
-                "id": null,
-                "expression": false,
-                "generator": false,
-                "async": false,
-                "params": [],
-                "body": {
-                  "type": "BlockStatement",
-                  "start": 144,
-                  "end": 227,
-                  "body": [
-                    {
-                      "type": "ExpressionStatement",
-                      "start": 147,
-                      "end": 224,
-                      "expression": {
-                        "type": "AssignmentExpression",
-                        "start": 147,
-                        "end": 223,
-                        "operator": "=",
-                        "left": {
-                          "type": "MemberExpression",
-                          "start": 147,
-                          "end": 163,
-                          "object": {
-                            "type": "Identifier",
-                            "start": 147,
-                            "end": 153,
-                            "name": "button"
-                          },
-                          "property": {
-                            "type": "Identifier",
-                            "start": 154,
-                            "end": 163,
-                            "name": "innerText"
-                          },
-                          "computed": false,
-                          "optional": false
-                        },
-                        "right": {
-                          "type": "TemplateLiteral",
-                          "start": 164,
-                          "end": 223,
-                          "expressions": [
-                            {
-                              "type": "UpdateExpression",
-                              "start": 175,
-                              "end": 184,
-                              "operator": "++",
-                              "prefix": true,
-                              "argument": {
-                                "type": "Identifier",
-                                "start": 177,
-                                "end": 184,
-                                "name": "counter"
-                              }
-                            },
-                            {
-                              "type": "ConditionalExpression",
-                              "start": 188,
-                              "end": 220,
-                              "test": {
-                                "type": "BinaryExpression",
-                                "start": 188,
-                                "end": 201,
-                                "left": {
-                                  "type": "Identifier",
-                                  "start": 188,
-                                  "end": 195,
-                                  "name": "counter"
-                                },
-                                "operator": "===",
-                                "right": {
-                                  "type": "Literal",
-                                  "start": 200,
-                                  "end": 201,
-                                  "value": 1,
-                                  "raw": "1"
-                                }
-                              },
-                              "consequent": {
-                                "type": "Literal",
-                                "start": 204,
-                                "end": 210,
-                                "value": "time",
-                                "raw": "'time'"
-                              },
-                              "alternate": {
-                                "type": "Literal",
-                                "start": 213,
-                                "end": 220,
-                                "value": "times",
-                                "raw": "'times'"
-                              }
-                            }
-                          ],
-                          "quasis": [
-                            {
-                              "type": "TemplateElement",
-                              "start": 165,
-                              "end": 173,
-                              "value": {
-                                "raw": "Clicked ",
-                                "cooked": "Clicked "
-                              },
-                              "tail": false
-                            },
-                            {
-                              "type": "TemplateElement",
-                              "start": 185,
-                              "end": 186,
-                              "value": {
-                                "raw": " ",
-                                "cooked": " "
-                              },
-                              "tail": false
-                            },
-                            {
-                              "type": "TemplateElement",
-                              "start": 221,
-                              "end": 222,
-                              "value": {
-                                "raw": " ",
-                                "cooked": " "
-                              },
-                              "tail": true
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            ],
-            "optional": false
-          }
-        }
-      ],
-      "sourceType": "script"
+      "end": 4,
+      "body": [],
+      "sourceType": "module"
     }
   },
   "cssAST": {
@@ -307,16 +14,16 @@
     "content": {
       "raws": {
         "semicolon": false,
-        "after": "\n\n"
+        "after": "\n"
       },
       "type": "root",
       "nodes": [
         {
           "raws": {
-            "before": "\n\n",
+            "before": "\n",
             "between": " ",
             "semicolon": true,
-            "after": "\n\n"
+            "after": "\n"
           },
           "type": "rule",
           "nodes": [
@@ -328,145 +35,35 @@
               "type": "decl",
               "source": {
                 "end": {
-                  "column": 26,
-                  "line": 4,
-                  "offset": 40
+                  "column": 18,
+                  "line": 3,
+                  "offset": 34
                 },
                 "inputId": 0,
                 "start": {
                   "column": 1,
-                  "line": 4,
-                  "offset": 14
+                  "line": 3,
+                  "offset": 16
                 }
               },
-              "prop": "background-color",
-              "value": "#474a4f"
-            },
-            {
-              "raws": {
-                "before": "\n",
-                "between": ": "
-              },
-              "type": "decl",
-              "source": {
-                "end": {
-                  "column": 12,
-                  "line": 5,
-                  "offset": 53
-                },
-                "inputId": 0,
-                "start": {
-                  "column": 1,
-                  "line": 5,
-                  "offset": 41
-                }
-              },
-              "prop": "width",
-              "value": "100%"
-            },
-            {
-              "raws": {
-                "before": "\n",
-                "between": ": "
-              },
-              "type": "decl",
-              "source": {
-                "end": {
-                  "column": 23,
-                  "line": 6,
-                  "offset": 77
-                },
-                "inputId": 0,
-                "start": {
-                  "column": 1,
-                  "line": 6,
-                  "offset": 54
-                }
-              },
-              "prop": "border",
-              "value": "1px solid #fff"
-            },
-            {
-              "raws": {
-                "before": "\n",
-                "between": ": "
-              },
-              "type": "decl",
-              "source": {
-                "end": {
-                  "column": 20,
-                  "line": 7,
-                  "offset": 98
-                },
-                "inputId": 0,
-                "start": {
-                  "column": 1,
-                  "line": 7,
-                  "offset": 78
-                }
-              },
-              "prop": "border-radius",
-              "value": "25px"
-            },
-            {
-              "raws": {
-                "before": "\n",
-                "between": ": "
-              },
-              "type": "decl",
-              "source": {
-                "end": {
-                  "column": 13,
-                  "line": 8,
-                  "offset": 112
-                },
-                "inputId": 0,
-                "start": {
-                  "column": 1,
-                  "line": 8,
-                  "offset": 99
-                }
-              },
-              "prop": "color",
-              "value": "white"
-            },
-            {
-              "raws": {
-                "before": "\n",
-                "between": ": "
-              },
-              "type": "decl",
-              "source": {
-                "end": {
-                  "column": 14,
-                  "line": 9,
-                  "offset": 127
-                },
-                "inputId": 0,
-                "start": {
-                  "column": 1,
-                  "line": 9,
-                  "offset": 113
-                }
-              },
-              "prop": "padding",
-              "value": "20px"
+              "prop": "font-weight",
+              "value": "bold"
             }
           ],
           "source": {
             "end": {
               "column": 1,
-              "line": 11,
-              "offset": 130
+              "line": 4,
+              "offset": 36
             },
             "inputId": 0,
             "start": {
               "column": 1,
-              "line": 3,
-              "offset": 2
+              "line": 2,
+              "offset": 1
             }
           },
-          "selector": "#myButton",
+          "selector": ".button-text",
           "lastEach": 1,
           "indexes": {}
         }
@@ -474,8 +71,8 @@
       "source": {
         "end": {
           "column": 1,
-          "line": 13,
-          "offset": 132
+          "line": 5,
+          "offset": 37
         },
         "inputId": 0,
         "start": {
@@ -489,7 +86,7 @@
       "inputs": [
         {
           "hasBOM": false,
-          "css": "\n\n#myButton {\nbackground-color: #474a4f;\nwidth: 100%;\nborder: 1px solid #fff;\nborder-radius: 25px;\ncolor: white;\npadding: 20px;\n\n}\n\n",
+          "css": "\n.button-text {\nfont-weight: bold;\n}\n",
           "file": "/Users/gugulethu/code/semantq/cmdapp/style"
         }
       ]
@@ -501,12 +98,12 @@
       {
         "html": {
           "start": 0,
-          "end": 191,
+          "end": 202,
           "type": "Fragment",
           "children": [
             {
               "start": 0,
-              "end": 191,
+              "end": 202,
               "type": "Element",
               "name": "customSyntax",
               "attributes": null,
@@ -514,7 +111,7 @@
                 [
                   {
                     "start": 15,
-                    "end": 175,
+                    "end": 186,
                     "type": "Element",
                     "name": "div",
                     "attributes": [
@@ -538,7 +135,7 @@
                       [
                         {
                           "start": 28,
-                          "end": 168,
+                          "end": 179,
                           "type": "Element",
                           "name": "div",
                           "attributes": [
@@ -562,7 +159,7 @@
                             [
                               {
                                 "start": 41,
-                                "end": 161,
+                                "end": 172,
                                 "type": "Element",
                                 "name": "div",
                                 "attributes": [
@@ -586,7 +183,7 @@
                                   [
                                     {
                                       "start": 54,
-                                      "end": 154,
+                                      "end": 165,
                                       "type": "Element",
                                       "name": "section",
                                       "attributes": [
@@ -609,50 +206,67 @@
                                       "children": [
                                         [
                                           {
-                                            "type": "Text",
-                                            "raw": "html:\n\n\n",
-                                            "data": "html:\n\n\n"
-                                          },
-                                          {
-                                            "start": 79,
-                                            "end": 109,
-                                            "type": "Element",
-                                            "name": "h1",
-                                            "attributes": null,
-                                            "children": [
-                                              [
-                                                {
-                                                  "type": "Text",
-                                                  "raw": "Welcome to Semantiq ",
-                                                  "data": "Welcome to Semantiq "
-                                                }
-                                              ]
-                                            ]
-                                          },
-                                          {
-                                            "start": 111,
-                                            "end": 143,
+                                            "start": 72,
+                                            "end": 154,
                                             "type": "Element",
                                             "name": "button",
                                             "attributes": [
                                               {
-                                                "start": 119,
-                                                "end": 132,
+                                                "start": 80,
+                                                "end": 94,
                                                 "type": "Attribute",
-                                                "name": "id",
+                                                "name": "class",
                                                 "value": [
                                                   {
-                                                    "start": 123,
-                                                    "end": 131,
+                                                    "start": 87,
+                                                    "end": 93,
                                                     "type": "Text",
-                                                    "raw": "myButton",
-                                                    "data": "myButton"
+                                                    "raw": "button",
+                                                    "data": "button"
                                                   }
                                                 ]
                                               }
                                             ],
                                             "children": [
-                                              []
+                                              [
+                                                {
+                                                  "start": 96,
+                                                  "end": 144,
+                                                  "type": "Element",
+                                                  "name": "span",
+                                                  "attributes": [
+                                                    {
+                                                      "start": 102,
+                                                      "end": 121,
+                                                      "type": "Attribute",
+                                                      "name": "class",
+                                                      "value": [
+                                                        {
+                                                          "start": 109,
+                                                          "end": 120,
+                                                          "type": "Text",
+                                                          "raw": "button-text",
+                                                          "data": "button-text"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ],
+                                                  "children": [
+                                                    [
+                                                      {
+                                                        "start": 123,
+                                                        "end": 136,
+                                                        "type": "Element",
+                                                        "name": "slot",
+                                                        "attributes": null,
+                                                        "children": [
+                                                          []
+                                                        ]
+                                                      }
+                                                    ]
+                                                  ]
+                                                }
+                                              ]
                                             ]
                                           }
                                         ]
