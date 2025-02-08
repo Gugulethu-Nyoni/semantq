@@ -93,14 +93,14 @@ customCode = customCode.replace('</customSyntax>', '</section> </div> </div> </d
     
     //console.log(customCode);
 
-    // Parse JavaScript code using acorn
-    const jsAST = parse(jsCode, { ecmaVersion: 2022 });
+// Parse JavaScript code using acorn
+const jsAST = parse(jsCode, { ecmaVersion: 2022, sourceType: "module" });
 
-    // Parse CSS code using postcss
-    const cssAST = postcss.parse(cssCode, { from: 'style' });
+// Parse CSS code using postcss
+const cssAST = postcss.parse(cssCode, { from: 'style' });
 
-     //console.log(JSON.stringify(cssAST, null,2));
-    const regeneratedCss = cssAST.toResult().css;
+//console.log(JSON.stringify(cssAST, null,2));
+const regeneratedCss = cssAST.toResult().css;
 	 //console.log(regeneratedCss);
 
 
