@@ -1,5 +1,5 @@
 export default {
   "/": "/",
   "home": "/",
-  "contact": "contact"
+  "slota": "slota"
 };
