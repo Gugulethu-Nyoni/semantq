@@ -54,10 +54,6 @@ function mergeComponents(imports, baseDir, astFile) {
     const mainAstContent = fs.readFileSync(astFile, 'utf-8');
     const mainAst = JSON.parse(mainAstContent);
 
-    // Debug: Check if mainAst is correctly parsed
-    console.log(`Parsing main AST from: ${astFile}`);
-    //console.log("Main AST structure:", JSON.stringify(mainAst, null, 2));
-
     // Ensure mainAst has jsAST, cssAST, and customAST with valid content
     if (!mainAst.jsAST || !mainAst.jsAST.content || !Array.isArray(mainAst.jsAST.content.body)) {
       console.error(`Invalid or missing jsAST in ${astFile}:`, mainAst.jsAST);
@@ -92,18 +88,24 @@ function mergeComponents(imports, baseDir, astFile) {
       },
     };
 
+    // Track merged components to avoid duplication
+    const mergedComponents = new Set();
+
+    // Helper function to check if a customAST node is a duplicate
+    const isCustomASTNodeDuplicate = (node, mergedNodes) => {
+      return mergedNodes.some(existingNode =>
+        JSON.stringify(existingNode) === JSON.stringify(node)
+      );
+    };
+
     // Loop through imports and merge their AST bodies
     for (const imp of imports) {
       let componentPath = imp.updatedSource.replace('src', 'build').replace('.smq', '.smq.ast');
       const componentContent = loadComponent(componentPath);
 
-      if (componentContent) {
+      if (componentContent && !mergedComponents.has(componentPath)) {
         try {
           const componentAst = JSON.parse(componentContent);
-          
-          // Debug: Check structure of imported component AST
-          console.log(`Parsing component AST from: ${componentPath}`);
-          //console.log("Component AST structure:", JSON.stringify(componentAst, null, 2));
 
           // Merge jsAST, cssAST, and customAST bodies if present
           if (componentAst.jsAST && componentAst.jsAST.content && Array.isArray(componentAst.jsAST.content.body)) {
@@ -113,9 +115,17 @@ function mergeComponents(imports, baseDir, astFile) {
             mergedAst.cssAST.content.nodes.push(...componentAst.cssAST.content.nodes);
           }
           if (componentAst.customAST && Array.isArray(componentAst.customAST.content)) {
-            mergedAst.customAST.content.push(...componentAst.customAST.content);
+            for (const customNode of componentAst.customAST.content) {
+              if (!isCustomASTNodeDuplicate(customNode, mergedAst.customAST.content)) {
+                mergedAst.customAST.content.push(customNode);
+              } else {
+                console.log(`Skipping duplicate customAST node from: ${componentPath}`);
+              }
+            }
           }
 
+          // Mark this component as merged
+          mergedComponents.add(componentPath);
         } catch (parseError) {
           console.error(`Error parsing AST of ${componentPath}:`, parseError);
         }
@@ -133,6 +143,8 @@ function mergeComponents(imports, baseDir, astFile) {
     return null;
   }
 }
+
+
 
 
 

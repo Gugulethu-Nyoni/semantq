@@ -45,94 +45,77 @@ function readSMQHTMLFiles(directory) {
 
 
 function parseComponent(filePath) {
-
-  //console.log("PATH",filePath);
-
-
   try {
-    // Read file synchronously
+    // Read the file synchronously
     const code = fs.readFileSync(filePath, 'utf8');
-    //console.log(code);
-
     const $ = cheerio.load(code);
 
-    // Extract JavaScript code from <script> tags
+    // Extract JavaScript, CSS, and custom syntax
     const jsCode = $('script').html() || '';
-
-    //console.log(jsCode);
-
-    // Extract CSS code from <style> tags
     let cssCode = $('style').html() || '';
 
-      //console.log("ISSUE",JSON.stringify(cssCode,null,2)); return;
+    // Fix CSS object issue
+    if (cssCode.trim() === '[object Object]') {
+      cssCode = '';
+    }
 
-      if (cssCode==="\n  [object Object]\n"){
-          cssCode='';
-      }
+    // Extract customSyntax content
+    const startMarker = '<customSyntax>';
+    const endMarker = '</customSyntax>';
+    const startIndex = code.indexOf(startMarker);
+    const endIndex = code.indexOf(endMarker, startIndex);
 
-// Define markers
-const startMarker = '<customSyntax>';
-const endMarker = '</customSyntax>';
+    let customCode = '';
+    if (startIndex !== -1 && endIndex !== -1) {
+      customCode = code.substring(startIndex, endIndex + endMarker.length).trim();
+    }
 
-// Find start and end indices
-const startIndex = code.indexOf(startMarker);
-const endIndex = code.indexOf(endMarker, startIndex);
+    // Parse JavaScript with Acorn
+    let jsAST = parse(jsCode, { ecmaVersion: 2022, sourceType: "module" });
 
-// Extract customSyntax block including markers
-let customCode = code.substring(startIndex, endIndex + endMarker.length).trim();
+    // Parse CSS with PostCSS
+    let cssAST = postcss.parse(cssCode, { from: 'style' });
 
-// Replace markers in the extracted block
-customCode = customCode.replace('<customSyntax>', '<customSyntax> <div id="1"> <div id="2"> <div id="3"> <section id="4">');
-customCode = customCode.replace('</customSyntax>', '</section> </div> </div> </div> </customSyntax>');
+    // Parse custom syntax
+    let customAST = parser.parse(customCode);
 
-//console.log("HERE", customCode);
+    // Remove duplicate nodes
+    jsAST = removeDuplicates(jsAST);
+    cssAST = removeDuplicates(cssAST);
+    customAST = removeDuplicates(customAST);
 
+    // Define new AST file path
+    const newFilePath = filePath.replace('.html', '.ast');
 
-     //return;
-
-    
-    //console.log(customCode);
-
-// Parse JavaScript code using acorn
-const jsAST = parse(jsCode, { ecmaVersion: 2022, sourceType: "module" });
-
-// Parse CSS code using postcss
-const cssAST = postcss.parse(cssCode, { from: 'style' });
-
-//console.log(JSON.stringify(cssAST, null,2));
-const regeneratedCss = cssAST.toResult().css;
-	 //console.log(regeneratedCss);
-
-
-
-
-    // Parse HTML (customSyntax) using your custom parser (replace customParser with your actual parser)
-    const customAST = parser.parse(customCode);
-   
-   // console.log("CS ",JSON.stringify(customAST, null, 2));
-
-   // console.log("JS ", JSON.stringify(jsAST, null, 2));
-  
-  //	const generatedCode = escodegen.generate(jsAST);
-  //    console.log(generatedCode);
-
-    const newFilePath = filePath.replace('.html','.ast'); 
-    writeToFile({jsAST: jsAST, cssAST, cssAST, customAST: customAST, newFilePath: newFilePath});
-
-/*
-    return {
-      jsAST,
-      cssAST,
-      customAST
-    };
-
-*/
+    // Write to file
+    writeToFile({ jsAST, cssAST, customAST, newFilePath });
 
   } catch (err) {
     console.error(`Error processing file ${filePath}:`, err);
-    return null;
   }
 }
+
+// Function to remove duplicates from AST structures
+function removeDuplicates(ast) {
+  const seen = new Set();
+  function traverse(node) {
+    if (!node || typeof node !== 'object') return node;
+
+    const key = JSON.stringify(node);
+    if (seen.has(key)) return null; // Remove duplicate nodes
+
+    seen.add(key);
+    if (Array.isArray(node)) {
+      return node.map(traverse).filter(Boolean);
+    } else {
+      return Object.fromEntries(
+        Object.entries(node).map(([k, v]) => [k, traverse(v)])
+      );
+    }
+  }
+  return traverse(ast);
+}
+
 
 
 
