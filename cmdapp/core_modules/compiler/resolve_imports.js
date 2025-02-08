@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import { walk } from 'estree-walker';
-
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -25,7 +24,7 @@ export function findAstFiles(dir) {
     const fullPath = path.join(dir, file);
     if (fs.statSync(fullPath).isDirectory()) {
       files = files.concat(findAstFiles(fullPath)); // Recursive call for subdirectories
-    } else if (file.endsWith('+page.smq.ast')) {
+    } else if (file.endsWith('.ast')) {
       files.push(fullPath);
     }
   });
@@ -46,29 +45,94 @@ function loadComponent(componentPath) {
   }
 }
 
-// Helper function: Merge components into the page
+
+
 // Helper function: Merge components into the page and write the merged AST
 function mergeComponents(imports, baseDir, astFile) {
-  let mergedContent = '';
+  try {
+    // Read the main AST
+    const mainAstContent = fs.readFileSync(astFile, 'utf-8');
+    const mainAst = JSON.parse(mainAstContent);
 
-  for (const imp of imports) {
-    let componentPath = imp.updatedSource.replace('src', 'build').replace('.smq', '.smq.ast');
-    //console.log("Merging Component:", componentPath);
-    const componentContent = loadComponent(componentPath);
+    // Debug: Check if mainAst is correctly parsed
+    console.log(`Parsing main AST from: ${astFile}`);
+    //console.log("Main AST structure:", JSON.stringify(mainAst, null, 2));
 
-    if (componentContent) {
-      mergedContent += `\n${componentContent}`;
+    // Ensure mainAst has jsAST, cssAST, and customAST with valid content
+    if (!mainAst.jsAST || !mainAst.jsAST.content || !Array.isArray(mainAst.jsAST.content.body)) {
+      console.error(`Invalid or missing jsAST in ${astFile}:`, mainAst.jsAST);
+      return null;
     }
+    if (!mainAst.cssAST || !mainAst.cssAST.content || !Array.isArray(mainAst.cssAST.content.nodes)) {
+      console.error(`Invalid or missing cssAST in ${astFile}:`, mainAst.cssAST);
+      return null;
+    }
+    if (!mainAst.customAST || !Array.isArray(mainAst.customAST.content)) {
+      console.error(`Invalid or missing customAST in ${astFile}:`, mainAst.customAST);
+      return null;
+    }
+
+    // Initialize merged AST with jsAST, cssAST, and customAST
+    let mergedAst = {
+      jsAST: {
+        type: 'JavaScript',
+        content: {
+          type: 'Program',
+          body: [...mainAst.jsAST.content.body], // Preserve the main jsAST body
+          sourceType: 'module',
+        },
+      },
+      cssAST: {
+        type: 'CSS',
+        content: { ...mainAst.cssAST.content }, // Preserve the CSS AST content
+      },
+      customAST: {
+        type: 'Custom',
+        content: [...mainAst.customAST.content], // Preserve the Custom AST content
+      },
+    };
+
+    // Loop through imports and merge their AST bodies
+    for (const imp of imports) {
+      let componentPath = imp.updatedSource.replace('src', 'build').replace('.smq', '.smq.ast');
+      const componentContent = loadComponent(componentPath);
+
+      if (componentContent) {
+        try {
+          const componentAst = JSON.parse(componentContent);
+          
+          // Debug: Check structure of imported component AST
+          console.log(`Parsing component AST from: ${componentPath}`);
+          //console.log("Component AST structure:", JSON.stringify(componentAst, null, 2));
+
+          // Merge jsAST, cssAST, and customAST bodies if present
+          if (componentAst.jsAST && componentAst.jsAST.content && Array.isArray(componentAst.jsAST.content.body)) {
+            mergedAst.jsAST.content.body.push(...componentAst.jsAST.content.body);
+          }
+          if (componentAst.cssAST && componentAst.cssAST.content && Array.isArray(componentAst.cssAST.content.nodes)) {
+            mergedAst.cssAST.content.nodes.push(...componentAst.cssAST.content.nodes);
+          }
+          if (componentAst.customAST && Array.isArray(componentAst.customAST.content)) {
+            mergedAst.customAST.content.push(...componentAst.customAST.content);
+          }
+
+        } catch (parseError) {
+          console.error(`Error parsing AST of ${componentPath}:`, parseError);
+        }
+      }
+    }
+
+    // Write the correctly formatted merged AST
+    const mergedFilePath = astFile.replace('.smq.ast', '.merged.ast');
+    fs.writeFileSync(mergedFilePath, JSON.stringify(mergedAst, null, 2), 'utf-8');
+    console.log(`Merged AST written to: ${mergedFilePath}`);
+
+    return mergedAst;
+  } catch (error) {
+    console.error(`Error merging components into ${astFile}:`, error);
+    return null;
   }
-
-  // Now write the merged content to the new +page.merged.ast file
-  const mergedFilePath = astFile.replace('.smq.ast', '.merged.ast');
-  fs.writeFileSync(mergedFilePath, mergedContent, 'utf-8');
-  console.log(`Merged AST written to: ${mergedFilePath}`);
-
-  return mergedContent;
 }
-
 
 
 
@@ -83,7 +147,7 @@ function resolveImports(astFilePath) {
     const imports = [];
     walk(ast, {
       enter(node) {
-        if (node.type === 'ImportDeclaration') {
+        if (node.type === 'ImportDeclaration' && node.source.value.startsWith('$')) {
           const source = node.source.value; //$components/Button.smq
           let updatedSource = source; 
 
@@ -105,8 +169,12 @@ function resolveImports(astFilePath) {
   }
 }
 
+
+
 // Main function: Resolve imports and merge components
 export async function importsResolver(destDir) {
+
+  console.log("INNNN?");
   try {
     // Step 1: Find all AST files
     const astFiles = findAstFiles(destDir);

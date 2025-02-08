@@ -61,8 +61,8 @@ let tagStack = [];
 // Extract script and style content including opening and closing tags
 while (i < compiledContent.length) {
   if (compiledContent.slice(i, i + 8) === '<script>') {
-    tagStack.push('<script>');
-    scriptContent += '<script>';
+    tagStack.push('<script type="module">');
+    scriptContent += '<script type="module">';
     i += 8;
     while (i < compiledContent.length && compiledContent.slice(i, i + 9) !== '</script>') {
       scriptContent += compiledContent[i];
@@ -223,12 +223,12 @@ if (line === 'script:') {
     } else if (line === 'style:') {
       tagStack.push('style');
       compiledContent += '<style>\n';
-    } else if (line === 'content:') {
-      // Skip the content declaration line
+    } else if (line === 'html:') {
+      // Skip the html declaration line
 
        // Add the opening tag for the wrapper
       compiledContent += '<customSyntax>\n';
-      tagStack.push('content');
+      tagStack.push('html');
 
 continue;
     } else if (line === 'end:') {
@@ -239,7 +239,7 @@ continue;
 
       //console.log(topTag);
 
-      if (topTag === 'content') {
+      if (topTag === 'html') {
 
         // Add the closing tag for the wrapper
         compiledContent += '</customSyntax>\n';

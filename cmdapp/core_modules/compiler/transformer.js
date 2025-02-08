@@ -35,6 +35,7 @@ function convertCssASTToString(cssAST) {
  * @param {String} directory - The directory path.
  */
 async function readSMQHTMLFiles(directory) {
+
   fs.readdir(directory, (err, files) => {
     if (err) {
       console.error('Error reading directory:', err);
@@ -51,7 +52,10 @@ async function readSMQHTMLFiles(directory) {
 
         if (stats.isDirectory()) {
           readSMQHTMLFiles(filePath); // Recursively call on subdirectory
-        } else if (path.extname(file).toLowerCase() === '.ast') {
+        } else if (path.basename(file).toLowerCase() === '+page.resolved.ast') {
+
+            console.log("ISINDE THERE****", file);
+
           fs.readFile(filePath, 'utf8', async (err, data) => {
             if (err) {
               console.error('Error reading file:', err);
@@ -99,7 +103,6 @@ async function readSMQHTMLFiles(directory) {
  * Start the transformation process.
  */
 export function transformSMQFiles(destDir) {
-  //const directory = '../../build/routes'; // src directory
   return readSMQHTMLFiles(destDir);
 }
 
