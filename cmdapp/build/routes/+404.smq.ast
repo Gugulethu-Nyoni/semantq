@@ -99,129 +99,119 @@
                 "between": ": "
               },
               "type": "decl",
+              "parent": null,
               "source": {
-                "end": {
-                  "column": 23,
-                  "line": 4,
-                  "offset": 38
+                "input": {
+                  "css": "\n\n.error-div {\nborder: 1px dashed red;\npadding: 10px;\nborder-radius: 25px;\nbackground-color: #fff;\n}\n\n",
+                  "hasBOM": false,
+                  "document": "\n\n.error-div {\nborder: 1px dashed red;\npadding: 10px;\nborder-radius: 25px;\nbackground-color: #fff;\n}\n\n",
+                  "file": "/Users/gugulethu/code/semantq/cmdapp/style"
                 },
-                "inputId": 0,
                 "start": {
                   "column": 1,
                   "line": 4,
                   "offset": 15
+                },
+                "end": {
+                  "column": 23,
+                  "line": 4,
+                  "offset": 38
                 }
               },
               "prop": "border",
               "value": "1px dashed red"
             },
             {
-              "raws": {
-                "before": "\n",
-                "between": ": "
-              },
+              "raws": null,
               "type": "decl",
+              "parent": null,
               "source": {
-                "end": {
-                  "column": 14,
-                  "line": 5,
-                  "offset": 53
-                },
-                "inputId": 0,
+                "input": null,
                 "start": {
                   "column": 1,
                   "line": 5,
                   "offset": 39
+                },
+                "end": {
+                  "column": 14,
+                  "line": 5,
+                  "offset": 53
                 }
               },
               "prop": "padding",
               "value": "10px"
             },
             {
-              "raws": {
-                "before": "\n",
-                "between": ": "
-              },
+              "raws": null,
               "type": "decl",
+              "parent": null,
               "source": {
-                "end": {
-                  "column": 20,
-                  "line": 6,
-                  "offset": 74
-                },
-                "inputId": 0,
+                "input": null,
                 "start": {
                   "column": 1,
                   "line": 6,
                   "offset": 54
+                },
+                "end": {
+                  "column": 20,
+                  "line": 6,
+                  "offset": 74
                 }
               },
               "prop": "border-radius",
               "value": "25px"
             },
             {
-              "raws": {
-                "before": "\n",
-                "between": ": "
-              },
+              "raws": null,
               "type": "decl",
+              "parent": null,
               "source": {
-                "end": {
-                  "column": 23,
-                  "line": 7,
-                  "offset": 98
-                },
-                "inputId": 0,
+                "input": null,
                 "start": {
                   "column": 1,
                   "line": 7,
                   "offset": 75
+                },
+                "end": {
+                  "column": 23,
+                  "line": 7,
+                  "offset": 98
                 }
               },
               "prop": "background-color",
               "value": "#fff"
             }
           ],
+          "parent": null,
           "source": {
-            "end": {
-              "column": 1,
-              "line": 8,
-              "offset": 100
-            },
-            "inputId": 0,
+            "input": null,
             "start": {
               "column": 1,
               "line": 3,
               "offset": 2
+            },
+            "end": {
+              "column": 1,
+              "line": 8,
+              "offset": 100
             }
           },
-          "selector": ".error-div",
-          "lastEach": 1,
-          "indexes": {}
+          "selector": ".error-div"
         }
       ],
       "source": {
-        "end": {
-          "column": 1,
-          "line": 10,
-          "offset": 102
-        },
-        "inputId": 0,
+        "input": null,
         "start": {
           "column": 1,
           "line": 1,
           "offset": 0
+        },
+        "end": {
+          "column": 1,
+          "line": 10,
+          "offset": 102
         }
-      },
-      "lastEach": 1,
-      "indexes": {},
-      "inputs": [
-        {
-          "hasBOM": false,
-          "css": "\n\n.error-div {\nborder: 1px dashed red;\npadding: 10px;\nborder-radius: 25px;\nbackground-color: #fff;\n}\n\n",
-          "file": "/Users/gugulethu/code/semantq/cmdapp/style"
-        }
-      ]
+      }
     }
   },
   "customAST": {
@@ -230,12 +220,12 @@
       {
         "html": {
           "start": 0,
-          "end": 570,
+          "end": 482,
           "type": "Fragment",
           "children": [
             {
               "start": 0,
-              "end": 570,
+              "end": 482,
               "type": "Element",
               "name": "customSyntax",
               "attributes": null,
@@ -243,22 +233,22 @@
                 [
                   {
                     "start": 15,
-                    "end": 554,
+                    "end": 466,
                     "type": "Element",
                     "name": "div",
                     "attributes": [
                       {
                         "start": 20,
-                        "end": 26,
+                        "end": 37,
                         "type": "Attribute",
-                        "name": "id",
+                        "name": "class",
                         "value": [
                           {
-                            "start": 24,
-                            "end": 25,
+                            "start": 27,
+                            "end": 36,
                             "type": "Text",
-                            "raw": "1",
-                            "data": "1"
+                            "raw": "error-div",
+                            "data": "error-div"
                           }
                         ]
                       }
@@ -266,215 +256,107 @@
                     "children": [
                       [
                         {
-                          "start": 28,
-                          "end": 547,
+                          "start": 39,
+                          "end": 70,
                           "type": "Element",
-                          "name": "div",
-                          "attributes": [
-                            {
-                              "start": 33,
-                              "end": 39,
-                              "type": "Attribute",
-                              "name": "id",
-                              "value": [
-                                {
-                                  "start": 37,
-                                  "end": 38,
-                                  "type": "Text",
-                                  "raw": "2",
-                                  "data": "2"
-                                }
-                              ]
-                            }
-                          ],
+                          "name": "h1",
+                          "attributes": null,
                           "children": [
                             [
                               {
-                                "start": 41,
-                                "end": 540,
+                                "type": "Text",
+                                "raw": "404: Page Not found  ",
+                                "data": "404: Page Not found  "
+                              }
+                            ]
+                          ]
+                        },
+                        {
+                          "start": 71,
+                          "end": 77,
+                          "type": "Element",
+                          "name": "br",
+                          "attributes": null,
+                          "children": []
+                        },
+                        {
+                          "type": "Text",
+                          "raw": "This is largely caused by absence of +page.smq in your root. ",
+                          "data": "This is largely caused by absence of +page.smq in your root. "
+                        },
+                        {
+                          "start": 138,
+                          "end": 144,
+                          "type": "Element",
+                          "name": "br",
+                          "attributes": null,
+                          "children": null
+                        },
+                        {
+                          "type": "Text",
+                          "raw": "Follow these steps to fix the issue: ",
+                          "data": "Follow these steps to fix the issue: "
+                        },
+                        {
+                          "start": 181,
+                          "end": 187,
+                          "type": "Element",
+                          "name": "br",
+                          "attributes": null,
+                          "children": null
+                        },
+                        {
+                          "start": 187,
+                          "end": 457,
+                          "type": "Element",
+                          "name": "ol",
+                          "attributes": null,
+                          "children": [
+                            [
+                              {
+                                "start": 193,
+                                "end": 246,
                                 "type": "Element",
-                                "name": "div",
-                                "attributes": [
-                                  {
-                                    "start": 46,
-                                    "end": 52,
-                                    "type": "Attribute",
-                                    "name": "id",
-                                    "value": [
-                                      {
-                                        "start": 50,
-                                        "end": 51,
-                                        "type": "Text",
-                                        "raw": "3",
-                                        "data": "3"
-                                      }
-                                    ]
-                                  }
-                                ],
+                                "name": "li",
+                                "attributes": null,
                                 "children": [
                                   [
                                     {
-                                      "start": 54,
-                                      "end": 533,
-                                      "type": "Element",
-                                      "name": "section",
-                                      "attributes": [
-                                        {
-                                          "start": 63,
-                                          "end": 69,
-                                          "type": "Attribute",
-                                          "name": "id",
-                                          "value": [
-                                            {
-                                              "start": 67,
-                                              "end": 68,
-                                              "type": "Text",
-                                              "raw": "4",
-                                              "data": "4"
-                                            }
-                                          ]
-                                        }
-                                      ],
-                                      "children": [
-                                        [
-                                          {
-                                            "start": 71,
-                                            "end": 522,
-                                            "type": "Element",
-                                            "name": "div",
-                                            "attributes": [
-                                              {
-                                                "start": 76,
-                                                "end": 93,
-                                                "type": "Attribute",
-                                                "name": "class",
-                                                "value": [
-                                                  {
-                                                    "start": 83,
-                                                    "end": 92,
-                                                    "type": "Text",
-                                                    "raw": "error-div",
-                                                    "data": "error-div"
-                                                  }
-                                                ]
-                                              }
-                                            ],
-                                            "children": [
-                                              [
-                                                {
-                                                  "start": 95,
-                                                  "end": 126,
-                                                  "type": "Element",
-                                                  "name": "h1",
-                                                  "attributes": null,
-                                                  "children": [
-                                                    [
-                                                      {
-                                                        "type": "Text",
-                                                        "raw": "404: Page Not found  ",
-                                                        "data": "404: Page Not found  "
-                                                      }
-                                                    ]
-                                                  ]
-                                                },
-                                                {
-                                                  "start": 127,
-                                                  "end": 133,
-                                                  "type": "Element",
-                                                  "name": "br",
-                                                  "attributes": null,
-                                                  "children": []
-                                                },
-                                                {
-                                                  "type": "Text",
-                                                  "raw": "This is largely caused by absence of +page.smq in your root. ",
-                                                  "data": "This is largely caused by absence of +page.smq in your root. "
-                                                },
-                                                {
-                                                  "start": 194,
-                                                  "end": 200,
-                                                  "type": "Element",
-                                                  "name": "br",
-                                                  "attributes": null,
-                                                  "children": []
-                                                },
-                                                {
-                                                  "type": "Text",
-                                                  "raw": "Follow these steps to fix the issue: ",
-                                                  "data": "Follow these steps to fix the issue: "
-                                                },
-                                                {
-                                                  "start": 237,
-                                                  "end": 243,
-                                                  "type": "Element",
-                                                  "name": "br",
-                                                  "attributes": null,
-                                                  "children": []
-                                                },
-                                                {
-                                                  "start": 243,
-                                                  "end": 513,
-                                                  "type": "Element",
-                                                  "name": "ol",
-                                                  "attributes": null,
-                                                  "children": [
-                                                    [
-                                                      {
-                                                        "start": 249,
-                                                        "end": 302,
-                                                        "type": "Element",
-                                                        "name": "li",
-                                                        "attributes": null,
-                                                        "children": [
-                                                          [
-                                                            {
-                                                              "type": "Text",
-                                                              "raw": "Go to your termial and cd to project route ",
-                                                              "data": "Go to your termial and cd to project route "
-                                                            }
-                                                          ]
-                                                        ]
-                                                      },
-                                                      {
-                                                        "start": 303,
-                                                        "end": 393,
-                                                        "type": "Element",
-                                                        "name": "li",
-                                                        "attributes": null,
-                                                        "children": [
-                                                          [
-                                                            {
-                                                              "type": "Text",
-                                                              "raw": "run this command to create a new route: npm run semantiq make:route nameofroute\n",
-                                                              "data": "run this command to create a new route: npm run semantiq make:route nameofroute\n"
-                                                            }
-                                                          ]
-                                                        ]
-                                                      },
-                                                      {
-                                                        "start": 394,
-                                                        "end": 507,
-                                                        "type": "Element",
-                                                        "name": "li",
-                                                        "attributes": null,
-                                                        "children": [
-                                                          [
-                                                            {
-                                                              "type": "Text",
-                                                              "raw": "Your new route will be created in src/routes with required files and you can add contents as you need.\n",
-                                                              "data": "Your new route will be created in src/routes with required files and you can add contents as you need.\n"
-                                                            }
-                                                          ]
-                                                        ]
-                                                      }
-                                                    ]
-                                                  ]
-                                                }
-                                              ]
-                                            ]
-                                          }
-                                        ]
-                                      ]
+                                      "type": "Text",
+                                      "raw": "Go to your termial and cd to project route ",
+                                      "data": "Go to your termial and cd to project route "
+                                    }
+                                  ]
+                                ]
+                              },
+                              {
+                                "start": 247,
+                                "end": 337,
+                                "type": "Element",
+                                "name": "li",
+                                "attributes": null,
+                                "children": [
+                                  [
+                                    {
+                                      "type": "Text",
+                                      "raw": "run this command to create a new route: npm run semantiq make:route nameofroute\n",
+                                      "data": "run this command to create a new route: npm run semantiq make:route nameofroute\n"
+                                    }
+                                  ]
+                                ]
+                              },
+                              {
+                                "start": 338,
+                                "end": 451,
+                                "type": "Element",
+                                "name": "li",
+                                "attributes": null,
+                                "children": [
+                                  [
+                                    {
+                                      "type": "Text",
+                                      "raw": "Your new route will be created in src/routes with required files and you can add contents as you need.\n",
+                                      "data": "Your new route will be created in src/routes with required files and you can add contents as you need.\n"
                                     }
                                   ]
                                 ]
