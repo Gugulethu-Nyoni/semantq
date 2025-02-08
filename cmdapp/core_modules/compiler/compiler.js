@@ -121,7 +121,7 @@ async function importsResolution(destDir) {
 
 async function slotsResolution(destDir) {
   try {
-    //console.log("Component parsing");
+    //console.log("Slots Resolution");
     const slotResolver = await import('./slotResolver.js');
     const slotResolved = slotResolver.processMergedFiles(destDir);
     //console.log("Resolved", res);
@@ -187,13 +187,13 @@ async function main(sourceDir,destDir, destDirBase) {
    await importsResolution(componentsDest);
    await slotsResolution(componentsDest);
 
-  await importsResolution(destDir);
+  //await importsResolution(destDir);
   //await slotsResolution(destDir);
 
 
 
   //await transformer(destDir);
-  //await transformer(componentsDest);
+  await transformer(componentsDest);
 
   await routesGenerator(sourceDir,destDir);
 
