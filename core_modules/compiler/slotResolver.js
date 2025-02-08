@@ -7,6 +7,7 @@ class SlotResolver {
     this.jsAST = ast.jsAST || { type: 'JavaScript', content: [] }; // Initialize JS AST
     this.cssAST = ast.cssAST || { type: 'CSS', content: {} }; // Initialize CSS AST
     this.customAST = ast.customAST || { type: 'Custom', content: [] }; // Initialize custom AST
+    this.importedComponents = this.extractImportedComponents(); // Extract imported components
   }
 
   // Helper function to safely get custom content
@@ -22,6 +23,24 @@ class SlotResolver {
   // Helper function to safely get CSS content
   getCSSContent() {
     return this.cssAST.content || {};
+  }
+
+  // Extract imported components from the jsAST
+  extractImportedComponents() {
+    const importedComponents = {};
+    const jsContent = this.getJSContent();
+
+    if (jsContent.body) {
+      jsContent.body.forEach(node => {
+        if (node.type === 'ImportDeclaration') {
+          const componentName = node.specifiers[0].local.name; // e.g., "Header"
+          const componentPath = node.source.value; // e.g., "$components/Header.smq"
+          importedComponents[componentName] = componentPath;
+        }
+      });
+    }
+
+    return importedComponents;
   }
 
   // Merge JS content from a slot into the main JS AST
@@ -45,7 +64,6 @@ class SlotResolver {
 
   // Resolve default slots (no name specified)
   resolveDefaultSlots() {
-    console.log("Phakathi ......");
     const content = this.getCustomContent();
 
     // Flatten all nodes and extract slots without a name (default slots)
@@ -67,6 +85,32 @@ class SlotResolver {
     });
   }
 
+  // Map imported components to their custom syntax in the HTML
+  mapImportedComponents() {
+    const content = this.getCustomContent();
+
+    content.forEach(node => {
+      if (node.html && node.html.children) {
+        this.mapComponentsInNode(node.html.children);
+      }
+    });
+  }
+
+  // Recursively map imported components in a node's children
+  mapComponentsInNode(children) {
+    children.forEach(child => {
+      if (child.type === 'Element' && this.importedComponents[child.name]) {
+        // Replace the custom syntax with the resolved component
+        child.name = this.importedComponents[child.name].split('/').pop().replace('.smq', ''); // e.g., "Header"
+      }
+
+      // Recursively process child nodes
+      if (child.children) {
+        this.mapComponentsInNode(child.children);
+      }
+    });
+  }
+
   // Helper function to extract slots from a node
   extractSlots(node) {
     if (node.type === 'Element' && node.name === 'slot') {
@@ -78,7 +122,8 @@ class SlotResolver {
 
   // Resolve all slots (including dynamic ones and nested)
   resolve() {
-    this.resolveDefaultSlots(); // Resolve default slots for now
+    this.resolveDefaultSlots(); // Resolve default slots
+    this.mapImportedComponents(); // Map imported components to their custom syntax
 
     // Return the resolved AST structure
     return {
@@ -91,7 +136,6 @@ class SlotResolver {
     };
   }
 }
-
 
 
 
