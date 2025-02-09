@@ -46,13 +46,20 @@ function loadComponent(componentPath) {
 }
 
 
-
 // Helper function: Merge components into the page and write the merged AST
 function mergeComponents(imports, baseDir, astFile) {
   try {
     // Read the main AST
     const mainAstContent = fs.readFileSync(astFile, 'utf-8');
     const mainAst = JSON.parse(mainAstContent);
+
+    // Detect if this is a page (has customAST) or a component (has a key based on filename)
+    const isPage = !!mainAst.customAST; // Pages have 'customAST'
+
+    // If it's a component, get the component key dynamically
+    const componentKey = isPage
+      ? 'customAST'
+      : path.basename(astFile, '.smq.ast').split('.')[0].toLowerCase();
 
     // Ensure mainAst has jsAST, cssAST, and customAST with valid content
     if (!mainAst.jsAST || !mainAst.jsAST.content || !Array.isArray(mainAst.jsAST.content.body)) {
@@ -63,8 +70,8 @@ function mergeComponents(imports, baseDir, astFile) {
       console.error(`Invalid or missing cssAST in ${astFile}:`, mainAst.cssAST);
       return null;
     }
-    if (!mainAst.customAST || !Array.isArray(mainAst.customAST.content)) {
-      console.error(`Invalid or missing customAST in ${astFile}:`, mainAst.customAST);
+    if (!mainAst[componentKey] || !Array.isArray(mainAst[componentKey].content)) {
+      console.error(`Invalid or missing ${componentKey} in ${astFile}:`, mainAst[componentKey]);
       return null;
     }
 
@@ -82,9 +89,9 @@ function mergeComponents(imports, baseDir, astFile) {
         type: 'CSS',
         content: { ...mainAst.cssAST.content }, // Preserve the CSS AST content
       },
-      customAST: {
+      [componentKey]: {
         type: 'Custom',
-        content: [...mainAst.customAST.content], // Preserve the Custom AST content
+        content: [...mainAst[componentKey].content], // Preserve the Custom AST content dynamically
       },
     };
 
@@ -107,6 +114,27 @@ function mergeComponents(imports, baseDir, astFile) {
         try {
           const componentAst = JSON.parse(componentContent);
 
+          // Determine component's specific key based on the component name (e.g., 'header')
+          const componentName = path.basename(componentPath, '.smq.ast').toLowerCase();
+          const componentKey = componentAst.customAST ? 'customAST' : componentName;
+
+          // Ensure the component's root key is correctly set
+          let componentHtmlKey = componentAst.html || {};
+          if (componentAst[componentName]) {
+            componentHtmlKey = componentAst[componentName];
+          } else if (componentAst.html) {
+            // Wrap html into the correct component name key if missing
+            componentAst[componentName] = {
+              type: 'HTML',
+              content: [
+                {
+                  html: componentAst.html,
+                },
+              ],
+            };
+            componentHtmlKey = componentAst[componentName];
+          }
+
           // Merge jsAST, cssAST, and customAST bodies if present
           if (componentAst.jsAST && componentAst.jsAST.content && Array.isArray(componentAst.jsAST.content.body)) {
             mergedAst.jsAST.content.body.push(...componentAst.jsAST.content.body);
@@ -114,12 +142,20 @@ function mergeComponents(imports, baseDir, astFile) {
           if (componentAst.cssAST && componentAst.cssAST.content && Array.isArray(componentAst.cssAST.content.nodes)) {
             mergedAst.cssAST.content.nodes.push(...componentAst.cssAST.content.nodes);
           }
-          if (componentAst.customAST && Array.isArray(componentAst.customAST.content)) {
-            for (const customNode of componentAst.customAST.content) {
-              if (!isCustomASTNodeDuplicate(customNode, mergedAst.customAST.content)) {
-                mergedAst.customAST.content.push(customNode);
+          if (componentAst[componentName] && Array.isArray(componentHtmlKey.content)) {
+            // Preserve the component's specific key, like 'header', 'footer', etc.
+            if (!mergedAst[componentName]) {
+              mergedAst[componentName] = {
+                type: 'HTML',
+                content: [],
+              };
+            }
+
+            for (const customNode of componentHtmlKey.content) {
+              if (!isCustomASTNodeDuplicate(customNode, mergedAst[componentName].content)) {
+                mergedAst[componentName].content.push(customNode);
               } else {
-                console.log(`Skipping duplicate customAST node from: ${componentPath}`);
+                console.log(`Skipping duplicate ${componentName} node from: ${componentPath}`);
               }
             }
           }
@@ -143,8 +179,6 @@ function mergeComponents(imports, baseDir, astFile) {
     return null;
   }
 }
-
-
 
 
 
