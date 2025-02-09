@@ -88,8 +88,8 @@
       }
     }
   },
-  "customAST": {
-    "type": "Custom",
+  "button": {
+    "type": "HTML",
     "content": [
       {
         "html": {
