@@ -34,8 +34,9 @@ function convertCssASTToString(cssAST) {
  * Read and process files in a directory recursively.
  * @param {String} directory - The directory path.
  */
-async function readSMQHTMLFiles(directory) {
 
+
+async function readSMQHTMLFiles(directory) {
   fs.readdir(directory, (err, files) => {
     if (err) {
       console.error('Error reading directory:', err);
@@ -53,8 +54,7 @@ async function readSMQHTMLFiles(directory) {
         if (stats.isDirectory()) {
           readSMQHTMLFiles(filePath); // Recursively call on subdirectory
         } else if (file.toLowerCase().endsWith('.resolved.ast')) {
-
-            console.log("ISINDE THERE****", file);
+          console.log("ISINDE THERE****", file);
 
           fs.readFile(filePath, 'utf8', async (err, data) => {
             if (err) {
@@ -64,27 +64,39 @@ async function readSMQHTMLFiles(directory) {
 
             try {
               const astObject = JSON.parse(data);
-              const jsAST = astObject.jsAST;
-              const cssASTObject = astObject.cssAST;
+
+              // Extract component name dynamically
+              const fileName = file.split('/').pop(); // Get just the file name
+              let componentName = fileName.startsWith("+page") ? "" : fileName.split('.')[0];
+              const htmlKey = componentName.toLowerCase();
+
+              // Dynamically determine AST keys
+              const jsASTKey = componentName ? `jsAST_${componentName}` : "jsAST";
+              const cssASTKey = componentName ? `cssAST_${componentName}` : "cssAST";
+              const customASTKey = componentName ? `${htmlKey}` : "customAST";
+
+              // Extract AST objects dynamically
+              const jsAST = astObject[jsASTKey];
+              const cssASTObject = astObject[cssASTKey];
+              const customSyntaxAST = astObject[customASTKey]?.content;
 
               let cssAST = '';
-              if (cssASTObject && cssASTObject.content && Array.isArray(cssASTObject.content.nodes) && cssASTObject.content.nodes.length > 0) {
+              if (cssASTObject?.content?.nodes?.length > 0) {
                 cssAST = convertCssASTToString(cssASTObject);
               }
 
-              //console.log("CSS Output:", cssAST);
-
-              const customSyntaxAST = astObject.customAST.content;
-              const customSyntaxObject = customSyntaxAST[0];
+              console.log("JS AST Key Used:", jsASTKey);
+              console.log("CSS AST Key Used:", cssASTKey);
+              console.log("Custom AST Key Used:", customASTKey);
 
               // Dynamically import the module and apply transformations
               try {
-                if (jsAST.content.body.length > 0 && customSyntaxAST[0].html.children[0].children[0].length > 0) {
+                if (jsAST?.content?.body?.length > 0 && customSyntaxAST?.[0]?.html?.children?.[0]?.children?.[0]?.length > 0) {
                   const atomiqueModule = await import('./static_analysis/anatomique.js');
                   const transformASTs = atomiqueModule.default; // If using default export
                   await transformASTs(jsAST.content, cssAST, customSyntaxAST, filePath);
                 } else {
-                  //console.log(`Transformer not run for ${filePath} - Either JS or HTML not found`);
+                  console.log(`Transformer not run for ${filePath} - Either JS or HTML not found`);
                 }
               } catch (importErr) {
                 console.error('Error importing module:', importErr);
@@ -98,6 +110,7 @@ async function readSMQHTMLFiles(directory) {
     });
   });
 }
+
 
 /**
  * Start the transformation process.
