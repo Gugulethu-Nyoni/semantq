@@ -17,7 +17,7 @@ const aliasMap = {
 
 
 
-// Helper function: Recursively find all `+page.smq.ast` files
+// Helper function: Recursively find all `.ast` files
 export function findAstFiles(dir) {
   let files = [];
   fs.readdirSync(dir).forEach(file => {
@@ -195,7 +195,7 @@ function resolveImports(astFilePath) {
 // Main function: Resolve imports and merge components
 export async function importsResolver(destDir) {
 
-  console.log("INNNN?");
+  //console.log("INNNN?");
   try {
     // Step 1: Find all AST files
     const astFiles = findAstFiles(destDir);
