@@ -3,19 +3,38 @@ import fs from 'fs';
 import path from 'path';
 
 import { walk } from 'estree-walker';
+import { traverse } from 'estraverse';
 
 class SlotResolver {
   constructor(ast, filePath) {
     this.filePath = filePath;
-    this.ast = ast; // The merged AST from +page.merged.ast
-    this.jsAST = ast.jsAST || { type: 'JavaScript', content: { body: [] } }; // Initialize JS AST
-    this.cssAST = ast.cssAST || { type: 'CSS', content: {} }; // Initialize CSS AST
-    this.customAST = ast.customAST || { type: 'Custom', content: [] }; // Initialize custom AST
+    this.ast = ast; // The merged AST from either +page.merged.ast or Component.merged.ast
+    this.componentName='';
+    // Extract component name dynamically (e.g., "Card" from "Card.merged.ast")
+    const fileName = path.basename(filePath, '.merged.ast');
+    const isPage = fileName.startsWith('+page');
+    if (!isPage) {
+      this.componentName=fileName; 
+    }
+
+    // Determine the appropriate AST keys
+    this.jsASTKey = isPage ? 'jsAST' : `jsAST_${fileName}`;
+    this.cssASTKey = isPage ? 'cssAST' : `cssAST_${fileName}`;
+
+    // Safely retrieve JS and CSS AST
+    this.jsAST = ast[this.jsASTKey] || { type: 'JavaScript', content: { body: [] } };
+    this.cssAST = ast[this.cssASTKey] || { type: 'CSS', content: {} };
+
+    // Pages also have customAST
+    this.customAST = isPage ? (ast.customAST || { type: 'Custom', content: [] }) : null;
+
     this.importedComponents = {}; // Registry for imported components
     this.childrenSlotsRegistry = {};
+
     this.buildComponentRegistry(); // Build the component registry
     this.resolvedAst = this.resolveSlots(ast, filePath);
   }
+
 
   // Helper function to safely get JS content
   getJSContent() {
@@ -168,6 +187,56 @@ replaceNode(ast, targetNodeName, replacementNode) {
 
 
 
+removeDefaultImport(importedComponentName) {
+  // Determine the jsAST key based on the componentName
+  let jsASTKey;
+  if (this.componentName === '') {
+    jsASTKey = "jsAST";
+  } else {
+    jsASTKey = "jsAST_" + this.componentName;
+  }
+
+
+  // Retrieve the js AST object for the given key
+  const ast = this.ast[jsASTKey];
+  //console.log("CHECK", ast);
+
+  // Check if the provided AST is valid
+  if (!ast || !ast.content || !ast.content.body) {
+    throw new Error('Invalid AST provided');
+  }
+
+  // Define a recursive function to traverse the AST
+  function traverse(node,importedComponentName) {
+    //console.log("THERE --", importedComponentName);
+    // Check if the current node is an import declaration statement
+    if (node.type === 'ImportDeclaration') {
+      // Check if the import declaration statement is for the specified component
+      if (node.specifiers.some(specifier => specifier.local.name === importedComponentName)) {
+        // Remove the import declaration statement
+        return null;
+      }
+    }
+
+    // Recursively traverse child nodes
+    if (node.body) {
+      node.body = node.body.filter(child => traverse(child,importedComponentName));
+    }
+
+    // Return the traversed node
+    return node;
+  }
+
+  // Traverse the AST and remove import declaration statements for the specified component
+  ast.content.body = ast.content.body.filter(node => traverse(node, importedComponentName));
+
+  // Return the modified AST
+  //console.log(JSON.stringify(ast,null,2));
+  return ast;
+}
+
+
+
 
   // Main method to resolve default slots
   resolveDefaultSlots(parentAst, childAst, componentName) {
@@ -193,6 +262,9 @@ replaceNode(ast, targetNodeName, replacementNode) {
         const updatedParentAst=this.replaceNode(parentAst, componentName, resolvedChildNode);      
        const componentAstKey = componentName.toLowerCase();
       delete this.ast[componentAstKey];
+     
+      // remove the import statement form the imported component that has been resolved from the parent component js ast
+      this.removeDefaultImport(componentName)
 
    //console.log("resolved parent",JSON.stringify(updatedParentAst,null,2));
    return updatedParentAst; 
@@ -260,6 +332,8 @@ replaceNode(ast, targetNodeName, replacementNode) {
 /// class wrapper
 
 }
+
+
 
 
 
