@@ -138,24 +138,24 @@ export function compileSMQFiles(destDir) {
 
 
 function writeToFile(astObjects) {
-  const jsAST = { type: 'JavaScript', content: astObjects.jsAST };
-  const cssAST = { type: 'CSS', content: astObjects.cssAST };
+  // Extract filename without extension
+  const fileName = path.basename(astObjects.newFilePath, '.ast'); 
 
-  // Extract filename from the path
-  const fileName = path.basename(astObjects.newFilePath, '.ast'); // Get filename without extension
+  let htmlKey = "customAST"; // Default for pages
+  let jsKey = "jsAST";
+  let cssKey = "cssAST";
 
-  let htmlKey = "customAST"; // Default key for pages
   if (!fileName.startsWith("+page")) {
-    htmlKey = fileName.split(".")[0].toLowerCase(); // Use the first part as the key for components
+    const componentName = fileName.split(".")[0]; // Extract component name
+    htmlKey = componentName.toLowerCase();
+    jsKey = `jsAST_${componentName}`;
+    cssKey = `cssAST_${componentName}`;
   }
 
-  // Dynamically assign the correct key for HTML AST
-  const htmlAST = { type: 'HTML', content: astObjects.customAST }; // Keeping content as `customAST`
-  
   const astObject = {
-    jsAST,
-    cssAST,
-    [htmlKey]: htmlAST, // Dynamically setting the key
+    [jsKey]: { type: 'JavaScript', content: astObjects.jsAST },
+    [cssKey]: { type: 'CSS', content: astObjects.cssAST },
+    [htmlKey]: { type: 'HTML', content: astObjects.customAST },
   };
 
   const jsonString = JSON.stringify(astObject, null, 2);
