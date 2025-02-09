@@ -137,30 +137,31 @@ export function compileSMQFiles(destDir) {
 //compileSMQFiles();
 
 
-function writeToFile(astObjects){
+function writeToFile(astObjects) {
+  const jsAST = { type: 'JavaScript', content: astObjects.jsAST };
+  const cssAST = { type: 'CSS', content: astObjects.cssAST };
 
-//console.log(astObjects); return;
+  // Extract filename from the path
+  const fileName = path.basename(astObjects.newFilePath, '.ast'); // Get filename without extension
 
-// Creating new objects with the same structure
-const jsAST = { type: 'JavaScript', content: astObjects.jsAST };
-const cssAST = { type: 'CSS', content: astObjects.cssAST };
-const customAST = { type: 'Custom', content: astObjects.customAST };
-
-
-  const astObject= {
-jsAST,
-cssAST,
-customAST,
-
+  let htmlKey = "customAST"; // Default key for pages
+  if (!fileName.startsWith("+page")) {
+    htmlKey = fileName.split(".")[0].toLowerCase(); // Use the first part as the key for components
   }
 
-const jsonString = JSON.stringify(astObject, null, 2);
+  // Dynamically assign the correct key for HTML AST
+  const htmlAST = { type: 'HTML', content: astObjects.customAST }; // Keeping content as `customAST`
+  
+  const astObject = {
+    jsAST,
+    cssAST,
+    [htmlKey]: htmlAST, // Dynamically setting the key
+  };
 
-const newFilePath = astObjects.newFilePath; 
+  const jsonString = JSON.stringify(astObject, null, 2);
+  const newFilePath = astObjects.newFilePath;
 
-
-
-    fs.unlink(newFilePath, (err) => {
+  fs.unlink(newFilePath, (err) => {
     if (err && err.code !== 'ENOENT') {
       console.error(err);
     } else {
@@ -168,11 +169,9 @@ const newFilePath = astObjects.newFilePath;
         if (err) {
           console.error(err);
         } else {
-          //console.log('Ast File written successfully');
+          console.log(`AST File written successfully: ${newFilePath}`);
         }
       });
     }
   });
-
-
 }
