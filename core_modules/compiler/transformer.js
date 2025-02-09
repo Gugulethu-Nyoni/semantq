@@ -52,7 +52,7 @@ async function readSMQHTMLFiles(directory) {
 
         if (stats.isDirectory()) {
           readSMQHTMLFiles(filePath); // Recursively call on subdirectory
-        } else if (path.basename(file).toLowerCase() === '+page.resolved.ast') {
+        } else if (file.toLowerCase().endsWith('.resolved.ast')) {
 
             console.log("ISINDE THERE****", file);
 
