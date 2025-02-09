@@ -214,8 +214,8 @@
       }
     }
   },
-  "customAST": {
-    "type": "Custom",
+  "+404": {
+    "type": "HTML",
     "content": [
       {
         "html": {
