@@ -169,7 +169,7 @@ function writeToFile(astObjects) {
         if (err) {
           console.error(err);
         } else {
-          console.log(`AST File written successfully: ${newFilePath}`);
+          // console.log(`AST File written successfully: ${newFilePath}`);
         }
       });
     }
