@@ -66,25 +66,56 @@ class SlotResolver {
   resolveSlots(ast, filePath) {
 
 
-    const parentComponentFileName = path.basename(filePath);
-    const parentComponentKey = parentComponentFileName.replace('.merged.ast','').toLowerCase();
+    const parentComponentFileName = path.basename(filePath); // Extract filename
+    let parentComponentKey;
+
+    // Determine if it's a page or a component
+    if (parentComponentFileName.startsWith("+page")) {
+        parentComponentKey = "customAST"; // Pages use 'customAST'
+    } else {
+        parentComponentKey = parentComponentFileName.replace('.merged.ast', '').toLowerCase(); // Components use lowercase name
+    }
+
+
     const parentComponentAST = ast[parentComponentKey].content[0];
+    //console.log(parentComponentKey, JSON.stringify(parentComponentAST,null,2));
+
+
     //console.log("PARENT",JSON.stringify(parentComponentAST,null,2));
 // now push this parent ast to the parent children registry 
 
+// Get the keys of the importedComponents object
+const reversedComponentNames = Object.keys(this.importedComponents).reverse();
 
-// now get all children asts  
-  for (const componentName in this.importedComponents) {
+// Loop through the reversed array
+for (const componentName of reversedComponentNames) {
     // Access the componentPath correctly using bracket notation
     const componentPath = this.importedComponents[componentName];
+    
+    // Log the component name and path (optional)
     //console.log(`Component: ${componentName}, Path: ${componentPath}`);
-    const childComponentName=componentName.toLowerCase();
-    const childComponentAST = ast[childComponentName].content[0];
+    
+    // Convert component name to lowercase
+    const childComponentName = componentName.toLowerCase();
+    
+    // Access the AST for the child component
+    //console.log("SEEEEE",filePath,childComponentName, JSON.stringify(ast,null,2));
+    const fileName = path.basename(filePath);
+    const resourceName = fileName.split('.')[0];
+    let childComponentAST; 
+
+    if (resourceName === '+page') {
+    childComponentAST = ast.customAST.content[0].children[0].children[0][0][childComponentName].content[0];
+    } else {
+    childComponentAST = ast[childComponentName].content[0];
+    }
+
 
 
     //console.log("CHILD",JSON.stringify(childComponentAST,null,2));
 
     // Example usage
+    //console.log(componentName, JSON.stringify(parentComponentAST,null,2));
 const mergedAst = this.resolveDefaultSlots(parentComponentAST, childComponentAST, componentName);
  //console.log("SEE",JSON.stringify(ast.card.content[0],null,2));
 //return this.resolvedAst;
@@ -241,7 +272,9 @@ removeDefaultImport(importedComponentName) {
   // Main method to resolve default slots
   resolveDefaultSlots(parentAst, childAst, componentName) {
     // Step 1: Dynamically find componentName in the parent AST
+    //console.log("LAPHA",componentName);
     let parentSlotNode = this.findTargetNode(parentAst, componentName);
+    //console.log("HERE",componentName, JSON.stringify(parentAst,null,2));
     parentSlotNode = parentSlotNode[0].children[0][0]; 
     //console.log("PARENT NODE",JSON.stringify(parentSlotNode[0].children[0][0],null,2));
 
@@ -340,12 +373,22 @@ removeDefaultImport(importedComponentName) {
 
 // Helper function: Recursively find all `.merged.ast` files
 function findMergedAstFiles(dir) {
+  let targetFileExtension;
+  const directoryScope = dir.split('/').pop(); 
+  //console.log("DRRRRRRRRRR", directoryScope);
+  if (directoryScope === 'components') {
+    targetFileExtension = '.merged.ast'; //
+   } else {
+   targetFileExtension = '.merged.ast';
+
+   }
+
   let files = [];
   fs.readdirSync(dir).forEach(file => {
     const fullPath = path.join(dir, file);
     if (fs.statSync(fullPath).isDirectory()) {
       files = files.concat(findMergedAstFiles(fullPath)); // Recursive call for subdirectories
-    } else if (file.endsWith('.merged.ast')) {
+    } else if (file.endsWith(targetFileExtension)) {
       files.push(fullPath);
     }
   });
@@ -355,6 +398,7 @@ function findMergedAstFiles(dir) {
 // Loop through given directory - get all `.merged.ast` files and process them with SlotResolver
 export async function processMergedFiles(destDir) {
   const files = findMergedAstFiles(destDir);
+  //console.log("Filessssssssssss", files);
 
   for (const filePath of files) {
     try {
