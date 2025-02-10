@@ -24,7 +24,8 @@ export function findAstFiles(dir) {
     const fullPath = path.join(dir, file);
     if (fs.statSync(fullPath).isDirectory()) {
       files = files.concat(findAstFiles(fullPath)); // Recursive call for subdirectories
-    } else if (file.endsWith('.ast')) {
+    } 
+    else if (file.endsWith('.ast')) {
       files.push(fullPath);
     }
   });
@@ -37,8 +38,33 @@ export function findAstFiles(dir) {
 function loadComponent(componentPath) {
   try {
     // Ensure the componentPath is an absolute path before reading
+    
+    const fileName = path.basename(componentPath); // Button.resolved.ast
+    const componentName = fileName.split('.')[0];
+    const basicAstFileName = componentName + '.smq.ast'; 
+    const astComponentPath = componentPath.replace(fileName, basicAstFileName);
+
+
+
+    //console.log("HHHHHH",componentPath);
     const fullPath = path.resolve(componentPath); // This should now be absolute
+    
+    try {
     return fs.readFileSync(fullPath, 'utf-8');
+    } catch (error) {
+    if (error.code === 'ENOENT') {
+    // File not found, attempt to read the alternative file path
+    const alternativeFullPath = path.resolve(astComponentPath);
+    return fs.readFileSync(alternativeFullPath, 'utf-8');
+    } else {
+    // Re-throw the error if it's not a file not found error
+    throw error;
+    }
+}
+
+
+
+
   } catch (error) {
     console.error(`Error loading component ${componentPath}:`, error);
     return null;
@@ -91,7 +117,7 @@ function mergeComponents(imports, baseDir, astFile) {
     const mergedComponents = new Set();
 
     // Helper function to check if a customAST node is a duplicate
-    const isCustomASTNodeDuplicate = (node, mergedNodes) => {
+    const isCustomASTNodeDuplicate = (node, mergedNodes,astFile) => {
       return mergedNodes.some(existingNode =>
         JSON.stringify(existingNode) === JSON.stringify(node)
       );
@@ -99,7 +125,18 @@ function mergeComponents(imports, baseDir, astFile) {
 
     // Merge component ASTs
     for (const imp of imports) {
-      let componentPath = imp.updatedSource.replace('src', 'build').replace('.smq', '.smq.ast');
+
+      const componentName = path.basename(astFile,'.smq.ast').split('.')[0];
+      let fileExtension;
+      if (componentName === '+page') {
+        fileExtension = '.resolved.ast';
+    } else {
+     fileExtension = '.smq.ast';
+
+    }
+
+      let componentPath = imp.updatedSource.replace('src', 'build').replace('.smq', fileExtension);
+      //console.log("THE component PATH",componentName, componentPath);
       const componentContent = loadComponent(componentPath);
 
       if (componentContent && !mergedComponents.has(componentPath)) {
@@ -145,7 +182,7 @@ function mergeComponents(imports, baseDir, astFile) {
     // Write the correctly formatted merged AST
     const mergedFilePath = astFile.replace('.smq.ast', '.merged.ast');
     fs.writeFileSync(mergedFilePath, JSON.stringify(mergedAst, null, 2), 'utf-8');
-    console.log(`Merged AST written to: ${mergedFilePath}`);
+    //console.log(`Merged AST written to: ${mergedFilePath}`);
 
     return mergedAst;
   } catch (error) {
