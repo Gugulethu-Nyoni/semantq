@@ -43,74 +43,86 @@ async function readSMQHTMLFiles(directory) {
       return;
     }
 
-    files.forEach((file) => {
-      const filePath = path.join(directory, file);
-      fs.stat(filePath, (err, stats) => {
-        if (err) {
-          console.error('Error stat-ing file:', err);
-          return;
-        }
+    // Filter and prioritize .resolved.ast files
+    const resolvedAstFiles = files.filter(file => file.toLowerCase().endsWith('.resolved.ast'));
+    const smqAstFiles = files.filter(file => file.toLowerCase().endsWith('.smq.ast'));
 
-        if (stats.isDirectory()) {
-          readSMQHTMLFiles(filePath); // Recursively call on subdirectory
-        } else if (file.toLowerCase().endsWith('.resolved.ast') || file.toLowerCase().endsWith('.smq.ast')) {
-          //console.log("ISINDE THERE****", file);
-
-          fs.readFile(filePath, 'utf8', async (err, data) => {
-            if (err) {
-              console.error('Error reading file:', err);
-              return;
-            }
-
-            try {
-              const astObject = JSON.parse(data);
-
-              // Extract component name dynamically
-              const fileName = file.split('/').pop(); // Get just the file name
-              let componentName = fileName.startsWith("+page") ? "" : fileName.split('.')[0];
-              const htmlKey = componentName.toLowerCase();
-
-              // Dynamically determine AST keys
-              const jsASTKey = componentName ? `jsAST_${componentName}` : "jsAST";
-              const cssASTKey = componentName ? `cssAST_${componentName}` : "cssAST";
-              const customASTKey = componentName ? `${htmlKey}` : "customAST";
-
-              // Extract AST objects dynamically
-              const jsAST = astObject[jsASTKey];
-              const cssASTObject = astObject[cssASTKey];
-              const customSyntaxAST = astObject[customASTKey]?.content;
-
-              let cssAST = '';
-              if (cssASTObject?.content?.nodes?.length > 0) {
-                cssAST = convertCssASTToString(cssASTObject);
-              }
-
-              console.log("JS AST Key Used:", jsASTKey);
-              console.log("CSS AST Key Used:", cssASTKey);
-              console.log("Custom AST Key Used:", customASTKey);
-
-              // Dynamically import the module and apply transformations
-              try {
-                if (jsAST?.content?.body?.length > 0 && customSyntaxAST?.[0]?.html?.children?.[0]?.children?.[0]?.length > 0) {
-                  const atomiqueModule = await import('./static_analysis/anatomique.js');
-                  const transformASTs = atomiqueModule.default; // If using default export
-                  await transformASTs(jsAST.content, cssAST, customSyntaxAST, filePath);
-                } else {
-                  console.log(`Transformer not run for ${filePath} - Either JS or HTML not found`);
-                }
-              } catch (importErr) {
-                console.error('Error importing module:', importErr);
-              }
-            } catch (parseErr) {
-              console.error('Error parsing JSON:', parseErr);
-            }
-          });
-        }
-      });
+    // Process .resolved.ast files first
+    resolvedAstFiles.forEach((file) => {
+      processFile(file, directory);
     });
+
+    // If no .resolved.ast files were found, process .smq.ast files
+    if (resolvedAstFiles.length === 0) {
+      smqAstFiles.forEach((file) => {
+        processFile(file, directory);
+      });
+    }
   });
 }
 
+// Helper function to process a file
+function processFile(file, directory) {
+  const filePath = path.join(directory, file);
+  fs.stat(filePath, (err, stats) => {
+    if (err) {
+      console.error('Error stat-ing file:', err);
+      return;
+    }
+
+    if (stats.isFile()) {
+      fs.readFile(filePath, 'utf8', async (err, data) => {
+        if (err) {
+          console.error('Error reading file:', err);
+          return;
+        }
+
+        try {
+          const astObject = JSON.parse(data);
+
+          // Extract component name dynamically
+          const fileName = file.split('/').pop(); // Get just the file name
+          let componentName = fileName.startsWith("+page") ? "" : fileName.split('.')[0];
+          const htmlKey = componentName.toLowerCase();
+
+          // Dynamically determine AST keys
+          const jsASTKey = componentName ? `jsAST_${componentName}` : "jsAST";
+          const cssASTKey = componentName ? `cssAST_${componentName}` : "cssAST";
+          const customASTKey = componentName ? `${htmlKey}` : "customAST";
+
+          // Extract AST objects dynamically
+          const jsAST = astObject[jsASTKey];
+          const cssASTObject = astObject[cssASTKey];
+          const customSyntaxAST = astObject[customASTKey]?.content;
+
+          let cssAST = '';
+          if (cssASTObject?.content?.nodes?.length > 0) {
+            cssAST = convertCssASTToString(cssASTObject);
+          }
+
+          //console.log("JS AST Key Used:", jsASTKey);
+          //console.log("CSS AST Key Used:", cssASTKey);
+          //console.log("Custom AST Key Used:", customASTKey);
+
+          // Dynamically import the module and apply transformations
+          try {
+            if (jsAST?.content?.body?.length > 0 && customSyntaxAST?.[0]?.html?.children?.[0]?.children?.[0]?.length > 0) {
+              const atomiqueModule = await import('./static_analysis/anatomique.js');
+              const transformASTs = atomiqueModule.default; // If using default export
+              await transformASTs(jsAST.content, cssAST, customSyntaxAST, filePath);
+            } else {
+              console.log(`Transformer not run for ${filePath} - Either JS or HTML not found`);
+            }
+          } catch (importErr) {
+            console.error('Error importing module:', importErr);
+          }
+        } catch (parseErr) {
+          console.error('Error parsing JSON:', parseErr);
+        }
+      });
+    }
+  });
+}
 
 /**
  * Start the transformation process.
