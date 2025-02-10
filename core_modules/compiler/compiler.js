@@ -135,7 +135,7 @@ async function slotsResolution(destDir) {
 
 async function transformer(destDir) {
   try {
-    console.log("Transforming Components");
+    //console.log("Transforming Components");
     const trans = await import('./transformer.js');
     trans.transformSMQFiles(destDir); 
     //console.log("Done: Transforming Components");
@@ -187,12 +187,12 @@ async function main(sourceDir,destDir, destDirBase) {
    await importsResolution(componentsDest);
    await slotsResolution(componentsDest);
 
-  //await importsResolution(destDir);
+  await importsResolution(destDir);
   //await slotsResolution(destDir);
 
 
 
-  //await transformer(destDir);
+  await transformer(destDir);
   await transformer(componentsDest);
 
   await routesGenerator(sourceDir,destDir);
