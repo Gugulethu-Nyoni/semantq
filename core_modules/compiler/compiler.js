@@ -148,7 +148,7 @@ async function slotsResolution(destDir) {
 
 async function transformer(destDir) {
   try {
-    //console.log("Transforming Components");
+    console.log("Transforming Components");
     const trans = await import('./transformer.js');
     trans.transformSMQFiles(destDir); 
     //console.log("Done: Transforming Components");
@@ -202,13 +202,11 @@ async function main(sourceDir,destDir, destDirBase) {
 /// resolve component imports and slots 
 // so that when we resolve page imports these are sorted
    
-   //await importsResolution(componentsDest);
-   //await slotsResolution(componentsDest);
+   await importsResolution(componentsDest);
+   await slotsResolution(componentsDest);
 
-  //await importsResolution(destDir);
-  //await slotsResolution(destDir);
-
-
+  await importsResolution(destDir);
+  await slotsResolution(destDir);
 
   await transformer(destDir);
   await transformer(componentsDest);
