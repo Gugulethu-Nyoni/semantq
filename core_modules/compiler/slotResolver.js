@@ -5,6 +5,11 @@ import path from 'path';
 import { walk } from 'estree-walker';
 import { traverse } from 'estraverse';
 
+import GetNodePositions from './utils/getNodePositions.js';
+import elementWalker from './utils/elementWalker.js';
+import Walker from './utils/deepWalker.js'; 
+
+
 class SlotResolver {
   constructor(ast, filePath) {
     this.filePath = filePath;
@@ -12,27 +17,35 @@ class SlotResolver {
     this.componentName='';
     // Extract component name dynamically (e.g., "Card" from "Card.merged.ast")
     const fileName = path.basename(filePath, '.merged.ast');
-    const isPage = fileName.startsWith('+page');
-    if (!isPage) {
+    this.isPage = false; 
+    this.isComponent = false; 
+
+    if (fileName.startsWith('+page')) {
+      this.isPage=true; 
+
+    }
+
+    if (!this.isPage) {
       this.componentName=fileName; 
     }
 
     // Determine the appropriate AST keys
-    this.jsASTKey = isPage ? 'jsAST' : `jsAST_${fileName}`;
-    this.cssASTKey = isPage ? 'cssAST' : `cssAST_${fileName}`;
+    this.jsASTKey = this.isPage ? 'jsAST' : `jsAST_${fileName}`;
+    this.cssASTKey = this.isPage ? 'cssAST' : `cssAST_${fileName}`;
+    this.htmlKey = this.isPage ? 'customAST' : `${this.componentName.toLowerCase()}`;
 
     // Safely retrieve JS and CSS AST
     this.jsAST = ast[this.jsASTKey] || { type: 'JavaScript', content: { body: [] } };
     this.cssAST = ast[this.cssASTKey] || { type: 'CSS', content: {} };
 
     // Pages also have customAST
-    this.customAST = isPage ? (ast.customAST || { type: 'Custom', content: [] }) : null;
+    this.customAST = this.ast[this.htmlKey] || { type: 'Custom', content: [] };
 
-    this.importedComponents = {}; // Registry for imported components
+    this.componentsRegistry = {}; // Registry for imported components
     this.childrenSlotsRegistry = {};
 
     this.buildComponentRegistry(); // Build the component registry
-    this.resolvedAst = this.resolveSlots(ast, filePath);
+    this.resolvedAst = this.resolveDefaultSlots(this.filePath);
   }
 
 
@@ -42,285 +55,143 @@ class SlotResolver {
   }
 
   // Build the component registry by extracting imports from the jsAST
-  buildComponentRegistry() {
+buildComponentRegistry() {
     const jsContent = this.getJSContent();
 
-    // Use estree-walker to traverse the jsAST
     walk(jsContent, {
-      enter: (node) => {
-        if (node.type === 'ImportDeclaration' && node.source.value.includes('$components')) {
-          // Extract the component name and source path
-          const componentName = node.specifiers[0].local.name; // e.g., "Header"
-          const componentPath = node.source.value; // e.g., "$components/Header.smq"
+        enter: ({ type, source, specifiers }) => {
+            if (type === 'ImportDeclaration' && source.value.includes('$components')) {
+                const componentName = specifiers[0].local.name; // e.g., "Header"
+                const componentPath = source.value; // e.g., "$components/Header.smq"
 
-          // Add the component to the registry
-          this.importedComponents[componentName] = componentPath;
-        }
-      },
+                // Ensure the component is used in the HTML AST before adding it
+                if (elementWalker(this.customAST, 'name', componentName)) {
+                    this.componentsRegistry[componentName] = componentPath;
+                }
+            }
+        },
     });
 
-    //console.log('Component Registry:', this.importedComponents);
-  }
-
-
-  resolveSlots(ast, filePath) {
-
-
-    const parentComponentFileName = path.basename(filePath); // Extract filename
-    let parentComponentKey;
-
-    // Determine if it's a page or a component
-    if (parentComponentFileName.startsWith("+page")) {
-        parentComponentKey = "customAST"; // Pages use 'customAST'
-    } else {
-        parentComponentKey = parentComponentFileName.replace('.merged.ast', '').toLowerCase(); // Components use lowercase name
-    }
-
-
-    const parentComponentAST = ast[parentComponentKey].content[0];
-    //console.log(parentComponentKey, JSON.stringify(parentComponentAST,null,2));
-
-
-    //console.log("PARENT",JSON.stringify(parentComponentAST,null,2));
-// now push this parent ast to the parent children registry 
-
-// Get the keys of the importedComponents object
-const reversedComponentNames = Object.keys(this.importedComponents).reverse();
-
-// Loop through the reversed array
-for (const componentName of reversedComponentNames) {
-    // Access the componentPath correctly using bracket notation
-    const componentPath = this.importedComponents[componentName];
-    
-    // Log the component name and path (optional)
-    //console.log(`Component: ${componentName}, Path: ${componentPath}`);
-    
-    // Convert component name to lowercase
-    const childComponentName = componentName.toLowerCase();
-    
-    // Access the AST for the child component
-    //console.log("SEEEEE",filePath,childComponentName, JSON.stringify(ast,null,2));
-    const fileName = path.basename(filePath);
-    const resourceName = fileName.split('.')[0];
-    let childComponentAST; 
-
-    if (resourceName === '+page') {
-    childComponentAST = ast.customAST.content[0].children[0].children[0][0][childComponentName].content[0];
-    } else {
-      //console.log(fileName, childComponentName, JSON.stringify(ast,null,2));
-      console.log(this.importedComponents);
-    childComponentAST = ast[childComponentName].content[0];
-    }
-
-
-
-    //console.log("CHILD",JSON.stringify(childComponentAST,null,2));
-
-    // Example usage
-    //console.log(componentName, JSON.stringify(parentComponentAST,null,2));
-const mergedAst = this.resolveDefaultSlots(parentComponentAST, childComponentAST, componentName);
- //console.log("SEE",JSON.stringify(ast.card.content[0],null,2));
-//return this.resolvedAst;
-
-//console.log("kunjani", JSON.stringify(ast, null,2));
-const resolvedFilePath = filePath.replace('.merged.', '.resolved.');
-fs.writeFileSync(resolvedFilePath, JSON.stringify(ast, null, 2), 'utf-8');
-
-
-
-
-//const finalHTML = this.astToHtml(mergedAst);
-//console.log(finalHTML);
-//console.log("resolved slots",JSON.stringify(mergedHTML,null,2));
-   
-  }
-}
-
-
-deepWalker(ast, nodeKey, nodeKeyValue) {
-  // Helper function to recursively traverse the AST
-  function walk(node, callback) {
-    // Call the callback on the current node
-    callback(node);
-
-    // Recursively traverse all properties of the node
-    for (const key in node) {
-      if (node.hasOwnProperty(key)) {
-        const value = node[key];
-
-        // If the value is an object or array, recursively walk it
-        if (typeof value === "object" && value !== null) {
-          if (Array.isArray(value)) {
-            value.forEach((item) => {
-              if (typeof item === "object" && item !== null) {
-                walk(item, callback);
-              }
-            });
-          } else {
-            walk(value, callback);
-          }
-        }
-      }
-    }
-  }
-
-  // Variable to store the found node
-  let foundNode = null;
-
-  // Start walking the AST
-  walk(ast, (node) => {
-    // Check if the current node has the specified key-value pair
-    if (node[nodeKey] === nodeKeyValue) {
-      foundNode = node;
-    }
-  });
-
-  // Return the found node (or null if not found)
-  return foundNode;
+    //console.log(this.componentsRegistry);
 }
 
 
 
-// Method to recursively replace nodes in any AST structure
-replaceNode(ast, targetNodeName, replacementNode) {
-  function traverse(node) {
-    if (!node) return;
 
-    // Check if the current node matches the target node
-    if (node.type === "Element" && node.name === targetNodeName) {
-      // Replace the entire target node with the replacement node
-      Object.assign(node, replacementNode);
-      return; // Stop further traversal for this branch
-    }
+ resolveDefaultSlots(filePath) {
+    // Extract filename (e.g., Card.merged.ast or +page.merged.ast)
+    const parentComponentFileName = path.basename(filePath);
+    const parentComponentKey = this.isPage
+        ? "customAST" // Pages use 'customAST'
+        : parentComponentFileName.replace('.merged.ast', '').toLowerCase(); // Components use lowercase name (e.g., 'card')
 
-    // Traverse the children of the current node
-    if (node.children) {
-      if (Array.isArray(node.children)) {
-        node.children.forEach((child, index) => {
-          if (Array.isArray(child)) {
-            // Handle nested arrays (e.g., [[child1, child2], [child3]])
-            child.forEach((subChild, subIndex) => {
-              if (subChild.type === "Element" && subChild.name === targetNodeName) {
-                // Replace the target node with the replacement node
-                child[subIndex] = replacementNode;
-              } else {
-                traverse(subChild);
-              }
-            });
-          } else {
-            // Handle non-nested children
-            if (child.type === "Element" && child.name === targetNodeName) {
-              // Replace the target node with the replacement node
-              node.children[index] = replacementNode;
-            } else {
-              traverse(child);
+    const parentComponentAST = this.ast[parentComponentKey];
+    const walk = new Walker();
+
+    // Loop through components in reverse for proper slot resolution in nested components
+    for (const key of Object.keys(this.componentsRegistry).reverse()) {
+        const childComponentName = key;
+        const childComponentKey = key.toLowerCase();
+
+        if (this.isPage) {
+            // PAGE SCOPE
+            const childComponentAstBlock = this.ast[childComponentKey];
+
+            // Locate the target node (child component in parent AST)
+            const targetNode = walk.deepWalker(
+                parentComponentAST,
+                walk.createMatchLogic('Element', childComponentName),
+                'Element'
+            )[0].node;
+
+            const targetNodeChildren = walk.findChildren(targetNode);
+
+            // Locate the slot node inside the child component AST
+            const slotNode = this.ast[childComponentKey];
+            const slotFallBackChildren = walk.findChildren(slotNode);
+
+            // Determine content to set: use targetNodeChildren if available, otherwise fallback
+            const contentToSet = (targetNodeChildren?.[0]?.length > 1)
+                ? targetNodeChildren[0][0]
+                : slotFallBackChildren?.[0]?.[0];
+
+            // Update parent AST with modified child component AST
+            const parentNodeLocations = new GetNodePositions(parentComponentAST, targetNode).init();
+            const cparentNode = parentNodeLocations[0].parentNode;
+            const ctargetNodeIndex = parentNodeLocations[0].nodeIndex;
+
+            if (cparentNode?.children?.[0]?.[ctargetNodeIndex]) {
+                cparentNode.children[0][ctargetNodeIndex] = childComponentAstBlock;
             }
-          }
-        });
-      } else {
-        // Handle non-array children
-        traverse(node.children);
-      }
-    }
-  }
+        } else {
+            // COMPONENT SCOPE
+            const childComponentAstBlock = this.ast[childComponentKey];
 
-  // Start traversal from the root of the AST
-  traverse(ast.html);
-  return ast;
+            // Locate the target node (child component in parent AST)
+            const targetNode = walk.deepWalker(
+                parentComponentAST,
+                walk.createMatchLogic('Element', childComponentName),
+                'Element'
+            )[0].node;
+
+            const targetNodeChildren = walk.findChildren(targetNode);
+
+            // Locate the slot node inside the child component AST
+            const slotNode = walk.deepWalker(
+                childComponentAstBlock,
+                walk.createMatchLogic('Element', 'slot'),
+                'Element'
+            )[0].node;
+
+            const slotFallBackChildren = walk.findChildren(slotNode);
+
+            // Determine content to set: use targetNodeChildren if available, otherwise fallback
+            const contentToSet = (targetNodeChildren?.[0]?.length > 1)
+                ? targetNodeChildren[0][0]
+                : slotFallBackChildren?.[0]?.[0];
+
+            // Find slot node positions in child component AST
+            const slotNodeLocations = new GetNodePositions(childComponentAstBlock, slotNode).init();
+            const parentNode = slotNodeLocations[0].parentNode;
+            const targetNodeIndex = slotNodeLocations[0].nodeIndex;
+
+            // Replace slot node in child AST with content
+            if (parentNode?.children?.[0]?.[targetNodeIndex]) {
+                parentNode.children[0][targetNodeIndex] = contentToSet;
+            }
+
+            // Update parent AST with modified child component AST
+            const parentNodeLocations = new GetNodePositions(parentComponentAST, targetNode).init();
+            const cparentNode = parentNodeLocations[0].parentNode;
+            const ctargetNodeIndex = parentNodeLocations[0].nodeIndex;
+
+            if (cparentNode?.children?.[0]?.[ctargetNodeIndex]) {
+                cparentNode.children[0][ctargetNodeIndex] = childComponentAstBlock;
+            }
+        }
+
+        // Clean up
+        delete this.ast[childComponentKey];
+    }
+
+    // Write the resolved AST to a file
+    this.writeResolvedAstFile();
+}
+
+
+writeResolvedAstFile() {
+    if (!this.ast || !this.filePath) throw new Error("AST data or filePath is missing");
+    const resolvedFilePath = this.filePath.replace(/merged/, "resolved"), resolvedDir = path.dirname(resolvedFilePath);
+    if (!fs.existsSync(resolvedDir)) fs.mkdirSync(resolvedDir, { recursive: true });
+    fs.writeFileSync(resolvedFilePath, JSON.stringify(this.ast, null, 2), "utf8");
+    console.log(`Resolved AST file saved at: ${resolvedFilePath}`);
 }
 
 
 
-removeDefaultImport(importedComponentName) {
-  // Determine the jsAST key based on the componentName
-  let jsASTKey;
-  if (this.componentName === '') {
-    jsASTKey = "jsAST";
-  } else {
-    jsASTKey = "jsAST_" + this.componentName;
-  }
-
-
-  // Retrieve the js AST object for the given key
-  const ast = this.ast[jsASTKey];
-  //console.log("CHECK", ast);
-
-  // Check if the provided AST is valid
-  if (!ast || !ast.content || !ast.content.body) {
-    throw new Error('Invalid AST provided');
-  }
-
-  // Define a recursive function to traverse the AST
-  function traverse(node,importedComponentName) {
-    //console.log("THERE --", importedComponentName);
-    // Check if the current node is an import declaration statement
-    if (node.type === 'ImportDeclaration') {
-      // Check if the import declaration statement is for the specified component
-      if (node.specifiers.some(specifier => specifier.local.name === importedComponentName)) {
-        // Remove the import declaration statement
-        return null;
-      }
-    }
-
-    // Recursively traverse child nodes
-    if (node.body) {
-      node.body = node.body.filter(child => traverse(child,importedComponentName));
-    }
-
-    // Return the traversed node
-    return node;
-  }
-
-  // Traverse the AST and remove import declaration statements for the specified component
-  ast.content.body = ast.content.body.filter(node => traverse(node, importedComponentName));
-
-  // Return the modified AST
-  //console.log(JSON.stringify(ast,null,2));
-  return ast;
-}
 
 
 
-
-  // Main method to resolve default slots
-  resolveDefaultSlots(parentAst, childAst, componentName) {
-    // Step 1: Dynamically find componentName in the parent AST
-    //console.log("LAPHA",componentName);
-    let parentSlotNode = this.findTargetNode(parentAst, componentName);
-    //console.log("HERE",componentName, JSON.stringify(parentAst,null,2));
-    console.log("parentSlotNode",JSON.stringify(parentSlotNode,null,2));
-
-    parentSlotNode = parentSlotNode[0].children[0][0]; 
-    //console.log("PARENT NODE",JSON.stringify(parentSlotNode[0].children[0][0],null,2));
-
-    const childSlotNode = this.findTargetNode(childAst, "slot");
-    //console.log(JSON.stringify(childSlotNode,null,2));
-    //console.log("CHILD",JSON.stringify(childAst,null,2));
-
-    // so let's replace the slot node in the child ast with the 
-    const targetNodeName = "slot";
-    const updateChildAst=this.replaceNode(childAst, targetNodeName, parentSlotNode);
-
-        //console.log("UPDATE CHILD",JSON.stringify(childAst,null,2));
-
-
-    const resolvedChildNode = childAst.html.children.find(child => child.name === 'customSyntax').children[0][0];
-
-    //console.log("target node child",JSON.stringify(resolvedChildNode,null,2));
-        const updatedParentAst=this.replaceNode(parentAst, componentName, resolvedChildNode);      
-       const componentAstKey = componentName.toLowerCase();
-      delete this.ast[componentAstKey];
-     
-      // remove the import statement form the imported component that has been resolved from the parent component js ast
-      this.removeDefaultImport(componentName)
-
-   //console.log("resolved parent",JSON.stringify(updatedParentAst,null,2));
-   return updatedParentAst; 
-    
-  }
-
-
-/*
  astToHtml(ast) {
   // Helper function to recursively traverse nodes
   function traverse(node) {
@@ -375,7 +246,7 @@ removeDefaultImport(importedComponentName) {
   // Start traversing from the root of the AST (HTML root node)
   return traverse(ast.html.children[0]);
 }
-*/
+
 
 /// class wrapper
 
