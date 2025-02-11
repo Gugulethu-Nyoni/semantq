@@ -127,14 +127,14 @@ function regularise(files) {
 
     // Perform transformations
     const targetNode = elementWalker(ast, 'name', 'customSyntax');
-    console.log("HERE",targetNode);
+    //console.log("HERE",targetNode);
     if (!targetNode) {
       console.error(`Target node not found in file: ${file}`);
       return;
     }
 
     const transformTextNodes = new TransformTextNodes(targetNode);
-    console.log("Compiler Text Fixer:", JSON.stringify(transformTextNodes, null, 2));
+    //console.log("Compiler Text Fixer:", JSON.stringify(transformTextNodes, null, 2));
 
     // Update the AST with the transformed node
     // Assuming `transformTextNodes` modifies `targetNode` in place
