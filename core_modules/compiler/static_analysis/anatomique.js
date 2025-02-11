@@ -10,7 +10,6 @@ import prettier from 'prettier';
 
 
 class GetNodePositions {
-
   constructor (ast, targetNode) {
     this.ast=ast;
     this.targetNode=targetNode;
@@ -284,7 +283,7 @@ function childrenChecker(nodeToCheck) {
  * in their respective order
  * all nodes at this stage are 'Element' types - no loose hanging text or mustache tags 
  * at this point - if such existed they have been transformed already and wrapped in 
- * spans - so very node at this stage is an html tag === node.type 'Element'
+ * spans - so every node at this stage is an html tag === node.type 'Element'
  * nodeStack is a result of a deep exhaustive traversal 
  * - same logic used by the Semantq html parser - so there is no node left out 
  * 2. @childrenChecker checks if node has children 
@@ -928,7 +927,8 @@ deepWalker(ast, nodeType = null, matchLogic, returnType = null) {
  * you also have to set the path of the item to returned
  * 
  * e.g.const returnType = {path: 'expression.name.name'}; 
- * when a match is found based on your matchLogic the function use that path to exract the target value from the matched node
+ * when a match is found based on your matchLogic the function
+ *  use that path to exract the target value from the matched node
  * 
  */
 
@@ -1677,6 +1677,7 @@ function visitMustacheIdentifierNodes(ast) {
   };
 
   // Find the customSyntax node within the AST
+  console.log("HERE",ast.html);
   const customSyntaxNode = findCustomSyntaxNode(ast.html);
   
   //console.log(customSyntaxNode);
@@ -1958,13 +1959,11 @@ if (stackCount && stackCount === 1) {
  * @visitMustacheIdentifierNodes we wrap loose hanging mustache tags into spans
  * e.g. {counter} becomes <span> {counter} </span>
  * 
- * we do this because in semantiq all html must be part of html Element (tag) node for 
- * more efficient handling.  
+ * we do this because in semantq all html must be part of html Element (tag) node for  * more efficient handling.  
  * 
- * free radicals are text nodes or mustache identifiers that are not wrapped in 
- * html tags and belong to the parent tag <customSyntax> </customSyntax>
+ * free radicals are text nodes or mustache identifiers that are not wrapped in html tags and belong to the parent tag <customSyntax> </customSyntax>
  * 
- * @visitEventHandlerNodes transforms event handlers e.g. from @click={incrementer} becomes @click={incrementer()} - other transformations are doen later on  
+ * @visitEventHandlerNodes transforms event handlers e.g. from @click={incrementer} becomes @click={incrementer()} - other transformations are done later on  
  */
 
 /**
@@ -1978,7 +1977,7 @@ export default async function transformASTs(jsAST, cssAST, customSyntaxAST, file
   const customSyntaxObject = customSyntaxAST[0];
 
   // Process text and mustache identifier nodes
-  visitTextNodes(customSyntaxObject);
+  //visitTextNodes(customSyntaxObject);
   visitMustacheIdentifierNodes(customSyntaxObject);
    // Visit event handler nodes
   visitEventHandlerNodes(customSyntaxObject);
@@ -2193,7 +2192,7 @@ if ( Array.isArray(staticNode.identifiersInFunctions) && staticNode.identifiersI
 ${formattedHTML}
 `;
 
-    const newFilePath = filePath.replace('.smq.ast', '.html');              
+const newFilePath = filePath.replace(/\+page\.(resolved|smq)\.ast$/, '+page.html');
 
     fs.unlink(newFilePath, (err) => {
       if (err && err.code !== 'ENOENT') {
