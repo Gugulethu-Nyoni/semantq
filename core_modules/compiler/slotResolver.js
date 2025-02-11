@@ -107,6 +107,8 @@ for (const componentName of reversedComponentNames) {
     if (resourceName === '+page') {
     childComponentAST = ast.customAST.content[0].children[0].children[0][0][childComponentName].content[0];
     } else {
+      //console.log(fileName, childComponentName, JSON.stringify(ast,null,2));
+      console.log(this.importedComponents);
     childComponentAST = ast[childComponentName].content[0];
     }
 
@@ -135,35 +137,46 @@ fs.writeFileSync(resolvedFilePath, JSON.stringify(ast, null, 2), 'utf-8');
 }
 
 
-  // Method to recursively find elements in any AST structure by element name
- findTargetNode(ast, targetElementName) {
-  let foundTargetElements = [];
+deepWalker(ast, nodeKey, nodeKeyValue) {
+  // Helper function to recursively traverse the AST
+  function walk(node, callback) {
+    // Call the callback on the current node
+    callback(node);
 
-  function traverse(node) {
-    if (!node) return;
+    // Recursively traverse all properties of the node
+    for (const key in node) {
+      if (node.hasOwnProperty(key)) {
+        const value = node[key];
 
-    if (node.type === "Element" && node.name === targetElementName) {
-      foundTargetElements.push(node);
-    }
-
-    if (node.children) {
-      if (Array.isArray(node.children)) {
-        node.children.forEach(child => {
-          if (Array.isArray(child)) {
-            child.forEach(subChild => traverse(subChild));
+        // If the value is an object or array, recursively walk it
+        if (typeof value === "object" && value !== null) {
+          if (Array.isArray(value)) {
+            value.forEach((item) => {
+              if (typeof item === "object" && item !== null) {
+                walk(item, callback);
+              }
+            });
           } else {
-            traverse(child);
+            walk(value, callback);
           }
-        });
-      } else {
-        traverse(node.children);
+        }
       }
     }
   }
 
-  traverse(ast.html);
+  // Variable to store the found node
+  let foundNode = null;
 
-  return foundTargetElements;
+  // Start walking the AST
+  walk(ast, (node) => {
+    // Check if the current node has the specified key-value pair
+    if (node[nodeKey] === nodeKeyValue) {
+      foundNode = node;
+    }
+  });
+
+  // Return the found node (or null if not found)
+  return foundNode;
 }
 
 
@@ -275,6 +288,8 @@ removeDefaultImport(importedComponentName) {
     //console.log("LAPHA",componentName);
     let parentSlotNode = this.findTargetNode(parentAst, componentName);
     //console.log("HERE",componentName, JSON.stringify(parentAst,null,2));
+    console.log("parentSlotNode",JSON.stringify(parentSlotNode,null,2));
+
     parentSlotNode = parentSlotNode[0].children[0][0]; 
     //console.log("PARENT NODE",JSON.stringify(parentSlotNode[0].children[0][0],null,2));
 
