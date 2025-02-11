@@ -2151,9 +2151,11 @@ if ( Array.isArray(staticNode.identifiersInFunctions) && staticNode.identifiersI
   
   if (jsCode && parsedHTML) {
 
-    //console.log('DONE!');
+    //console.log('DONE!',parsedHTML);
+    const cleanedHTML = parsedHTML.replace(/<\/?customSyntax>/g, '');
+
  
-  writeCodeToFile(jsCode, parsedHTML, appendtoJsScriptTag);
+  writeCodeToFile(jsCode, cleanedHTML, appendtoJsScriptTag);
 
   }
 
