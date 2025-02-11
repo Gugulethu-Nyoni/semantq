@@ -106,6 +106,19 @@ async function componentParser(destDir) {
 
 
 
+async function transformTextNodes(destDir) {
+  try {
+    //console.log("Fix text Nodes");
+    const regularised = await import('./transformTextNodes.js');
+    regularised.init(destDir);
+    //console.log("Done: component parsing");
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+
 async function importsResolution(destDir) {
   try {
     //console.log("Component parsing");
@@ -182,12 +195,17 @@ async function main(sourceDir,destDir, destDirBase) {
   await componentParser(destDir);
   await componentParser(componentsDest);
 
+  await transformTextNodes(destDir);
+  await transformTextNodes(componentsDest);
+
+
 /// resolve component imports and slots 
 // so that when we resolve page imports these are sorted
-   await importsResolution(componentsDest);
-   await slotsResolution(componentsDest);
+   
+   //await importsResolution(componentsDest);
+   //await slotsResolution(componentsDest);
 
-  await importsResolution(destDir);
+  //await importsResolution(destDir);
   //await slotsResolution(destDir);
 
 
