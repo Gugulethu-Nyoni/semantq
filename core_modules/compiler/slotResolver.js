@@ -106,14 +106,86 @@ buildComponentRegistry() {
 
             const targetNodeChildren = walk.findChildren(targetNode);
 
+            //console.log("LAPHASLOTA",targetNodeChildren);
+
+
             // Locate the slot node inside the child component AST
-            const slotNode = this.ast[childComponentKey];
+            //console.log("SLOT?",JSON.stringify(this.ast[childComponentKey],null,2));
+            const slotNode = walk.deepWalker(
+                childComponentAstBlock,
+                walk.createMatchLogic('Element', 'slot'),
+                'Element'
+            )[0].node;
+
+            //console.log("LAPHA",slotNode);
+
             const slotFallBackChildren = walk.findChildren(slotNode);
+
+            
+            /** now we replace the children of the component slot element node in the child ast with the children of the component element node in the parent ast if it set - else we revert to the fallback in the slot node (if any) 
+             * 
+             *
+             **/
+
+            // Determine content to set: use targetNodeChildren if available, otherwise fallback
+
+            let contentToSet;
+            if (targetNodeChildren && targetNodeChildren[0].length > 0){
+              contentToSet= targetNodeChildren[0][0]; 
+
+
+            } else {
+             contentToSet= slotFallBackChildren[0][0]; 
+
+            }
+
+            //console.log("YEEEEEEE",JSON.stringify(contentToSet,null,2));
+
+
+            /*
+            const contentToSet = (targetNodeChildren?.[0]?.length > 1)
+                ? targetNodeChildren[0][0]
+                : slotFallBackChildren?.[0]?.[0];
+            */
+
+            // Find slot node positions in child component AST
+            const slotNodeLocations = new GetNodePositions(childComponentAstBlock, slotNode).init();
+            const parentNode = slotNodeLocations[0].parentNode;
+            const targetNodeIndex = slotNodeLocations[0].nodeIndex;
+
+
+            // Replace slot node in child AST with content
+            if (parentNode?.children?.[0]?.[targetNodeIndex]) {
+                parentNode.children[0][targetNodeIndex] = contentToSet;
+            } 
+
+            //console.log("YEEEEEEE",JSON.stringify(childComponentAstBlock,null,2));
+
+
+            // NOW UPDATE/REPLACE THE ENTIRE COMPONENT ELEMENT NODE IN PARENT AST
+
+            // Update parent AST with modified child component AST
+            const parentNodeLocations = new GetNodePositions(parentComponentAST, targetNode).init();
+            const actualParentNode = parentNodeLocations[0].parentNode;
+            const actualTargetNodeIndex = parentNodeLocations[0].nodeIndex;
+
+            if (actualParentNode?.children?.[0]?.[actualTargetNodeIndex]) {
+                actualParentNode.children[0][actualTargetNodeIndex] = childComponentAstBlock;
+            } 
+
+            console.log("YEEEEEEE",JSON.stringify(parentComponentAST,null,2));
+
+
+
+
+            /*
+            const componentNode = this.ast[childComponentKey];
+            const sslotFallBackChildren = walk.findChildren(componentNode);
 
             // Determine content to set: use targetNodeChildren if available, otherwise fallback
             const contentToSet = (targetNodeChildren?.[0]?.length > 1)
                 ? targetNodeChildren[0][0]
-                : slotFallBackChildren?.[0]?.[0];
+                : sslotFallBackChildren?.[0]?.[0];
 
             // Update parent AST with modified child component AST
             const parentNodeLocations = new GetNodePositions(parentComponentAST, targetNode).init();
@@ -123,6 +195,9 @@ buildComponentRegistry() {
             if (cparentNode?.children?.[0]?.[ctargetNodeIndex]) {
                 cparentNode.children[0][ctargetNodeIndex] = childComponentAstBlock;
             }
+            */
+
+
         } else {
             // COMPONENT SCOPE
             const childComponentAstBlock = this.ast[childComponentKey];
@@ -146,7 +221,7 @@ buildComponentRegistry() {
             const slotFallBackChildren = walk.findChildren(slotNode);
 
             // Determine content to set: use targetNodeChildren if available, otherwise fallback
-            const contentToSet = (targetNodeChildren?.[0]?.length > 1)
+            const contentToSet = (targetNodeChildren?.[0]?.length > 0)
                 ? targetNodeChildren[0][0]
                 : slotFallBackChildren?.[0]?.[0];
 
