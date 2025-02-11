@@ -72,7 +72,6 @@ function loadComponent(componentPath) {
 }
 
 
-// Helper function: Merge components into the page and write the merged AST
 function mergeComponents(imports, baseDir, astFile) {
   try {
     // Read the main AST
@@ -87,9 +86,9 @@ function mergeComponents(imports, baseDir, astFile) {
       ? 'customAST'
       : path.basename(astFile, '.smq.ast').split('.')[0].toLowerCase();
 
-    const componentName = path.basename(astFile,'.smq.ast').split('.')[0];
+    const componentName = path.basename(astFile, '.smq.ast').split('.')[0];
 
-    // **Dynamic AST keys for components**
+    // Dynamic AST keys for components
     const jsKey = isPage ? 'jsAST' : `jsAST_${componentName}`;
     const cssKey = isPage ? 'cssAST' : `cssAST_${componentName}`;
 
@@ -117,34 +116,28 @@ function mergeComponents(imports, baseDir, astFile) {
     const mergedComponents = new Set();
 
     // Helper function to check if a customAST node is a duplicate
-    const isCustomASTNodeDuplicate = (node, mergedNodes,astFile) => {
-      return mergedNodes.some(existingNode =>
-        JSON.stringify(existingNode) === JSON.stringify(node)
+    const isCustomASTNodeDuplicate = (node, mergedNodes) => {
+      return mergedNodes.some(
+        (existingNode) => JSON.stringify(existingNode) === JSON.stringify(node)
       );
     };
 
     // Merge component ASTs
     for (const imp of imports) {
+      const componentName = path.basename(astFile, '.smq.ast').split('.')[0];
+      const fileExtension = componentName === '+page' ? '.resolved.ast' : '.smq.ast';
+      const componentPath = imp.updatedSource
+        .replace('src', 'build')
+        .replace('.smq', fileExtension);
 
-      const componentName = path.basename(astFile,'.smq.ast').split('.')[0];
-      let fileExtension;
-      if (componentName === '+page') {
-        fileExtension = '.resolved.ast';
-    } else {
-     fileExtension = '.smq.ast';
-
-    }
-
-      let componentPath = imp.updatedSource.replace('src', 'build').replace('.smq', fileExtension);
-      //console.log("THE component PATH",componentName, componentPath);
       const componentContent = loadComponent(componentPath);
 
       if (componentContent && !mergedComponents.has(componentPath)) {
         try {
           const componentAst = JSON.parse(componentContent);
 
-          // **Determine dynamic component keys**
-          const componentName = path.basename(componentPath, '.smq.ast').toLowerCase();
+          // Determine dynamic component keys
+          const componentName = path.basename(componentPath, fileExtension).toLowerCase();
           const componentHtmlKey = componentAst.customAST ? 'customAST' : componentName;
           const componentJsKey = `jsAST_${componentName}`;
           const componentCssKey = `cssAST_${componentName}`;
@@ -182,7 +175,7 @@ function mergeComponents(imports, baseDir, astFile) {
     // Write the correctly formatted merged AST
     const mergedFilePath = astFile.replace('.smq.ast', '.merged.ast');
     fs.writeFileSync(mergedFilePath, JSON.stringify(mergedAst, null, 2), 'utf-8');
-    //console.log(`Merged AST written to: ${mergedFilePath}`);
+    console.log(`Merged AST written to: ${mergedFilePath}`);
 
     return mergedAst;
   } catch (error) {
@@ -190,8 +183,6 @@ function mergeComponents(imports, baseDir, astFile) {
     return null;
   }
 }
-
-
 
 
 // Helper function: Parse AST and resolve imports
