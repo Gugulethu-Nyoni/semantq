@@ -40,7 +40,7 @@ async function readSMQHTMLFiles(directory) {
       console.error('Error reading directory:', err);
       return;
     }
-    console.log("ALL Files", files);
+    //console.log("ALL Files", files);
 
     files.forEach((file) => {
       const filePath = path.join(directory, file);
