@@ -450,7 +450,13 @@ export default function walk(ast) {
   let regularHtml = '';
 
   const processNode = (node) => {
-    if (node.type === 'Element') {
+     // Skip processing if the node is a <customSyntax> element
+    /*
+    if (node.type === 'Element' && node.name === 'customSyntax') {
+      return; // Skip this node and its children
+    } */
+
+    if (node.type === 'Element' && node.name !== 'customSyntax') {
       let attributesData = '';
       if (node.attributes !== null) {
         const processedAttributes = processAttributes(node.attributes);
@@ -475,7 +481,7 @@ export default function walk(ast) {
       Object.values(node).forEach(value => nestedWalker(value));
     }
 
-    if (node.type === 'Element' && !selfClosingTags.includes(node.name)) {
+    if (node.type === 'Element' && !selfClosingTags.includes(node.name) && node.name !== 'customSyntax') {
       regularHtml += `</${node.name}>`; // Add closing tag here
     }
 
