@@ -151,7 +151,7 @@ h1 {
 
 ## Example Project Structure
 
-Here’s an example of how you might organize your Semantq project:
+Here’s an example of how a Semantq project is organized:
 
 
 ```bash
