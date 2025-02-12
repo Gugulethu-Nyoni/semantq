@@ -207,7 +207,7 @@ const lineStart = i;
 const line = content.slice(lineStart, i).trim();
 
 
-const validTags = ['script:', 'style:', 'html:', 'end:'];
+const validTags = ['@script', '@style', 'html:', '@end'];
 
 // Add this inside the while loop, after extracting the line
 // Validate the line for specific custom syntax declarations
@@ -217,10 +217,10 @@ if (validTags.includes(line.toLowerCase()) && line !== line.toLowerCase()) {
 
 
     // Check for custom syntax declarations
-if (line === 'script:') {
+if (line === '@script') {
       tagStack.push('script');
       compiledContent += '<script>\n';
-    } else if (line === 'style:') {
+    } else if (line === '@style') {
       tagStack.push('style');
       compiledContent += '<style>\n';
     } else if (line === 'html:') {
@@ -231,9 +231,9 @@ if (line === 'script:') {
       tagStack.push('html');
 
 continue;
-    } else if (line === 'end:') {
+    } else if (line === '@end') {
       if (tagStack.length === 0) {
-        throw new Error(`Invalid "end:" tag found outside of "script:" or "style:" blocks in file ${filePath} \x1b[0m`);
+        throw new Error(`Invalid "@end" tag found outside of "@script" or "@style" blocks in file ${filePath} \x1b[0m`);
       }
       const topTag = tagStack.pop();
 
@@ -264,10 +264,10 @@ i++;
   if (tagStack.length > 0) {
     const topTag = tagStack[0];
     if (topTag === 'script') {
-      throw new Error(`\x1b[31mMissing "end:" tag for a "script:" block in file ${filePath}\x1b[0m`);
+      throw new Error(`\x1b[31mMissing "@end" tag for a "@script" block in file ${filePath}\x1b[0m`);
     } else if (topTag === 'style') {
-      //throw new Error('Missing "end:" tag for a "style:" block');
-      throw new Error(`\x1b[31mMissing "end:" tag for a "style:" block in file ${filePath}\x1b[0m`);
+      //throw new Error('Missing "@end" tag for a "@style" block');
+      throw new Error(`\x1b[31mMissing "@end" tag for a "@style" block in file ${filePath}\x1b[0m`);
 
     }
   }
