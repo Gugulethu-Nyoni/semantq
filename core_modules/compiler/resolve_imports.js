@@ -175,7 +175,7 @@ function mergeComponents(imports, baseDir, astFile) {
     // Write the correctly formatted merged AST
     const mergedFilePath = astFile.replace('.smq.ast', '.merged.ast');
     fs.writeFileSync(mergedFilePath, JSON.stringify(mergedAst, null, 2), 'utf-8');
-    console.log(`Merged AST written to: ${mergedFilePath}`);
+    //console.log(`Merged AST written to: ${mergedFilePath}`);
 
     return mergedAst;
   } catch (error) {
