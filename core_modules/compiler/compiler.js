@@ -148,7 +148,7 @@ async function slotsResolution(destDir) {
 
 async function transformer(destDir) {
   try {
-    console.log("Transforming Components");
+    //console.log("Transforming Components");
     const trans = await import('./transformer.js');
     trans.transformSMQFiles(destDir); 
     //console.log("Done: Transforming Components");
@@ -180,40 +180,47 @@ async function routesGenerator(sourceDir,destDir) {
   }
 }
 
-async function main(sourceDir,destDir, destDirBase) {
-  //const dirPath = '/Users/gugulethu/code/semantiq/lab/theCompiler/build/routes';
+//async function main(sourceDir,destDir, destDirBase)
 
-  // Wait for the directory cleanup to finish before proceeding
+ async function main(sourceDir,destDir, destDirBase) {
   await cleanupDirectory(destDirBase);
-  // Run the tasks sequentially
-  await compileCustomTags(sourceDir); // routes
-  await compileCustomTags(componentsSrc); // components
 
-  //await validateIfSyntax();  // Uncomment if needed
+  // Step 1: Compile custom tags
+  await Promise.all([
+   compileCustomTags(sourceDir),
+   compileCustomTags(componentsSrc),
+  ]);
 
-  // generate page and components ASTs
-  await componentParser(destDir);
-  await componentParser(componentsDest);
+  // Step 2: Parse components
+  await Promise.all([
+   componentParser(destDir),
+   componentParser(componentsDest),
+  ]);
 
-  await transformTextNodes(destDir);
-  await transformTextNodes(componentsDest);
+  // Step 3: Transform text nodes
+  await Promise.all([
+   transformTextNodes(destDir),
+   transformTextNodes(componentsDest),
+  ]);
 
-
-/// resolve component imports and slots 
-// so that when we resolve page imports these are sorted
-   
-   await importsResolution(componentsDest);
-   await slotsResolution(componentsDest);
-
+  // Step 4: Resolve imports and slots
+  await importsResolution(componentsDest);
+  await slotsResolution(componentsDest);
   await importsResolution(destDir);
   await slotsResolution(destDir);
 
-  await transformer(destDir);
-  await transformer(componentsDest);
+  // Step 5: Transform components
+  await Promise.all([
+   transformer(destDir),
+   transformer(componentsDest),
+  ]);
 
-  await routesGenerator(sourceDir,destDir);
-
+  // Step 6: Generate routes
+ // await routesGenerator(sourceDir, destDir);
 }
+
+
+
 
 main(sourceDir,destDir, destDirBase)
   .then(() => {
