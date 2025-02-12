@@ -173,7 +173,7 @@ buildComponentRegistry() {
                 actualParentNode.children[0][actualTargetNodeIndex] = childComponentAstBlock;
             } 
 
-            console.log("YEEEEEEE",JSON.stringify(parentComponentAST,null,2));
+            //console.log("YEEEEEEE",JSON.stringify(parentComponentAST,null,2));
 
 
 
@@ -250,23 +250,61 @@ buildComponentRegistry() {
     }
 
     // Write the resolved AST to a file
+    this.removedComponentImports();
     this.writeResolvedAstFile();
 }
 
 
 writeResolvedAstFile() {
+
     if (!this.ast || !this.filePath) throw new Error("AST data or filePath is missing");
     const resolvedFilePath = this.filePath.replace(/merged/, "resolved"), resolvedDir = path.dirname(resolvedFilePath);
     if (!fs.existsSync(resolvedDir)) fs.mkdirSync(resolvedDir, { recursive: true });
     fs.writeFileSync(resolvedFilePath, JSON.stringify(this.ast, null, 2), "utf8");
-    console.log(`Resolved AST file saved at: ${resolvedFilePath}`);
+    //console.log(`Resolved AST file saved at: ${resolvedFilePath}`);
+}
+
+removedComponentImports () {
+
+for (const componentName in this.componentsRegistry) {
+  //console.log("RE",componentName);
+
+  /// run deep walk to get the node 
+
+  walk(this.ast['jsAST'], {
+  enter: (node, parent) => {
+    if (node.type === 'ImportDeclaration') {
+      node.specifiers.forEach(specifier => {
+        if (
+          specifier.type === 'ImportDefaultSpecifier' &&
+          specifier.local.name === componentName
+        ) {
+          // Remove the import by filtering it out from the parent's body array
+          if (parent && Array.isArray(parent.body)) {
+            parent.body = parent.body.filter(n => n !== node);
+          }
+          // Stop traversing this node
+          return false; // This prevents further traversal into this node
+        }
+      });
+    }
+  },
+});
+
+//console.log("The Node",importNode);
+// can we get node positions 
+
+
+
+}
+
+
 }
 
 
 
 
-
-
+/*
  astToHtml(ast) {
   // Helper function to recursively traverse nodes
   function traverse(node) {
@@ -321,7 +359,7 @@ writeResolvedAstFile() {
   // Start traversing from the root of the AST (HTML root node)
   return traverse(ast.html.children[0]);
 }
-
+*/
 
 /// class wrapper
 
