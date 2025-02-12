@@ -1677,7 +1677,7 @@ function visitMustacheIdentifierNodes(ast) {
   };
 
   // Find the customSyntax node within the AST
-  console.log("HERE",ast.html);
+  //console.log("HERE",ast.html);
   const customSyntaxNode = findCustomSyntaxNode(ast.html);
   
   //console.log(customSyntaxNode);
@@ -2152,13 +2152,13 @@ if ( Array.isArray(staticNode.identifiersInFunctions) && staticNode.identifiersI
   if (jsCode && parsedHTML) {
 
     //console.log('DONE!',parsedHTML);
-    const cleanedHTML = parsedHTML.replace(/<\/?customSyntax>/g, '');
-
- 
-  writeCodeToFile(jsCode, cleanedHTML, appendtoJsScriptTag);
+    //const cleanedHTML = parsedHTML.replace(/<\/?customSyntax>/g, '');
+   //const cleanedHTML = removeCustomSyntaxTags(parsedHTML);
+   writeCodeToFile(jsCode, parsedHTML, appendtoJsScriptTag);
 
   }
 
+  
 
 
   /**
