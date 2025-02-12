@@ -36,6 +36,149 @@ This makes it ideal for creating structured, dynamic content efficiently.
 
 ---
 
+
+# Component Structure in SemantQ
+
+A component in Semantq is composed of **JavaScript**, **CSS**, and **HTML**. All of these are optional, meaning you can include only what your component needs.
+
+---
+
+## JavaScript
+
+In Semantq, JavaScript code is enclosed within `@script` and `@end` tags. These tags act as markers for the beginning and end of the script block.
+
+### Example: `Card.smq` or `+page.smq`
+
+```semantq
+@script
+console.log("Hello World");
+@end
+```
+
+---
+
+## CSS
+
+Similarly, CSS styles are enclosed within `@style` and `@end` tags. These tags define the start and end of the style block.
+
+### Example: `Card.smq` or `+page.smq`
+
+```semantq
+@style
+h1 { color: red; }
+@end
+```
+
+---
+
+## HTML
+
+The HTML content is marked with the `html:` tag. This tag is optional but helps provide structure and clarity to your component by explicitly indicating where the HTML begins.
+
+### Example: `Card.smq` or `+page.smq`
+
+```Semantq
+html:
+<h1>Hello World</h1>
+```
+
+---
+
+## Using Regular HTML Tags
+
+You are also free to use standard HTML `<script>` and `<style>` tags if you prefer. This approach is fully supported in Semantq.
+
+### Example:
+
+```html
+<script>
+  console.log("Hello World");
+</script>
+
+<style>
+  h1 { color: red; }
+</style>
+
+<h1>Hello World</h1>
+```
+
+---
+
+## Important Notes
+
+1. **Consistency is Key**:
+   - Avoid mixing syntax styles within the same component. Choose one approach and stick with it.
+   - For example, **do not** combine `@script` with `<script>` tags in the same component:
+
+   ```semantq
+   @script
+   console.log("Hello World");
+   <script> // This is invalid!
+   ```
+
+2. **Optional HTML Marker**:
+   - The `html:` marker is optional but recommended for better readability and structure.
+
+3. **Flexibility**:
+   - You can include only the parts your component needs (e.g., just HTML, or HTML + CSS, or all three).
+
+---
+
+## Full Example
+
+Here’s a complete example of a Semantq component using the custom syntax:
+
+```Semantq
+@script
+console.log("Component script loaded!");
+@end
+```
+
+```Semantq
+@style
+h1 {
+  color: blue;
+  font-family: Arial, sans-serif;
+}
+@end
+```
+
+```Semantq
+   html:
+<h1>Welcome to Semantq</h1>
+<p>This is a sample component.</p>
+```
+
+## Example Project Structure
+
+Here’s an example of how you might organize your Semantq project:
+
+
+```bash
+src/
+├── components/            # Shared components (available for import)
+│   ├── global/            # Default Semantq-provided components
+│   │   ├── Theme.smq      # Theme handling (light/dark modes, etc.)
+│   │   ├── Button.smq     # Semantq-provided button component
+│   │   ├── Modal.smq      # Semantq-provided modal component
+│   ├── Card.smq           # Custom reusable Card component
+│   ├── Header.smq         # Custom reusable Header component
+│   ├── Footer.smq         # Custom reusable Footer component
+│   ├── Sidebar.smq        # Custom reusable Sidebar component (optional)
+├── routes/                # Application pages & layouts
+│   ├── home/              # Home page route
+│   │   ├── +page.smq      # Home page content
+│   │   ├── +layout.smq    # (Optional) Custom layout for Home
+│   ├── about/             # About page route
+│   │   ├── +page.smq      # About page content
+│   ├── dashboard/         # Dashboard page route
+│   │   ├── +page.smq      # Dashboard page content
+│   │   ├── +layout.smq    # (Optional) Custom layout for Dashboard
+│   ├── contact/           # Contact page route
+│   │   ├── +page.smq      # Contact page content
+```
+
+
 ## Existing Syntax Blocks
 
 ### HTML Elements
