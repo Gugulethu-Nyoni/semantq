@@ -84,6 +84,8 @@ function parseComponent(filePath) {
     cssAST = removeDuplicates(cssAST);
     customAST = removeDuplicates(customAST);
 
+    //console.log(JSON.stringify(cssAST,null,2));
+
     // Define new AST file path
     const newFilePath = filePath.replace('.html', '.ast');
 
@@ -169,7 +171,7 @@ function writeToFile(astObjects) {
         if (err) {
           console.error(err);
         } else {
-          //console.log(`AST File written successfully: ${newFilePath} ${jsonString}`);
+          //console.log(`AST File written successfully: ${newFilePath}`);
         }
       });
     }
