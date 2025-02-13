@@ -39,7 +39,7 @@ program
     try {
       // Define directories to create
       const directories = [
-        'src/components',
+        'src/components/global',
         'src/routes',
         'build/components',
         'build/routes',
