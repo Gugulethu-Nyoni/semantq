@@ -60,9 +60,14 @@ buildComponentRegistry() {
 
     walk(jsContent, {
         enter: ({ type, source, specifiers }) => {
-            if (type === 'ImportDeclaration' && source.value.includes('$components')) {
+            if (type === 'ImportDeclaration' && source.value.includes('$')) {
+
+              //console.log(source);
                 const componentName = specifiers[0].local.name; // e.g., "Header"
-                const componentPath = source.value; // e.g., "$components/Header.smq"
+                let componentPath = source.value; // e.g., "$components/Header.smq"
+                if(componentPath.includes('$global')) {
+                  componentPath = componentPath.replace('$global', '$components/global')
+                }
 
                 // Ensure the component is used in the HTML AST before adding it
                 if (elementWalker(this.customAST, 'name', componentName)) {
@@ -111,17 +116,22 @@ buildComponentRegistry() {
 
             // Locate the slot node inside the child component AST
             //console.log("SLOT?",JSON.stringify(this.ast[childComponentKey],null,2));
-            const slotNode = walk.deepWalker(
+            let slotNode;
+            const getSlotNode = walk.deepWalker(
                 childComponentAstBlock,
                 walk.createMatchLogic('Element', 'slot'),
                 'Element'
-            )[0].node;
+            )[0];//.node;
 
-            //console.log("LAPHA",slotNode);
+            // so we only handle fall backs if there is a slot element node in the child componemt ast 
+
+            if (getSlotNode) {
+            slotNode = getSlotNode.node;
+
+//console.log("LAPHA",slotNode);
 
             const slotFallBackChildren = walk.findChildren(slotNode);
-
-            
+          
             /** now we replace the children of the component slot element node in the child ast with the children of the component element node in the parent ast if it set - else we revert to the fallback in the slot node (if any) 
              * 
              *
@@ -161,6 +171,15 @@ buildComponentRegistry() {
 
             //console.log("YEEEEEEE",JSON.stringify(childComponentAstBlock,null,2));
 
+
+
+            }
+
+
+
+
+
+            
 
             // NOW UPDATE/REPLACE THE ENTIRE COMPONENT ELEMENT NODE IN PARENT AST
 
@@ -212,11 +231,15 @@ buildComponentRegistry() {
             const targetNodeChildren = walk.findChildren(targetNode);
 
             // Locate the slot node inside the child component AST
-            const slotNode = walk.deepWalker(
+            let slotNode;
+            const getSlotNode = walk.deepWalker(
                 childComponentAstBlock,
                 walk.createMatchLogic('Element', 'slot'),
                 'Element'
-            )[0].node;
+            )[0]; //.node;
+
+            if (getSlotNode) {
+              slotNode = getSlotNode.node;
 
             const slotFallBackChildren = walk.findChildren(slotNode);
 
@@ -233,6 +256,11 @@ buildComponentRegistry() {
             // Replace slot node in child AST with content
             if (parentNode?.children?.[0]?.[targetNodeIndex]) {
                 parentNode.children[0][targetNodeIndex] = contentToSet;
+            }
+
+
+
+
             }
 
             // Update parent AST with modified child component AST
