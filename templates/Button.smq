@@ -1,36 +1,13 @@
-script:
+@script
+import Count from '$global/Count.smq';
 
-const button= document.getElementById('myButton');
-let counter= 0; 
+@end
 
-button.innerText="Clicked 0 times";
+@style
 
-button.addEventListener('click', ()=>{
-    
-    button.innerText=`Clicked ${++counter} ${counter === 1 ? 'time' : 'times'} `;
-
-}); 
-
-end: 
-
-style:
-
-#myButton {
-    background-color: #474a4f;
-    width: 100%;
-    border: 1px solid #fff;
-    border-radius: 25px;
-    color: white;
-    padding: 20px;
-    
-}
-
-end: 
-
-html:
+@end
 
 
-<h1> Welcome to Semantiq </h1>
-
-<button id="myButton">
-</button>
+<Count>
+Click Me
+</Count>
