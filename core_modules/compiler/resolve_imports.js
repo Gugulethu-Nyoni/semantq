@@ -10,7 +10,8 @@ const __dirname = path.dirname(__filename);
 // Define alias resolution (match your Vite config)
 const aliasMap = {
   "$components": path.resolve(__dirname, "../../src/components"),
-  "$lib": path.resolve(__dirname, "../../src/lib"),  // Add more if needed
+  "$global": path.resolve(__dirname, "../../src/components/global"),
+  "$lib": path.resolve(__dirname, "../../src/lib"),  
 };
 
 //console.warn("ALIAS",aliasMap.$components)
@@ -130,6 +131,8 @@ function mergeComponents(imports, baseDir, astFile) {
         .replace('src', 'build')
         .replace('.smq', fileExtension);
 
+        //console.log("PATH",componentPath);
+
       const componentContent = loadComponent(componentPath);
 
       if (componentContent && !mergedComponents.has(componentPath)) {
@@ -204,6 +207,8 @@ function resolveImports(astFilePath) {
             const firstChunk = source.split('/')[0]; // Extract the first chunk (e.g. $components)
             const alias = aliasMap[firstChunk]; // Get the alias from the alias map
             updatedSource = source.replace(firstChunk, alias); // Replace the first chunk with the alias
+            //console.log(updatedSource);
+
           }
           const specifiers = node.specifiers.map((s) => s.local.name);
           imports.push({ updatedSource, specifiers });
@@ -237,6 +242,8 @@ export async function importsResolver(destDir) {
         //console.log(`No imports found in ${astFile}. Skipping.`);
         return null; // Return null if no imports
       }
+
+      //console.log(imports);
 
       const baseDir = path.dirname(astFile);
 
