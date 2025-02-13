@@ -91,31 +91,50 @@ program
 // ===============================
 //  INSTALL TAILWIND COMMAND
 // ===============================
+
 program
   .command('install:tailwind')
   .description('Install and configure Tailwind CSS for Semantq')
   .action(() => {
     try {
-      console.log('📦 Installing Tailwind CSS...');
-      execSync('npm install --save-dev tailwindcss postcss autoprefixer', { stdio: 'inherit' });
+      console.log('📦 Installing Tailwind CSS and dependencies...');
+
+      // Step 1: Install Tailwind CSS, PostCSS, and Autoprefixer
+      execSync('npm install -D tailwindcss postcss autoprefixer', { stdio: 'inherit' });
+
+      // Step 2: Install Vite and PostCSS for Vite
+      execSync('npm install -D vite postcss tailwindcss', { stdio: 'inherit' });
+
+      // Step 3: Initialize Tailwind CSS
       execSync('npx tailwindcss init -p', { stdio: 'inherit' });
 
-      const tailwindConfigPath = path.join(process.cwd(), 'tailwind.config.js');
+      // Step 4: Create or update vite.config.js
+      const viteConfigPath = path.join(process.cwd(), 'vite.config.js');
+      const viteConfigContent = `import { defineConfig } from 'vite';
+import postcss from 'postcss';
+
+export default defineConfig({
+  css: {
+    postcss
+  }
+});`;
+
+      fs.writeFileSync(viteConfigPath, viteConfigContent);
+      console.log('✅ Created/updated vite.config.js');
+
+      // Step 5: Append Tailwind directives to global.css
       const globalCSSPath = path.join(process.cwd(), 'src/styles/global.css');
+      const tailwindDirectives = `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`;
 
-      // Modify Tailwind config
-      fs.writeFileSync(tailwindConfigPath, `module.exports = {
-  content: ["./src/**/*.{html,js,smq}"],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};`);
+      if (fs.existsSync(globalCSSPath)) {
+        fs.appendFileSync(globalCSSPath, tailwindDirectives);
+        console.log('✅ Appended Tailwind directives to global.css');
+      } else {
+        fs.writeFileSync(globalCSSPath, tailwindDirectives);
+        console.log('✅ Created global.css with Tailwind directives');
+      }
 
-      // Append Tailwind directives to global CSS
-      fs.appendFileSync(globalCSSPath, '\n@tailwind base;\n@tailwind components;\n@tailwind utilities;');
-
-      console.log('✅ Tailwind CSS installed and configured successfully!');
+      console.log('🎉 Tailwind CSS installed and configured successfully!');
     } catch (error) {
       console.error('❌ Error installing Tailwind CSS:', error.message);
     }
