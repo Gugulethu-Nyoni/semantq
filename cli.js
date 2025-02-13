@@ -63,7 +63,8 @@ program
       safeCopySync(templateDirectory, projectPath);
 
       // Copy specific template files
-      await copyIfExists(path.join(templateDirectory, 'Button.smq'), path.join(projectPath, 'src/components/Button.smq'));
+      await copyIfExists(path.join(templateDirectory, 'Button.smq'), path.join(projectPath, 'src/components/global/Button.smq'));
+      await copyIfExists(path.join(templateDirectory, 'Count.smq'), path.join(projectPath, 'src/components/global/Count.smq'));
       await copyIfExists(path.join(templateDirectory, '+404.smq'), path.join(projectPath, 'src/routes/+404.smq'));
 
       // Create empty routes.js
@@ -123,7 +124,7 @@ export default defineConfig({
       console.log('✅ Created/updated vite.config.js');
 
       // Step 5: Append Tailwind directives to global.css
-      const globalCSSPath = path.join(process.cwd(), 'src/styles/global.css');
+      const globalCSSPath = path.join(process.cwd(), 'global.css');
       const tailwindDirectives = `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`;
 
       if (fs.existsSync(globalCSSPath)) {

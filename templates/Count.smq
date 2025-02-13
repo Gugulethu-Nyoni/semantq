@@ -1,0 +1,13 @@
+@script
+let counter = 0;
+
+function incrementer () {
+	counter ++;
+}
+@end
+
+<button @click={incrementer}>
+<slot> </slot>
+</button> 
+
+
