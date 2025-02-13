@@ -15,19 +15,30 @@ function convertCssASTToString(cssAST) {
     return '';
   }
 
-  return cssAST.content.nodes.map(node => {
-    if (node.type === 'rule') {
-      const selector = node.selectors ? node.selectors.join(', ') : '';
-      const declarations = node.nodes
-        ? node.nodes.filter(decl => decl.type === 'decl')
-          .map(decl => `${decl.prop}: ${decl.value};`)
-          .join('\n')
-        : '';
-      return `${selector} {\n${declarations}\n}`;
+  let cssString = '';
+
+  // Iterate over each rule in the AST
+  cssAST.content.nodes.forEach(rule => {
+    if (rule.type !== "rule" || !rule.selector || !Array.isArray(rule.nodes)) {
+     // console.warn('Skipping invalid rule:', rule);
+      return; // Skip invalid rules
     }
-    // Handle other node types if necessary
-    return '';
-  }).join('\n');
+
+    cssString += `${rule.selector} {\n`;
+
+    // Iterate over each declaration
+    rule.nodes.forEach(decl => {
+      if (decl.type !== "decl" || !decl.prop || !decl.value) {
+        //console.warn('Skipping invalid declaration:', decl);
+        return;
+      }
+      cssString += `  ${decl.prop}: ${decl.value};\n`;
+    });
+
+    cssString += `}\n`;
+  });
+
+  return cssString;
 }
 
 /**
@@ -82,6 +93,8 @@ async function readSMQHTMLFiles(directory) {
                   let cssAST = '';
                   if (cssASTObject && cssASTObject.content && Array.isArray(cssASTObject.content.nodes) && cssASTObject.content.nodes.length > 0) {
                     cssAST = convertCssASTToString(cssASTObject);
+
+                    //console.log("FINAL CSS",JSON.stringify(cssAST,null,2))
                   }
 
                   const customSyntaxAST = astObject.customAST.content;
