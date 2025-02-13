@@ -11,7 +11,7 @@
   <!-- Theme Toggle Button -->
   <button id="theme-toggle" class="theme-toggle">☀️</button>
 
-  <div id="semantqComponent"></div>
+  <div id="app"></div>
 
   <div class="container">
     <h1>Welcome to SemantQ</h1>
@@ -37,6 +37,7 @@
     <footer>
       <p>© <span id="year"></span> SemantQ. All rights reserved. | <a href="#">Privacy Policy</a></p>
     </footer>
+  </div>
   </div>
 
   <script>
@@ -66,5 +67,7 @@
       localStorage.setItem('theme', isDarkMode ? 'dark-mode' : 'light-mode');
     });
   </script>
+
+  <script src="./global.js" type="module"></script>
 </body>
 </html>
