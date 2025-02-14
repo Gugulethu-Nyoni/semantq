@@ -157,7 +157,7 @@ function mergeComponents(imports, baseDir, astFile) {
 
     // Write the merged ASTs to the new file
     fs.writeFileSync(newFileName, JSON.stringify(finalMergedAST, null, 2), 'utf-8');
-    console.log(`Merged AST written to: ${newFileName}`);
+    //console.log(`Merged AST written to: ${newFileName}`);
 }
 
 
