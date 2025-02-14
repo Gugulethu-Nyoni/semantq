@@ -11,9 +11,11 @@ import Walker from './utils/deepWalker.js';
 
 
 class SlotResolver {
+  
   constructor(ast, filePath) {
     this.filePath = filePath;
     this.ast = ast; // The merged AST from either +page.merged.ast or Component.merged.ast
+    console.log(filePath, this.ast);
     this.componentName='';
     // Extract component name dynamically (e.g., "Card" from "Card.merged.ast")
     const fileName = path.basename(filePath, '.merged.ast');
@@ -229,6 +231,8 @@ buildComponentRegistry() {
             )[0].node;
 
             const targetNodeChildren = walk.findChildren(targetNode);
+
+            console.log("CCAST",childComponentAstBlock);
 
             // Locate the slot node inside the child component AST
             let slotNode;
