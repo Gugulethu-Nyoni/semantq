@@ -15,7 +15,7 @@ class SlotResolver {
   constructor(ast, filePath) {
     this.filePath = filePath;
     this.ast = ast; // The merged AST from either +page.merged.ast or Component.merged.ast
-    console.log(filePath, this.ast);
+    //console.log(filePath, JSON.stringify(this.ast.customAST,null,2));
     this.componentName='';
     // Extract component name dynamically (e.g., "Card" from "Card.merged.ast")
     const fileName = path.basename(filePath, '.merged.ast');
@@ -29,19 +29,21 @@ class SlotResolver {
 
     if (!this.isPage) {
       this.componentName=fileName; 
+
     }
 
+
     // Determine the appropriate AST keys
-    this.jsASTKey = this.isPage ? 'jsAST' : `jsAST_${fileName}`;
-    this.cssASTKey = this.isPage ? 'cssAST' : `cssAST_${fileName}`;
+    this.jsASTKey = "jsAST";//
+    this.cssASTKey = "cssAST"; 
     this.htmlKey = this.isPage ? 'customAST' : `${this.componentName.toLowerCase()}`;
 
     // Safely retrieve JS and CSS AST
     this.jsAST = ast[this.jsASTKey] || { type: 'JavaScript', content: { body: [] } };
     this.cssAST = ast[this.cssASTKey] || { type: 'CSS', content: {} };
-
     // Pages also have customAST
     this.customAST = this.ast[this.htmlKey] || { type: 'Custom', content: [] };
+        //console.log("customAST",this.customAST);
 
     this.componentsRegistry = {}; // Registry for imported components
     this.childrenSlotsRegistry = {};
@@ -102,6 +104,7 @@ buildComponentRegistry() {
 
         if (this.isPage) {
             // PAGE SCOPE
+          //console.log("HERE",this.isPage);
             const childComponentAstBlock = this.ast[childComponentKey];
 
             // Locate the target node (child component in parent AST)
@@ -113,77 +116,36 @@ buildComponentRegistry() {
 
             const targetNodeChildren = walk.findChildren(targetNode);
 
-            //console.log("LAPHASLOTA",targetNodeChildren);
-
-
             // Locate the slot node inside the child component AST
-            //console.log("SLOT?",JSON.stringify(this.ast[childComponentKey],null,2));
             let slotNode;
             const getSlotNode = walk.deepWalker(
                 childComponentAstBlock,
                 walk.createMatchLogic('Element', 'slot'),
                 'Element'
-            )[0];//.node;
-
-            // so we only handle fall backs if there is a slot element node in the child componemt ast 
+            )[0];
 
             if (getSlotNode) {
-            slotNode = getSlotNode.node;
+                slotNode = getSlotNode.node;
+                const slotFallBackChildren = walk.findChildren(slotNode);
 
-//console.log("LAPHA",slotNode);
+                // Determine content to set: use targetNodeChildren if available, otherwise fallback
+                let contentToSet;
+                if (targetNodeChildren && targetNodeChildren[0].length > 0) {
+                    contentToSet = targetNodeChildren[0][0];
+                } else {
+                    contentToSet = slotFallBackChildren[0][0];
+                }
 
-            const slotFallBackChildren = walk.findChildren(slotNode);
-          
-            /** now we replace the children of the component slot element node in the child ast with the children of the component element node in the parent ast if it set - else we revert to the fallback in the slot node (if any) 
-             * 
-             *
-             **/
+                // Find slot node positions in child component AST
+                const slotNodeLocations = new GetNodePositions(childComponentAstBlock, slotNode).init();
+                const parentNode = slotNodeLocations[0].parentNode;
+                const targetNodeIndex = slotNodeLocations[0].nodeIndex;
 
-            // Determine content to set: use targetNodeChildren if available, otherwise fallback
-
-            let contentToSet;
-            if (targetNodeChildren && targetNodeChildren[0].length > 0){
-              contentToSet= targetNodeChildren[0][0]; 
-
-
-            } else {
-             contentToSet= slotFallBackChildren[0][0]; 
-
+                // Replace slot node in child AST with content
+                if (parentNode?.children?.[0]?.[targetNodeIndex]) {
+                    parentNode.children[0][targetNodeIndex] = contentToSet;
+                }
             }
-
-            //console.log("YEEEEEEE",JSON.stringify(contentToSet,null,2));
-
-
-            /*
-            const contentToSet = (targetNodeChildren?.[0]?.length > 1)
-                ? targetNodeChildren[0][0]
-                : slotFallBackChildren?.[0]?.[0];
-            */
-
-            // Find slot node positions in child component AST
-            const slotNodeLocations = new GetNodePositions(childComponentAstBlock, slotNode).init();
-            const parentNode = slotNodeLocations[0].parentNode;
-            const targetNodeIndex = slotNodeLocations[0].nodeIndex;
-
-
-            // Replace slot node in child AST with content
-            if (parentNode?.children?.[0]?.[targetNodeIndex]) {
-                parentNode.children[0][targetNodeIndex] = contentToSet;
-            } 
-
-            //console.log("YEEEEEEE",JSON.stringify(childComponentAstBlock,null,2));
-
-
-
-            }
-
-
-
-
-
-            
-
-            // NOW UPDATE/REPLACE THE ENTIRE COMPONENT ELEMENT NODE IN PARENT AST
 
             // Update parent AST with modified child component AST
             const parentNodeLocations = new GetNodePositions(parentComponentAST, targetNode).init();
@@ -192,35 +154,12 @@ buildComponentRegistry() {
 
             if (actualParentNode?.children?.[0]?.[actualTargetNodeIndex]) {
                 actualParentNode.children[0][actualTargetNodeIndex] = childComponentAstBlock;
-            } 
-
-            //console.log("YEEEEEEE",JSON.stringify(parentComponentAST,null,2));
-
-
-
-
-            /*
-            const componentNode = this.ast[childComponentKey];
-            const sslotFallBackChildren = walk.findChildren(componentNode);
-
-            // Determine content to set: use targetNodeChildren if available, otherwise fallback
-            const contentToSet = (targetNodeChildren?.[0]?.length > 1)
-                ? targetNodeChildren[0][0]
-                : sslotFallBackChildren?.[0]?.[0];
-
-            // Update parent AST with modified child component AST
-            const parentNodeLocations = new GetNodePositions(parentComponentAST, targetNode).init();
-            const cparentNode = parentNodeLocations[0].parentNode;
-            const ctargetNodeIndex = parentNodeLocations[0].nodeIndex;
-
-            if (cparentNode?.children?.[0]?.[ctargetNodeIndex]) {
-                cparentNode.children[0][ctargetNodeIndex] = childComponentAstBlock;
             }
-            */
 
-
+            //console.log("resolved ast",JSON.stringify(this.ast,null,2));
         } else {
             // COMPONENT SCOPE
+         // console.log("Component SCope");
             const childComponentAstBlock = this.ast[childComponentKey];
 
             // Locate the target node (child component in parent AST)
@@ -232,52 +171,52 @@ buildComponentRegistry() {
 
             const targetNodeChildren = walk.findChildren(targetNode);
 
-            console.log("CCAST",childComponentAstBlock);
-
             // Locate the slot node inside the child component AST
             let slotNode;
             const getSlotNode = walk.deepWalker(
                 childComponentAstBlock,
                 walk.createMatchLogic('Element', 'slot'),
                 'Element'
-            )[0]; //.node;
+            )[0];
 
             if (getSlotNode) {
-              slotNode = getSlotNode.node;
+                slotNode = getSlotNode.node;
+                const slotFallBackChildren = walk.findChildren(slotNode);
 
-            const slotFallBackChildren = walk.findChildren(slotNode);
+                // Determine content to set: use targetNodeChildren if available, otherwise fallback
+                const contentToSet = (targetNodeChildren?.[0]?.length > 0)
+                    ? targetNodeChildren[0][0]
+                    : slotFallBackChildren?.[0]?.[0];
 
-            // Determine content to set: use targetNodeChildren if available, otherwise fallback
-            const contentToSet = (targetNodeChildren?.[0]?.length > 0)
-                ? targetNodeChildren[0][0]
-                : slotFallBackChildren?.[0]?.[0];
+                // Find slot node positions in child component AST
+                const slotNodeLocations = new GetNodePositions(childComponentAstBlock, slotNode).init();
+                const parentNode = slotNodeLocations[0].parentNode;
+                const targetNodeIndex = slotNodeLocations[0].nodeIndex;
 
-            // Find slot node positions in child component AST
-            const slotNodeLocations = new GetNodePositions(childComponentAstBlock, slotNode).init();
-            const parentNode = slotNodeLocations[0].parentNode;
-            const targetNodeIndex = slotNodeLocations[0].nodeIndex;
-
-            // Replace slot node in child AST with content
-            if (parentNode?.children?.[0]?.[targetNodeIndex]) {
-                parentNode.children[0][targetNodeIndex] = contentToSet;
-            }
-
-
-
-
+                // Replace slot node in child AST with content
+                if (parentNode?.children?.[0]?.[targetNodeIndex]) {
+                    parentNode.children[0][targetNodeIndex] = contentToSet;
+                }
             }
 
             // Update parent AST with modified child component AST
             const parentNodeLocations = new GetNodePositions(parentComponentAST, targetNode).init();
             const cparentNode = parentNodeLocations[0].parentNode;
+            //console.log("NODE NOT BEING DELETED",cparentNode);
             const ctargetNodeIndex = parentNodeLocations[0].nodeIndex;
 
             if (cparentNode?.children?.[0]?.[ctargetNodeIndex]) {
                 cparentNode.children[0][ctargetNodeIndex] = childComponentAstBlock;
             }
+
+/* HERE WE NEED TO REMOVE the imported component element node in the parent ast */
+
+
+
         }
 
         // Clean up
+        //console.log("deleteKey",childComponentKey);
         delete this.ast[childComponentKey];
     }
 
@@ -285,6 +224,13 @@ buildComponentRegistry() {
     this.removedComponentImports();
     this.writeResolvedAstFile();
 }
+
+
+
+
+
+
+
 
 
 writeResolvedAstFile() {
@@ -296,8 +242,9 @@ writeResolvedAstFile() {
     //console.log(`Resolved AST file saved at: ${resolvedFilePath}`);
 }
 
-removedComponentImports () {
 
+
+removedComponentImports () {
 for (const componentName in this.componentsRegistry) {
   //console.log("RE",componentName);
 
