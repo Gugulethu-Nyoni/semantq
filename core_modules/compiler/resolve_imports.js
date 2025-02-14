@@ -118,22 +118,38 @@ function mergeComponents(imports, baseDir, astFile) {
         const componentName = imp.specifiers[0]; // e.g. Counter
         let componentAST; 
 
+        let isResolved = false; 
+
         if (fileExists(resolvedComponentPath)) {
         //console.log("Resolved component found, loading from:", resolvedComponentPath);
         componentAST = JSON.parse(fs.readFileSync(resolvedComponentPath, 'utf-8'));
+        //console.log("Exists?",componentAST);
+        isResolved = true; 
         } else {
           //console.log("Resolved component not found, loading from:", componentPath);
           componentAST = JSON.parse(fs.readFileSync(componentPath, 'utf-8'));
        }
 
-        const importJsKey = `jsAST_${componentName}`;
-        const importCssKey = `cssAST_${componentName}`;
-        const importHtmlKey = componentName.toLowerCase();
+       //console.log("HERE",isResolved);
+        
+        let importJsKey;
+        let importCssKey;
+        let importHtmlKey;
+
+        if (isResolved) {
+        importJsKey = 'jsAST';
+        importCssKey = 'cssAST';
+        importHtmlKey = componentName.toLowerCase();
+      } else {
+        importJsKey = `jsAST_${componentName}`;
+        importCssKey = `cssAST_${componentName}`;
+        importHtmlKey = componentName.toLowerCase();
+      }
 
         const componentJSAST = componentAST[importJsKey] || { content: { body: [] } };
         const componentCSSAST = componentAST[importCssKey] || { content: { nodes: [] } };
         const componentHtmlAST = componentAST[importHtmlKey] || { content: [] };
-
+        //console.log(resolvedComponentPath, componentName,componentJSAST);
         // Merging JS AST
         const componentJSBody = componentJSAST.content.body;
         mergedAST.jsAST = {
