@@ -165,8 +165,8 @@ program
 
       // Create necessary files
       fs.writeFileSync(path.join(routePath, '+page.smq'), '// Page logic here', 'utf-8');
-      fs.writeFileSync(path.join(routePath, '+layout.smq'), '// Layout logic here', 'utf-8');
-      fs.writeFileSync(path.join(routePath, '+server.js'), '// Server-side logic here\nmodule.exports = {};', 'utf-8');
+      //fs.writeFileSync(path.join(routePath, '+layout.smq'), '// Layout logic here', 'utf-8');
+      //fs.writeFileSync(path.join(routePath, '+server.js'), '// Server-side logic here\nmodule.exports = {};', 'utf-8');
 
       console.log(`✅ Route '${routeName}' created successfully!`);
     } catch (error) {
