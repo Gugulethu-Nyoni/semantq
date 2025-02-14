@@ -426,7 +426,7 @@ class AnyVisitor extends NodeVisitor {
         //console.log("HERE",result.targetNode.value[0].raw);
 
        // console.log("HERE", result); return;
-        const handler = result.targetNode.value[0].raw.replace('()','');
+        const handler = result.targetNode.value[0].name.name.replace('()','');
         if (handler) {
           handlersObject.push(handler);
         }
@@ -607,13 +607,13 @@ class TransformEventHandlerNodes extends NodeVisitor {
     if (node.type && node.type === 'Attribute') {
         if (typeof node.name === 'object' && node.name.type === 'EventHandler') {
 
-          //console.log("THIS",node.value[0].raw);
+          //console.log("THIS",node.value[0].name.name);
           //return;
 
-        const functionIdentifier= node.value[0].raw.replace(/{|}/g, '');
+        const functionIdentifier= node.value[0].name.name.replace(/{|}/g, '');
         const tranformedfunctionIdentifier = functionIdentifier + "()";
         //console.log("ANY",tranformedfunctionIdentifier);
-        node.value[0].raw = tranformedfunctionIdentifier; 
+        node.value[0].name.name = tranformedfunctionIdentifier; 
         const transformOnEvent= 'on'+node.name.name;
         node.name.name = transformOnEvent;
 
