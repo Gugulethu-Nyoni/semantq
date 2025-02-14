@@ -193,26 +193,29 @@ async function routesGenerator(sourceDir,destDir) {
 
   // Step 2: Parse components
   await Promise.all([
-   componentParser(destDir),
-   componentParser(componentsDest),
+  componentParser(destDir),
+  componentParser(componentsDest),
   ]);
 
   // Step 3: Transform text nodes
   await Promise.all([
-   transformTextNodes(destDir),
-   transformTextNodes(componentsDest),
+  transformTextNodes(destDir),
+  transformTextNodes(componentsDest),
   ]);
 
   // Step 4: Resolve imports and slots
   await importsResolution(componentsDest);
-  await slotsResolution(componentsDest);
+  //await slotsResolution(componentsDest);
+  
   await importsResolution(destDir);
-  await slotsResolution(destDir);
+  //await slotsResolution(destDir);
 
   // Step 5: Transform components
   await Promise.all([
-   transformer(destDir),
-   transformer(componentsDest),
+  //transformer(destDir),
+  
+
+  // transformer(componentsDest),
   ]);
 
   // Step 6: Generate routes
