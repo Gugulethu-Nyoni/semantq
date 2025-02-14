@@ -75,107 +75,91 @@ function loadComponent(componentPath) {
 
 
 
-
 function mergeComponents(imports, baseDir, astFile) {
-    
-        const mainAst = JSON.parse(fs.readFileSync(astFile, 'utf-8'));
-        let resourceName = path.basename(astFile, '.smq.ast').split('.')[0];
-        const isPage = resourceName === '+page';
-        //resourceName = resourceName.toLowerCase(); // e.g. +page or Card 
-        const fileExtension = '.smq.ast';
+    const mainAst = JSON.parse(fs.readFileSync(astFile, 'utf-8'));
+    let resourceName = path.basename(astFile, '.smq.ast').split('.')[0];
+    const isPage = resourceName === '+page';
+    const fileExtension = '.smq.ast';
 
-        // Keys for accessing ASTs based on whether it's a page or a component
-        const jsKey = isPage ? 'jsAST' : `jsAST_${resourceName}`;
-        const cssKey = isPage ? 'cssAST' : `cssAST_${resourceName}`;
-        const htmlKey = isPage ? 'customAST' : resourceName.toLowerCase();
+    // Keys for accessing ASTs based on whether it's a page or a component
+    const jsKey = isPage ? 'jsAST' : `jsAST_${resourceName}`;
+    const cssKey = isPage ? 'cssAST' : `cssAST_${resourceName}`;
+    const htmlKey = isPage ? 'customAST' : resourceName.toLowerCase();
 
-        // Main AST objects for either +page or Component
-        const mainJSAST = mainAst[jsKey] || { content: { body: [] } };
-        const mainCSSAST = mainAst[cssKey] || { content: { nodes: [] } };
-        const mainHtmlAST = mainAst[htmlKey] || { content: [] };
-      
-      /*  
-        if (isPage) {
-          console.log(`${resourceName} Main Component AST`);
-        console.log(mainJSAST, mainCSSAST,mainHtmlAST);
-      } */
-        
+    // Main AST objects for either +page or Component
+    const mainJSAST = mainAst[jsKey] || { content: { body: [] } };
+    const mainCSSAST = mainAst[cssKey] || { content: { nodes: [] } };
+    const mainHtmlAST = mainAst[htmlKey] || { content: [] };
 
-        // Object to hold merged AST
-        let mergedAST = {
-            jsAST: mainJSAST,
-            cssAST: mainCSSAST,
-            customAST: mainHtmlAST,
+    // Object to hold merged AST
+    let mergedAST = {
+        jsAST: mainJSAST,
+        cssAST: mainCSSAST,
+        customAST: mainHtmlAST,
+    };
+
+    // Extract imported components' ASTs and merge them
+    for (const imp of imports) {
+        const componentPath = imp.updatedSource
+            .replace('src', 'build')
+            .replace('.smq', fileExtension);
+
+        const componentName = imp.specifiers[0]; // e.g. Counter
+        const componentAST = loadComponent(componentPath);
+
+        const importJsKey = `jsAST_${componentName}`;
+        const importCssKey = `cssAST_${componentName}`;
+        const importHtmlKey = componentName.toLowerCase();
+
+        const componentJSAST = componentAST[importJsKey] || { content: { body: [] } };
+        const componentCSSAST = componentAST[importCssKey] || { content: { nodes: [] } };
+        const componentHtmlAST = componentAST[importHtmlKey] || { content: [] };
+
+        // Merging JS AST
+        const componentJSBody = componentJSAST.content.body;
+        mergedAST.jsAST = {
+            ...mergedAST.jsAST,  // Spread the root structure of mainJSAST
+            content: {
+                ...mergedAST.jsAST.content,  // Keep the content structure intact
+                body: [...mergedAST.jsAST.content.body, ...componentJSBody]  // Merge the body
+            }
         };
 
-        // Extract imported components' ASTs and merge them
-        for (const imp of imports) {
-            const componentPath = imp.updatedSource
-                .replace('src', 'build')
-                .replace('.smq', fileExtension);
-
-              const componentName = imp.specifiers[0]; // e.g. Counter
-                //console.log("SEEEEEEEE",componentName);
-            const componentAST = loadComponent(componentPath);
-            //console.log("THIS",componentAST);
-            const importJsKey = `jsAST_${componentName}`;
-            const importCssKey = `cssAST_${componentName}`;
-            const importHtmlKey = componentName.toLowerCase();
-
-           
-            const componentJSAST = componentAST[importJsKey] || { content: { body: [] } };
-            const componentCSSAST = componentAST[importCssKey] || { content: { nodes: [] } };
-            const componentHtmlAST = componentAST[importHtmlKey] || { content: [] };
-             
-                //if (isPage) {
-                  //console.log("KEYS",Object.keys(componentAST));
-                 //console.log(`${componentName} AST blocks`);
-                //console.log(componentJSAST, componentCSSAST,componentHtmlAST);
-             // } 
-
-                let mergedJSAST;
-                let mergedCSSAST;
-                let mergedHTML; 
-
-                const componentJSBody=componentJSAST.content.body;
-                mergedJSAST = [...mainJSAST.content.body, ...componentJSBody]; 
-                // Merging AST bodies
-                //console.log("MERGED",resourceName, JSON.stringify(mergedJSAST,null,2));
-
-                const componentCSSNodes = componentCSSAST?.content?.nodes || [];
-                mergedCSSAST = [...mainCSSAST.content.nodes, ...componentCSSNodes];  // Merging CSS nodes
-
-                mergedHTML = {
-                  ...mainHtmlAST, 
-                  [importHtmlKey]: componentHtmlAST  
-                 };
-
-               //console.log("MERGED",resourceName, JSON.stringify(mergedHTML,null,2));
-
-
-               const mergedAST = {
-                [jsKey]: mergedJSAST,           // Merged JS AST
-                [cssKey]: mergedCSSAST,         // Merged CSS AST
-                [htmlKey]: mergedHTML          // Merged HTML AST (main HTML +
-                };
-
-// Construct the new file name: resourceName + ".merged.ast"
-const newFileName = path.join(path.dirname(astFile), `${resourceName}.merged.ast`);
-
-// Write the merged ASTs to the new file
-fs.writeFileSync(newFileName, JSON.stringify(mergedAST, null, 2), 'utf-8');
-
-console.log(`Merged AST written to: ${newFileName}`);
-
-
-
-        
-
-
-          
-
+        // Merging CSS AST
+        const componentCSSNodes = componentCSSAST?.content?.nodes || [];
+        mergedAST.cssAST = {
+            ...mergedAST.cssAST,  // Spread the root structure of mainCSSAST
+            content: {
+                ...mergedAST.cssAST.content, // Keep the content structure intact
+                nodes: [...mergedAST.cssAST.content.nodes, ...componentCSSNodes]  // Merge the nodes
             }
+        };
+
+        // Merging HTML AST
+        mergedAST.customAST = {
+            ...mergedAST.customAST,  // Spread the root structure of mainHtmlAST
+            content: [
+                ...mergedAST.customAST.content,
+                { [importHtmlKey]: componentHtmlAST.content }  // Merge the component HTML AST under its key
+            ]
+        };
+    }
+
+    // After the loop, prepare the final merged AST
+    const finalMergedAST = {
+        [jsKey]: mergedAST.jsAST,  // Merged JS AST
+        [cssKey]: mergedAST.cssAST, // Merged CSS AST
+        [htmlKey]: mergedAST.customAST,
+    };
+
+    // Construct the new file name: resourceName + ".merged.ast"
+    const newFileName = path.join(path.dirname(astFile), `${resourceName}.merged.ast`);
+
+    // Write the merged ASTs to the new file
+    fs.writeFileSync(newFileName, JSON.stringify(finalMergedAST, null, 2), 'utf-8');
+    console.log(`Merged AST written to: ${newFileName}`);
 }
+
 
 
 
