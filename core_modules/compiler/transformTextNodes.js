@@ -88,7 +88,7 @@ function readAstFile(filePath) {
 function writeAstFile(filePath, ast) {
   try {
     fs.writeFileSync(filePath, JSON.stringify(ast, null, 2));
-    console.log(`Successfully updated file: ${filePath}`);
+    //console.log(`Successfully updated file: ${filePath}`);
   } catch (error) {
     console.error(`Error writing file ${filePath}:`, error);
   }

@@ -205,14 +205,14 @@ async function routesGenerator(sourceDir,destDir) {
 
   // Step 4: Resolve imports and slots
   await importsResolution(componentsDest);
-  //await slotsResolution(componentsDest);
+  await slotsResolution(componentsDest);
   
   await importsResolution(destDir);
-  //await slotsResolution(destDir);
+  await slotsResolution(destDir);
 
   // Step 5: Transform components
   await Promise.all([
-  //transformer(destDir),
+  transformer(destDir),
   
 
   // transformer(componentsDest),
