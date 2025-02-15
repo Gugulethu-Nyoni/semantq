@@ -26,15 +26,171 @@ semantq create myapp
 
 This will generate a new project with the required folder structure.
 
-### Installing Tailwind CSS
+### Tailwind CSS Installation
 
-To install and configure Tailwind CSS in your project, navigate to the project root and run:
+
+With Semantq, you only need to run one command to install Tailwind CSS. Semantq will automatically install all required dependencies and set up the necessary configurations. However, if you prefer, you can manually install Tailwind CSS by following the guide below.
+
+---
+
+## One-Command Approach
+
+To install and configure Tailwind CSS, simply run the following command in your Semantq project:
 
 ```bash
 semantq install:tailwind
 ```
 
-This command will set up Tailwind CSS and its configuration files.
+This single command handles everything for you, from installing dependencies to configuring files. No manual setup is required!
+
+
+At this point you are done installing Tailwind CSS. 
+
+## Testing Your Tailwind Installation
+
+To verify that Tailwind CSS is working correctly, follow these steps:
+
+1. Add some HTML elements with Tailwind classes to your page or component. For example:
+   ```html
+   <div class="p-6 bg-blue-500 text-white rounded-lg">
+     <h1 class="text-2xl font-bold">Tailwind CSS is Working!</h1>
+     <p class="mt-2">This is a test to confirm Tailwind is properly installed.</p>
+   </div>
+   ```
+
+2. Run your development server:
+   ```bash
+   npm run dev
+   ```
+
+3. Open your browser and navigate to your application. You should see the styled elements on the page.
+
+4. **Inspect the Page Source**:
+   - Open your browser’s developer tools (right-click → Inspect).
+   - Navigate to the "Sources" tab and look for the `global.css` file.
+   - Verify that Tailwind’s utility classes are being applied.
+
+
+## What Happens During the One-Command Approach Installation ?
+
+When you run `semantq install:tailwind`, the following steps are executed automatically:
+
+### 1. **Install Tailwind CSS and Dependencies**
+   - Tailwind CSS v3, PostCSS, and Autoprefixer are installed as development dependencies using npm.
+   - Command executed:
+     ```bash
+     npm install -D tailwindcss@3 postcss autoprefixer
+     ```
+
+### 2. **Initialize Tailwind CSS**
+   - A `tailwind.config.js` file and a `postcss.config.js` file are generated.
+   - Command executed:
+     ```bash
+     npx tailwindcss init -p
+     ```
+
+### 3. **Configure Tailwind’s Content Paths**
+   - The `tailwind.config.js` file is updated to include the necessary content paths for your Semantq project.
+   - Example configuration:
+     ```javascript
+     export default {
+       content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx,html,smq}"],
+       theme: {
+         extend: {},
+       },
+       plugins: [],
+     };
+     ```
+
+### 4. **Create or Update `vite.config.js`**
+   - The `vite.config.js` file is created or updated to include PostCSS configuration for Tailwind CSS.
+   - Example configuration:
+     ```javascript
+     import { defineConfig } from 'vite';
+     import postcss from 'postcss';
+
+     export default defineConfig({
+       css: {
+         postcss
+       }
+     });
+     ```
+
+### 5. **Add Tailwind Directives to `global.css`**
+   - Tailwind CSS directives (`@tailwind base`, `@tailwind components`, `@tailwind utilities`) are added to the `global.css` file.
+   - If `global.css` doesn’t exist, it is created with the Tailwind directives.
+   - Example content:
+     ```css
+     @tailwind base;
+     @tailwind components;
+     @tailwind utilities;
+     ```
+
+---
+
+## Manual Installation (Optional)
+
+If you prefer to install Tailwind CSS manually, follow these steps:
+
+### 1. Install Tailwind CSS and Dependencies
+Run the following command to install Tailwind CSS, PostCSS, and Autoprefixer:
+```bash
+npm install -D tailwindcss@3 postcss autoprefixer
+```
+
+### 2. Initialize Tailwind CSS
+Generate the `tailwind.config.js` and `postcss.config.js` files:
+```bash
+npx tailwindcss init -p
+```
+
+### 3. Configure Tailwind’s Content Paths
+Open the `tailwind.config.js` file and update the `content` array to include your project’s file paths:
+```javascript
+export default {
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx,html,smq}"],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+```
+
+### 4. Add Tailwind Directives to Your CSS File
+Create or update your `global.css` file (or any other CSS file) and add the following Tailwind directives:
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+---
+
+## Benefits of the One-Command Approach
+
+- **Saves Time**: No need to manually install dependencies or configure files.
+- **Eliminates Errors**: Automated setup reduces the risk of misconfiguration.
+- **Consistency**: Ensures Tailwind CSS is set up correctly for every Semantq project.
+
+---
+
+## Post-Installation
+
+Once the installation is complete, you can start using Tailwind CSS classes in your Semantq project. Simply run your development server, and Tailwind will be ready to go!
+
+```bash
+npm run dev
+```
+
+---
+
+## Troubleshooting
+
+If you encounter any issues during installation, check the following:
+1. Ensure you have Node.js and npm installed.
+2. Verify that your project is a valid Semantq JS Framework application.
+3. Check the console for any error messages and refer to the Tailwind CSS documentation if needed.
+
 
 ### Creating a New Route
 
@@ -59,5 +215,5 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ---
 
-Thank you for using Semantq CLI! Happy coding! 🚀
+Thank you for using Semantq! Happy coding! 🚀
 ```
