@@ -100,14 +100,24 @@ program
     try {
       console.log('📦 Installing Tailwind CSS and dependencies...');
 
-      // Step 1: Install Tailwind CSS, PostCSS, and Autoprefixer
-      execSync('npm install -D tailwindcss postcss autoprefixer', { stdio: 'inherit' });
+      // Step 1: Install Tailwind CSS v3, PostCSS, and Autoprefixer
+      execSync('npm install -D tailwindcss@3 postcss autoprefixer', { stdio: 'inherit' });
 
-      // Step 2: Install Vite and PostCSS for Vite
-      execSync('npm install -D vite postcss tailwindcss', { stdio: 'inherit' });
-
-      // Step 3: Initialize Tailwind CSS
+      // Step 2: Initialize Tailwind CSS
       execSync('npx tailwindcss init -p', { stdio: 'inherit' });
+
+      // Step 3: Configure Tailwind’s Content Paths in tailwind.config.js
+      const tailwindConfigPath = path.join(process.cwd(), 'tailwind.config.js');
+      const tailwindConfigContent = `export default {
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx,html,smq}"],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};`;
+
+      fs.writeFileSync(tailwindConfigPath, tailwindConfigContent);
+      console.log('✅ Configured content paths in tailwind.config.js');
 
       // Step 4: Create or update vite.config.js
       const viteConfigPath = path.join(process.cwd(), 'vite.config.js');
@@ -140,6 +150,7 @@ export default defineConfig({
       console.error('❌ Error installing Tailwind CSS:', error.message);
     }
   });
+
 
 // ===============================
 //  CREATE ROUTE COMMAND
