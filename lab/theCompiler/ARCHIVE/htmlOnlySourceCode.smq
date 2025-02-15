@@ -1,9 +1,0 @@
-
-
-
-
-
-<input type="text" id="boundInput" value="" /> <br/> 
-
-
-<button @click={alerter}> Click Me </button> 
