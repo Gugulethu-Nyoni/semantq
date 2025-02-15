@@ -133,17 +133,23 @@ export default defineConfig({
       fs.writeFileSync(viteConfigPath, viteConfigContent);
       console.log('✅ Created/updated vite.config.js');
 
-      // Step 5: Append Tailwind directives to global.css
+            // Step 5: Append Tailwind directives to global.css
       const globalCSSPath = path.join(process.cwd(), 'global.css');
       const tailwindDirectives = `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`;
 
       if (fs.existsSync(globalCSSPath)) {
-        fs.appendFileSync(globalCSSPath, tailwindDirectives);
-        console.log('✅ Appended Tailwind directives to global.css');
+        // Read the existing content
+        const existingContent = fs.readFileSync(globalCSSPath, 'utf-8');
+        
+        // Write Tailwind directives at the top and append the existing content
+        fs.writeFileSync(globalCSSPath, tailwindDirectives + existingContent);
+        console.log('✅ Appended Tailwind directives to the top of global.css');
       } else {
+        // Create global.css with Tailwind directives if it doesn't exist
         fs.writeFileSync(globalCSSPath, tailwindDirectives);
         console.log('✅ Created global.css with Tailwind directives');
       }
+
 
       console.log('🎉 Tailwind CSS installed and configured successfully!');
     } catch (error) {
