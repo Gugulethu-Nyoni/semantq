@@ -43,7 +43,7 @@ A component in Semantq is composed of **JavaScript**, **CSS**, and **HTML**. All
 
 ---
 
-## JavaScript
+## JavaScript Tags
 
 In Semantq, JavaScript code is enclosed within `@script` and `@end` tags. These tags act as markers for the beginning and end of the script block.
 
@@ -57,7 +57,7 @@ console.log("Hello World");
 
 ---
 
-## CSS
+## CSS Tags
 
 Similarly, CSS styles are enclosed within `@style` and `@end` tags. These tags define the start and end of the style block.
 
@@ -71,14 +71,14 @@ h1 { color: red; }
 
 ---
 
-## HTML
+## HTML Tag (Optional)
 
-The HTML content is marked with the `html:` tag. This tag is optional but helps provide structure and clarity to your component by explicitly indicating where the HTML begins.
+The HTML content is marked with the `@html` tag. This tag is optional but helps provide structure and clarity to your component by explicitly indicating where the HTML begins.
 
 ### Example: `Card.smq` or `+page.smq`
 
 ```Semantq
-html:
+@html
 <h1>Hello World</h1>
 ```
 
@@ -144,7 +144,7 @@ h1 {
 ```
 
 ```Semantq
-   html:
+@html
 <h1>Welcome to Semantq</h1>
 <p>This is a sample component.</p>
 ```
