@@ -154,7 +154,7 @@ const lineStart = i;
 const line = content.slice(lineStart, i).trim();
 
 
-const validTags = ['@script', '@style', 'html:', '@end'];
+const validTags = ['@script', '@style', '@html', '@end'];
 
 // Add this inside the while loop, after extracting the line
 // Validate the line for specific custom syntax declarations
