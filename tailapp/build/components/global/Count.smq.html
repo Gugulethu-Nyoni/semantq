@@ -1,0 +1,15 @@
+<script type="module">
+let counter = 0;
+
+function incrementer () {
+counter ++;
+}
+</script>
+
+
+
+<customSyntax>
+<button @click={incrementer}>
+<slot> </slot>
+</button>
+</customSyntax>
