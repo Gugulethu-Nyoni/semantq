@@ -17,6 +17,7 @@ const safeCopySync = (source, destination) => {
 };
 
 // Utility function to copy files only if they exist
+
 const copyIfExists = async (source, destination) => {
   if (await fs.pathExists(source)) {
     await fs.copyFile(source, destination);
@@ -24,6 +25,35 @@ const copyIfExists = async (source, destination) => {
     console.warn(`Warning: ${source} does not exist, skipping.`);
   }
 };
+
+
+
+// Utility function to copy files and directories if they exist
+/*
+const copyIfExists = async (source, destination) => {
+  try {
+    const stats = await fs.promises.stat(source);
+
+    if (stats.isDirectory()) {
+      // Handle directory: ensure destination exists and recursively copy files
+      await fs.promises.mkdir(destination, { recursive: true });
+
+      const files = await fs.promises.readdir(source);
+      for (const file of files) {
+        const currentSource = path.join(source, file);
+        const currentDestination = path.join(destination, file);
+        await copyIfExists(currentSource, currentDestination);
+      }
+    } else if (stats.isFile()) {
+      // Handle file: simply copy it
+      await fs.promises.copyFile(source, destination);
+      //console.log(`Copied: ${source} to ${destination}`);
+    }
+  } catch (error) {
+    console.warn(`Warning: ${source} does not exist, skipping. Error: ${error.message}`);
+  }
+};
+*/
 
 // ===============================
 //  CREATE NEW PROJECT COMMAND
@@ -60,12 +90,21 @@ program
 
       // Copy essential files and directories
       safeCopySync(path.resolve(__dirname, './core_modules'), path.join(projectPath, 'core_modules'));
-      safeCopySync(templateDirectory, projectPath);
+      //safeCopySync(templateDirectory, projectPath);
+
+            // Copy specific template files
+      await copyIfExists(path.join(templateDirectory, 'index.html'), path.join(projectPath, 'index.html'));
+      await copyIfExists(path.join(templateDirectory, 'global.js'), path.join(projectPath, 'global.js'));
+      await copyIfExists(path.join(templateDirectory, 'global.css'), path.join(projectPath, 'global.css'));
+
 
       // Copy specific template files
       await copyIfExists(path.join(templateDirectory, 'Button.smq'), path.join(projectPath, 'src/components/global/Button.smq'));
       await copyIfExists(path.join(templateDirectory, 'Count.smq'), path.join(projectPath, 'src/components/global/Count.smq'));
       await copyIfExists(path.join(templateDirectory, '+404.smq'), path.join(projectPath, 'src/routes/+404.smq'));
+      
+      // copy the public route
+      safeCopySync(path.resolve(__dirname, './templates/public'), path.join(projectPath, 'public'));
 
       // Create empty routes.js
       await fs.writeFile(path.join(projectPath, 'build/routes/routes.js'), 'export default [];');
