@@ -126,7 +126,7 @@ async function readAndCompileSMQFile(filePath) {
         // Write compiled content to a new .html file
         const outputFilePath = path.join(path.dirname(buildPath), `${path.basename(buildPath, '.smq')}.smq.html`);
         await fs.promises.writeFile(outputFilePath, compiledContent, 'utf8');
-        console.log(`File ${outputFilePath} compiled successfully.`);
+        //console.log(`File ${outputFilePath} compiled successfully.`);
     } catch (err) {
         console.error(`Error processing file ${filePath}:`, err);
     }
