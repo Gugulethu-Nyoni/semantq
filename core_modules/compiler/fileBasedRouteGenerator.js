@@ -2,19 +2,18 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export function generateFileBasedRoutes(basePath) {
-    const routesPath = basePath;
     const fileBasedRoutes = {};
 
     try {
-        traverseDirectory(routesPath, '', fileBasedRoutes);
+        traverseDirectory(basePath, '', fileBasedRoutes);
         writeRoutesToFile(basePath, fileBasedRoutes);
     } catch (err) {
-        console.error('Error reading directory:', err);
+        console.error('Error generating routes:', err);
     }
 }
 
 function traverseDirectory(directoryPath, relativePath, fileBasedRoutes) {
-    // Add routes for the home page ("/") and "home" ("/")
+    // Add default routes
     fileBasedRoutes['/'] = '/';
     fileBasedRoutes['home'] = '/';
 
@@ -24,7 +23,7 @@ function traverseDirectory(directoryPath, relativePath, fileBasedRoutes) {
         const stats = fs.statSync(filePath);
 
         if (stats.isDirectory()) {
-            const newRelativePath = path.join(relativePath, file);
+            const newRelativePath = `${path.posix.join(relativePath, file)}`;
             fileBasedRoutes[newRelativePath] = newRelativePath;
             traverseDirectory(filePath, newRelativePath, fileBasedRoutes);
         }
@@ -33,7 +32,7 @@ function traverseDirectory(directoryPath, relativePath, fileBasedRoutes) {
 
 function writeRoutesToFile(basePath, fileBasedRoutes) {
     const filePath = path.join(basePath, 'fileBasedRoutes.js');
-    const fileContent = `export default ${JSON.stringify(fileBasedRoutes, null, 2)};`;
+    const fileContent = `const fileBasedRoutes = ${JSON.stringify(fileBasedRoutes, null, 2)};\n\nexport default fileBasedRoutes;`;
     fs.writeFileSync(filePath, fileContent);
 }
 
