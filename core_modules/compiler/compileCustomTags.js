@@ -170,7 +170,7 @@ if (line === '@script') {
     } else if (line === '@style') {
       tagStack.push('style');
       compiledContent += '<style>\n';
-    } else if (line === 'html:') {
+    } else if (line === '@html') {
       // Skip the html declaration line
 
        // Add the opening tag for the wrapper
