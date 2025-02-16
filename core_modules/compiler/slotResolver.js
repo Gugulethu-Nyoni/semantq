@@ -133,8 +133,15 @@ buildComponentRegistry() {
                 if (targetNodeChildren && targetNodeChildren[0].length > 0) {
                     contentToSet = targetNodeChildren[0][0];
                 } else {
+                  //console.log("HERE",slotFallBackChildren);
+
+                  if (slotFallBackChildren) {
                     contentToSet = slotFallBackChildren[0][0];
+                  }
                 }
+
+                //console.log("HERE",contentToSet);
+
 
                 // Find slot node positions in child component AST
                 const slotNodeLocations = new GetNodePositions(childComponentAstBlock, slotNode).init();
