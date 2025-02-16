@@ -168,8 +168,8 @@ async function routesGenerator(sourceDir,destDir) {
     routesModule.generateFileBasedRoutes(destDir);
     //console.log('Route generation completed');
    // Copy routes.json from sourceDir to destDir
-    const sourceRoutesFile = path.join(sourceDir, 'routes.json');
-    const destRoutesFile = path.join(destDir, 'routes.json');
+    const sourceRoutesFile = path.join(sourceDir, 'routes.js');
+    const destRoutesFile = path.join(destDir, 'routes.js');
 
     await fse.copy(sourceRoutesFile, destRoutesFile);
    // console.log(`Copied routes.json from ${sourceDir} to ${destDir}`);
@@ -219,7 +219,7 @@ async function routesGenerator(sourceDir,destDir) {
   ]);
 
   // Step 6: Generate routes
- // await routesGenerator(sourceDir, destDir);
+ await routesGenerator(sourceDir, destDir);
 }
 
 
