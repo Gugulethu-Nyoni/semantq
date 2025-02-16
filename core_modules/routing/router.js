@@ -1,5 +1,8 @@
 import fileBasedRoutes from '../../build/routes/fileBasedRoutes.js';
-import declaredRoutes from '../../build/routes/routes.json';
+import declaredRoutes from '../../build/routes/routes.js';
+import path from 'path';
+
+
 
 class Router {
     constructor(declaredRoutes, fileBasedRoutes) {
@@ -14,6 +17,9 @@ class Router {
         this.indexFileHash = null;
         this.storageKey = "currentRouteState";
         this.globalStorageKey = "smqState";
+        this.loadedModules = {};  // Store loaded modules
+        this.routesBase ='/build/routes';
+
         
         localStorage.setItem('routeEvent', 'initialLoad');
     }
@@ -49,7 +55,7 @@ class Router {
             const content = await response.text();
             const hash = await this.calculateHash(content);
             this.indexFileHash = hash;
-            console.log('Hash of index file:', hash);
+            //console.log('Hash of index file:', hash);
         } catch (error) {
             console.error('Error calculating hash:', error);
         }
@@ -98,6 +104,7 @@ class Router {
     async fetchComponentDefinition(routeFile) {
         const response = await fetch(routeFile);
         const html = await response.text();
+        //console.log(html);
         const routeFileHash = await this.calculateHash(html);
         if (routeFileHash === this.indexFileHash && routeFile !== null) {
             const errorFile = '../../build/routes/' + '+404.smq';
@@ -111,89 +118,116 @@ class Router {
         }
     }
 
-    async render(route, resourceId) {
-        const placeholder = document.getElementById('dynamicComponentPlaceholder');
-        if (resourceId !== undefined) {
-            placeholder.setAttribute('data-resource-id', resourceId);
-            const existingData = localStorage.getItem('smqState');
-            const parsedData = JSON.parse(existingData || '{}');
-            if (!parsedData['componentDataId']) {
-                parsedData['componentDataId'] = [{ newState: resourceId }];
-            }
-            Object.values(parsedData).forEach((value) => {
-                value.map((item) => {
-                    if (item.key === 'componentDataId') {
-                        item.newState = resourceId;
-                    }
-                });
-            });
-            localStorage.setItem('smqState', JSON.stringify(parsedData, null, 2));
+ async render(route, resourceId) {
+    //console.log("Check", resourceId);
+    const placeholder = document.getElementById('app');
+    if (resourceId !== undefined) {
+        placeholder.setAttribute('data-resource-id', resourceId);
+        const existingData = localStorage.getItem('smqState');
+        const parsedData = JSON.parse(existingData || '{}');
+        if (!parsedData['componentDataId']) {
+            parsedData['componentDataId'] = [{ newState: resourceId }];
         }
-        const existingScripts = document.querySelectorAll('script[scope="component-js"]');
-        for (const script of existingScripts) {
-            script.remove();
-        }
-        try {
-            const componentDefinition = await this.fetchComponentDefinition(route);
-            const template = document.createElement('template');
-            template.innerHTML = componentDefinition.trim();
-            const clone = template.content.cloneNode(true);
-            const scripts = clone.querySelectorAll('script');
-            if (scripts) {
-                for (const script of scripts) {
-                    const newScript = document.createElement('script');
-                    newScript.setAttribute('scope', 'component-js');
-                    newScript.setAttribute('type', 'module');
-                    if (script.src) {
-                        await fetch(script.src)
-                            .then(response => response.text())
-                            .then(scriptSource => {
-                                newScript.textContent = scriptSource;
-                                document.head.appendChild(newScript);
-                            });
-                    } else {
-                        if (resourceId !== undefined) {
-                            const letStatement = `let componentDataId = ${resourceId};`;
-                            const existingScriptContent = script.textContent || script.innerText;
-                            const newScriptContent = `${letStatement}\n${existingScriptContent}`;
-                            newScript.textContent = newScriptContent;
-                            document.head.appendChild(newScript);
-                            const boundElements = clone.querySelectorAll(`[data-bind="componentDataId"]`);
-                            if (boundElements.length > 0) {
-                                boundElements.forEach((element) => {
-                                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                                        element.value = resourceId;
-                                    } else {
-                                        element.textContent = resourceId;
-                                    }
-                                });
-                            }
-                        } else {
-                            newScript.textContent = script.textContent;
-                            document.head.appendChild(newScript);
-                        }
-                    }
+        Object.values(parsedData).forEach((value) => {
+            value.map((item) => {
+                if (item.key === 'componentDataId') {
+                    item.newState = resourceId;
                 }
-            }
-            if (!scripts && resourceId) {
-                const scriptElement = document.createElement('script');
-                scriptElement.textContent = `let resourceId = "${resourceId}";`;
-                document.head.appendChild(scriptElement);
-            }
-            for (const script of scripts) {
-                script.remove();
-            }
-            placeholder.appendChild(clone);
-            this.routeHandled = true;
-            this.isHandledByClickEvent = false;
-        } catch (error) {
-            console.error(error);
-        }
+            });
+        });
+        localStorage.setItem('smqState', JSON.stringify(parsedData, null, 2));
     }
 
+    // Remove existing scoped JS and CSS
+    const existingScripts = document.querySelectorAll('script[scope="component-js"]');
+    const existingStyles = document.querySelectorAll('style[scope="component-css"]');
+    for (const script of existingScripts) script.remove();
+    for (const style of existingStyles) style.remove();
+
+    try {
+        const componentDefinition = await this.fetchComponentDefinition(route);
+        const template = document.createElement('template');
+        template.innerHTML = componentDefinition.trim();
+        const clone = template.content.cloneNode(true);
+
+        // Append the component HTML to the placeholder
+        placeholder.appendChild(clone);
+
+
+        // Inject resourceId as a global variable if available
+        if (resourceId !== undefined) {
+            const scriptElement = document.createElement('script');
+            scriptElement.textContent = `window.resourceId = "${resourceId}";`;
+            document.body.appendChild(scriptElement);
+        }
+
+        // Handle <style> tags scoped to this component
+        const styles = clone.querySelectorAll('style');
+        for (const style of styles) {
+            const newStyle = document.createElement('style');
+            newStyle.setAttribute('scope', 'component-css');
+            newStyle.textContent = style.textContent; // Transfer style content
+            document.head.appendChild(newStyle);
+        }
+
+        // Handle <script type="module"> tag scoped to this component
+        // Handle <script type="module"> tag scoped to this component
+            const script = clone.querySelector('script[type="module"]');
+            if (script) {
+                // Store the script content directly in the loadedModules object using the route as the key
+                this.loadedModules[route] = script.textContent;
+            }
+
+
+            //const scriptPath = '/' + route+'.js'; 
+            const routeName = route.split('/').slice(-2, -1)[0]; // about
+            const scriptPath = route.replace('+page.html', `${routeName}.js`);
+
+            console.log("ROUTE",scriptPath);
+
+
+            //const scriptPath = new URL(`/build/routes/${route}/${route}.js`, import.meta.url).href;
+
+            const module = await import(/* @vite-ignore */ scriptPath);
+            console.log("Loaded module:", module);
+
+        // Store the module in the loadedModules object
+        this.loadedModules[route] = module;
+
+        // Invoke init() if it exists
+        if (module.init) {
+            console.log("Init function detected. Running it now...");
+            module.init();
+        } else {
+            console.warn(`No init() function found in module for route: ${route}`);
+        }
+
+
+        // Ensure scripts run after the DOM is fully loaded
+            /*
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM fully loaded and parsed');
+        }); */
+
+        this.routeHandled = true;
+        this.isHandledByClickEvent = false;
+    } catch (error) {
+        console.error('Error rendering component:', error);
+    }
+}
+
+
+
+
+
+
+
+
+
     handleFileBasedRoute(targetRoute, popScope, searchParams) {
+        console.log(targetRoute, "fileBased");
         let storageRoute;
-        if (targetRoute === '/') {
+        if (targetRoute === '/' || targetRoute === 'home'  ) {
             storageRoute = targetRoute;
             window.location.href = this.basePath;
         } else {
@@ -213,7 +247,7 @@ class Router {
         } else if (targetRoute === '/') {
             fileRoute = null;
         }
-        const placeholder = document.getElementById('dynamicComponentPlaceholder');
+        const placeholder = document.getElementById('app');
         placeholder.innerHTML = '';
         const scriptTags = document.querySelectorAll('script');
         scriptTags.forEach(script => {
@@ -233,7 +267,7 @@ class Router {
                 script.type = 'module';
                 script.setAttribute('scope', 'framework');
                 script.defer = true;
-                document.body.appendChild(script);
+                //document.body.appendChild(script);
             }
             if (targetRoute === '/demos') {
                 const link = document.createElement('link');
@@ -250,7 +284,10 @@ class Router {
         });
     }
 
+
     handleDeclaredRoute(targetRoute, popScope, searchParams) {
+                console.log(targetRoute, "Declared");
+
         if (targetRoute === '/' || targetRoute === '/home') {
             window.location.href = this.basePath;
         }
@@ -287,14 +324,14 @@ class Router {
         let fileRoute;
         if (declaredRoute.hasOwnProperty('component')) {
             const resource = declaredRoute['component'];
-            fileRoute = '../../build/components/' + declaredRoute['component'].replace('/', '') + '.html';
+            fileRoute = '../../build/components/' + declaredRoute['component'].replace('/', '') + '.smq';
         }
         if (declaredRoute.hasOwnProperty('page')) {
             const resource = declaredRoute['page'];
             const targetRouteLowercase = routePath.toLowerCase();
             fileRoute = '../../build/routes/' + targetRouteLowercase.replace(/^\/+/, '') + '/' + '+page.html';
         }
-        const placeholder = document.getElementById('dynamicComponentPlaceholder');
+        const placeholder = document.getElementById('app');
         placeholder.innerHTML = '';
         const scriptTags = document.querySelectorAll('script');
         scriptTags.forEach(script => {
@@ -373,6 +410,9 @@ if (routeEvent !== 'click' && targetRoute !== currentUrl) {
     window.addEventListener('popstate', handleURLChange);
     window.addEventListener('load', handleURLChange);
 }
+
+
+
 
 function handleURLChange(event) {
     let targetRoute = window.location.pathname;
