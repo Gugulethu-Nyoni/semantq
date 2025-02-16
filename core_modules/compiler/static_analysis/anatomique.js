@@ -4,9 +4,11 @@
 import escodegen from 'escodegen';
 import { parse } from 'acorn';
 import customHtmlParser from '../customHtmlParser.js';
-import fs from 'fs';
+import fs from 'fs-extra';
 import prettier from 'prettier';
-
+//import generate from "@babel/generator";
+import { default as generator } from '@babel/generator';
+//import generate from '@babel/generator';
 
 
 class GetNodePositions {
@@ -2131,31 +2133,37 @@ if ( Array.isArray(staticNode.identifiersInFunctions) && staticNode.identifiersI
 
   if (functions.length > 0) {
     for (let n = 0; n < functions.length; ++n) {
-      globaliserObject+=`\n window.${functions[n].value}=${functions[n].value};`;
+      //globaliserObject+=`\n window.${functions[n].value}=${functions[n].value};`;
     }
    }
 
     appendtoJsScriptTag = `
     ${reRendersObject}
-    document.addEventListener("DOMContentLoaded", function() {
-    ${globaliserObject}
-    });`; 
+    `; 
 
 
 
   //console.log("FNs",functions[0]);
 
+
+
+    //console.log(JSON.stringify(newJsAST, null,2));
   const jsCode = escodegen.generate(newJsAST);
-  const parsedHTML = customHtmlParser(newHTMLAST);
+  //return; 
+  
+  /*
+  const code = generate(newJsAST);
+  console.log(code); // Output: console.log("Hello, World!");
+  return; */
 
   
+
+
+  
+  const parsedHTML = customHtmlParser(newHTMLAST);
+
   if (jsCode && parsedHTML) {
-
-    //console.log('DONE!',parsedHTML);
-    //const cleanedHTML = parsedHTML.replace(/<\/?customSyntax>/g, '');
-   //const cleanedHTML = removeCustomSyntaxTags(parsedHTML);
    writeCodeToFile(jsCode, parsedHTML, appendtoJsScriptTag);
-
   }
 
   
@@ -2176,17 +2184,40 @@ if ( Array.isArray(staticNode.identifiersInFunctions) && staticNode.identifiersI
       indentSize: 2,
     });
 
+console.log("JS",formattedJsCode);
+
+const routeName = filePath.split('/').slice(-2, -1)[0];
+
+// Create the file name dynamically (e.g., 'about.js' for the 'about' route)
+const jsFileName = `${routeName}.js`;
+
+// Construct the path to write the new JS file
+const jsFilePath = filePath.replace(/\+page\.(resolved|smq)\.ast$/, jsFileName);
+
+
+// Construct the JavaScript content to write into the file
+const jsContent = `
+    export function init() {
+      ${formattedJsCode}
+      ${appendtoJsScriptTag}
+    }
+`;
+
+// Write the JavaScript content to the new file
+
+try {
+  await fs.promises.writeFile(jsFilePath, jsContent);
+  //console.log(`File ${newFilePath} written successfully`);
+} catch (err) {
+  console.error(err);
+}
+
 
 
 
 
 
     const output = `
-<script type="module">
-  ${formattedJsCode}
-  ${appendtoJsScriptTag}
-</script>
-
 <style>
   ${cssAST}
 </style>
@@ -2196,6 +2227,9 @@ ${formattedHTML}
 
 const newFilePath = filePath.replace(/\+page\.(resolved|smq)\.ast$/, '+page.html');
 
+console.log("LOOK",newFilePath);
+
+/*
     fs.unlink(newFilePath, (err) => {
       if (err && err.code !== 'ENOENT') {
         console.error(err);
@@ -2209,6 +2243,22 @@ const newFilePath = filePath.replace(/\+page\.(resolved|smq)\.ast$/, '+page.html
         });
       }
     });
+*/
+
+try {
+  await fs.promises.unlink(newFilePath);
+} catch (err) {
+  if (err.code !== 'ENOENT') {
+    console.error(err);
+  }
+}
+
+try {
+  await fs.promises.writeFile(newFilePath, output);
+  //console.log(`File ${newFilePath} written successfully`);
+} catch (err) {
+  console.error(err);
+}
 
   }
 
