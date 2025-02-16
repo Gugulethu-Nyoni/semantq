@@ -112,7 +112,7 @@ class Router {
     }
 
     async render(route, resourceId) {
-        const placeholder = document.getElementById('dynamicComponentPlaceholder');
+        const placeholder = document.getElementById('app');
         if (resourceId !== undefined) {
             placeholder.setAttribute('data-resource-id', resourceId);
             const existingData = localStorage.getItem('smqState');

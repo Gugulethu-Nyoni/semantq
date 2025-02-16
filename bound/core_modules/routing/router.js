@@ -193,7 +193,7 @@ class Router {
 
     handleFileBasedRoute(targetRoute, popScope, searchParams) {
         let storageRoute;
-        if (targetRoute === '/') {
+        if (targetRoute === '/' || targetRoute === 'home'  ) {
             storageRoute = targetRoute;
             window.location.href = this.basePath;
         } else {
