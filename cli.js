@@ -84,7 +84,7 @@ program
  
 
      // Create empty routes.json in src/routes
-      await fs.writeFile(path.join(projectPath, 'src/routes/routes.json'), '[]');
+      await fs.writeFile(path.join(projectPath, 'src/routes/routes.js'), '[]');
 
   
 
