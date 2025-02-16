@@ -46,7 +46,6 @@ function fileExists(filePath) {
 
 
 // Helper function: Load a component file
-// Helper function: Load a component file
 function loadComponent(componentPath) {
   try {
     // Ensure the componentPath is an absolute path before reading
