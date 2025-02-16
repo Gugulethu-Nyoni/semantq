@@ -9,6 +9,14 @@ import prettier from 'prettier';
 //import generate from "@babel/generator";
 import { default as generator } from '@babel/generator';
 //import generate from '@babel/generator';
+//import traverse from "@babel/traverse";
+//import * as t from "@babel/types";
+//import generate from "@babel/generator";
+//import cloneDeep from "lodash.clonedeep"; 
+import * as estraverse from "estraverse";
+
+
+//console.log(typeof traverse.default); // Should print "function"
 
 
 class GetNodePositions {
@@ -1978,292 +1986,173 @@ if (stackCount && stackCount === 1) {
 export default async function transformASTs(jsAST, cssAST, customSyntaxAST, filePath) {
   const customSyntaxObject = customSyntaxAST[0];
 
-  // Process text and mustache identifier nodes
-  //visitTextNodes(customSyntaxObject);
+  // Process mustache and event handler nodes
   visitMustacheIdentifierNodes(customSyntaxObject);
-   // Visit event handler nodes
   visitEventHandlerNodes(customSyntaxObject);
 
+  // Initialize tracking variables
+  let nodeStatus;
+  let identifiersInFunctions;
+  let activeBlock;
+  let stackCount;
+  const processedBlocks = new Set(); // Tracks processed blocks to avoid redundancy
 
+  let transformedASTs;
+  let reRendersObject = "";
+  const uniqueCalls = new Set();
 
-  
+  // --------------------
+  // Transform Reactive Nodes
+  // --------------------
+  nodeStatus = 1;
+  stackCount = getActiveNodes(customSyntaxAST, customSyntaxObject, jsAST, nodeStatus, 2);
 
-let nodeStatus;
-let identifiersInFunctions;
-let activeBlock;
-let stackCount;
-
-// Initialize a Set to track processed blocks
-const processedBlocks = new Set();
-
-// Transform Reactive Nodes
-nodeStatus = 1;
-stackCount = getActiveNodes(customSyntaxAST, customSyntaxObject, jsAST, nodeStatus, 2);
-//console.log("SEE active stack count", stackCount);
-
-let transformedASTs;
-let reRendersObject=``;
-const uniqueCalls = new Set();
-
-
-for (let n = 0; n < stackCount; n++) {
-  const reactiveNode = getActiveNodes(customSyntaxAST, customSyntaxObject, jsAST, nodeStatus);
-  //console.log("RN", reactiveNode.reactiveStack); return;
-  identifiersInFunctions = reactiveNode.identifiersInFunctions;
-  activeBlock = reactiveNode.reactiveStack;
-
-  // Convert activeBlock to a string representation to be used in the Set
-  const blockKey = JSON.stringify(activeBlock);
-
-  // Check if the block has already been processed
-  if (!processedBlocks.has(blockKey)) {
-    const transpilerReactive = new Transpiler(identifiersInFunctions, customSyntaxObject, jsAST, activeBlock, nodeStatus);
-    transformedASTs = transpilerReactive.getTransformedASTs();
+  for (let n = 0; n < stackCount; n++) {
+    const reactiveNode = getActiveNodes(customSyntaxAST, customSyntaxObject, jsAST, nodeStatus);
+    identifiersInFunctions = reactiveNode.identifiersInFunctions;
+    activeBlock = reactiveNode.reactiveStack;
     
-    // Mark the block as processed
-    processedBlocks.add(blockKey);
-  }
-
-// prepare reRenderFunction calls here 
-
-  //console.log("IFu",identifiersInFunctions);
-
-
-identifiersInFunctions.forEach(obj => {
-  const keys = Object.keys(obj);
-  keys.forEach(key => {
-    const reRenderCall = `reRender${key.charAt(0).toUpperCase()}${key.slice(1)}();`;
-    if (!uniqueCalls.has(reRenderCall)) {
-      uniqueCalls.add(reRenderCall);
-      reRendersObject += reRenderCall;
+    const blockKey = JSON.stringify(activeBlock);
+    if (!processedBlocks.has(blockKey)) {
+      const transpilerReactive = new Transpiler(identifiersInFunctions, customSyntaxObject, jsAST, activeBlock, nodeStatus);
+      transformedASTs = transpilerReactive.getTransformedASTs();
+      processedBlocks.add(blockKey);
     }
-  });
-});
 
-//console.log(reRendersObject);
+    // Prepare reRender function calls
+    identifiersInFunctions.forEach(obj => {
+      Object.keys(obj).forEach(key => {
+        const reRenderCall = `reRender${key.charAt(0).toUpperCase()}${key.slice(1)}();`;
+        if (!uniqueCalls.has(reRenderCall)) {
+          uniqueCalls.add(reRenderCall);
+          reRendersObject += reRenderCall;
+        }
+      });
+    });
+  }
 
+  // --------------------
+  // Transform Static Nodes
+  // --------------------
+  nodeStatus = 0;
+  stackCount = getActiveNodes(customSyntaxAST, customSyntaxObject, jsAST, nodeStatus, 1);
 
+  for (let n = 0; n < stackCount; n++) {
+    const staticNode = getActiveNodes(customSyntaxAST, customSyntaxObject, jsAST, nodeStatus);
+    if (!staticNode) continue;
 
-
-
-
-  //identifier.charAt(0).toUpperCase() 
-
-}
-
-// Transform Static Nodes
-
-nodeStatus = 0;
-stackCount = getActiveNodes(customSyntaxAST, customSyntaxObject, jsAST, nodeStatus, 1);
-//console.log("SEE STATIC COUNT---", stackCount); return;
-
-for (let n = 0; n < stackCount; n++) {
-  const staticNode = getActiveNodes(customSyntaxAST, customSyntaxObject, jsAST, nodeStatus);
-  //console.log("RN", staticNode); return;
-if (staticNode) {
-
-  let identifiersInFunctions = [];
-if ( Array.isArray(staticNode.identifiersInFunctions) && staticNode.identifiersInFunctions.length > 0) {
-  identifiersInFunctions = staticNode.identifiersInFunctions;
-}
-
-  activeBlock = staticNode.staticStack;
-
-  // Convert activeBlock to a string representation to be used in the Set
-  const blockKey = JSON.stringify(activeBlock);
-
-  // Check if the block has already been processed
-  if (!processedBlocks.has(blockKey)) {
-    const transpilerStatic = new Transpiler(identifiersInFunctions, customSyntaxObject, jsAST, activeBlock, nodeStatus);
-    transformedASTs = transpilerStatic.getTransformedASTs();
+    identifiersInFunctions = Array.isArray(staticNode.identifiersInFunctions) ? staticNode.identifiersInFunctions : [];
+    activeBlock = staticNode.staticStack;
     
-    // Mark the block as processed
-    processedBlocks.add(blockKey);
+    const blockKey = JSON.stringify(activeBlock);
+    if (!processedBlocks.has(blockKey)) {
+      const transpilerStatic = new Transpiler(identifiersInFunctions, customSyntaxObject, jsAST, activeBlock, nodeStatus);
+      transformedASTs = transpilerStatic.getTransformedASTs();
+      processedBlocks.add(blockKey);
+    }
   }
 
-}
-}
+  // --------------------
+  // Generate final ASTs
+  // --------------------
+  let newJsAST = transformedASTs ? transformedASTs.transformedJsAST : jsAST;
+  let newHTMLAST = transformedASTs ? transformedASTs.transformedCustomSyntaxAST : customSyntaxAST;
 
-
-
-
-//console.log("FDF"<transformedASTs);
-
- 
-  let newJsAST; 
-  let newHTMLAST; 
-
-  if (transformedASTs) {
-    newJsAST =transformedASTs.transformedJsAST;
-  } else {
-
-    newJsAST = jsAST;
-  }
-
-  if (transformedASTs) {
-
-    newHTMLAST =transformedASTs.transformedCustomSyntaxAST;
-
-
-  } else {
-
-     newHTMLAST = customSyntaxAST; 
-
-  }
- 
-
-
+  // --------------------
+  // Extract Function Names for Global Scope
+  // --------------------
   const walk = new Walker();
-  let nodeType;
-  let nodeName;
-  let returnType;
-  let matchLogic;
-  let functions;
-  let callees;
+  const nodeType = "FunctionDeclaration";
+  const returnType = { path: "id.name" };
+  const matchLogic = walk.createMatchLogic(nodeType);
+  const functions = walk.deepWalker(newJsAST, nodeType, matchLogic, returnType);
 
-  nodeType = 'FunctionDeclaration';
-  returnType = { path: 'id.name' };
-  matchLogic = walk.createMatchLogic(nodeType);
-  functions = walk.deepWalker(newJsAST, nodeType, matchLogic, returnType);
+  //let appendtoJsScriptTag = `\n${reRendersObject}\n`;
+
+  // --------------------
+  // Wrap JavaScript Code in init() Only Once
+  // --------------------
+  function wrapCodeInInit(ast) {
+    let imports = [];
+    let otherCode = [];
+
+    ast.body.forEach(node => {
+      if (node.type === "ImportDeclaration") {
+        imports.push(node);
+      } else {
+        otherCode.push(node);
+      }
+    });
+
+    const initFunction = {
+      type: "FunctionDeclaration",
+      id: { type: "Identifier", name: "init" },
+      params: [],
+      body: { type: "BlockStatement", body: otherCode },
+    };
+
+    const exportInit = {
+      type: "ExportNamedDeclaration",
+      declaration: initFunction,
+      specifiers: [],
+      source: null,
+    };
+
+    ast.body = [...imports, exportInit];
+    return ast;
+  }
+
+  if (!newJsAST.__wrapped) { // Ensure wrapCodeInInit is applied only once
+  let reRendersAST;
+
+  if (reRendersObject) {
+    reRendersAST = parse(reRendersObject, { ecmaVersion: 2022, sourceType: "module" });
+
+    // Append body of reRendersAST to newJsAST
+    newJsAST.body.push(...reRendersAST.body);
+  }
+
+  newJsAST = wrapCodeInInit(newJsAST);
+  newJsAST.__wrapped = true; // Mark as wrapped
+}
 
 
-  let globaliserObject=``;
-  let appendtoJsScriptTag; 
-
-
-  if (functions.length > 0) {
-    for (let n = 0; n < functions.length; ++n) {
-      //globaliserObject+=`\n window.${functions[n].value}=${functions[n].value};`;
-    }
-   }
-
-    appendtoJsScriptTag = `
-    ${reRendersObject}
-    `; 
-
-
-
-  //console.log("FNs",functions[0]);
-
-
-
-    //console.log(JSON.stringify(newJsAST, null,2));
   const jsCode = escodegen.generate(newJsAST);
-  //return; 
-  
-  /*
-  const code = generate(newJsAST);
-  console.log(code); // Output: console.log("Hello, World!");
-  return; */
-
-  
-
-
-  
   const parsedHTML = customHtmlParser(newHTMLAST);
 
   if (jsCode && parsedHTML) {
-   writeCodeToFile(jsCode, parsedHTML, appendtoJsScriptTag);
+    await writeCodeToFile(jsCode, parsedHTML);
   }
 
-  
-
-
-  /**
-   * Write the transformed JavaScript and HTML to the output file.
-   * @param {String} jsCode - The transformed JavaScript code.
-   * @param {String} parsedHTML - The transformed HTML code.
-   */
+  // --------------------
+  // Write Transformed Code to File
+  // --------------------
   async function writeCodeToFile(jsCode, parsedHTML) {
-    const formattedJsCode = await prettier.format(jsCode, { parser: 'babel' });
-    const formattedHTML = await prettier.format(parsedHTML, {
-      parser: 'html',
-      printWidth: 80,
-      proseWrap: 'always',
-      htmlWhitespaceSensitivity: 'css',
-      indentSize: 2,
-    });
+    const formattedJsCode = await prettier.format(jsCode, { parser: "babel" });
+    const formattedHTML = await prettier.format(parsedHTML, { parser: "html" });
+    
+    const routeName = filePath.split("/").slice(-2, -1)[0];
+    const jsFileName = `${routeName}.js`;
+    const jsFilePath = filePath.replace(/\+page\.(resolved|smq)\.ast$/, jsFileName);
+    const jsContent = `${formattedJsCode}\n`;
 
-console.log("JS",formattedJsCode);
-
-const routeName = filePath.split('/').slice(-2, -1)[0];
-
-// Create the file name dynamically (e.g., 'about.js' for the 'about' route)
-const jsFileName = `${routeName}.js`;
-
-// Construct the path to write the new JS file
-const jsFilePath = filePath.replace(/\+page\.(resolved|smq)\.ast$/, jsFileName);
-
-
-// Construct the JavaScript content to write into the file
-const jsContent = `
-    export function init() {
-      ${formattedJsCode}
-      ${appendtoJsScriptTag}
+    try {
+      await fs.promises.writeFile(jsFilePath, jsContent);
+    } catch (err) {
+      console.error(err);
     }
-`;
 
-// Write the JavaScript content to the new file
+    const newFilePath = filePath.replace(/\+page\.(resolved|smq)\.ast$/, "\+page.html");
+    try {
+      await fs.promises.unlink(newFilePath);
+    } catch (err) {
+      if (err.code !== "ENOENT") console.error(err);
+    }
 
-try {
-  await fs.promises.writeFile(jsFilePath, jsContent);
-  //console.log(`File ${newFilePath} written successfully`);
-} catch (err) {
-  console.error(err);
-}
-
-
-
-
-
-
-    const output = `
-<style>
-  ${cssAST}
-</style>
-
-${formattedHTML}
-`;
-
-const newFilePath = filePath.replace(/\+page\.(resolved|smq)\.ast$/, '+page.html');
-
-console.log("LOOK",newFilePath);
-
-/*
-    fs.unlink(newFilePath, (err) => {
-      if (err && err.code !== 'ENOENT') {
-        console.error(err);
-      } else {
-        fs.writeFile(newFilePath, output, (err) => {
-          if (err) {
-            console.error(err);
-          } else {
-            //console.log(`File ${newFilePath} written successfully`);
-          }
-        });
-      }
-    });
-*/
-
-try {
-  await fs.promises.unlink(newFilePath);
-} catch (err) {
-  if (err.code !== 'ENOENT') {
-    console.error(err);
+    try {
+      await fs.promises.writeFile(newFilePath, `<style>\n${cssAST}\n</style>\n${formattedHTML}`);
+    } catch (err) {
+      console.error(err);
+    }
   }
 }
-
-try {
-  await fs.promises.writeFile(newFilePath, output);
-  //console.log(`File ${newFilePath} written successfully`);
-} catch (err) {
-  console.error(err);
-}
-
-  }
-
-
-}
-
-
-
