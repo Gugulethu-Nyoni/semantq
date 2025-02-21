@@ -11,7 +11,7 @@
   <!-- Theme Toggle Button -->
   <button id="theme-toggle" class="theme-toggle">☀️</button>
 
-  <div id="app"></div>
+  <div id="app">
 
   <div class="container">
     <h1>Welcome to SemantQ</h1>
@@ -38,35 +38,36 @@
       <p>© <span id="year"></span> SemantQ. All rights reserved. | <a href="#">Privacy Policy</a></p>
     </footer>
   </div>
+  
   </div>
 
   <script>
-    // Set the current year in the footer
-    document.getElementById("year").textContent = new Date().getFullYear();
+  // Set the current year in the footer
+  document.getElementById("year").textContent = new Date().getFullYear();
 
-    // Theme Toggle Logic
-    const themeToggle = document.getElementById('theme-toggle');
-    const body = document.body;
+  // Theme Toggle Logic
+  const themeToggle = document.getElementById('theme-toggle');
+  const body = document.body;
 
-    // Check for saved theme in localStorage
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      body.classList.add(savedTheme);
-      themeToggle.textContent = savedTheme === 'dark-mode' ? '☀️' : '🌙';
-    } else {
-      // Default to dark mode if no theme is set in localStorage
-      body.classList.add('dark-mode');
-      themeToggle.textContent = '☀️'; // Display the sun icon for switching to light mode
-    }
+  // Check for saved theme in localStorage
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) {
+    body.classList.add(savedTheme);
+    themeToggle.textContent = savedTheme === 'dark-mode' ? '☀️' : '🌙';
+  } else {
+    // Default to dark mode if no theme is set in localStorage
+    body.classList.add('dark-mode');
+    themeToggle.textContent = '☀️'; // Display the sun icon for switching to light mode
+  }
 
-    // Toggle Theme
-    themeToggle.addEventListener('click', () => {
-      body.classList.toggle('dark-mode');
-      const isDarkMode = body.classList.contains('dark-mode');
-      themeToggle.textContent = isDarkMode ? '☀️' : '🌙';
-      localStorage.setItem('theme', isDarkMode ? 'dark-mode' : 'light-mode');
-    });
-  </script>
+  // Toggle Theme
+  themeToggle.addEventListener('click', () => {
+    body.classList.toggle('dark-mode');
+    const isDarkMode = body.classList.contains('dark-mode');
+    themeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+    localStorage.setItem('theme', isDarkMode ? 'dark-mode' : 'light-mode');
+  });
+</script>
 
   <script src="./global.js" type="module"></script>
 </body>
