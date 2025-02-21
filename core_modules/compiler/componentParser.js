@@ -57,6 +57,48 @@ async function parseComponent(filePath) {
     cssAST = removeDuplicates(cssAST);
     customAST = removeDuplicates(customAST);
 
+    /* LET'S LEAN UP JS AST CODE HERE */
+
+function cleanJSAST(node) {
+    if (!node || typeof node !== 'object') return node;
+
+    // Handle CallExpression argument null issue
+    if (node.type === 'CallExpression' && node.arguments === null) {
+        node.arguments = [];
+    }
+
+    // Handle null params in FunctionExpression, ArrowFunctionExpression, and MethodDefinition
+    if ((node.type === 'FunctionExpression' || node.type === 'ArrowFunctionExpression') && node.params === null) {
+        node.params = [];
+    }
+
+    if (node.type === 'MethodDefinition' && node.value && node.value.type === 'FunctionExpression' && node.value.params === null) {
+        node.value.params = [];
+    }
+
+    // Recursively clean child nodes
+    for (const key in node) {
+        if (node.hasOwnProperty(key)) {
+            const value = node[key];
+
+            if (Array.isArray(value)) {
+                node[key] = value.filter(Boolean).map(cleanJSAST);
+            } else if (typeof value === 'object' && value !== null) {
+                cleanJSAST(value);
+            }
+        }
+    }
+
+    return node;
+}
+
+
+jsAST = cleanJSAST(jsAST);
+
+//console.log(JSON.stringify(jsAST, null, 2));
+
+    /* CLEAN UP JS AST CODE END */
+
     const newFilePath = filePath.replace('.html', '.ast');
     await writeToFile({ jsAST, cssAST, customAST, newFilePath });
   } catch (err) {
@@ -133,7 +175,7 @@ async function writeToFile(astObjects) {
 
     // Write the new file
     await fs.promises.writeFile(newFilePath, jsonString);
-    console.log(`AST File written successfully: ${newFilePath}`);
+    //console.log(`AST File written successfully: ${newFilePath}`);
   } catch (err) {
     console.error(`Error writing AST file ${newFilePath}:`, err);
   }
