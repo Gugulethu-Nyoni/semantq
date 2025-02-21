@@ -10,56 +10,35 @@ import parser from './semantq_parser.js';
 
 
 
-function readSMQHTMLFiles(directory) {
+async function readSMQHTMLFiles(directory) {
+  const files = await fs.promises.readdir(directory);
 
-  fs.readdir(directory, (err, files) => {
-    if (err) {
-      console.error('Error reading directory:', err);
-      return;
+  for (const file of files) {
+    const filePath = path.join(directory, file);
+    const stats = await fs.promises.stat(filePath);
+
+    if (stats.isDirectory()) {
+      await readSMQHTMLFiles(filePath); // Recursively process subdirectories
+    } else if (path.extname(file).toLowerCase() === '.html') {
+      await parseComponent(filePath);
     }
-
-    files.forEach((file) => {
-      const filePath = path.join(directory, file);
-      fs.stat(filePath, (err, stats) => {
-        if (err) {
-          console.error('Error stat-ing file:', err);
-          return;
-        }
-
-        if (stats.isDirectory()) {
-          readSMQHTMLFiles(filePath); // Recursively call on subdirectory
-        } else if (path.extname(file).toLowerCase() === '.html') {
-         // console.log(`Found html file: ${filePath}`);
-
-         const parsedBlocks = parseComponent(filePath);
-
-         //console.log(parsedBlocks);
-
-        }
-      });
-    });
-  });
+  }
 }
 
 
 
-
-function parseComponent(filePath) {
+async function parseComponent(filePath) {
   try {
-    // Read the file synchronously
     const code = fs.readFileSync(filePath, 'utf8');
     const $ = cheerio.load(code);
 
-    // Extract JavaScript, CSS, and custom syntax
     const jsCode = $('script').html() || '';
     let cssCode = $('style').html() || '';
 
-    // Fix CSS object issue
     if (cssCode.trim() === '[object Object]') {
       cssCode = '';
     }
 
-    // Extract customSyntax content
     const startMarker = '<customSyntax>';
     const endMarker = '</customSyntax>';
     const startIndex = code.indexOf(startMarker);
@@ -70,32 +49,22 @@ function parseComponent(filePath) {
       customCode = code.substring(startIndex, endIndex + endMarker.length).trim();
     }
 
-    // Parse JavaScript with Acorn
     let jsAST = parse(jsCode, { ecmaVersion: 2022, sourceType: "module" });
-
-    // Parse CSS with PostCSS
     let cssAST = postcss.parse(cssCode, { from: 'style' });
-
-    // Parse custom syntax
     let customAST = parser.parse(customCode);
 
-    // Remove duplicate nodes
     jsAST = removeDuplicates(jsAST);
     cssAST = removeDuplicates(cssAST);
     customAST = removeDuplicates(customAST);
 
-    //console.log(JSON.stringify(cssAST,null,2));
-
-    // Define new AST file path
     const newFilePath = filePath.replace('.html', '.ast');
-
-    // Write to file
-    writeToFile({ jsAST, cssAST, customAST, newFilePath });
-
+    await writeToFile({ jsAST, cssAST, customAST, newFilePath });
   } catch (err) {
     console.error(`Error processing file ${filePath}:`, err);
   }
 }
+
+
 
 // Function to remove duplicates from AST structures
 function removeDuplicates(ast) {
@@ -124,24 +93,17 @@ function removeDuplicates(ast) {
 
 
 
-
-
-
-
-
 // Main function
-export function compileSMQFiles(destDir) {
-    //const directory = '../../build/routes'; // dest directory
-  return  readSMQHTMLFiles(destDir);
+export async function compileSMQFiles(destDir) {
+  await readSMQHTMLFiles(destDir);
 }
 
 // Compile .smq files
 //compileSMQFiles();
 
 
-function writeToFile(astObjects) {
-  // Extract filename without extension
-  const fileName = path.basename(astObjects.newFilePath, '.ast'); 
+async function writeToFile(astObjects) {
+  const fileName = path.basename(astObjects.newFilePath, '.ast');
 
   let htmlKey = "customAST"; // Default for pages
   let jsKey = "jsAST";
@@ -163,17 +125,16 @@ function writeToFile(astObjects) {
   const jsonString = JSON.stringify(astObject, null, 2);
   const newFilePath = astObjects.newFilePath;
 
-  fs.unlink(newFilePath, (err) => {
-    if (err && err.code !== 'ENOENT') {
-      console.error(err);
-    } else {
-      fs.writeFile(newFilePath, jsonString, (err) => {
-        if (err) {
-          console.error(err);
-        } else {
-          //console.log(`AST File written successfully: ${newFilePath}`);
-        }
-      });
-    }
-  });
+  try {
+    // Delete the file if it exists
+    await fs.promises.unlink(newFilePath).catch((err) => {
+      if (err.code !== 'ENOENT') throw err; // Ignore "file not found" errors
+    });
+
+    // Write the new file
+    await fs.promises.writeFile(newFilePath, jsonString);
+    console.log(`AST File written successfully: ${newFilePath}`);
+  } catch (err) {
+    console.error(`Error writing AST file ${newFilePath}:`, err);
+  }
 }
