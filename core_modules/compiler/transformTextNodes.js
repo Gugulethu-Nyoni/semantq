@@ -1,16 +1,14 @@
 "use strict";
-import fs from 'fs';
+import fs from 'fs/promises'; // Use fs.promises for async file operations
 import path from 'path';
 import elementWalker from './utils/elementWalker.js';
 
-
 class TransformTextNodes {
-  constructor (subRootNodeChildren)
-  {
-    this.subRootNodeChildren = subRootNodeChildren; 
+  constructor(subRootNodeChildren) {
+    this.subRootNodeChildren = subRootNodeChildren;
     this.transformTextNodes();
-
   }
+
   transformTextNodes() {
     if (!this.subRootNodeChildren || !this.subRootNodeChildren.children || !Array.isArray(this.subRootNodeChildren.children[0])) {
       return;
@@ -23,12 +21,10 @@ class TransformTextNodes {
 
       if (node.type === 'Text' && node.raw !== newLines && node.raw !== whiteSpaces) {
         this.subRootNodeChildren.children[0][i] = this.createTextNode(node);
-        return this.subRootNodeChildren; 
+        return this.subRootNodeChildren;
       }
     }
   }
-
-
 
   createTextNode(node) {
     return {
@@ -50,33 +46,30 @@ class TransformTextNodes {
   }
 }
 
-
-/// loop through files 
-// for each files 
-
-
 // Helper function: Recursively find all `.ast` files
-function findAstFiles(dir) {
+async function findAstFiles(dir) {
   let files = [];
-  const items = fs.readdirSync(dir);
+  const items = await fs.readdir(dir);
 
-  items.forEach(item => {
+  for (const item of items) {
     const fullPath = path.join(dir, item);
-    if (fs.statSync(fullPath).isDirectory()) {
-      files = files.concat(findAstFiles(fullPath)); // Recursive call for subdirectories
+    const stats = await fs.stat(fullPath);
+
+    if (stats.isDirectory()) {
+      const subDirFiles = await findAstFiles(fullPath); // Recursive call for subdirectories
+      files = files.concat(subDirFiles);
     } else if (item.endsWith('.ast')) {
       files.push(fullPath);
-
     }
-  });
+  }
 
   return files;
 }
 
 // Helper function: Read and parse AST file
-function readAstFile(filePath) {
+async function readAstFile(filePath) {
   try {
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    const fileContent = await fs.readFile(filePath, 'utf-8');
     return JSON.parse(fileContent);
   } catch (error) {
     console.error(`Error reading or parsing file ${filePath}:`, error);
@@ -85,9 +78,9 @@ function readAstFile(filePath) {
 }
 
 // Helper function: Write updated AST back to file
-function writeAstFile(filePath, ast) {
+async function writeAstFile(filePath, ast) {
   try {
-    fs.writeFileSync(filePath, JSON.stringify(ast, null, 2));
+    await fs.writeFile(filePath, JSON.stringify(ast, null, 2));
     //console.log(`Successfully updated file: ${filePath}`);
   } catch (error) {
     console.error(`Error writing file ${filePath}:`, error);
@@ -106,47 +99,41 @@ function getFileMetadata(fileName) {
 }
 
 // Main function: Regularise AST files
-function regularise(files) {
-  files.forEach(file => {
+async function regularise(files) {
+  for (const file of files) {
     const fileName = path.basename(file);
     const { isPage, isComponent, componentName, htmlAstKey } = getFileMetadata(fileName);
 
     // Read the AST file
-    const astBlocks = readAstFile(file);
-    if (!astBlocks) return; // Skip if file reading failed
+    const astBlocks = await readAstFile(file);
+    if (!astBlocks) continue; // Skip if file reading failed
 
     // Get the target AST block
     const ast = astBlocks[htmlAstKey];
-    //console.log(JSON.stringify(ast,null,2));
-    
-
     if (!ast) {
       console.error(`No AST block found for key: ${htmlAstKey} in file: ${file}`);
-      return;
+      continue;
     }
 
     // Perform transformations
     const targetNode = elementWalker(ast, 'name', 'customSyntax');
-    //console.log("HERE",targetNode);
     if (!targetNode) {
       console.error(`Target node not found in file: ${file}`);
-      return;
+      continue;
     }
 
     const transformTextNodes = new TransformTextNodes(targetNode);
-    //console.log("Compiler Text Fixer:", JSON.stringify(transformTextNodes, null, 2));
 
     // Update the AST with the transformed node
-    // Assuming `transformTextNodes` modifies `targetNode` in place
     astBlocks[htmlAstKey] = ast;
 
     // Write the updated AST back to the file
-    writeAstFile(file, astBlocks);
-  });
+    await writeAstFile(file, astBlocks);
+  }
 }
 
 // Entry point
-export function init(destDir) {
-  const files = findAstFiles(destDir);
-  regularise(files);
+export async function init(destDir) {
+  const files = await findAstFiles(destDir);
+  await regularise(files);
 }
