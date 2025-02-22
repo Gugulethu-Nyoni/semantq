@@ -11,6 +11,10 @@ The Semantq CLI provides commands to generate individual components or full reso
 ### 1. Generate Model (Requires `-a` for Database: `supabase` | `mongo`)
 ```bash
 semantq make:model User -a supabase
+```
+OR 
+
+```bash
 semantq make:model User -a mongo
 ```
 
