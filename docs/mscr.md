@@ -364,3 +364,6 @@ const form = new Formique(formSchema, formParams, formSettings);
 - Extend the CLI to support more advanced features (such as middleware and testing templates).
 
 Happy coding! 🎉
+
+
+## Semantq Main Documentation: [Semantq Syntax Guide](https://github.com/Gugulethu-Nyoni/semantq).
