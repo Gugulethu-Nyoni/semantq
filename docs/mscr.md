@@ -354,7 +354,7 @@ const form = new Formique(formSchema, formParams, formSettings);
 
 - Use `semantq make:resource` to generate all MSCR files at once.
 - Use individual commands (`make:model`, `make:service`, etc.) to create specific components as needed.
-- Always specify the database adapter (`-a supabase` or `-a mongo`) when creating models or services.
+- Always specify the database adapter (`-a supabase` or `-a mongo`) when creating a resources, models or services.
 
 ---
 
