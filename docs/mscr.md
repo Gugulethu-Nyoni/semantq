@@ -358,10 +358,9 @@ const form = new Formique(formSchema, formParams, formSettings);
 
 ---
 
-## 🚀 Next Steps
+## 🚀 TO DO
 
-- Explore additional database adapters (e.g., Firebase, PostgreSQL).
-- Extend the CLI to support more advanced features (e.g., middleware, testing templates).
-- Contribute to the Semantq ecosystem by building plugins or integrations.
+- Add additional database adapters (e.g., Firebase, MySQL).
+- Extend the CLI to support more advanced features (such as middleware and testing templates).
 
 Happy coding! 🎉
