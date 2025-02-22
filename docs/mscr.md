@@ -1,6 +1,6 @@
 # Semantq MSCR Architecture: Full-Stack Setup Guide
 
-Welcome to the **Semantq MSCR Architecture** documentation! This guide will walk you through the setup, usage, and workflow of the **Model-Service-Controller-Routes (MSCR)** architecture for building scalable and maintainable full-stack applications. Whether you're creating individual components or generating a full resource, Semantq's CLI makes it easy to scaffold your backend with support for database adapters like **Supabase** and **MongoDB**.
+Welcome to the **Semantq MSCR Architecture** documentation. This guide will walk you through the setup, usage, and workflow of the **Model-Service-Controller-Routes (MSCR)** architecture for building scalable and maintainable full-stack applications. Whether you're creating individual components or generating a full resource, Semantq's CLI makes it easy to scaffold your backend with support for database adapters like **Supabase** and **MongoDB**. (More adapters to be added.)
 
 ---
 
@@ -364,6 +364,5 @@ const form = new Formique(formSchema, formParams, formSettings);
 - Extend the CLI to support more advanced features (such as middleware and testing templates).
 
 Happy coding! 🎉
-
 
 ## Semantq Main Documentation: [Semantq Syntax Guide](https://github.com/Gugulethu-Nyoni/semantq).
