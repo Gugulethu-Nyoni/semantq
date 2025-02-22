@@ -21,8 +21,13 @@ semantq make:model User -a mongo
 ### 2. Generate Service (Requires `-a` for Database: `supabase` | `mongo`)
 ```bash
 semantq make:service User -a supabase
+```
+OR
+
+```bash
 semantq make:service User -a mongo
 ```
+
 
 ### 3. Generate Controller (No `-a` flag required)
 ```bash
