@@ -301,7 +301,7 @@ export default router;
 Here’s an example of a form built with **Formique**, Semantq's native form builder:
 
 ```javascript
-<script>
+@script
 import Formique from 'formique';
 
 const formSchema = [
@@ -332,14 +332,20 @@ const formSettings = {
 
 // Initialize the form
 const form = new Formique(formSchema, formParams, formSettings);
-</script>
+@end
+```
+
+
+```html
+@html
+<div id="formique"></div>
 ```
 
 ### Chain of Events
 1. The form is submitted to `/api/user/register`.
-2. The request is routed to the `userRoutes.js` file.
+2. The request is handled via the `userRoutes.js` file which imports the userController.js.
 3. The `createUser` method in `userController.js` handles the request.
-4. The `userService.js` calls the `createRecord` method in `User.js`.
+4. The `userService.js` imported in userController.js calls the `createRecord` method in `User.js`.
 5. The user is created in the database, and a response is sent back to the client.
 
 ---
