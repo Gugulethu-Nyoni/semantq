@@ -169,9 +169,7 @@ program
     console.log(`✅ Created file: ${supabaseConfigPath}`);
 
     console.log('🟢 Supabase setup complete!');
-    console.log('👉 Replace "your-project-id" and "your-anon-public-key" in lib/supabaseConfig.js with your actual Supabase credentials.');
-
-    console.log('👉 Also make sure that you have the correct .env set up for your SUPABASE_URL and  SUPABASE_ANON_KEY. It is recommended to save your .env file in the root of your project.');
+    console.log('👉 Make sure that you have the correct .env set up for your SUPABASE_URL and  SUPABASE_ANON_KEY in the .env file. It is recommended to save your .env file in the root of your project.');
 
   });
 
