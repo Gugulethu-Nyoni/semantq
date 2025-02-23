@@ -7,7 +7,6 @@ import { fileURLToPath } from 'url';
 
 //import packageJson from './package.json' assert { type: 'json' };
 // Read package.json without import assertions
-const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 //import { generateResource } from './cli-utils.js';
 import { generateResource, generateModel, generateService, generateController, generateRoute } from './cli-utils.js';
 
@@ -18,6 +17,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const baseDir = __dirname;
 
+
+// Use the absolute path to reference package.json
+const packageJsonPath = path.join(__dirname, 'package.json');
+// Read and parse the package.json
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 // Now resolve the paths as usual
 //const baseDir = baseDir;
 //const templateDirectory = path.join(baseDir, 'templates');
