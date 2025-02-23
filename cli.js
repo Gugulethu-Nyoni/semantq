@@ -3,12 +3,26 @@ import { program } from 'commander';
 import fs from 'fs-extra';
 import path from 'path';
 import { execSync } from 'child_process';
+import { fileURLToPath } from 'url';
+
 //import packageJson from './package.json' assert { type: 'json' };
 // Read package.json without import assertions
-
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 //import { generateResource } from './cli-utils.js';
 import { generateResource, generateModel, generateService, generateController, generateRoute } from './cli-utils.js';
+
+
+
+// Get the current module's filename and directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const baseDir = __dirname;
+
+// Now resolve the paths as usual
+//const baseDir = baseDir;
+//const templateDirectory = path.join(baseDir, 'templates');
+//const coreModulesDirectory = path.join(baseDir, 'core_modules');
+//const configsDirectory = path.join(baseDir, 'configs');
 
 
 
@@ -61,7 +75,7 @@ program
   .command('install:server')
   .description('Create the server directory and initialize server.js')
   .action(() => {
-    const serverDir = path.join(process.cwd(), 'server');
+    const serverDir = path.join(baseDir, 'server');
     const serverFilePath = path.join(serverDir, 'server.js');
 
     // Create the server directory if it doesn't exist
@@ -81,14 +95,14 @@ import { fileURLToPath } from 'url';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const import.meta.url = path.dirname(fileURLToPath(import.meta.url));
+const baseDir = path.dirname(fileURLToPath(baseDir));
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // 🔄 Automatically load all routes from the \`routes\` folder
-const routesPath = path.join(import.meta.url, 'routes');
+const routesPath = path.join(baseDir, 'routes');
 fs.readdirSync(routesPath).forEach((file) => {
   if (file.endsWith('Routes.js')) {
     const route = \`./routes/\${file}\`;
@@ -143,7 +157,7 @@ program
 
 
     // Step 2: Create lib/supabaseConfig.js
-    const libDir = path.join(process.cwd(), 'lib');
+    const libDir = path.join(baseDir, 'lib');
     const supabaseConfigPath = path.join(libDir, 'supabaseConfig.js');
 
     // Create the lib directory if it doesn't exist
@@ -235,9 +249,9 @@ program
   .command('create <projectName>')
   .description('Generate the project structure')
   .action(async (projectName) => {
-    const projectPath = path.join(process.cwd(), projectName);
-    const templateDirectory = path.resolve(import.meta.url, './templates');
-    const configDirectory = path.resolve(import.meta.url, './configs');
+    const projectPath = path.join(baseDir, projectName);
+    const templateDirectory = path.join(baseDir, 'templates');
+    const configDirectory = path.join(baseDir, 'configs');
 
     try {
       // Define directories to create
@@ -263,7 +277,7 @@ program
   
 
       // Copy essential files and directories
-      safeCopySync(path.resolve(import.meta.url, './core_modules'), path.join(projectPath, 'core_modules'));
+      safeCopySync(path.resolve(baseDir, './core_modules'), path.join(projectPath, 'core_modules'));
       //safeCopySync(templateDirectory, projectPath);
 
             // Copy specific template files
@@ -278,7 +292,7 @@ program
       await copyIfExists(path.join(templateDirectory, '+404.smq'), path.join(projectPath, 'src/routes/+404.smq'));
       
       // copy the public route
-      safeCopySync(path.resolve(import.meta.url, './templates/public'), path.join(projectPath, 'public'));
+      safeCopySync(path.resolve(baseDir, './templates/public'), path.join(projectPath, 'public'));
 
       // Create empty routes.js
       await fs.writeFile(path.join(projectPath, 'build/routes/routes.js'), 'export default [];');
@@ -320,7 +334,7 @@ program
       execSync('npx tailwindcss init -p', { stdio: 'inherit' });
 
       // Step 3: Configure Tailwind’s Content Paths in tailwind.config.js
-      const tailwindConfigPath = path.join(process.cwd(), 'tailwind.config.js');
+      const tailwindConfigPath = path.join(baseDir, 'tailwind.config.js');
       const tailwindConfigContent = `export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx,html,smq}"],
   theme: {
@@ -333,7 +347,7 @@ program
       console.log('✅ Configured content paths in tailwind.config.js');
 
       // Step 4: Create or update vite.config.js
-      const viteConfigPath = path.join(process.cwd(), 'vite.config.js');
+      const viteConfigPath = path.join(baseDir, 'vite.config.js');
       const viteConfigContent = `import { defineConfig } from 'vite';
 import postcss from 'postcss';
 
@@ -347,7 +361,7 @@ export default defineConfig({
       console.log('✅ Created/updated vite.config.js');
 
             // Step 5: Append Tailwind directives to global.css
-      const globalCSSPath = path.join(process.cwd(), 'global.css');
+      const globalCSSPath = path.join(baseDir, 'global.css');
       const tailwindDirectives = `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`;
 
       if (fs.existsSync(globalCSSPath)) {
@@ -378,7 +392,7 @@ program
   .command('make:route <routeName>')
   .description('Create a new route in src/routes')
   .action((routeName) => {
-    const routesDir = path.join(process.cwd(), 'src/routes');
+    const routesDir = path.join(baseDir, 'src/routes');
     const routePath = path.join(routesDir, routeName);
 
     try {
