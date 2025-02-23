@@ -103,7 +103,7 @@ export default mongoose.model('${name}', ${nameLower}Schema);
     case 'supabase':
       // Supabase model (assuming PostgreSQL as database)
       modelTemplate = `
-import { supabase } from '../utils/supabaseClient.js'; // Make sure to import your Supabase client
+import { supabase } from '../../lib/supabaseConfig.js'; // Make sure to import your Supabase client
 
 export default class ${name} {
   constructor(data) {
