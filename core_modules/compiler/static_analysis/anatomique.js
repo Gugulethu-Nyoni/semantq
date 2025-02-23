@@ -14,6 +14,9 @@ import { default as generator } from '@babel/generator';
 //import generate from "@babel/generator";
 //import cloneDeep from "lodash.clonedeep"; 
 import * as estraverse from "estraverse";
+//import * as walk from 'acorn-walk';
+import { generate } from 'astring'
+//import astring from "astring";
 
 
 //console.log(typeof traverse.default); // Should print "function"
@@ -2117,7 +2120,28 @@ export default async function transformASTs(jsAST, cssAST, customSyntaxAST, file
 }
 
 
-  const jsCode = escodegen.generate(newJsAST);
+  //const jsCode = escodegen.generate(newJsAST);
+//const jsCode = prettier.format(newJsAST, {  parser: "babel", });
+
+let jsCode;
+
+if (newJsAST || newJsAST.body || newJsAST.body.length > 0) {
+jsCode = escodegen.generate(newJsAST);
+
+}
+
+//console.log(JSON.stringify(jsCode,null,2));
+
+
+//console.log(JSON.stringify(newJsAST,null,2));
+
+
+
+//const jsCode = generate.default(newJsAST).code;
+//console.log(jsCode);
+
+
+
   const parsedHTML = customHtmlParser(newHTMLAST);
 
   if (jsCode && parsedHTML) {
