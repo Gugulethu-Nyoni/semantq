@@ -1,9 +1,6 @@
 // cli-utils.js
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Ensure directory exists
 function ensureDirectoryExists(dirPath) {
@@ -38,14 +35,14 @@ function updateIndexFile(dirPath, name) {
 }
 
 // Main resource generation function
-export function generateResource(name, database) {
+export function generateResource(name, database, targetBaseDir) {
   const folders = ['models', 'services', 'controllers', 'routes'];
-  folders.forEach(folder => ensureDirectoryExists(path.join(__dirname, `server/${folder}`)));
+  folders.forEach(folder => ensureDirectoryExists(path.join(targetBaseDir, `server/${folder}`)));
 
-  generateModel(name, database);
-  generateService(name,database);
-  generateController(name);
-  generateRoute(name);
+  generateModel(name, database, targetBaseDir);
+  generateService(name, database, targetBaseDir);
+  generateController(name, targetBaseDir);
+  generateRoute(name, targetBaseDir);
 
   console.log(`🎉 Successfully generated ${name} resource with ${database} adapter!`);
 }
@@ -58,17 +55,15 @@ function pluralize(word) {
   return word + 's'; // Default case: "User" -> "Users"
 }
 
-// Generate Model with CRUD operations and actual record fetching
 // Generate Model function
-export function generateModel(name, database) {
+export function generateModel(name, database, targetBaseDir) {
   const nameLower = name.toLowerCase();
-  const pluralName = pluralize(nameLower);//`${nameLower}s`; // Plural table name for Supabase
-  
+  const pluralName = pluralize(nameLower);
+
   let modelTemplate = '';
 
   switch (database) {
     case 'mongo':
-      // MongoDB model schema
       modelTemplate = `
 import mongoose from 'mongoose';
 
@@ -85,7 +80,7 @@ ${name}Schema.statics.createRecord = async function(data) {
 };
 
 ${name}Schema.statics.getAllRecords = async function() {
-  return await this.find(); // Fetch all records from MongoDB
+  return await this.find();
 };
 
 ${name}Schema.statics.updateRecord = async function(id, data) {
@@ -101,9 +96,8 @@ export default mongoose.model('${name}', ${nameLower}Schema);
       break;
 
     case 'supabase':
-      // Supabase model (assuming PostgreSQL as database)
       modelTemplate = `
-import { supabase } from '../../lib/supabaseConfig.js'; // Make sure to import your Supabase client
+import { supabase } from '../../lib/supabaseConfig.js';
 
 export default class ${name} {
   constructor(data) {
@@ -113,7 +107,7 @@ export default class ${name} {
   // CRUD Operations
   static async createRecord(data) {
     const { data: record, error } = await supabase
-      .from('${pluralName}') // Using plural table name
+      .from('${pluralName}')
       .insert([data])
       .single();
 
@@ -160,112 +154,67 @@ export default class ${name} {
   }
 
   // Write model file to disk
-  const filePath = path.join(__dirname, `server/models/${name}.js`);
+  const filePath = path.join(targetBaseDir, `server/models/${name}.js`);
   writeFileIfNotExists(filePath, modelTemplate);
-  
+
   // Update index file for dynamic imports
-  updateIndexFile(path.join(__dirname, 'server/models'), name);
+  updateIndexFile(path.join(targetBaseDir, 'server/models'), name);
 
   console.log(`✅ Generated ${name} model with ${database} adapter.`);
 }
 
-
-
-
-
-
 // Function to generate service dynamically based on database type
-export function generateService(name, database) {
+export function generateService(name, database, targetBaseDir) {
   const nameLower = name.toLowerCase();
-  const pluralName = pluralize(name); // Pluralize the name for use in the model and service
+  const pluralName = pluralize(name);
 
-  // Template for Supabase Service with pluralized names
-  const supabaseServiceTemplate = `
-import ${name} from '../models/${name}.js';
-
-class ${name}Service {
-  async create${name}(data) {
-    return await ${name}.createRecord(data);
-  }
-
-  async get${name}ById(id) {
-    return await ${name}.findById(id);
-  }
-
-  async getAll${pluralName}() {
-    return await ${name}.getAllRecords();
-  }
-
-  async update${name}(id, data) {
-    return await ${name}.updateRecord(id, data);
-  }
-
-  async delete${name}(id) {
-    return await ${name}.deleteRecord(id);
-  }
-}
-
-export default new ${name}Service();
-`;
-
-  // Template for MongoDB Service with pluralized names
-  const mongoServiceTemplate = `
-import ${name} from '../models/${name}.js';
-
-class ${name}Service {
-  async create${name}(data) {
-    return await ${name}.createRecord(data);
-  }
-
-  async get${name}ById(id) {
-    return await ${name}.findById(id);
-  }
-
-  async getAll${pluralName}() {
-    return await ${name}.getAllRecords();
-  }
-
-  async update${name}(id, data) {
-    return await ${name}.updateRecord(id, data);
-  }
-
-  async delete${name}(id) {
-    return await ${name}.deleteRecord(id);
-  }
-}
-
-export default new ${name}Service();
-`;
-
-  // Select the correct template based on the database type
   let serviceTemplate = '';
-  if (database === 'supabase') {
-    serviceTemplate = supabaseServiceTemplate;
-  } else if (database === 'mongo') {
-    serviceTemplate = mongoServiceTemplate;
+
+  if (database === 'supabase' || database === 'mongo') {
+    serviceTemplate = `
+import ${name} from '../models/${name}.js';
+
+class ${name}Service {
+  async create${name}(data) {
+    return await ${name}.createRecord(data);
+  }
+
+  async get${name}ById(id) {
+    return await ${name}.findById(id);
+  }
+
+  async getAll${pluralName}() {
+    return await ${name}.getAllRecords();
+  }
+
+  async update${name}(id, data) {
+    return await ${name}.updateRecord(id, data);
+  }
+
+  async delete${name}(id) {
+    return await ${name}.deleteRecord(id);
+  }
+}
+
+export default new ${name}Service();
+`;
   } else {
     console.error('Unsupported database type. Please use "supabase" or "mongo".');
     return;
   }
 
   // Create the service file path dynamically
-  const filePath = path.join(__dirname, `server/services/${nameLower}Service.js`);
-  writeFileIfNotExists(filePath, serviceTemplate);  // Assuming a function to write the file if it doesn't exist
-  updateIndexFile(path.join(__dirname, 'server/services'), `${name}Service`);  // Update the index file for service imports
+  const filePath = path.join(targetBaseDir, `server/services/${nameLower}Service.js`);
+  writeFileIfNotExists(filePath, serviceTemplate);
+  updateIndexFile(path.join(targetBaseDir, 'server/services'), `${name}Service`);
 
   console.log(`✅ Generated ${name} service for ${database}.`);
 }
 
-
-
-
-
-
-
 // Generate Controller
-export function generateController(name) {
+export function generateController(name, targetBaseDir) {
   const nameLower = name.toLowerCase();
-  const pluralName = pluralize(nameLower);  // Use custom pluralize function
+  const pluralName = pluralize(nameLower);
 
   const controllerTemplate = `
 import ${nameLower}Service from '../services/${nameLower}Service.js';
@@ -325,17 +274,16 @@ class ${name}Controller {
 export default new ${name}Controller();
 `;
 
-  const filePath = path.join(__dirname, `server/controllers/${nameLower}Controller.js`);
+  const filePath = path.join(targetBaseDir, `server/controllers/${nameLower}Controller.js`);
   writeFileIfNotExists(filePath, controllerTemplate);
-  updateIndexFile(path.join(__dirname, 'server/controllers'), `${name}Controller`);
+  updateIndexFile(path.join(targetBaseDir, 'server/controllers'), `${name}Controller`);
   console.log(`✅ Generated ${name} controller.`);
 }
 
-
 // Generate Route
-export function generateRoute(name) {
+export function generateRoute(name, targetBaseDir) {
   const nameLower = name.toLowerCase();
-  const pluralName = pluralize(nameLower);  // Use custom pluralize function
+  const pluralName = pluralize(nameLower);
 
   const routeTemplate = `
 import express from 'express';
@@ -358,11 +306,11 @@ export default router;
 `;
 
   // Write the route file
-  const filePath = path.join(__dirname, `server/routes/${nameLower}Routes.js`);
+  const filePath = path.join(targetBaseDir, `server/routes/${nameLower}Routes.js`);
   writeFileIfNotExists(filePath, routeTemplate);
 
   // Update index file for dynamic imports
-  updateIndexFile(path.join(__dirname, 'server/routes'), `${nameLower}Routes`);
-  
+  updateIndexFile(path.join(targetBaseDir, 'server/routes'), `${nameLower}Routes`);
+
   console.log(`✅ Generated ${name} route.`);
 }
