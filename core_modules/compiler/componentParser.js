@@ -6,6 +6,7 @@ import { parse } from 'acorn';
 import postcss from 'postcss';
 import escodegen from 'escodegen';
 import parser from './semantq_parser.js'; 
+import esprima from 'esprima';
 
 
 
@@ -49,7 +50,8 @@ async function parseComponent(filePath) {
       customCode = code.substring(startIndex, endIndex + endMarker.length).trim();
     }
 
-    let jsAST = parse(jsCode, { ecmaVersion: 2022, sourceType: "module" });
+    let jsAST = parse(jsCode, { ecmaVersion: 2023, sourceType: "module" });
+    //let jsAST = esprima.parseScript(code);
     let cssAST = postcss.parse(cssCode, { from: 'style' });
     let customAST = parser.parse(customCode);
 
