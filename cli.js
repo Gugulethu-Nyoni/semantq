@@ -3,21 +3,236 @@ import { program } from 'commander';
 import fs from 'fs-extra';
 import path from 'path';
 import { execSync } from 'child_process';
-import packageJson from './package.json' assert { type: 'json' };
-import { generateResource } from './cli-utils.js';
+//import packageJson from './package.json' assert { type: 'json' };
+// Read package.json without import assertions
+
+const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+//import { generateResource } from './cli-utils.js';
+import { generateResource, generateModel, generateService, generateController, generateRoute } from './cli-utils.js';
 
 
+/*
 const args = process.argv.slice(2);
 
-if (args[0] === 'make:resource' && args[1]) {
-  const name = args[1];
-  const adapterIndex = args.indexOf('-a');
-  const adapter = adapterIndex !== -1 ? args[adapterIndex + 1] : 'mongo';
-
-  generateResource(name, adapter);
-} else {
-  console.log('Usage: node cli.js make:resource <ResourceName> -a <database (mongo|supabase)>');
+if (args.length < 2) {
+  console.log('Usage: node cli.js <command> <ResourceName> [-a <database (mongo|supabase)>]');
+  process.exit(1);
 }
+
+const command = args[0];
+const name = args[1];
+const adapterIndex = args.indexOf('-a');
+const adapter = adapterIndex !== -1 ? args[adapterIndex + 1] : 'mongo';
+
+switch (command) {
+  case 'make:resource':
+    generateResource(name, adapter);
+    break;
+
+  case 'make:model':
+    generateModel(name, adapter);
+    break;
+
+  case 'make:service':
+    generateService(name, adapter);
+    break;
+
+  case 'make:controller':
+    generateController(name);
+    break;
+
+  case 'make:route':
+    generateRoute(name);
+    break;
+
+  default:
+    console.log('Invalid command. Use one of the following:');
+    console.log('  semantq make:resource <ResourceName> -a <mongo|supabase>');
+    console.log('  semantq make:model <ResourceName> -a <mongo|supabase>');
+    console.log('  semantq cli.js make:service <ResourceName> -a <mongo|supabase>');
+    console.log('  semantq cli.js make:controller <ResourceName>');
+    console.log('  semantq cli.js make:route <ResourceName>');
+    break;
+}
+*/
+
+
+
+// Register the 'make:resource' command
+program
+  .command('make:resource <name>')
+  .description('Generate a full resource (model, service, controller, and routes)')
+  .option('-a, --adapter <adapter>', 'Specify the database adapter (mongo or supabase)', 'mongo')
+  .action((name, options) => {
+    generateResource(name, options.adapter);
+  });
+
+// Register the 'make:model' command
+program
+  .command('make:model <name>')
+  .description('Generate a model')
+  .option('-a, --adapter <adapter>', 'Specify the database adapter (mongo or supabase)', 'mongo')
+  .action((name, options) => {
+    generateModel(name, options.adapter);
+  });
+
+// Register the 'make:service' command
+program
+  .command('make:service <name>')
+  .description('Generate a service')
+  .option('-a, --adapter <adapter>', 'Specify the database adapter (mongo or supabase)', 'mongo')
+  .action((name, options) => {
+    generateService(name, options.adapter);
+  });
+
+// Register the 'make:controller' command
+program
+  .command('make:controller <name>')
+  .description('Generate a controller')
+  .action((name) => {
+    generateController(name);
+  });
+
+// Register the 'make:route' command
+program
+  .command('make:route <name>')
+  .description('Generate a route')
+  .action((name) => {
+    generateRoute(name);
+  });
+
+
+// Register the 'install:server' command
+program
+  .command('install:server')
+  .description('Create the server directory and initialize server.js')
+  .action(() => {
+    const serverDir = path.join(process.cwd(), 'server');
+    const serverFilePath = path.join(serverDir, 'server.js');
+
+    // Create the server directory if it doesn't exist
+    if (!fs.existsSync(serverDir)) {
+      fs.mkdirSync(serverDir, { recursive: true });
+      console.log(`✅ Created directory: ${serverDir}`);
+    }
+
+    // Write the server.js file
+    const serverCode = `
+import express from 'express';
+import cors from 'cors';
+import mongoose from 'mongoose';
+import { createClient } from '@supabase/supabase-js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// 🔄 Automatically load all routes from the \`routes\` folder
+const routesPath = path.join(__dirname, 'routes');
+fs.readdirSync(routesPath).forEach((file) => {
+  if (file.endsWith('Routes.js')) {
+    const route = \`./routes/\${file}\`;
+    import(route).then((module) => {
+      const routeName = file.replace('Routes.js', '').toLowerCase();
+      app.use(\`/api/\${routeName}\`, module.default);
+      console.log(\`✅ Loaded route: /api/\${routeName}\`);
+    }).catch((err) => console.error(\`❌ Failed to load \${file}:\`, err));
+  }
+});
+
+// MongoDB Connection
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('🟢 MongoDB connected'))
+  .catch(err => console.error('🔴 MongoDB connection error:', err));
+
+// Supabase Connection
+export const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+
+// Default route
+app.get('/', (req, res) => res.send('API is running 🚀'));
+
+// Start server
+app.listen(PORT, () => console.log(\`🟢 Server running on port \${PORT}\`));
+`;
+
+    fs.writeFileSync(serverFilePath, serverCode.trim());
+    console.log(`✅ Server created file successfully. Now you can create resources for your database or api driven apps.`);
+  });
+
+
+
+
+
+// Register the 'install:supabase' command
+program
+  .command('install:supabase')
+  .description('Install Supabase and set up configuration')
+  .action(() => {
+    // Step 1: Install @supabase/supabase-js
+    console.log('Installing @supabase/supabase-js...');
+    try {
+      execSync('npm install @supabase/supabase-js', { stdio: 'inherit' });
+      console.log('✅ Successfully installed @supabase/supabase-js');
+    } catch (error) {
+      console.error('❌ Failed to install @supabase/supabase-js:', error);
+      process.exit(1);
+    }
+
+
+    try {
+      execSync('npm install dotenv', { stdio: 'inherit' });
+      console.log('✅ dotenv installed succesfully!');
+    } catch (error) {
+      console.error('❌ Failed to install dotenv:', error);
+      process.exit(1);
+    }
+
+
+
+
+    // Step 2: Create lib/supabaseConfig.js
+    const libDir = path.join(process.cwd(), 'lib');
+    const supabaseConfigPath = path.join(libDir, 'supabaseConfig.js');
+
+    // Create the lib directory if it doesn't exist
+    if (!fs.existsSync(libDir)) {
+      fs.mkdirSync(libDir, { recursive: true });
+      console.log(`✅ Created directory: ${libDir}`);
+    }
+
+    // Write the supabaseConfig.js file
+    const supabaseConfigCode = `
+    import { createClient } from '@supabase/supabase-js';
+    import dotenv from 'dotenv';
+    dotenv.config(); // Load environment variables
+
+
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+    export const supabase = createClient(supabaseUrl, supabaseKey);
+`;
+
+    fs.writeFileSync(supabaseConfigPath, supabaseConfigCode.trim());
+    console.log(`✅ Created file: ${supabaseConfigPath}`);
+
+    console.log('🟢 Supabase setup complete!');
+    console.log('👉 Replace "your-project-id" and "your-anon-public-key" in lib/supabaseConfig.js with your actual Supabase credentials.');
+
+    console.log('👉 Also make sure that you have the correct .env set up for your SUPABASE_URL and  SUPABASE_ANON_KEY. It is recommended to save your .env file in the root of your project.');
+
+  });
+
+
+
+
 
 
 program.version(packageJson.version, '-v, --version', 'Output the current version of semantq');
