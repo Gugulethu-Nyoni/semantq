@@ -4,13 +4,13 @@
   "description": "",
   "type": "module",
   "main": "src/index.js",
-  "scripts": {
-    "start": "node server.js",
-    "compile": "node core_modules/compiler/compiler.js",
-    "dev": "npm run compile && concurrently \"npm run app-server\" \"vite\"",
-    "app-server": "node ./core_modules/app-node-server/core.js"
-  },
-  "keywords": [],
+"scripts": {
+  "start": "node server.js",
+  "compile": "node core_modules/compiler/compiler.js",
+  "dev": "npm run compile && vite",
+  "dev-s": "npm run compile && concurrently \"npm run app-server\" \"vite\"",
+  "app-server": "node ./server/server.js"
+}, "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -39,5 +39,6 @@
     "fs-extra": "^11.2.0",
     "http": "^0.0.1-security",
     "http-proxy": "^1.18.1",
+    "dotenv": "^16.0.0"
   }
 }
