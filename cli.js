@@ -81,14 +81,14 @@ import { fileURLToPath } from 'url';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const import.meta.url = path.dirname(fileURLToPath(import.meta.url));
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // 🔄 Automatically load all routes from the \`routes\` folder
-const routesPath = path.join(__dirname, 'routes');
+const routesPath = path.join(import.meta.url, 'routes');
 fs.readdirSync(routesPath).forEach((file) => {
   if (file.endsWith('Routes.js')) {
     const route = \`./routes/\${file}\`;
@@ -236,8 +236,8 @@ program
   .description('Generate the project structure')
   .action(async (projectName) => {
     const projectPath = path.join(process.cwd(), projectName);
-    const templateDirectory = path.resolve(__dirname, './templates');
-    const configDirectory = path.resolve(__dirname, './configs');
+    const templateDirectory = path.resolve(import.meta.url, './templates');
+    const configDirectory = path.resolve(import.meta.url, './configs');
 
     try {
       // Define directories to create
@@ -263,7 +263,7 @@ program
   
 
       // Copy essential files and directories
-      safeCopySync(path.resolve(__dirname, './core_modules'), path.join(projectPath, 'core_modules'));
+      safeCopySync(path.resolve(import.meta.url, './core_modules'), path.join(projectPath, 'core_modules'));
       //safeCopySync(templateDirectory, projectPath);
 
             // Copy specific template files
@@ -278,7 +278,7 @@ program
       await copyIfExists(path.join(templateDirectory, '+404.smq'), path.join(projectPath, 'src/routes/+404.smq'));
       
       // copy the public route
-      safeCopySync(path.resolve(__dirname, './templates/public'), path.join(projectPath, 'public'));
+      safeCopySync(path.resolve(import.meta.url, './templates/public'), path.join(projectPath, 'public'));
 
       // Create empty routes.js
       await fs.writeFile(path.join(projectPath, 'build/routes/routes.js'), 'export default [];');
