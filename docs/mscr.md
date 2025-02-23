@@ -51,48 +51,19 @@ project-root/
 ```
 
 
-## 🚀 CLI Commands Overview
+## 🚀 MSCR CLI Commands Overview
 
-The Semantq CLI provides commands to generate individual components or full resources for your backend. Here's a quick overview:
-
-### 1. Generate Model (Requires `-a` for Database: `supabase` | `mongo`)
-```bash
-semantq make:model User -a supabase
-```
-OR 
-
-```bash
-semantq make:model User -a mongo
-```
-
-### 2. Generate Service (Requires `-a` for Database: `supabase` | `mongo`)
-```bash
-semantq make:service User -a supabase
-```
-OR
-
-```bash
-semantq make:service User -a mongo
-```
+The Semantq CLI offers commands to generate a full set of resources for a model. For instance, you might want to set up all the required CRUD resources (model, service, controller and route) for a new User model, or you may prefer to generate individual components. Below is the guide.
 
 
-### 3. Generate Controller (No `-a` flag required)
-```bash
-semantq make:controller User
-```
-
-### 4. Generate Route (No `-a` flag required)
-```bash
-semantq make:route User
-```
-
-### 5. Generate Full Resource (All MSCR Files: Model, Service, Controller, Route)
+### 1. Generate Full Resources (All MSCR Files: Model, Service, Controller, Route)
 ```bash
 semantq make:resource User -a supabase
+```
+OR
+```bash
 semantq make:resource User -a mongo
 ```
-
----
 
 ## 📂 Directory Structure
 
@@ -110,9 +81,39 @@ server/
 │   └── userRoutes.js    # Route file for defining API endpoints
 ```
 
+### 2. Generate Model (Requires `-a` for Database: `supabase` | `mongo`)
+```bash
+semantq make:model User -a supabase
+```
+OR 
+
+```bash
+semantq make:model User -a mongo
+```
+
+### 3. Generate Service (Requires `-a` for Database: `supabase` | `mongo`)
+```bash
+semantq make:service User -a supabase
+```
+OR
+
+```bash
+semantq make:service User -a mongo
+```
+
+
+### 4. Generate Controller (No `-a` flag required)
+```bash
+semantq make:controller User
+```
+
+### 5. Generate Route (No `-a` flag required)
+```bash
+semantq make:route User
+```
 ---
 
-## 🔗 Chain of Events: From Form Submission to Database
+## 🔗 Chain of Events: We will use an example of a form submission to the supabase database
 
 Here’s how the MSCR architecture handles a form submission:
 
