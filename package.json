@@ -1,6 +1,6 @@
 {
   "name": "semantq",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "type": "module",
   "description": "Elegant Purpose Driven JS Framework",
   "main": "index.js",
