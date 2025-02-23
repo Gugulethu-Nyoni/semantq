@@ -29,7 +29,6 @@
     "estraverse": "^5.3.0"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.42.4",
     "axios": "^1.6.8",
     "canvas": "^2.11.2",
     "cheerio": "^1.0.0-rc.12",
@@ -37,11 +36,7 @@
     "escodegen": "^2.1.0",
     "express": "^4.19.2",
     "fs-extra": "^11.2.0",
-    "he": "^1.2.0",
     "http": "^0.0.1-security",
     "http-proxy": "^1.18.1",
-    "jsdom": "^24.0.0",
-    "node-fetch": "^3.3.2",
-    "whatwg-url": "^14.0.0"
   }
 }
