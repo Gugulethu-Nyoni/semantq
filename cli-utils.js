@@ -38,7 +38,7 @@ function updateIndexFile(dirPath, name) {
 }
 
 // Main resource generation function
-export function generateResource(name, database = 'mongo') {
+export function generateResource(name, database) {
   const folders = ['models', 'services', 'controllers', 'routes'];
   folders.forEach(folder => ensureDirectoryExists(path.join(__dirname, `server/${folder}`)));
 
@@ -60,7 +60,7 @@ function pluralize(word) {
 
 // Generate Model with CRUD operations and actual record fetching
 // Generate Model function
-export function generateModel(name, database = 'mongo') {
+export function generateModel(name, database) {
   const nameLower = name.toLowerCase();
   const pluralName = pluralize(nameLower);//`${nameLower}s`; // Plural table name for Supabase
   
@@ -103,7 +103,7 @@ export default mongoose.model('${name}', ${nameLower}Schema);
     case 'supabase':
       // Supabase model (assuming PostgreSQL as database)
       modelTemplate = `
-import { supabase } from '../utils/supabaseClient'; // Make sure to import your Supabase client
+import { supabase } from '../utils/supabaseClient.js'; // Make sure to import your Supabase client
 
 export default class ${name} {
   constructor(data) {
