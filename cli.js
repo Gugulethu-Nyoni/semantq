@@ -11,52 +11,6 @@ const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 import { generateResource, generateModel, generateService, generateController, generateRoute } from './cli-utils.js';
 
 
-/*
-const args = process.argv.slice(2);
-
-if (args.length < 2) {
-  console.log('Usage: node cli.js <command> <ResourceName> [-a <database (mongo|supabase)>]');
-  process.exit(1);
-}
-
-const command = args[0];
-const name = args[1];
-const adapterIndex = args.indexOf('-a');
-const adapter = adapterIndex !== -1 ? args[adapterIndex + 1] : 'mongo';
-
-switch (command) {
-  case 'make:resource':
-    generateResource(name, adapter);
-    break;
-
-  case 'make:model':
-    generateModel(name, adapter);
-    break;
-
-  case 'make:service':
-    generateService(name, adapter);
-    break;
-
-  case 'make:controller':
-    generateController(name);
-    break;
-
-  case 'make:route':
-    generateRoute(name);
-    break;
-
-  default:
-    console.log('Invalid command. Use one of the following:');
-    console.log('  semantq make:resource <ResourceName> -a <mongo|supabase>');
-    console.log('  semantq make:model <ResourceName> -a <mongo|supabase>');
-    console.log('  semantq cli.js make:service <ResourceName> -a <mongo|supabase>');
-    console.log('  semantq cli.js make:controller <ResourceName>');
-    console.log('  semantq cli.js make:route <ResourceName>');
-    break;
-}
-*/
-
-
 
 // Register the 'make:resource' command
 program
