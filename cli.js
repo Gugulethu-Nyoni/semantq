@@ -46,7 +46,7 @@ program
   .description('Generate a full resource (model, service, controller, and routes)')
   .option('-a, --adapter <adapter>', 'Specify the database adapter (mongo or supabase)', 'mongo')
   .action((name, options) => {
-    generateResource(name, options.adapter);
+    generateResource(name, options.adapter, process.cwd()); // Pass targetBaseDir
   });
 
 // ===============================
