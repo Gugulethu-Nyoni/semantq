@@ -6,17 +6,7 @@ import { parse } from 'acorn';
 import customHtmlParser from '../customHtmlParser.js';
 import fs from 'fs-extra';
 import prettier from 'prettier';
-//import generate from "@babel/generator";
-import { default as generator } from '@babel/generator';
-//import generate from '@babel/generator';
-//import traverse from "@babel/traverse";
-//import * as t from "@babel/types";
-//import generate from "@babel/generator";
-//import cloneDeep from "lodash.clonedeep"; 
 import * as estraverse from "estraverse";
-//import * as walk from 'acorn-walk';
-import { generate } from 'astring'
-//import astring from "astring";
 
 
 //console.log(typeof traverse.default); // Should print "function"
