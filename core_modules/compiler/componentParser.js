@@ -6,7 +6,7 @@ import { parse } from 'acorn';
 import postcss from 'postcss';
 import escodegen from 'escodegen';
 import parser from './semantq_parser.js'; 
-import esprima from 'esprima';
+//import esprima from 'esprima';
 
 
 
