@@ -1,8 +1,55 @@
 # Semantq MSCR Architecture: Full-Stack Setup Guide
 
-Welcome to the **Semantq MSCR Architecture** documentation. This guide will walk you through the setup, usage, and workflow of the **Model-Service-Controller-Routes (MSCR)** architecture for building scalable and maintainable full-stack applications. Whether you're creating individual components or generating a full resource, Semantq's CLI makes it easy to scaffold your backend with support for database adapters like **Supabase** and **MongoDB**. (More adapters to be added.)
+Welcome to the **Semantq MSCR Architecture** documentation. This guide will walk you through the server up setup, usage, and workflow of the **Model-Service-Controller-Routes (MSCR)** architecture for building scalable and maintainable full-stack applications. Whether you're creating individual components or generating a full resource, Semantq's CLI makes it easy to scaffold your backend with support for database adapters like **Supabase** and **MongoDB**. (More adapters to be added.)
 
 ---
+
+
+
+### 1. Install the Server
+To set up the server directory and initialize the `server.js` file, run:
+```bash
+semantq install:server
+```
+
+This will:
+- Create a `server` directory.
+- Generate a `server.js` file with the necessary boilerplate code.
+
+
+
+### 2. Install Supabase
+To install the Supabase client and set up the configuration file, run:
+```bash
+semantq install:supabase
+```
+
+This will:
+- Install the `@supabase/supabase-js` package.
+- Create a `lib/supabaseConfig.js` file with the Supabase configuration.
+
+#### Supabase Credentials
+Make sure that you have the correct .env set up for your SUPABASE_URL and  SUPABASE_ANON_KEY in the .env file. It is recommended to save your .env file in the root of your project.
+
+---
+
+## 🏗️ Project Structure
+
+After running the installation commands, your project server will have the following structure:
+
+```
+project-root/
+├── server/
+│   ├── models/            # Database models
+│   ├── services/          # Business logic
+│   ├── controllers/       # HTTP request handlers
+│   ├── routes/            # API routes
+│   └── server.js          # Main server file
+├── lib/
+│   └── supabaseConfig.js  # Supabase configuration
+
+```
+
 
 ## 🚀 CLI Commands Overview
 
