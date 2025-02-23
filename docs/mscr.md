@@ -109,7 +109,7 @@ semantq make:controller User
 
 ### 5. Generate Route (No `-a` flag required)
 ```bash
-semantq make:route User
+semantq make:apiRoute User
 ```
 ---
 
