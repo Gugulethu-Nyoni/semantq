@@ -121,13 +121,12 @@ program
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Middleware
@@ -146,14 +145,6 @@ fs.readdirSync(routesPath).forEach((file) => {
     }).catch((err) => console.error(\`❌ Failed to load \${file}:\`, err));
   }
 });
-
-// MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('🟢 MongoDB connected'))
-  .catch(err => console.error('🔴 MongoDB connection error:', err));
-
-// Supabase Connection
-export const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 // Default route
 app.get('/', (req, res) => res.send('API is running 🚀'));
