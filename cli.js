@@ -17,6 +17,9 @@ const sourceBaseDir = __dirname; // Directory of the semantq npm package
 const packageJsonPath = path.join(sourceBaseDir, 'package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
+// Set the version from package.json
+program.version(packageJson.version, '-v, --version', 'Output the current version of semantq');
+
 // Utility function to resolve paths relative to the source or target directory
 const resolvePath = (baseDir, ...paths) => path.resolve(baseDir, ...paths);
 
@@ -57,7 +60,7 @@ program
   .description('Generate a model')
   .option('-a, --adapter <adapter>', 'Specify the database adapter (mongo or supabase)', 'mongo')
   .action((name, options) => {
-    generateModel(name, options.adapter);
+    generateModel(name, options.adapter, process.cwd()); // Pass targetBaseDir
   });
 
 // ===============================
@@ -68,7 +71,7 @@ program
   .description('Generate a service')
   .option('-a, --adapter <adapter>', 'Specify the database adapter (mongo or supabase)', 'mongo')
   .action((name, options) => {
-    generateService(name, options.adapter);
+    generateService(name, options.adapter, process.cwd()); // Pass targetBaseDir
   });
 
 // ===============================
@@ -78,7 +81,7 @@ program
   .command('make:controller <name>')
   .description('Generate a controller')
   .action((name) => {
-    generateController(name);
+    generateController(name, process.cwd()); // Pass targetBaseDir
   });
 
 // ===============================
@@ -88,7 +91,7 @@ program
   .command('make:apiRoute <name>')
   .description('Generate a route')
   .action((name) => {
-    generateRoute(name);
+    generateRoute(name, process.cwd()); // Pass targetBaseDir
   });
 
 // ===============================
@@ -244,8 +247,8 @@ program
       await copyIfExists(resolvePath(templateDirectory, 'index.html'), resolvePath(targetBaseDir, 'index.html'));
       await copyIfExists(resolvePath(templateDirectory, 'global.js'), resolvePath(targetBaseDir, 'global.js'));
       await copyIfExists(resolvePath(templateDirectory, 'global.css'), resolvePath(targetBaseDir, 'global.css'));
-      //await copyIfExists(resolvePath(templateDirectory, 'Button.smq'), resolvePath(targetBaseDir, 'src/components/global/Button.smq'));
-      //await copyIfExists(resolvePath(templateDirectory, 'Count.smq'), resolvePath(targetBaseDir, 'src/components/global/Count.smq'));
+      await copyIfExists(resolvePath(templateDirectory, 'Button.smq'), resolvePath(targetBaseDir, 'src/components/global/Button.smq'));
+      await copyIfExists(resolvePath(templateDirectory, 'Count.smq'), resolvePath(targetBaseDir, 'src/components/global/Count.smq'));
       await copyIfExists(resolvePath(templateDirectory, '+404.smq'), resolvePath(targetBaseDir, 'src/routes/+404.smq'));
 
       // Copy the public directory
