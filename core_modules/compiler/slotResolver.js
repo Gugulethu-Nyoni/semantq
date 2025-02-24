@@ -374,7 +374,9 @@ function findMergedAstFiles(dir) {
     if (fs.statSync(fullPath).isDirectory()) {
       files = files.concat(findMergedAstFiles(fullPath)); // Recursive call for subdirectories
     } else if (file.endsWith(targetFileExtension)) {
+      if (file !== '+layout.merged.ast') {
       files.push(fullPath);
+    }
     }
   });
   return files;
