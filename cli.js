@@ -115,7 +115,6 @@ program
     const serverCode = `
 import express from 'express';
 import cors from 'cors';
-import mongoose from 'mongoose';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -367,7 +366,17 @@ program
       fs.mkdirSync(routePath, { recursive: true });
 
       // Create necessary files
-      fs.writeFileSync(resolvePath(routePath, '+page.smq'), '// Page logic here', 'utf-8');
+    const pageContent = `@script
+
+    @end
+
+    @style
+
+    @end
+
+    @html`;
+
+    fs.writeFileSync(resolvePath(routePath, '+page.smq'), pageContent, 'utf-8');
       console.log(`✅ Route '${routeName}' created successfully!`);
     } catch (error) {
       console.error(`❌ Error creating route '${routeName}':`, error.message);
