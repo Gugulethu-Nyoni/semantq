@@ -21,7 +21,12 @@ async function readSMQHTMLFiles(directory) {
     if (stats.isDirectory()) {
       await readSMQHTMLFiles(filePath); // Recursively process subdirectories
     } else if (path.extname(file).toLowerCase() === '.html') {
-      await parseComponent(filePath);
+            const fileName = file.replace('.smq.html', '');
+            //console.log("Here",fileName);
+          if (fileName !== '+layout') {
+            await parseComponent(filePath);
+            }
+
     }
   }
 }
