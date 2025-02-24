@@ -2144,6 +2144,16 @@ jsCode = escodegen.generate(newJsAST);
   async function writeCodeToFile(jsCode, parsedHTML) {
     const formattedJsCode = await prettier.format(jsCode, { parser: "babel" });
     const formattedHTML = await prettier.format(parsedHTML, { parser: "html" });
+
+    if (fileName.includes("+layout")) {
+
+ // write LAYOUT FILE INTO DESIRED JS Wrapped html
+
+
+        } 
+
+
+        else {
     
     const routeName = filePath.split("/").slice(-2, -1)[0];
     const jsFileName = `${routeName}.js`;
@@ -2168,5 +2178,13 @@ jsCode = escodegen.generate(newJsAST);
     } catch (err) {
       console.error(err);
     }
+
+//close else
   }
+
+
+
+
+  }
+
 }
