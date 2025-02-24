@@ -39,10 +39,30 @@ async function compileCustomTags(sourceDir) {
   }
 }
 
+// Compile custom tags
+async function compileLayoutCustomTags(sourceDir) {
+  try {
+    const tagCompiler = await import('./compileLayoutCustomTags.js');
+    await tagCompiler.compileSMQFiles(sourceDir);
+  } catch (error) {
+    throw error;
+  }
+}
+
 // Parse components
 async function componentParser(destDir) {
   try {
     const validate = await import('./componentParser.js');
+    await validate.compileSMQFiles(destDir);
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Parse components
+async function layoutComponentParser(destDir) {
+  try {
+    const validate = await import('./layoutComponentParser.js');
     await validate.compileSMQFiles(destDir);
   } catch (error) {
     throw error;
@@ -58,6 +78,37 @@ async function transformTextNodes(destDir) {
     throw error;
   }
 }
+
+
+// Resolve imports
+async function layoutImportsResolution(destDir) {
+  try {
+    const resolve = await import('./resolve_layout_imports.js');
+    await resolve.importsResolver(destDir);
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Resolve slots
+async function layoutSlotsResolution(destDir) {
+  try {
+    const slotResolver = await import('./LayoutSlotResolver.js');
+    await slotResolver.processMergedFiles(destDir);
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+
+
+
+
+
+
+
+
 
 // Resolve imports
 async function importsResolution(destDir) {
@@ -78,6 +129,8 @@ async function slotsResolution(destDir) {
     throw error;
   }
 }
+
+
 
 // Transform components
 async function transformer(destDir) {
@@ -110,21 +163,37 @@ async function main(sourceDir, destDir, destDirBase) {
     // Step 0: Clean up the build directory
     await cleanupDirectory(destDirBase);
 
+
     // Step 1: Compile custom tags
     await compileCustomTags(sourceDir);
     await compileCustomTags(componentsSrc);
+    await compileLayoutCustomTags(sourceDir);
+
 
     // Step 2: Parse components
     await componentParser(destDir);
     await componentParser(componentsDest);
+    await layoutComponentParser(destDir);
+
+
 
     // Step 3: Transform text nodes
     await transformTextNodes(destDir);
     await transformTextNodes(componentsDest);
 
+
     // Step 4: Resolve imports and slots
     await importsResolution(componentsDest);
     await slotsResolution(componentsDest);
+
+  /* RESOLVE LAYOUT FIELS HERE */
+
+    await layoutImportsResolution(destDir);
+    await layoutSlotsResolution(destDir);
+    /* END OF DEALING WITH LAYOUTS */
+
+
+/*
     await importsResolution(destDir);
     await slotsResolution(destDir);
 
@@ -134,6 +203,9 @@ async function main(sourceDir, destDir, destDirBase) {
 
     // Step 6: Generate routes
     await routesGenerator(sourceDir, destDir);
+
+
+*/
 
     console.log('\x1b[32mCompilation completed successfully!\x1b[0m');
   } catch (error) {
