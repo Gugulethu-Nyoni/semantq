@@ -27,7 +27,9 @@ export function findAstFiles(dir) {
       files = files.concat(findAstFiles(fullPath)); // Recursive call for subdirectories
     } 
     else if (file.endsWith('.ast')) {
+      if (file !== '+layout.smq.ast') {
       files.push(fullPath);
+    }
     }
   });
   return files;
