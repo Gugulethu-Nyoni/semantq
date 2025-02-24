@@ -19,11 +19,22 @@ function readSMQFiles(directory) {
         }
 
         if (stats.isDirectory()) {
+           // console.log(filePath);
           readSMQFiles(filePath); // Recursively call on subdirectory
-        } else if (path.extname(file).toLowerCase() === '.smq') {
-          //console.log(`Found .smq file: ${filePath}`);
-          readAndCompileSMQFile(filePath);
+        } 
+
+        //else if (path.basename(file).toLowerCase() === '.smq' && path.basename(file).toLowerCase() !== '+layout.smq') {
+
+        else if (path.basename(file).endsWith('.smq')) {
+            const fileName = path.basename(file).replace('.smq',''); // +page or +layout or Button
+           // console.log(`Found.smq file: ${filePath} ${fileName}`);
+            if (fileName !== '+layout') {
+                //console.log(`We compile ${fileName}`);
+            readAndCompileSMQFile(filePath);
+          }
+          //readAndCompileSMQFile(filePath);
         }
+
       });
     });
   });
@@ -228,7 +239,6 @@ i++;
 
 // Main function
 export function compileSMQFiles(sourceDir) {
-   // const directory = '../../src/routes'; // src directory
     readSMQFiles(sourceDir);
 }
 
