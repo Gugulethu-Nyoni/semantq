@@ -67,16 +67,32 @@ async function readSMQHTMLFiles(directory) {
           const fileName = path.basename(file).toLowerCase();
           const resolvedASTPath = path.join(directory, '+page.resolved.ast');
           const smqASTPath = path.join(directory, '+page.smq.ast');
+          const layoutSmqASTPath = path.join(directory, '+layout.smq.ast');
+          const layoutResolvedASTPath = path.join(directory, '+layout.resolved.ast');
 
           // Check for +page.resolved.ast first
-          if (fileName === '+page.resolved.ast' || fileName === '+page.smq.ast') {
+          if (fileName === '+page.resolved.ast' || fileName === '+page.smq.ast' || fileName === '+layout.smq.ast' || fileName === '+layout.resolved.ast') {
+            
             let fileToRead = null;
 
             if (fs.existsSync(resolvedASTPath)) {
               fileToRead = resolvedASTPath;
-            } else if (fs.existsSync(smqASTPath)) {
+            } 
+
+            if (fs.existsSync(smqASTPath)) {
               fileToRead = smqASTPath;
             }
+
+            if (fs.existsSync(layoutSmqASTPath)) {
+              fileToRead = layoutSmqASTPath;
+            }
+
+            if (fs.existsSync(layoutResolvedASTPath)) {
+              fileToRead = layoutResolvedASTPath;
+            }
+
+
+
 
             if (fileToRead) {
               fs.readFile(fileToRead, 'utf8', async (err, data) => {
