@@ -91,18 +91,25 @@ async function writeAstFile(filePath, ast) {
 function getFileMetadata(fileName) {
   const baseName = fileName.replace('.smq.ast', '');
   const isPage = baseName === '+page';
+  const isLayout = baseName === '+layout';
   const isComponent = !isPage;
   const componentName = isComponent ? baseName : null;
-  const htmlAstKey = isPage ? 'customAST' : componentName.toLowerCase();
+  let htmlAstKey;  //= isPage ? 'customAST' : componentName.toLowerCase();
 
-  return { isPage, isComponent, componentName, htmlAstKey };
+  if (isPage || isLayout) {
+  htmlAstKey ='customAST';
+  } else {
+  htmlAstKey = componentName.toLowerCase(); 
+  }
+
+  return { isPage, isLayout, isComponent, componentName, htmlAstKey };
 }
 
 // Main function: Regularise AST files
 async function regularise(files) {
   for (const file of files) {
     const fileName = path.basename(file);
-    const { isPage, isComponent, componentName, htmlAstKey } = getFileMetadata(fileName);
+    const { isPage, isLayout, isComponent, componentName, htmlAstKey } = getFileMetadata(fileName);
 
     // Read the AST file
     const astBlocks = await readAstFile(file);
