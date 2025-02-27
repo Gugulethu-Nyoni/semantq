@@ -2150,7 +2150,9 @@ jsCode = escodegen.generate(newJsAST);
  // write LAYOUT FILE INTO DESIRED JS Wrapped html
 
 if () {
-  
+  /// laoyot js bundle
+
+  let finalJSCode; 
 }
 
         } 
