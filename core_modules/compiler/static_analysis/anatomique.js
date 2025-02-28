@@ -2152,7 +2152,9 @@ jsCode = escodegen.generate(newJsAST);
 if () {
   /// laoyot js bundle
 
-  let finalJSCode; 
+  let finalJSCode;
+
+  //package as `head, body, footer`
 }
 
         } 
