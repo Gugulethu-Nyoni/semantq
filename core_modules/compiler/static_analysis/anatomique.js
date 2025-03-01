@@ -2090,7 +2090,7 @@ export default async function transformASTs(jsAST, cssAST, customSyntaxAST, file
   const targetDir = path.dirname(filePath); // This will give the directory containing the file
   const routeDirName = path.basename(targetDir); // This will give the last directory name (e.g., "admin")
 
-  console.log(`Processing layout file in route directory: ${routeDirName}`);
+  //console.log(`Processing layout file in route directory: ${routeDirName}`);
 
   // Define the layout file paths
   const layoutResolvedPath = path.join(targetDir, '+layout.resolved.ast');
