@@ -1980,8 +1980,8 @@ export default async function transformASTs(jsAST, cssAST, customSyntaxAST, file
   const customSyntaxObject = customSyntaxAST[0];
 
   // Process mustache and event handler nodes
-  visitMustacheIdentifierNodes(customSyntaxObject);
-  visitEventHandlerNodes(customSyntaxObject);
+  if (customSyntaxObject) visitMustacheIdentifierNodes(customSyntaxObject);
+  if (customSyntaxObject) visitEventHandlerNodes(customSyntaxObject);
 
   // Initialize tracking variables
   let nodeStatus;
@@ -1998,7 +1998,9 @@ export default async function transformASTs(jsAST, cssAST, customSyntaxAST, file
   // Transform Reactive Nodes
   // --------------------
   nodeStatus = 1;
+  if (customSyntaxObject && jsAST ) {
   stackCount = getActiveNodes(customSyntaxAST, customSyntaxObject, jsAST, nodeStatus, 2);
+
 
   for (let n = 0; n < stackCount; n++) {
     const reactiveNode = getActiveNodes(customSyntaxAST, customSyntaxObject, jsAST, nodeStatus);
@@ -2045,6 +2047,9 @@ export default async function transformASTs(jsAST, cssAST, customSyntaxAST, file
     }
   }
 
+
+}
+
   // --------------------
   // Generate final ASTs
   // --------------------
@@ -2054,11 +2059,15 @@ export default async function transformASTs(jsAST, cssAST, customSyntaxAST, file
   // --------------------
   // Extract Function Names for Global Scope
   // --------------------
+  /*
+  if (jsAST) {
   const walk = new Walker();
   const nodeType = "FunctionDeclaration";
   const returnType = { path: "id.name" };
   const matchLogic = walk.createMatchLogic(nodeType);
   const functions = walk.deepWalker(newJsAST, nodeType, matchLogic, returnType);
+}
+*/
 
   //let appendtoJsScriptTag = `\n${reRendersObject}\n`;
 
@@ -2145,22 +2154,7 @@ jsCode = escodegen.generate(newJsAST);
     const formattedJsCode = await prettier.format(jsCode, { parser: "babel" });
     const formattedHTML = await prettier.format(parsedHTML, { parser: "html" });
 
-    if (fileName.includes("+layout")) {
-
- // write LAYOUT FILE INTO DESIRED JS Wrapped html
-
-if () {
-  /// laoyot js bundle
-
-  let finalJSCode;
-
-  //package as `head, body, footer`
-}
-
-        } 
-
-
-        else {
+   
     
     const routeName = filePath.split("/").slice(-2, -1)[0];
     const jsFileName = `${routeName}.js`;
@@ -2186,8 +2180,6 @@ if () {
       console.error(err);
     }
 
-//close else
-  }
 
 
 
