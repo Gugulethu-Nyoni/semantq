@@ -5,6 +5,9 @@ import escodegen from 'escodegen';
 import { parse } from 'acorn';
 import customHtmlParser from '../customHtmlParser.js';
 import fs from 'fs-extra';
+//import fs from 'fs';
+import path from 'path';
+
 import prettier from 'prettier';
 import * as estraverse from "estraverse";
 
@@ -2071,6 +2074,99 @@ export default async function transformASTs(jsAST, cssAST, customSyntaxAST, file
 
   //let appendtoJsScriptTag = `\n${reRendersObject}\n`;
 
+
+
+  async function processLayoutFile(filePath) {
+  // Extract the target directory from the filePath
+  const targetDir = path.dirname(filePath); // This will give the directory containing the file
+  const routeDirName = path.basename(targetDir); // This will give the last directory name (e.g., "admin")
+
+  console.log(`Processing layout file in route directory: ${routeDirName}`);
+
+  // Define the layout file paths
+  const layoutResolvedPath = path.join(targetDir, '+layout.resolved.ast');
+  const layoutSmqPath = path.join(targetDir, '+layout.smq.ast');
+
+  let layoutFilePath;
+
+  // Check if +layout.resolved.ast exists
+  if (fs.existsSync(layoutResolvedPath)) {
+    layoutFilePath = layoutResolvedPath;
+  }
+  // If not, check if +layout.smq.ast exists
+  else if (fs.existsSync(layoutSmqPath)) {
+    layoutFilePath = layoutSmqPath;
+  } else {
+    // No layout file found
+    console.log('No layout file found.');
+    return;
+  }
+
+  //console.log(layoutFilePath);
+
+  // Read the layout file content
+  const layoutContent = fs.readFileSync(layoutFilePath, 'utf-8');
+  const layoutAST = JSON.parse(layoutContent);
+
+// Extract header, main, and footer blocks from the layout AST
+let layoutAstBlocks = {
+  header: null,
+  main: null,
+  footer: null,
+};
+
+// Helper function to traverse the AST and extract blocks
+function traverse(node) {
+ // console.log("Current Node:", node);
+
+  // If the node is an array, traverse each item in the array
+  if (Array.isArray(node)) {
+    node.forEach(child => traverse(child));
+    return;
+  }
+
+  // If the node is an object, check its type and name
+  if (node.type === 'Element') {
+    if (node.name === 'header') {
+      layoutAstBlocks.header = node;
+    } else if (node.name === 'main') {
+      layoutAstBlocks.main = node;
+    } else if (node.name === 'footer') {
+      layoutAstBlocks.footer = node;
+    }
+  }
+
+  // Traverse nested children
+  if (node.children) {
+    node.children.forEach(child => traverse(child));
+  }
+}
+
+// Start traversal from the root of the layout AST
+const rootNode = layoutAST.customAST.content[0].html.children[0].children[0];
+traverse(rootNode);
+
+//console.log("Extracted Blocks:", layoutAstBlocks);
+
+  // Parse each block using customHtmlParser
+  const layoutHtml = {
+    header: layoutAstBlocks.header ? customHtmlParser(layoutAstBlocks.header) : '',
+    main: layoutAstBlocks.main ? customHtmlParser(layoutAstBlocks.main) : '',
+    footer: layoutAstBlocks.footer ? customHtmlParser(layoutAstBlocks.footer) : '',
+  };
+
+  // Append the layoutHtml object to the jsCode object
+  /*
+  const updatedJsCode = {
+    ...jsCode,
+    layoutHtml,
+  };
+  */
+
+  return layoutHtml;
+}
+
+
   // --------------------
   // Wrap JavaScript Code in init() Only Once
   // --------------------
@@ -2114,6 +2210,34 @@ export default async function transformASTs(jsAST, cssAST, customSyntaxAST, file
     newJsAST.body.push(...reRendersAST.body);
   }
 
+      /// so here check if layout file exists | either +layout.smq.ast or +layout.resolved.ast
+    /// check for +layout.resolved.ast first - if not there get +layout.smq.ast if there
+    /// read content of the file - in the file we want to get header and main and footer elements ast and keep these in an object e.g const layoutAstBlocks = {header: body: footer}, note that a layout file may have any of those blocks as each is optional - so we only get what's there 
+    // then parse each block using: customHtmlParser(headerAST); customHtmlParser(bodyAST); customHtmlParser(footerAST); - if those ast blocks exist
+
+    // final html outputs must be stored in a layoutHtml object and appended to to the top of jsCode object above  (jsCode = escodegen.generate(newJsAST); so we should add the layoutHtml object (with header, body, footer) sub blocks in such a way that they can extracted easily.  
+
+
+  const layoutHTML = processLayoutFile(filePath); 
+  console.log("LAYOUT HTML",layoutHTML);
+
+  const layoutAST = `const layoutBlocks = {
+  header: \`${layoutHTML.header}\`,
+  body: \`${layoutHTML.main}\`,
+  footer: \`${layoutHTML.footer}\`
+  };`;
+
+    // Parse the layoutAST string into an AST
+    const parsedLayoutAST = acorn.parse(layoutAST, {
+      ecmaVersion: 'latest',
+      sourceType: 'module'
+    });
+
+  // get ast object of const 
+
+  newJsAST.body.push(...parsedLayoutAST.body);
+
+
   newJsAST = wrapCodeInInit(newJsAST);
   newJsAST.__wrapped = true; // Mark as wrapped
 }
@@ -2144,7 +2268,10 @@ jsCode = escodegen.generate(newJsAST);
   const parsedHTML = customHtmlParser(newHTMLAST);
 
   if (jsCode && parsedHTML) {
+
     await writeCodeToFile(jsCode, parsedHTML);
+
+
   }
 
   // --------------------
