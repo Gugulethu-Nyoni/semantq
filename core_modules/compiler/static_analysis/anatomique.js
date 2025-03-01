@@ -1982,7 +1982,6 @@ if (stackCount && stackCount === 1) {
 export default async function transformASTs(jsAST, cssAST, customSyntaxAST, filePath) {
   const customSyntaxObject = customSyntaxAST[0];
 
-    console.log("NJST",jsAST);
 
 
   // Process mustache and event handler nodes
@@ -2056,11 +2055,16 @@ export default async function transformASTs(jsAST, cssAST, customSyntaxAST, file
 
 }
 
+
+
   // --------------------
   // Generate final ASTs
   // --------------------
   let newJsAST = transformedASTs ? transformedASTs.transformedJsAST : jsAST;
   let newHTMLAST = transformedASTs ? transformedASTs.transformedCustomSyntaxAST : customSyntaxAST;
+
+      //console.log("NJST",JSON.stringify(newHTMLAST,null,2));
+
 
 //  console.log("NJST",newJsAST);
 
@@ -2172,6 +2176,8 @@ traverse(rootNode);
 }
 
 
+
+
   // --------------------
   // Wrap JavaScript Code in init() Only Once
   // --------------------
@@ -2218,6 +2224,8 @@ traverse(rootNode);
     // Append body of reRendersAST to newJsAST
     newJsAST.body.push(...reRendersAST.body);
   }
+
+
 
       /// so here check if layout file exists | either +layout.smq.ast or +layout.resolved.ast
     /// check for +layout.resolved.ast first - if not there get +layout.smq.ast if there
@@ -2334,6 +2342,9 @@ function appendFooter(footerHTML) {
 
   newJsAST.body.push(...layoutRendererAST.body);
 
+    //console.log("NJST",JSON.stringify(newJsAST,null,2));
+
+
 };
 
 
@@ -2348,14 +2359,12 @@ function appendFooter(footerHTML) {
 
 let jsCode;
 
-if (newJsAST || newJsAST.body || newJsAST.body.length > 0) {
+if (newJsAST && newJsAST.body && newJsAST.body.length > 0) {
 jsCode = escodegen.generate(newJsAST);
 
 }
 
 //console.log(JSON.stringify(jsCode,null,2));
-
-
 //console.log(JSON.stringify(newJsAST,null,2));
 
 
