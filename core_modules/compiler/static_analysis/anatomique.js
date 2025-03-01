@@ -2218,8 +2218,9 @@ traverse(rootNode);
     // final html outputs must be stored in a layoutHtml object and appended to to the top of jsCode object above  (jsCode = escodegen.generate(newJsAST); so we should add the layoutHtml object (with header, body, footer) sub blocks in such a way that they can extracted easily.  
 
 
-  const layoutHTML = processLayoutFile(filePath); 
-  console.log("LAYOUT HTML",layoutHTML);
+  //const layoutHTML = processLayoutFile(filePath); 
+  const layoutHTML = await processLayoutFile(filePath);
+  //console.log("LAYOUT HTML",layoutHTML);
 
   const layoutAST = `const layoutBlocks = {
   header: \`${layoutHTML.header}\`,
@@ -2227,8 +2228,12 @@ traverse(rootNode);
   footer: \`${layoutHTML.footer}\`
   };`;
 
-    // Parse the layoutAST string into an AST
-    const parsedLayoutAST = acorn.parse(layoutAST, {
+  console.log("const layoutHTML",layoutHTML);
+  console.log("const layoutAST",layoutAST);
+
+
+  // Parse the layoutAST string into an AST
+    const parsedLayoutAST = parse(layoutAST, {
       ecmaVersion: 'latest',
       sourceType: 'module'
     });
@@ -2236,6 +2241,92 @@ traverse(rootNode);
   // get ast object of const 
 
   newJsAST.body.push(...parsedLayoutAST.body);
+
+
+
+
+
+  if (layoutHTML) {
+
+const layoutRenderer = `
+
+  if (layoutBlocks) {
+
+    // Step 1: Update <head> if header exists
+    if (layoutBlocks.header) {
+      updateHead(layoutBlocks.header);
+    }
+
+    // Step 2: Update <body> if body exists
+    if (layoutBlocks.body) {
+      updateBody(layoutBlocks.body);
+    }
+
+    // Step 3: Append <footer> to <body> if footer exists
+    if (layoutBlocks.footer) {
+      appendFooter(layoutBlocks.footer);
+    }
+
+  
+function updateHead(headerHTML) {
+  const head = document.head;
+
+  // Create a template for the header content
+  const template = document.createElement('template');
+  template.innerHTML = headerHTML;
+
+  // Remove existing elements except those with semantq
+
+  Array.from(head.children).forEach(child => {
+    if (!child.hasAttribute('semantq')) {
+      head.removeChild(child);
+    }
+  });
+
+  // Clone and append the template content
+  const newElements = template.content.cloneNode(true);
+  head.appendChild(newElements);
+}
+
+function updateBody(bodyHTML) {
+  const body = document.body;
+
+  // Create a template for the body content
+  const template = document.createElement('template');
+  template.innerHTML = bodyHTML;
+
+  // Replace the body content with the cloned template
+  body.innerHTML = ''; // Clear existing content
+  body.appendChild(template.content.cloneNode(true));
+}
+
+function appendFooter(footerHTML) {
+  const body = document.body;
+
+  // Create a template for the footer content
+  const template = document.createElement('template');
+  template.innerHTML = footerHTML;
+
+  // Append the cloned template content to the body
+  body.appendChild(template.content.cloneNode(true));
+}
+
+}`; 
+
+
+
+    // Parse the layoutAST string into an AST
+    const layoutRendererAST = parse(layoutRenderer, {
+      ecmaVersion: 'latest',
+      sourceType: 'module'
+    });
+
+  // get ast object of const 
+
+  newJsAST.body.push(...layoutRendererAST.body);
+
+};
+
 
 
   newJsAST = wrapCodeInInit(newJsAST);
