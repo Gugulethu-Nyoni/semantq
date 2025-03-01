@@ -67,11 +67,12 @@ async function readSMQHTMLFiles(directory) {
           const fileName = path.basename(file).toLowerCase();
           const resolvedASTPath = path.join(directory, '+page.resolved.ast');
           const smqASTPath = path.join(directory, '+page.smq.ast');
-          const layoutSmqASTPath = path.join(directory, '+layout.smq.ast');
-          const layoutResolvedASTPath = path.join(directory, '+layout.resolved.ast');
+          //const layoutSmqASTPath = path.join(directory, '+layout.smq.ast');
+          //const layoutResolvedASTPath = path.join(directory, '+layout.resolved.ast');
 
           // Check for +page.resolved.ast first
-          if (fileName === '+page.resolved.ast' || fileName === '+page.smq.ast' || fileName === '+layout.smq.ast' || fileName === '+layout.resolved.ast') {
+          // || fileName === '+layout.smq.ast' || fileName === '+layout.resolved.ast'
+          if (fileName === '+page.resolved.ast' || fileName === '+page.smq.ast') {
             
             let fileToRead = null;
 
@@ -83,6 +84,8 @@ async function readSMQHTMLFiles(directory) {
               fileToRead = smqASTPath;
             }
 
+            /*
+
             if (fs.existsSync(layoutSmqASTPath)) {
               fileToRead = layoutSmqASTPath;
             }
@@ -90,6 +93,7 @@ async function readSMQHTMLFiles(directory) {
             if (fs.existsSync(layoutResolvedASTPath)) {
               fileToRead = layoutResolvedASTPath;
             }
+            */
 
 
 
@@ -104,6 +108,7 @@ async function readSMQHTMLFiles(directory) {
                 try {
                   const astObject = JSON.parse(data);
                   const jsAST = astObject.jsAST;
+                  //console.log("HERE1",JSON.stringify(jsAST,null,2));
                   const cssASTObject = astObject.cssAST;
 
                   let cssAST = '';
@@ -119,7 +124,7 @@ async function readSMQHTMLFiles(directory) {
                   // Dynamically import the module and apply transformations
                   try {
                     if (jsAST.content.body.length > 0 || customSyntaxAST[0].html.children[0].children[0].length > 0) {
-                      //console.log(filePath);
+                      //console.log(jsAST.content.body);
                       const fileName = path.basename(filePath);
                       // exclude transformation of layout ast files for now
                       if (fileName.includes('+page')) {
