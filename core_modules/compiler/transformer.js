@@ -145,9 +145,71 @@ async function readSMQHTMLFiles(directory) {
 /**
  * Start the transformation process.
  */
+
+/*
 export function transformSMQFiles(destDir) {
   //const directory = '../../build/routes'; // src directory
   return readSMQHTMLFiles(destDir);
 }
+*/
+
+export function transformSMQFiles(destDir) {
+  // Recursively process the directory
+  processDirectory(destDir);
+
+  // After processing, return the result of readSMQHTMLFiles (assuming this is another function)
+  return readSMQHTMLFiles(destDir);
+}
+
+
+function processDirectory(dir) {
+  // Read the contents of the directory
+  const files = fs.readdirSync(dir);
+
+  // Track whether resolved.ast files exist for page and layout
+  let hasPageResolved = false;
+  let hasLayoutResolved = false;
+
+  // First pass: Check if resolved.ast files exist
+  files.forEach(file => {
+    const filePath = path.join(dir, file);
+
+    if (fs.statSync(filePath).isDirectory()) {
+      // Recursively process subdirectories
+      processDirectory(filePath);
+    } else if (file.startsWith('+page.') && file.endsWith('.resolved.ast')) {
+      hasPageResolved = true;
+    } else if (file.startsWith('+layout.') && file.endsWith('.resolved.ast')) {
+      hasLayoutResolved = true;
+    }
+  });
+
+  // Second pass: Delete unnecessary files
+  files.forEach(file => {
+    const filePath = path.join(dir, file);
+
+    if (!fs.statSync(filePath).isDirectory()) {
+      if (file.startsWith('+page.')) {
+        if (hasPageResolved && file !== '+page.resolved.ast') {
+          // Delete all +page.* files except +page.resolved.ast
+          fs.unlinkSync(filePath);
+        } else if (!hasPageResolved && !file.endsWith('.smq.ast')) {
+          // Delete all +page.* files except +page.smq.ast
+          fs.unlinkSync(filePath);
+        }
+      } else if (file.startsWith('+layout.')) {
+        if (hasLayoutResolved && file !== '+layout.resolved.ast') {
+          // Delete all +layout.* files except +layout.resolved.ast
+          fs.unlinkSync(filePath);
+        } else if (!hasLayoutResolved && !file.endsWith('.smq.ast')) {
+          // Delete all +layout.* files except +layout.smq.ast
+          fs.unlinkSync(filePath);
+        }
+      }
+    }
+  });
+}
+
+
 
 //transformSMQFiles();
