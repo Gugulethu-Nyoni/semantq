@@ -4,7 +4,7 @@ import path from 'path';
 
 
 
-class Router {
+export default class Router {
     constructor(declaredRoutes, fileBasedRoutes) {
         this.declaredRoutes = declaredRoutes;
         this.fileBasedRoutes = fileBasedRoutes;
@@ -17,6 +17,7 @@ class Router {
         this.indexFileHash = null;
         this.storageKey = "currentRouteState";
         this.globalStorageKey = "smqState";
+        this.loadedLayoutModules = {}; // For layout modules
         this.loadedModules = {};  // Store loaded modules
         this.routesBase ='/build/routes';
 
@@ -120,7 +121,39 @@ class Router {
 
  async render(route, resourceId) {
     //console.log("Check", resourceId);
+
+/* HANDLE LAYOUT IF ANY */
+
+        const routeName = route.split('/').slice(-2, -1)[0]; // e.g., "about"
+        const layoutScriptPath = route.replace('+page.html', `+layout.js`);
+
+        console.log("Loading layout script:", layoutScriptPath);
+
+        // Dynamically import the layout script
+        const layoutModule = await import(/* @vite-ignore */ layoutScriptPath);
+        console.log("Loaded layout module:", layoutModule);
+
+        // Store the layout module in the loadedLayoutModules object
+        this.loadedLayoutModules[route] = layoutModule;
+
+        // Execute the layout logic (e.g., layoutInit function)
+        if (layoutModule.layoutInit) {
+            console.log("Running layout init...");
+            layoutModule.layoutInit();
+        } else {
+            console.warn(`No layoutInit() function found in layout module for route: ${route}`);
+        }
+
+/* END HANDLE LAYOUT */
+
+
+
+
+
+
+
     const placeholder = document.getElementById('app');
+    console.log("IKHONA",placeholder);
     if (resourceId !== undefined) {
         placeholder.setAttribute('data-resource-id', resourceId);
         const existingData = localStorage.getItem('smqState');
@@ -180,10 +213,10 @@ class Router {
 
 
             //const scriptPath = '/' + route+'.js'; 
-            const routeName = route.split('/').slice(-2, -1)[0]; // about
+            //const routeName = route.split('/').slice(-2, -1)[0]; // about
             const scriptPath = route.replace('+page.html', `${routeName}.js`);
 
-            console.log("ROUTE",scriptPath);
+           // console.log("ROUTE",scriptPath);
 
 
             //const scriptPath = new URL(`/build/routes/${route}/${route}.js`, import.meta.url).href;
