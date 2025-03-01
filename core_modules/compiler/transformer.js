@@ -119,9 +119,15 @@ async function readSMQHTMLFiles(directory) {
                   // Dynamically import the module and apply transformations
                   try {
                     if (jsAST.content.body.length > 0 || customSyntaxAST[0].html.children[0].children[0].length > 0) {
+                      //console.log(filePath);
+                      const fileName = path.basename(filePath);
+                      // exclude transformation of layout ast files for now
+                      if (fileName.includes('+page')) {
                       const atomiqueModule = await import('./static_analysis/anatomique.js');
                       const transformASTs = atomiqueModule.default; // If using default export
                       await transformASTs(jsAST.content, cssAST, customSyntaxAST, filePath);
+                    }
+
                     } else {
                       console.log(`Transformer not run for ${filePath} - Either JS or HTML not found`);
                     }
