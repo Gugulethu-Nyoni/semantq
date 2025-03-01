@@ -2248,7 +2248,7 @@ traverse(rootNode);
   //console.log("const layoutHTML",layoutHTML);
   //console.log("const layoutAST",layoutAST);
 
-
+/*
   // Parse the layoutAST string into an AST
     const parsedLayoutAST = parse(layoutAST, {
       ecmaVersion: 'latest',
@@ -2259,6 +2259,8 @@ traverse(rootNode);
 
   newJsAST.body.push(...parsedLayoutAST.body);
 
+  */
+
 //console.log("Updated",JSON.stringify(newJsAST,null,2));
 
 
@@ -2266,6 +2268,15 @@ traverse(rootNode);
   if (layoutHTML) {
 
 const layoutRenderer = `
+
+export function layoutInit() {
+
+const layoutBlocks = {
+  header: \`${layoutHTML.header}\`,
+  body: \`${layoutHTML.main}\`,
+  footer: \`${layoutHTML.footer}\`
+  };
+
 
   if (layoutBlocks) {
 
@@ -2328,9 +2339,12 @@ function appendFooter(footerHTML) {
   body.appendChild(template.content.cloneNode(true));
 }
 
+}
+
 }`; 
 
 
+/*
 
     // Parse the layoutAST string into an AST
     const layoutRendererAST = parse(layoutRenderer, {
@@ -2341,10 +2355,26 @@ function appendFooter(footerHTML) {
   // get ast object of const 
 
   newJsAST.body.push(...layoutRendererAST.body);
+*/
 
-    //console.log("NJST",JSON.stringify(newJsAST,null,2));
+  const targetDir = path.dirname(filePath); // This will give the directory containing the file
+  const routeDirName = path.basename(targetDir); // This will give the last directory name (e.g., "admin")
 
 
+  const newFileName = path.join(targetDir, '+layout.js'); // Saves in the same directory as the page.js file
+
+// Write the layoutRenderer content into the new file
+fs.writeFile(newFileName, layoutRenderer, (err) => {
+  if (err) {
+    console.error('Error writing layout file:', err);
+  } else {
+    console.log(`Layout JS file written successfully to ${newFileName}`);
+  }
+});
+
+  
+
+  
 };
 
 
