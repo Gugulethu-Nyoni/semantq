@@ -1982,6 +1982,9 @@ if (stackCount && stackCount === 1) {
 export default async function transformASTs(jsAST, cssAST, customSyntaxAST, filePath) {
   const customSyntaxObject = customSyntaxAST[0];
 
+    console.log("NJST",jsAST);
+
+
   // Process mustache and event handler nodes
   if (customSyntaxObject) visitMustacheIdentifierNodes(customSyntaxObject);
   if (customSyntaxObject) visitEventHandlerNodes(customSyntaxObject);
@@ -2058,6 +2061,8 @@ export default async function transformASTs(jsAST, cssAST, customSyntaxAST, file
   // --------------------
   let newJsAST = transformedASTs ? transformedASTs.transformedJsAST : jsAST;
   let newHTMLAST = transformedASTs ? transformedASTs.transformedCustomSyntaxAST : customSyntaxAST;
+
+//  console.log("NJST",newJsAST);
 
   // --------------------
   // Extract Function Names for Global Scope
@@ -2200,6 +2205,10 @@ traverse(rootNode);
     return ast;
   }
 
+
+
+
+
   if (!newJsAST.__wrapped) { // Ensure wrapCodeInInit is applied only once
   let reRendersAST;
 
@@ -2228,8 +2237,8 @@ traverse(rootNode);
   footer: \`${layoutHTML.footer}\`
   };`;
 
-  console.log("const layoutHTML",layoutHTML);
-  console.log("const layoutAST",layoutAST);
+  //console.log("const layoutHTML",layoutHTML);
+  //console.log("const layoutAST",layoutAST);
 
 
   // Parse the layoutAST string into an AST
@@ -2242,7 +2251,7 @@ traverse(rootNode);
 
   newJsAST.body.push(...parsedLayoutAST.body);
 
-
+//console.log("Updated",JSON.stringify(newJsAST,null,2));
 
 
 
@@ -2359,10 +2368,7 @@ jsCode = escodegen.generate(newJsAST);
   const parsedHTML = customHtmlParser(newHTMLAST);
 
   if (jsCode && parsedHTML) {
-
     await writeCodeToFile(jsCode, parsedHTML);
-
-
   }
 
   // --------------------
