@@ -119,128 +119,187 @@ export default class Router {
         }
     }
 
- async render(route, resourceId) {
-    //console.log("Check", resourceId);
-
-/* HANDLE LAYOUT IF ANY */
-
-        const routeName = route.split('/').slice(-2, -1)[0]; // e.g., "about"
-        const layoutScriptPath = route.replace('+page.html', `+layout.js`);
-
-        console.log("Loading layout script:", layoutScriptPath);
-
-        // Dynamically import the layout script
-        const layoutModule = await import(/* @vite-ignore */ layoutScriptPath);
-        console.log("Loaded layout module:", layoutModule);
-
-        // Store the layout module in the loadedLayoutModules object
-        this.loadedLayoutModules[route] = layoutModule;
-
-        // Execute the layout logic (e.g., layoutInit function)
-        if (layoutModule.layoutInit) {
-            console.log("Running layout init...");
-            layoutModule.layoutInit();
-        } else {
-            console.warn(`No layoutInit() function found in layout module for route: ${route}`);
-        }
-
-/* END HANDLE LAYOUT */
 
 
+async render(route, resourceId) {
+const rawRoute = route;
+    // HANDLE LAYOUT IF ANY
+    if (typeof route === 'string') {
+
+
+if (!route) {
+  console.error('Route is null or undefined.');
+  return;
+}
+
+// Normalize route to remove extra slashes
+route = route.replace(/\/+/g, '/'); 
+
+// Remove any trailing file names (e.g., "+page.html")
+route = route.replace(/\+page\.html$/, ''); 
+
+// Extract route parts
+const routeParts = route.split('/');
+const routesIndex = routeParts.indexOf('routes');
+
+// Ensure "routes" exists in the path
+if (routesIndex === -1 || routesIndex + 1 >= routeParts.length) {
+  console.error('Invalid route structure:', route);
+  return;
+}
+
+// Get base directory (e.g., "admin" from "/routes/admin/users")
+const routeBaseDir = routeParts[routesIndex + 1];
+
+// Get current directory (e.g., "users" from "/routes/admin/users"), if it exists
+const routeDir = (routeParts.length > routesIndex + 2 && !routeParts[routesIndex + 2].startsWith('+')) 
+  ? routeParts[routesIndex + 2] 
+  : null;
+
+// **Prepend "build/" before "routes/" to construct the correct path**
+const layoutScriptInRouteDir = routeDir ? `/build/routes/${routeBaseDir}/${routeDir}/+layout.js` : null;
+const layoutScriptInBaseDir = `/build/routes/${routeBaseDir}/+layout.js`;
+
+// Clean up paths
+const cleanPath = (path) => path ? path.replace(/\/+/g, '/') : null;
+
+console.log('Looking for layout scripts in:', cleanPath(layoutScriptInRouteDir), cleanPath(layoutScriptInBaseDir));
+
+// Helper function to check if a file exists using fetch
+async function fileExists(url) {
+  try {
+    const response = await fetch(url, { method: 'HEAD' });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+let layoutModule = null;
+
+// Function to safely import a module
+async function safeImport(modulePath) {
+  try {
+    return await import(/* @vite-ignore */ modulePath);
+  } catch (error) {
+    console.warn(`Failed to import module: ${modulePath}`, error);
+    return null; // Return null if the module cannot be imported
+  }
+}
+
+// Check for layout script in the current route directory first
+if (layoutScriptInRouteDir && await fileExists(cleanPath(layoutScriptInRouteDir))) {
+  console.log(`Layout script found in route directory: ${cleanPath(layoutScriptInRouteDir)}`);
+  layoutModule = await safeImport(cleanPath(layoutScriptInRouteDir));
+} 
+// If not found, check in the base route directory
+else if (await fileExists(cleanPath(layoutScriptInBaseDir))) {
+  console.log(`Layout script found in base route directory: ${cleanPath(layoutScriptInBaseDir)}`);
+  layoutModule = await safeImport(cleanPath(layoutScriptInBaseDir));
+} 
+// Fallback if no script is found
+else {
+  console.log('No layout script found. Skipping layout import.');
+}
+
+// Store the loaded layout module only if found
+if (layoutModule) {
+  this.loadedLayoutModules[route] = layoutModule;
+
+  // If the layout module has an init function, run it
+  if (layoutModule?.layoutInit) {
+    console.log("Running layout init...");
+    layoutModule.layoutInit();
+  } else {
+    console.warn(`No layoutInit() function found in layout module for route: ${route}`);
+  }
+} else {
+  console.log(`No valid layout module found for ${route}. Proceeding without a layout.`);
+}
 
 
 
 
+
+
+
+    }
+
+
+
+
+    // END HANDLE LAYOUT
 
     const placeholder = document.getElementById('app');
-    console.log("IKHONA",placeholder);
+    //console.log("IKHONA", placeholder);
+
     if (resourceId !== undefined) {
         placeholder.setAttribute('data-resource-id', resourceId);
-        const existingData = localStorage.getItem('smqState');
-        const parsedData = JSON.parse(existingData || '{}');
-        if (!parsedData['componentDataId']) {
-            parsedData['componentDataId'] = [{ newState: resourceId }];
+
+        const existingData = JSON.parse(localStorage.getItem('smqState') || '{}');
+
+        if (!existingData['componentDataId']) {
+            existingData['componentDataId'] = [{ newState: resourceId }];
         }
-        Object.values(parsedData).forEach((value) => {
-            value.map((item) => {
+
+        Object.values(existingData).forEach((value) => {
+            value.forEach((item) => {
                 if (item.key === 'componentDataId') {
                     item.newState = resourceId;
                 }
             });
         });
-        localStorage.setItem('smqState', JSON.stringify(parsedData, null, 2));
+
+        localStorage.setItem('smqState', JSON.stringify(existingData, null, 2));
     }
 
     // Remove existing scoped JS and CSS
-    const existingScripts = document.querySelectorAll('script[scope="component-js"]');
-    const existingStyles = document.querySelectorAll('style[scope="component-css"]');
-    for (const script of existingScripts) script.remove();
-    for (const style of existingStyles) style.remove();
+    document.querySelectorAll('script[scope="component-js"]').forEach(script => script.remove());
+    document.querySelectorAll('style[scope="component-css"]').forEach(style => style.remove());
 
     try {
-        const componentDefinition = await this.fetchComponentDefinition(route);
-        const template = document.createElement('template');
-        template.innerHTML = componentDefinition.trim();
-        const clone = template.content.cloneNode(true);
+        if (typeof rawRoute === 'string') {
+            const componentDefinition = await this.fetchComponentDefinition(rawRoute);
+            const template = document.createElement('template');
+            template.innerHTML = componentDefinition.trim();
+            const clone = template.content.cloneNode(true);
+            placeholder.appendChild(clone);
 
-        // Append the component HTML to the placeholder
-        placeholder.appendChild(clone);
-
-
-        // Inject resourceId as a global variable if available
-        if (resourceId !== undefined) {
-            const scriptElement = document.createElement('script');
-            scriptElement.textContent = `window.resourceId = "${resourceId}";`;
-            document.body.appendChild(scriptElement);
-        }
-
-        // Handle <style> tags scoped to this component
-        const styles = clone.querySelectorAll('style');
-        for (const style of styles) {
-            const newStyle = document.createElement('style');
-            newStyle.setAttribute('scope', 'component-css');
-            newStyle.textContent = style.textContent; // Transfer style content
-            document.head.appendChild(newStyle);
-        }
-
-        // Handle <script type="module"> tag scoped to this component
-        // Handle <script type="module"> tag scoped to this component
-            const script = clone.querySelector('script[type="module"]');
-            if (script) {
-                // Store the script content directly in the loadedModules object using the route as the key
-                this.loadedModules[route] = script.textContent;
+            if (resourceId !== undefined) {
+                const scriptElement = document.createElement('script');
+                scriptElement.textContent = `window.resourceId = "${resourceId}";`;
+                document.body.appendChild(scriptElement);
             }
 
+            // Handle scoped styles
+            clone.querySelectorAll('style').forEach((style) => {
+                const newStyle = document.createElement('style');
+                newStyle.setAttribute('scope', 'component-css');
+                newStyle.textContent = style.textContent;
+                document.head.appendChild(newStyle);
+            });
 
-            //const scriptPath = '/' + route+'.js'; 
-            //const routeName = route.split('/').slice(-2, -1)[0]; // about
-            const scriptPath = route.replace('+page.html', `${routeName}.js`);
+            // Store the module script content
+            const script = clone.querySelector('script[type="module"]');
+            if (script) {
+                this.loadedModules[rawRoute] = script.textContent;
+            }
 
-           // console.log("ROUTE",scriptPath);
-
-
-            //const scriptPath = new URL(`/build/routes/${route}/${route}.js`, import.meta.url).href;
+            const scriptPath = rawRoute.replace('+page.html', `${rawRoute.split('/').slice(-2, -1)[0]}.js`);
+            console.log("ROUTE", scriptPath);
 
             const module = await import(/* @vite-ignore */ scriptPath);
             console.log("Loaded module:", module);
 
-        // Store the module in the loadedModules object
-        this.loadedModules[route] = module;
+            this.loadedModules[route] = module;
 
-        // Invoke init() if it exists
-        if (module.init) {
-            console.log("Init function detected. Running it now...");
-            module.init();
-        } else {
-            console.warn(`No init() function found in module for route: ${route}`);
+            if (module.init) {
+                console.log("Init function detected. Running it now...");
+                module.init();
+            } else {
+                console.warn(`No init() function found in module for route: ${rawRoute}`);
+            }
         }
-
-
-        // Ensure scripts run after the DOM is fully loaded
-            /*
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM fully loaded and parsed');
-        }); */
 
         this.routeHandled = true;
         this.isHandledByClickEvent = false;
