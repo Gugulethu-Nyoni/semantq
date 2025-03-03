@@ -193,7 +193,7 @@ async function main(sourceDir, destDir, destDirBase) {
     /* END OF DEALING WITH LAYOUTS */
 
 
-/*
+
     await importsResolution(destDir);
     await slotsResolution(destDir);
 
@@ -205,7 +205,7 @@ async function main(sourceDir, destDir, destDirBase) {
     await routesGenerator(sourceDir, destDir);
 
 
-*/
+
 
     console.log('\x1b[32mCompilation completed successfully!\x1b[0m');
   } catch (error) {
