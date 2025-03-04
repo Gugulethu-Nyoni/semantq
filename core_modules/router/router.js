@@ -121,6 +121,8 @@ export default class Router {
 
 
 
+
+
 async render(route, resourceId) {
 const rawRoute = route;
     // HANDLE LAYOUT IF ANY
@@ -204,6 +206,11 @@ else {
 
 // Store the loaded layout module only if found
 if (layoutModule) {
+
+// delete first if exists 
+
+    delete this.loadedLayoutModules[route];
+
   this.loadedLayoutModules[route] = layoutModule;
 
   // If the layout module has an init function, run it
@@ -282,6 +289,7 @@ if (layoutModule) {
             // Store the module script content
             const script = clone.querySelector('script[type="module"]');
             if (script) {
+                delete this.loadedModules[rawRoute];
                 this.loadedModules[rawRoute] = script.textContent;
             }
 
