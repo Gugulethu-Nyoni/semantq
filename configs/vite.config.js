@@ -3,6 +3,7 @@ import postcss from 'postcss';
 
 export default defineConfig({
   css: {
-    postcss
-  }
+    postcss,
+  },
+  base: '/',
 });
