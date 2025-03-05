@@ -128,7 +128,7 @@ async function readSMQHTMLFiles(directory) {
                   let cssAST = '';
                   if (cssASTObject && cssASTObject.content && Array.isArray(cssASTObject.content.nodes) && cssASTObject.content.nodes.length > 0) {
                     
-                     console.log(JSON.stringify(cssASTObject,null,2));
+                     //console.log(JSON.stringify(cssASTObject,null,2));
                     cssAST = convertCssASTToString(cssASTObject);
 
                     //console.log("FINAL CSS",JSON.stringify(cssAST,null,2))
