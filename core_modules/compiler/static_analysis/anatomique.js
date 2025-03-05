@@ -2107,7 +2107,7 @@ export default async function transformASTs(jsAST, cssAST, customSyntaxAST, file
     layoutFilePath = layoutSmqPath;
   } else {
     // No layout file found
-    console.log('No layout file found.');
+   // console.log('No layout file found.');
     return;
   }
 
@@ -2239,11 +2239,15 @@ traverse(rootNode);
   const layoutHTML = await processLayoutFile(filePath);
   //console.log("LAYOUT HTML",layoutHTML);
 
+  let layoutAST; 
+  
+  if (layoutHTML) {
   const layoutAST = `const layoutBlocks = {
   header: \`${layoutHTML.header}\`,
   body: \`${layoutHTML.main}\`,
   footer: \`${layoutHTML.footer}\`
   };`;
+}
 
   //console.log("const layoutHTML",layoutHTML);
   //console.log("const layoutAST",layoutAST);
@@ -2368,13 +2372,13 @@ fs.writeFile(newFileName, layoutRenderer, (err) => {
   if (err) {
     console.error('Error writing layout file:', err);
   } else {
-    console.log(`Layout JS file written successfully to ${newFileName}`);
+   // console.log(`Layout JS file written successfully to ${newFileName}`);
   }
 });
 
   
 
-  
+
 };
 
 
