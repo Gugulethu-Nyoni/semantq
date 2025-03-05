@@ -17,25 +17,39 @@ function convertCssASTToString(cssAST) {
 
   let cssString = '';
 
-  // Iterate over each rule in the AST
   cssAST.content.nodes.forEach(rule => {
-    if (rule.type !== "rule" || !rule.selector || !Array.isArray(rule.nodes)) {
-     // console.warn('Skipping invalid rule:', rule);
-      return; // Skip invalid rules
+    if (rule.type === "rule" && rule.selector && Array.isArray(rule.nodes)) {
+      // Process normal CSS rules
+      cssString += `${rule.selector} {\n`;
+
+      rule.nodes.forEach(decl => {
+        if (decl.type === "decl" && decl.prop && decl.value) {
+          cssString += `  ${decl.prop}: ${decl.value};\n`;
+        }
+      });
+
+      cssString += `}\n`;
+
+    } else if (rule.type === "atrule" && rule.name === "keyframes") {
+      // Process @keyframes blocks
+      cssString += `@keyframes ${rule.params} {\n`;
+
+      rule.nodes.forEach(frame => {
+        if (frame.type === "rule" && Array.isArray(frame.nodes)) {
+          cssString += `  ${frame.selector} {\n`;
+
+          frame.nodes.forEach(decl => {
+            if (decl.type === "decl" && decl.prop && decl.value) {
+              cssString += `    ${decl.prop}: ${decl.value};\n`;
+            }
+          });
+
+          cssString += `  }\n`;
+        }
+      });
+
+      cssString += `}\n`;
     }
-
-    cssString += `${rule.selector} {\n`;
-
-    // Iterate over each declaration
-    rule.nodes.forEach(decl => {
-      if (decl.type !== "decl" || !decl.prop || !decl.value) {
-        //console.warn('Skipping invalid declaration:', decl);
-        return;
-      }
-      cssString += `  ${decl.prop}: ${decl.value};\n`;
-    });
-
-    cssString += `}\n`;
   });
 
   return cssString;
@@ -113,6 +127,8 @@ async function readSMQHTMLFiles(directory) {
 
                   let cssAST = '';
                   if (cssASTObject && cssASTObject.content && Array.isArray(cssASTObject.content.nodes) && cssASTObject.content.nodes.length > 0) {
+                    
+                     console.log(JSON.stringify(cssASTObject,null,2));
                     cssAST = convertCssASTToString(cssASTObject);
 
                     //console.log("FINAL CSS",JSON.stringify(cssAST,null,2))
@@ -130,6 +146,7 @@ async function readSMQHTMLFiles(directory) {
                       if (fileName.includes('+page')) {
                       const atomiqueModule = await import('./static_analysis/anatomique.js');
                       const transformASTs = atomiqueModule.default; // If using default export
+                      //console.log(JSON.stringify(cssAST,null,2));
                       await transformASTs(jsAST.content, cssAST, customSyntaxAST, filePath);
                     }
 
