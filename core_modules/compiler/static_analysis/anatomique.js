@@ -597,10 +597,10 @@ class Transpiler extends NodeVisitor {
             let eventListenerCode; 
 
 
-            if (eventHandlerNode && eventFunctionNode) {
+            if (eventHandlerNode.length > 0 && eventFunctionNode) {
 
              // console.log("Calling it ...");
-             // console.log(JSON.stringify(block.parentNode,null,2));
+             //console.log("SEE",JSON.stringify(eventHandlerNode,null,2));
 
               const eventName = eventHandlerNode[0].value; // e.g. onclick
               const eventFunction = eventFunctionNode[0].value; // e.g. incrementer()
@@ -614,7 +614,7 @@ class Transpiler extends NodeVisitor {
 
             }
 
-            console.log("ELC",JSON.stringify(this.customSyntaxAST,null,2));
+           // console.log("ELC",JSON.stringify(this.customSyntaxAST,null,2));
 
 
 
