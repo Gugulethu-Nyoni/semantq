@@ -10,337 +10,10 @@ import path from 'path';
 
 import prettier from 'prettier';
 import * as estraverse from "estraverse";
+import Walker from './deeperWalker.js';
+import GetNodePositions from '../utils/GetNodePositions.js';
+import EventHandlerProcessor from './transformEventHandlers.js';
 
-
-//console.log(typeof traverse.default); // Should print "function"
-
-
-class GetNodePositions {
-  constructor (ast, targetNode) {
-    this.ast=ast;
-    this.targetNode=targetNode;
-    //console.log("inside",JSON.stringify(ast,null,2));
-  }
-
-findIndexInChildren(parent) {  
-
-const isObject = (value) => value && typeof value === 'object';
-  
-  if (parent.children) {
-    if (Array.isArray(parent.children)) {
-      // Iterate over the array of arrays
-      for (let i = 0; i < parent.children.length; i++) {
-        const childArray = parent.children[i];
-        if (Array.isArray(childArray)) {
-          for (let j = 0; j < childArray.length; j++) {
-            const child = childArray[j];
-
-            //console.log("TYPE",parent.name, child.type);
-
-      const startMatch = isObject(child.start) ? this.deepEqual(child.start, this.targetNode.start) : child.start === this.targetNode.start;
-      const endMatch = isObject(child.end) ? this.deepEqual(child.end, this.targetNode.end) : child.end === this.targetNode.end;      
-            
-            if (
-              startMatch
-              && endMatch
-              && child.type === this.targetNode.type 
-              && child.name === this.targetNode.name 
-              && this.deepEqual(child.attributes, this.targetNode.attributes) 
-              && this.deepEqual(child.children, this.targetNode.children)
-            ) {
-             
-             //console.log("matchFound", "child",child, "target",this.targetNode);
-
-              //return [i, j]; // Return the indices of the child node
-              return j; // return index only
-            }
-
-
-          }
-        }
-      }
-    } else {
-      // Iterate over the object
-      for (const key in parent.children) {
-        if (Object.hasOwnProperty.call(parent.children, key)) {
-          const childArray = parent.children[key];
-          if (Array.isArray(childArray)) {
-            for (let j = 0; j < childArray.length; j++) {
-              const child = childArray[j];
-              if (
-                child.start === this.targetNode.start &&
-                child.end === this.targetNode.end &&
-                child.type === this.targetNode.type &&
-                child.name === this.targetNode.name &&
-                this.deepEqual(child.attributes, this.targetNode.attributes) &&
-                this.deepEqual(child.children, this.targetNode.children)
-              ) {
-                //return [key, j]; // Return the key and index of the child node
-                return j; // return index only
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-    
-  return -1; // Return -1 if the targetNode is not found
-}
-
-
-
- deepEqual(a, b) {
-  if (a === b) return true;
-  if (a == null || b == null) return false;
-
-  if (Array.isArray(a) && Array.isArray(b)) {
-    if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i++) {
-      if (!this.deepEqual(a[i], b[i])) return false;
-    }
-    return true;
-  }
-
-  if (typeof a === 'object' && typeof b === 'object') {
-    const keysA = Object.keys(a);
-    const keysB = Object.keys(b);
-    if (keysA.length !== keysB.length) return false;
-    for (const key of keysA) {
-      if (!keysB.includes(key) || !this.deepEqual(a[key], b[key])) return false;
-    }
-    return true;
-  }
-
-  return false;
-}
-
-
-walk() {
-    let matchFound = false;
-    let nodeStack = [];
-    let visitedNodes = new Set();
-
-    const processNode = (node) => {
-      if (node && (node.type === 'Element' || node.type === 'Text' || node.type === 'MustacheIdentifier')) {
-        const nodeKey = `${node.type}-${node.start}-${node.end}`;
-        if (!visitedNodes.has(nodeKey)) {
-          visitedNodes.add(nodeKey);
-          nodeStack.push({
-            node: node,
-            nodeName: node.name || node.type,
-            nodeType: node.type,
-            nodeText: node.type === 'Text' ? node.text : null,
-          });
-        }
-      }
-
-      if (
-        node.start === this.targetNode.start &&
-        node.end === this.targetNode.end &&
-        node.type === this.targetNode.type &&
-        node.name === this.targetNode.name &&
-        this.deepEqual(node.attributes, this.targetNode.attributes) &&
-        this.deepEqual(node.children, this.targetNode.children)
-      ) {
-        matchFound = true;
-      }
-
-      if (!matchFound) {
-        if (Array.isArray(node.children)) {
-          node.children.forEach((child) => nestedWalker(child));
-        } else if (typeof node === 'object' && node !== null) {
-          Object.values(node).forEach((value) => nestedWalker(value));
-        }
-      }
-    };
-
-    const nestedWalker = (node) => {
-      if (!matchFound) {
-        if (Array.isArray(node)) {
-          node.forEach((item) => nestedWalker(item));
-        } else if (typeof node === 'object' && node !== null) {
-          processNode(node);
-          if (node.children) {
-            node.children.forEach((child) => nestedWalker(child));
-          }
-        }
-      }
-    };
-
-    nestedWalker(this.ast);
-    return nodeStack;
-  }
-
-
- findChildren(node) {
-  const _findChildren = (node) => {
-    if (node && typeof node === 'object') {
-      if (node.type === 'Element' && node.children && typeof node.children === 'object' && Object.keys(node.children).length > 0) {
-        // node has a children object which is not empty
-        return node.children;
-      } else if (node.children && typeof node.children === 'object' && Object.keys(node.children).length > 0) {
-        for (let i = 0; i < node.children.length; i++) {
-          _findChildren(node.children[i]);
-        }
-      }
-
-      if (node.type === 'Element' && Array.isArray(node.children) && node.children.length > 0) {
-        // node has a children array which is not empty
-        return node.children;
-      } else if (Array.isArray(node.children) && node.children.length > 0) {
-        for (let i = 0; i < node.children.length; i++) {
-          _findChildren(node.children[i]);
-        }
-      }
-
-      // Recursively search through the properties of the node
-      for (const key in node) {
-        if (node.hasOwnProperty(key)) {
-          const result = _findChildren(node[key]);
-          if (result) {
-            return result;
-          }
-        }
-      }
-    }
-    return false;
-  };
-
-  return _findChildren(node);
-}
- 
-
-
-/** @childrenChecker(nodeToCheck)
- * use for drilling down until there is no array or object passed
- * it drills down to the very elements objects/arrays
- * it won't pass an object
- * useful for traversing objects/arrays for element/units
- * WON'T WORK FOR PASSING NODES (OBJECTS OR ARRAYS) 
- */
-
-/*
-function childrenChecker(nodeToCheck) {
-    // Helper function to drill down into arrays and objects
-    function deepCheck(node) {
-        if (Array.isArray(node)) {
-            for (let i = 0; i < node.length; ++i) {
-                if (deepCheck(node[i])) {
-                    return true;
-                }
-            }
-        } else if (typeof node === 'object' && node !== null) {
-            for (let key in node) {
-                if (deepCheck(node[key])) {
-                    return true;
-                }
-            }
-        } else {
-            // Base case: when node is neither an array nor an object
-            console.log("event got here",node);
-            return findChildren(node);
-        }
-        return false;
-    }
-
-    return deepCheck(nodeToCheck);
-}
-
-*/
-
- childrenChecker(nodeToCheck) {
-    if (Array.isArray(nodeToCheck)) {
-        for (let i = 0; i < nodeToCheck.length; ++i) {
-            if (this.findChildren(nodeToCheck[i])) {
-              //console.log("here",nodeToCheck[i]);
-                 return nodeToCheck[i]; //return true;
-            }
-        }
-    } else if (typeof nodeToCheck === 'object' && nodeToCheck !== null) {
-        for (let key in nodeToCheck) {
-            if (this.findChildren(nodeToCheck[key])) {
-              //console.log("here",nodeToCheck[key]);
-                return nodeToCheck[key]; //return true;
-            }
-        }
-    } else {
-      //console.log("here",nodeToCheck);
-        return this.findChildren(nodeToCheck);
-    }
-
-    return false; // If no children are found in the array or object
-}
-
-
-/**@nodeStack - careful that parent could be sibling 
- * - because parent is simply the previous node encountered in the traversal
- * - to find the parent we need to get the first node in the stack 
- * with the targetNode in it's children
- * - a button element in a table td - will exist in that td and in the tr of that td 
- * - we must get the immediate parent so that catch that as the active node to be replaced 
- * in the grandParent node
- */
-
-
-/** @for Lopp
- * 1. iterate through the nodeStack - this nodeStack has all nodes in the ast 
- * in their respective order
- * all nodes at this stage are 'Element' types - no loose hanging text or mustache tags 
- * at this point - if such existed they have been transformed already and wrapped in 
- * spans - so every node at this stage is an html tag === node.type 'Element'
- * nodeStack is a result of a deep exhaustive traversal 
- * - same logic used by the Semantq html parser - so there is no node left out 
- * 2. @childrenChecker checks if node has children 
- * - if it doesn't we don't have to bother  looking for the targetNode in it 
- * 3. if nodeToCheck has children then we proceed to findIndexInChildren()
- * if index is -1 then targetNode is ƒNOT found in the node
- * if existsIndex > -1 then we have found the tagetNode in the node and 
- * hev the index as 
- * 4. with the parentNode and nodeIndex plus newNode - we can replace the node
- */
-
-init() {
-
-//console.log("HERE now",this.ast);
-const nodeStack = this.walk(this.ast);
-let nodeLocations = [];
-//console.log("NODE STACK",nodeStack); 
-//console.log(JSON.stringify(nodeStack,null,2));
-
-
-for (let i = 0; i < nodeStack.length; i++) {
-  const nodeToCheck = nodeStack[i];
-  const result = this.childrenChecker(nodeToCheck);
-
-  if (result && result.children) {
-    const existsIndex = this.findIndexInChildren(result);
-
-
-    if (existsIndex > -1) {
-        nodeLocations.push({
-        parentNode: nodeToCheck.node,
-        nodeIndex: existsIndex,
-      });
-
-      return nodeLocations;
-    }
-  }
-
-
-
-}
-
-//console.log("HERE now",nodeLocations);
-
-return nodeLocations; 
-
-}
-
-
-
-}
 
 
 
@@ -660,417 +333,7 @@ class TransformEventHandlerNodes extends NodeVisitor {
 
 
 
-class TransformTextNodes extends NodeVisitor {
-  transformTextNodes(subRootNodeChildren, ast) {
 
-
-    //console.log("inn",JSON.stringify(subRootNodeChildren.children[0],null,2));
-
-    for (let i =0; i < subRootNodeChildren.children[0].length; i++) {
-
-
-  const node=subRootNodeChildren.children[0][i];
-  const newLines = '\n\n\n\n';
-  const whiteSpaces = ' ';
-
-
-  if (node.type === 'Text' && node.raw !== newLines && node.raw !== whiteSpaces) {
- // console.log(node);
-  //console.log(i);
-
-
-  const newTextNode = {
-            start: node.start,
-            end: node.end,
-            type: "Element",
-            name: "span",
-            attributes: [],
-            children: [
-              {
-                start: node.start,
-                end: node.end,
-                type: "Text",
-                raw: node.raw,
-                data: node.data
-              }
-            ]
-          };
-
-          // Update node
-          subRootNodeChildren.children[0][i] = newTextNode;
-          //console.log("UPDATED NODE", JSON.stringify(ast,null,2));
-
-  // transform node
-
-    }
-
-  }
-  
-   
-
-  }
-}
-
-
-
-class Walker extends NodeVisitor {
-
-traverse(ast, targetNode, eventHandlers=null) {
-    const results = [];
-
-    //console.log("E Handlers", eventHandlers); return;
-
-    function _traverse(node, parent, key, index, eventHandlers=null ) {
-        if (node === null || node === undefined) {
-            return; // Stop traversal for non-existent nodes
-        }
-
-        if (node.type === targetNode && node.name.type=== 'EventHandler') {
-
-         // console.log("LAPAHA",JSON.stringify(node,null,2)); return;
-
-            results.push({
-                targetNode: node,
-                parent: parent,
-                key: targetNode,
-                index: index
-            });
-        }
-
-        if (Array.isArray(node)) {
-            for (let i = 0; i < node.length; i++) {
-                _traverse(node[i], node, i, i);
-            }
-        } else if (typeof node === 'object') {
-            for (let key in node) {
-                if (node.hasOwnProperty(key)) {
-                    _traverse(node[key], node, targetNode, key);
-                }
-            }
-        }
-    }
-
-
-
-    _traverse(ast, null, targetNode, null,eventHandlers); // Start traversal from the root node
-    return results; // Return all found target nodes
-}
-
-
-
-walk(ast, targetNodeType) {
-  //console.log("Problem",JSON.stringify(ast,null,2));
-    const results = [];
-
-    function _walk(node, parent, grandParent) {
-      //console.log("LPAHA",JSON.stringify(node.html.children,null,2));
-        if (node === null || node === undefined) return; 
-        //const index = 23; 
-
-
-
-        if (node.type === targetNodeType) {
-
-          // console.log("FLAG",node.type);
-
-        const walk = new Walker();
-
-        //console.log("FormatTT",parent);
-        const index =walk.findIndexInChildren(grandParent, parent);
-
-            results.push({
-                targetNode: node,
-                parent: parent,
-                grandParent: grandParent,
-                parentIndex: index
-            }); 
-        }
-
-        // Traverse children if they exist
-        if (node.children) {
-            node.children.forEach((childArray, childKey) => {
-                if (Array.isArray(childArray)) {
-                    childArray.forEach((child, childIndex) => {
-                      _walk(child, node, parent);
-                    });
-                } else {
-                   _walk(childArray, node, parent);
-                }
-            });
-        }
-    }
-
-     // Ensure ast is properly structured
-  if (ast && ast.html) {
-    _walk(ast.html, null, null);
-  } else {
-    console.error("AST or AST.html is not defined");
-  }
-    //console.log("All Blocks",results);
-    return results;
-}
-
-
-
-
-
-// Helper function for deep equality check
-/*
-deepEqual(a, b) {
-  const walk = new Walker();
-
-  if (a === b) return true;
-  if (a == null || b == null) return false;
-  if (Array.isArray(a) && Array.isArray(b)) {
-    if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i++) {
-      if (!walk.deepEqual(a[i], b[i])) return false;
-    }
-    return true;
-  }
-  if (typeof a === 'object' && typeof b === 'object') {
-    const keysA = Object.keys(a);
-    const keysB = Object.keys(b);
-    if (keysA.length !== keysB.length) return false;
-    for (const key of keysA) {
-      if (!keysB.includes(key) || !walk.deepEqual(a[key], b[key])) return false;
-    }
-    return true;
-  }
-  return false;
-}
-*/
-
-deepWalker(ast, nodeType = null, matchLogic, returnType = null) {
-    if (!ast) {
-        console.log("No AST object provided e.g. deepWalker(ast, nodeType,etc);");
-        return;
-    }
-
-    if (!matchLogic) {
-        console.log("You need to define matchLogic e.g. deepWalker(ast, nodeType,matchLogic);");
-        return;
-    }
-
-    if (!nodeType || !returnType) {
-        console.log('There is no target or return type in your deepWalker request!. Please specify target e.g. deepWalker(ast, nodeType, returnType)');
-        return;
-    }
-
-    let results = [];
-    const visited = new Set();
-
-    function _deepWalk(node) {
-        if (!node || visited.has(node)) return; // Stop infinite loops
-        visited.add(node);
-
-        if (matchLogic(node)) {
-            if (returnType.path) {
-                //results.push(getValueByPath(node, returnType.path));
-            results.push({value: getValueByPath(node, returnType.path), node: node});
-
-            }
-        }
-
-        // Traverse arrays
-        if (Array.isArray(node)) {
-            for (let child of node) {
-                _deepWalk(child);
-            }
-        }
-
-        // Traverse objects
-        if (typeof node === 'object') {
-            for (let key in node) {
-                if (node.hasOwnProperty(key)) {
-                    _deepWalk(node[key]);
-                }
-            }
-        }
-    }
-
-    function getValueByPath(obj, path) {
-        const keys = path.split('.');
-        let value = obj;
-        for (const key of keys) {
-            if (Array.isArray(value) && !isNaN(key)) {
-                value = value[parseInt(key)];
-            } else {
-                value = value[key];
-            }
-            if (value === undefined || value === null) {
-                return undefined;
-            }
-        }
-        return value;
-    }
-
-    _deepWalk(ast);
-    return results;
-}
-
-
-
-// 
-
-/**@createMatchLogic important function for creating fucntions that check for specified
- * parameters in the node
- * function takes only three params - nodeType, nodeName and NodeValue - all are optional
- * if no parameters is set function will return: (node) => true;
- * e.g. to check if a node type exists you can create the matchLogic this way
- * 
- * const nodeType='Element';
- * const matchLogic = createMatchLogic(nodeType);
- * // (node) => node.type === nodeType;
- * 
- * if you want to check for node type and node name
- * 
- * const nodeType='Element';
- * const nodeName='span';
- * const matchLogic = createMatchLogic(nodeType,nodeName);
- * // (node) => node.type === nodeType && node.name === nodeName;
- * 
- * you also have to set the path of the item to returned
- * 
- * e.g.const returnType = {path: 'expression.name.name'}; 
- * when a match is found based on your matchLogic the function
- *  use that path to exract the target value from the matched node
- * 
- */
-
-createMatchLogic(nodeType = null, nodeName = null, nodeValue = null) {
-    if (nodeType && !nodeName && !nodeValue) {
-        return (node) => node.type === nodeType;
-    }
-
-    if (nodeType && nodeName && !nodeValue) {
-        return (node) => node.type === nodeType && node.name === nodeName;
-    }
-
-    if (nodeType && nodeName && nodeValue) {
-        return (node) => node.type === nodeType && node.name === nodeName && node.value === nodeValue;
-    }
-
-    // Optional: handle cases where no parameters or some combination is provided
-    return (node) => true;
-}
-
-
-
-
-deepEqual(a, b) {
-  const walk = new Walker();
-
-  if (a === b) return true;
-  if (a == null || b == null) return false;
-
-  if (Array.isArray(a) && Array.isArray(b)) {
-    if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i++) {
-      if (!walk.deepEqual(a[i], b[i])) return false;
-    }
-    return true;
-  }
-
-  if (typeof a === 'object' && typeof b === 'object') {
-    const keysA = Object.keys(a);
-    const keysB = Object.keys(b);
-    if (keysA.length !== keysB.length) return false;
-    for (const key of keysA) {
-      if (!keysB.includes(key) || !walk.deepEqual(a[key], b[key])) return false;
-    }
-    return true;
-  }
-
-  return false;
-}
-
-
-
-findIndexInChildren(grandParent, targetNode) {
-  const walk = new Walker();
-
-  const isObject = (value) => value && typeof value === 'object';
-
-
-  if (grandParent.children) {
-    if (Array.isArray(grandParent.children)) {
-      // Iterate over the array of arrays
-      for (let i = 0; i < grandParent.children.length; i++) {
-        const childArray = grandParent.children[i];
-        if (Array.isArray(childArray)) {
-          for (let j = 0; j < childArray.length; j++) {
-            const child = childArray[j];
-
-      const startMatch = isObject(child.start) ? walk.deepEqual(child.start, walk.targetNode.start) : child.start === targetNode.start;
-      const endMatch = isObject(child.end) ? walk.deepEqual(child.end, walk.targetNode.end) : child.end === targetNode.end;      
-
-            if (
-              startMatch
-              && endMatch
-              && child.type === targetNode.type
-              && child.name === targetNode.name
-              && walk.deepEqual(child.attributes, targetNode.attributes)
-              && walk.deepEqual(child.children, targetNode.children)
-            ) {
-              //return [i, j]; // Return the indices of the child node
-              return j; // return index only
-            }
-          }
-        }
-      }
-    } else {
-      // Iterate over the object
-      for (const key in grandParent.children) {
-        if (Object.hasOwnProperty.call(grandParent.children, key)) {
-          const childArray = grandParent.children[key];
-          if (Array.isArray(childArray)) {
-            for (let j = 0; j < childArray.length; j++) {
-              const child = childArray[j];
-              if (
-                child.start === targetNode.start &&
-                child.end === targetNode.end &&
-                child.type === targetNode.type &&
-                child.name === targetNode.name &&
-                walk.deepEqual(child.attributes, targetNode.attributes) &&
-                walk.deepEqual(child.children, targetNode.children)
-              ) {
-                //return [key, j]; // Return the key and index of the child node
-                return j; // return index only
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  return -1; // Return -1 if the targetNode is not found
-}
-
-
-traverseForTypeAndName(node, nodeType, nodeName, nodeNameChecker) {
-    const results = [];
-
-    const walkRecursive = (currentNode) => {
-      if (Array.isArray(currentNode)) {
-        currentNode.forEach(item => walkRecursive(item));
-      } else if (typeof currentNode === 'object' && currentNode !== null) {
-        if (currentNode.type === nodeType && nodeNameChecker(currentNode, nodeName)) {
-          results.push(currentNode);
-        }
-        for (const key in currentNode) {
-          if (Object.prototype.hasOwnProperty.call(currentNode, key)) {
-            walkRecursive(currentNode[key]);
-          }
-        }
-      }
-    };
-
-    walkRecursive(node);
-    return results;
-  }
-
-}
 
 
 
@@ -1177,10 +440,14 @@ class Transpiler extends NodeVisitor {
 
   transformReactive(block) {
 
+    //const walk = new Walker();
+
     const identifier=block.identifier; 
         //console.log("REACTIVE");
      // Generate unique ID and placeholder span node
     const targetNode=block.activeNode;
+    //console.log(JSON.stringify(block,null,2));
+
     const parentNode = block.parentNode;
     const parentNodeIndex = block.parentNodeIndex
 
@@ -1303,6 +570,67 @@ class Transpiler extends NodeVisitor {
           const targetJsNode = walk.traverseForTypeAndName(this.jsAST, nodeType, nodeName, nodeNameChecker);
 
 
+         /* transform inline event handlers to event lister js code */
+       
+
+
+          
+            let eventHandlerNode;
+            let enodeType = 'EventHandler';
+            let ereturnType = { path:'name' };
+            let ematchLogic = walk.createMatchLogic(enodeType);
+            eventHandlerNode = walk.deepWalker(block.parentNode, enodeType, ematchLogic, ereturnType);
+
+
+            //console.log("FIRST",JSON.stringify(eventHandlerNode,null,2));
+
+            // Now we need to get event handler function 
+
+            let eventFunctionNode;
+            let fnodeType = 'MustacheAttribute';
+            let freturnType = { path:'name.name' };
+            let fmatchLogic = walk.createMatchLogic(fnodeType);
+            eventFunctionNode = walk.deepWalker(block.parentNode, fnodeType, fmatchLogic, freturnType);
+
+            //console.log("SECOND",JSON.stringify(eventFunctionNode,null,2));
+
+            let eventListenerCode; 
+
+
+            if (eventHandlerNode && eventFunctionNode) {
+
+             // console.log("Calling it ...");
+             // console.log(JSON.stringify(block.parentNode,null,2));
+
+              const eventName = eventHandlerNode[0].value; // e.g. onclick
+              const eventFunction = eventFunctionNode[0].value; // e.g. incrementer()
+
+              //console.log("THERE",eventFunction);
+
+
+            const eventListenerCodeBuilder = new EventHandlerProcessor(block.parentNode, eventName, eventFunction, "MustacheAttribute", this.customSyntaxAST);
+            eventListenerCode = eventListenerCodeBuilder.process();
+
+
+            }
+
+            console.log("ELC",JSON.stringify(this.customSyntaxAST,null,2));
+
+
+
+
+
+
+           // let eventHandlerNode; 
+           // const nodeType='Element';
+           // const matchLogic = createMatchLogic(nodeType);
+
+
+
+
+
+        /* END OF TRANSFORM inline event handlers to event listern js code */
+
 
 
             // Create function
@@ -1314,6 +642,7 @@ class Transpiler extends NodeVisitor {
               }
               // ${uppercaseIdentifier} rendering
               
+              ${eventListenerCode}
 
               //${reRenderFunctionName}()`;
 
@@ -1340,7 +669,7 @@ class Transpiler extends NodeVisitor {
 
 
    _jsAstGenerator (jsCode) {
-      return parse(jsCode, { ecmaVersion: 2023});
+      return parse(jsCode, { ecmaVersion: 'latest'});
    }
 
 
