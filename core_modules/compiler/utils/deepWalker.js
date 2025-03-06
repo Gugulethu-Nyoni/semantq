@@ -1,6 +1,7 @@
 "use strict";
 
 export default class Walker  {
+    
 constructor (ast, targetNode) {
 }
 
