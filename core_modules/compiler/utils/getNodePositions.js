@@ -108,7 +108,7 @@ walk() {
     let visitedNodes = new Set();
 
     const processNode = (node) => {
-      if (node && (node.type === 'Element' || node.type === 'Text' || node.type === 'MustacheIdentifier')) {
+      if (node && (node.type === 'Element' || node.type === 'Text' || node.type === 'MustacheIdentifier' || node.type === 'Attribute')) {
         const nodeKey = `${node.type}-${node.start}-${node.end}`;
         if (!visitedNodes.has(nodeKey)) {
           visitedNodes.add(nodeKey);
