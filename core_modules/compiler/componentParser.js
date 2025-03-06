@@ -83,6 +83,11 @@ function cleanJSAST(node) {
         node.value.params = [];
     }
 
+    // Handle null params in FunctionDeclaration
+    if (node.type === 'FunctionDeclaration' && node.params === null) {
+        node.params = [];
+    }
+
     // Recursively clean child nodes
     for (const key in node) {
         if (node.hasOwnProperty(key)) {
@@ -98,6 +103,7 @@ function cleanJSAST(node) {
 
     return node;
 }
+
 
 
 jsAST = cleanJSAST(jsAST);
