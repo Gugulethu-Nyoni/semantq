@@ -56,7 +56,7 @@ For a detailed syntax guide, check out the [Semantq Syntax Guide](docs/Semantq-S
 
 For a detailed slot composition guide, see: [Semantq Slot Composition Guide](docs/Semantq-slots.md).
 
-For Semantq Layouts Guuide: [Semantq CLI Guide](docs/Semantq-Layouts.md).
+For Semantq Layouts Guide: [Semantq Layouts Guide](docs/Semantq-Layouts.md).
 
 For Semantq CLI commands see this guide: [Semantq CLI Guide](docs/Semantq-cli.md).
 For Semantq's full stack's Model-Service-Controller-Routes (MSCR) architecture CLI commands please see: [Semantq MSCR CLI Guide](docs/mscr.md).
