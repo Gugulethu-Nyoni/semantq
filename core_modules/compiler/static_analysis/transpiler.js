@@ -1,4 +1,14 @@
-export default class Transpiler  NodeVisitor {
+import escodegen from 'escodegen';
+import { parse } from 'acorn';
+import customHtmlParser from '../customHtmlParser.js';
+import fs from 'fs-extra';
+//import fs from 'fs';
+import path from 'path';
+import Walker from './deeperWalker.js';
+
+
+export default class Transpiler {
+
   constructor(identifiersInFunctions,customSyntaxAST, jsAST, activeBlock,nodeStatus) {
     this.identifiersinFunctionsObject = identifiersInFunctions;
     this.customSyntaxAST = customSyntaxAST;
@@ -9,10 +19,6 @@ export default class Transpiler  NodeVisitor {
     this.reactiveHandledIdentifiersFuncs = [];
     this.nodeStatus = nodeStatus;
     this.transpile();
-
-    
-
-
 
   }
 
@@ -34,7 +40,7 @@ export default class Transpiler  NodeVisitor {
    transformStatic(block) {
     const identifier=block.identifier; 
 
-    console.log("STATIC",block);
+    //console.log("STATIC",block);
 
     const targetNode=block.activeNode;
     const parentNode = block.parentNode;
@@ -242,7 +248,6 @@ export default class Transpiler  NodeVisitor {
               }
               // ${uppercaseIdentifier} rendering
               
-              ${eventListenerCode}
 
               //${reRenderFunctionName}()`;
 
