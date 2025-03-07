@@ -25,7 +25,7 @@ By default, all components and pages in Semantq rely on the `index.html` file fo
 - **`+layout.smq`**: A layout file that defines the structure for a route or group of routes.
 - **Layout Inheritance**: Layouts can be inherited from parent directories, allowing you to define a base layout for a group of routes.
 - **Override Behavior**: You can override the default layout or a base layout by defining a `+layout.smq` file in a specific route.
-- **Optional Sections**: The `@head`, `@body`, and `@footer` sections are optional. You can include only the sections you need.
+- **Optional Sections**: The `@script`, `@head`, `@body`, and `@footer` sections are optional. You can include only the sections you need.
 
 ---
 
@@ -143,11 +143,15 @@ import Footer from '$global/Footer';
 @end
 ```
 
-### **Example 2: Custom Layout for Dashboard Route**
+### **Example 2: Custom Layout for Bootstrap Dashboard Route**
 Create a `+layout.smq` file in the `dashboard` directory:
 ```smq
 @head
-<link rel="stylesheet" href="/public/dashboard.css" />
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
 @end
 
 @body
@@ -178,7 +182,7 @@ Create a `+layout.smq` file in the `dashboard` directory:
    When overriding a base layout, test the specific route to ensure the custom layout works as expected.
 
 6. **Layout Sections Are Optional**:  
-   Only include the section(s) (`@head`, `@body`, `@footer`) that are necessary for your layout. All of these are optional. Only use what you need. 
+   Only include the section(s) (`@script`,`@head`, `@body`, `@footer`) that are necessary for your layout. All of these are optional. Only use what you need. 
 
 ---
 
