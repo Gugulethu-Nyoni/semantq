@@ -267,6 +267,3 @@ Slots in Semantq provide a powerful way to compose components and build flexible
 
 For more details, check out the [Semantq documentation](https://github.com/Gugulethu-Nyoni/semantq) or explore the.
 
----
-
-This documentation is now ready to be published on GitHub or shared with your team. Let me know if you need further refinements!
