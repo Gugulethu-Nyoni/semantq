@@ -41,17 +41,19 @@ this.process();
 
                 const getNodeLocations = new GetNodePositions(this.customAST, attr.node);
                 const nodeLocations = getNodeLocations.init();
+                const parentNode = nodeLocations[0].parentNode;
+                const parentNodeandIndex=nodeLocations[0]; 
 
-                console.log(nodeLocations);
-
-
-
-
-           // const eventListenerCodeBuilder = new EventHandlerProcessor(attr.node, eventName, eventFunctionName, pathValue, this.customAST);
-           // eventListenerCode = eventListenerCodeBuilder.process();
+                //console.log(parentNode);
 
 
-            //console.log(eventListenerCode);
+
+
+        const eventListenerCodeBuilder = new EventHandlerProcessor(attr.node, eventName, eventFunctionName, pathValue, parentNodeandIndex);
+        const eventListenerCode = eventListenerCodeBuilder.process();
+
+
+            console.log(eventListenerCode);
 
 
 
