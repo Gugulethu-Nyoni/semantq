@@ -25,6 +25,7 @@ By default, all components and pages in Semantq rely on the `index.html` file fo
 - **`+layout.smq`**: A layout file that defines the structure for a route or group of routes.
 - **Layout Inheritance**: Layouts can be inherited from parent directories, allowing you to define a base layout for a group of routes.
 - **Override Behavior**: You can override the default layout or a base layout by defining a `+layout.smq` file in a specific route.
+- **Optional Sections**: The `@head`, `@body`, and `@footer` sections are optional. You can include only the sections you need.
 
 ---
 
@@ -40,42 +41,49 @@ To create a custom layout, add a `+layout.smq` file in the desired route or base
 
 ## **3. Layout File Structure**
 
-The `+layout.smq` file follows a specific structure with four main sections:
+The `+layout.smq` file follows a specific structure with four main sections. All sections (`@script`, `@head`, `@body`, `@footer`) are **optional**, and you can include only the sections you need.
 
 ### **Sections**
 1. **`@script`**: Include JavaScript for importing necessary components.  
-   **Note**: JavaScript included here is not bundled with the final app. It is only used during the layout-building workflow.
+   **Note**: JavaScript included here is not bundled with the final app. It is only used during the layout-building workflow.  
+   You can import local components using the `$global` alias or relative paths.
    ```smq
    @script
-   // Import necessary components or libraries
-   import { ComponentA, ComponentB } from './components';
+   import TopBar from '$global/TopBar';
+   import SideBar from '$global/SideBar';
+   import MainContent from '$global/MainContent';
+   import Footer from '$global/Footer';
    @end
    ```
 
 2. **`@head`**: Include CSS links and script tags for your layout.  
-   **Example**: Add Bootstrap CSS and JS CDN links.
+   **Example**: Add local CSS files or CDN links.
    ```smq
    @head
-   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+   <link rel="stylesheet" href="/public/admin.css" />
+   <link rel="stylesheet" href="https://unpkg.com/anygridcss@1.0.1/anyGrid.css" />
    @end
    ```
 
 3. **`@body`**: Define the HTML structure for the body of the page.  
-   **Note**: Semantq works with `<div id="app"></div>` as the main app container. You can override this, but you must maintain the `id="app"` attribute.
+   **Note**: Semantq works with `<div id="app"></div>` as the main app container. You can override this, but you must maintain the `id="app"` attribute.  
+   You can use imported components in the body section.
    ```smq
    @body
-   <div id="app">
-     <header>Custom Header</header>
-     <main>Main Content</main>
-   </div>
+   <TopBar />
+   <SideBar />
+   <MainContent>
+     <!-- Main content goes here -->
+   </MainContent>
+   <Footer />
    @end
    ```
 
-4. **`@footer`**: Include HTML that goes into the footer of the page.
+4. **`@footer`**: Include HTML or scripts that go into the footer of the page.  
+   **Example**: Add a local JavaScript file.
    ```smq
    @footer
-   <footer>Custom Footer</footer>
+   <script src="/public/admin.js" type="module"></script>
    @end
    ```
 
@@ -109,20 +117,29 @@ src/
 ### **Example 1: Base Layout for Admin Routes**
 Create a `+layout.smq` file in the `admin` directory:
 ```smq
+@script
+import TopBar from '$global/TopBar';
+import SideBar from '$global/SideBar';
+import MainContent from '$global/MainContent';
+import Footer from '$global/Footer';
+@end
+
 @head
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="/public/admin.css" />
+<link rel="stylesheet" href="https://unpkg.com/anygridcss@1.0.1/anyGrid.css" />
 @end
 
 @body
-<div id="app">
-  <header>Admin Portal</header>
-  <main>Main Content</main>
-</div>
+<TopBar />
+<SideBar />
+<MainContent>
+  <!-- Main content goes here -->
+</MainContent>
+<Footer />
 @end
 
 @footer
-<footer>Admin Footer</footer>
+<script src="/public/admin.js" type="module"></script>
 @end
 ```
 
@@ -130,8 +147,7 @@ Create a `+layout.smq` file in the `admin` directory:
 Create a `+layout.smq` file in the `dashboard` directory:
 ```smq
 @head
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="/public/dashboard.css" />
 @end
 
 @body
@@ -140,24 +156,20 @@ Create a `+layout.smq` file in the `dashboard` directory:
   <main>Dashboard Content</main>
 </div>
 @end
-
-@footer
-<footer>Dashboard Footer</footer>
-@end
 ```
 
 ---
 
 ## **6. Best Practices**
 
-1. **Maintain the `id="app"` Container**:  
-   Always include a `<div id="app"></div>` in the `@body` section to ensure compatibility with Semantq's rendering system.
+1. **Maintain the `id="app"` Container (Optional)**:  
+   If you want to have fine grained control over Semantq's default app container you must include a `<div id="app"></div>` in the `@body` section of your +layout.file.
 
 2. **Use CDN Resources Wisely**:  
-   When using CDN resources (e.g., Bootstrap), ensure they are loaded in the `@head` section.
+   When using CDN css and js resources (e.g., Bootstrap), ensure they are loaded in the `@head` section.
 
 3. **Avoid App-Specific JavaScript in Layouts**:  
-   JavaScript included in the `@script` section is not bundled with the final app. Use it only for layout-specific workflows.
+   JavaScript included in the `@script` section is not bundled with the final app. Use it only for layout-specific workflows. 
 
 4. **Leverage Layout Inheritance**:  
    Define base layouts for groups of routes to avoid duplication and ensure consistency.
@@ -165,14 +177,13 @@ Create a `+layout.smq` file in the `dashboard` directory:
 5. **Test Layout Overrides**:  
    When overriding a base layout, test the specific route to ensure the custom layout works as expected.
 
+6. **Layout Sections Are Optional**:  
+   Only include the section(s) (`@head`, `@body`, `@footer`) that are necessary for your layout. All of these are optional. Only use what you need. 
+
 ---
 
 ## **Conclusion**
 
 Layouts in Semantq provide a powerful way to customize the structure of your pages and components. By using `+layout.smq` files, you can define base layouts for groups of routes or create custom layouts for specific routes. This flexibility allows you to build complex applications while maintaining a clean and organized codebase.
 
-For more information, refer to the [Semantq JS Framework Documentation](#).
-
----
-
-Feel free to customize this documentation further to match your framework's branding and style. Let me know if you need additional sections or examples! 🚀
+For more information, refer to the [Semantq JS Framework Documentation](https://github.com/Gugulethu-Nyoni/semantq).
