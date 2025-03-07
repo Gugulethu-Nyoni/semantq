@@ -1,4 +1,7 @@
 import EventHandlerProcessor from './transformEventHandlers.js';
+import GetNodePositions from '../utils/GetNodePositions.js';
+import Walker from './deeperWalker.js';
+
 
 
 export default class ProcessEventHandlers {       
@@ -13,56 +16,42 @@ this.process();
 
 
          process () {
+
+            //console.log(this.customAST, this.jsAST)
+
+            const walk = new Walker();
+
+
           
-            let eventHandlerNode;
-            let enodeType = 'EventHandler';
-            let ereturnType = { path:'name' };
-            //let ereturnType = { path: 'value[0].name.name' };
-            //let pathValue = this.eventFunction;
-            let ematchLogic = walk.createMatchLogic(enodeType);
-            eventHandlerNode = walk.deepWalker(block.parentNode, enodeType, ematchLogic, ereturnType);
+            let eventHandlers;
+            let nodeType = 'Attribute';
+            let returnType = { path:'value[0].type' };
+            let pathValue = 'MustacheAttribute';
+            let matchLogic = walk.createMatchLogic(nodeType);
+            eventHandlers = walk.deepWalker(this.customAST, nodeType, matchLogic, returnType,pathValue);
+
+            //console.log(JSON.stringify(eventHandlers,null,2));
+
+            eventHandlers.forEach(attr => {
+
+                const eventName = attr.node.name.name;
+                const eventFunctionName = attr.node.value[0].name.name;
 
 
-            //console.log("BLOCK",JSON.stringify(block.parentNode,null,2));
 
-            // Now we need to get event handler function 
-
-            let eventFunctionNode;
-            let fnodeType = 'MustacheAttribute';
-            let freturnType = { path:'name.name' };
-            let fmatchLogic = walk.createMatchLogic(fnodeType);
-            eventFunctionNode = walk.deepWalker(block.parentNode, fnodeType, fmatchLogic, freturnType);
-
-            //console.log("SECOND",JSON.stringify(eventFunctionNode,null,2));
-
-            let eventListenerCode =''; 
-
-
-            //console.log(identifier,JSON.stringify(eventHandlerNode,null,2));
-
-
-            if (eventHandlerNode.length > 0 && eventFunctionNode.length > 0) {
-
-             //console.log("Calling it ...",);
-             //console.log("SEE",JSON.stringify(eventFunctionNode,null,2));
-
-              const eventName = eventHandlerNode[0].value; // e.g. onclick
-              const eventFunction = eventFunctionNode[0].value; // e.g. incrementer()
-
-              //console.log("THERE",eventFunction);
-
-
-              //console.log("SEE",JSON.stringify(eventFunction,null,2));
-
-
-            const eventListenerCodeBuilder = new EventHandlerProcessor(block.parentNode, eventName, eventFunction, "MustacheAttribute", this.customSyntaxAST);
+            const eventListenerCodeBuilder = new EventHandlerProcessor(attr.node, eventName, eventFunctionName, pathValue, this.customAST);
             eventListenerCode = eventListenerCodeBuilder.process();
 
 
-            }
+            console.log(eventListenerCode);
 
-           //console.log("ELC",JSON.stringify(eventListenerCode,null,2));
 
+
+
+            }); 
+
+            
+            
 }
 
 
