@@ -935,6 +935,18 @@ const layoutBlocks = {
     }
 
   
+// Utility function to load scripts and ensure they execute
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+
 function updateHead(headerHTML) {
   const head = document.head;
 
@@ -953,7 +965,20 @@ function updateHead(headerHTML) {
   // Clone and append the template content
   const newElements = template.content.cloneNode(true);
   head.appendChild(newElements);
+
+
+   // Load scripts in the header
+    const scripts = template.content.querySelectorAll('script');
+    scripts.forEach(script => {
+      if (script.src) {
+        loadScript(script.src)
+          .then(() => console.log('Loaded script'))
+          .catch(err => console.error('Failed to load script', err));
+      }
+    });
 }
+
+
 
 function updateBody(bodyHTML) {
   const body = document.body;
