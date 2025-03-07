@@ -14,9 +14,8 @@ import Walker from './deeperWalker.js';
 
 // Event Handler Class Definitions
 class MustacheAttribute {
-  constructor(node, eventName, eventFunction, parentNode) {
+  constructor(node, eventName, eventFunction) {
     this.node = node;
-    this.customAST = parentNode;
     this.eventName = eventName;
     //console.log("EVENTNAME",this.eventName);
     this.eventFunction = eventFunction;
@@ -29,15 +28,13 @@ class MustacheAttribute {
 
   transform() {
 
-   // console.log(this.customAST);
-
 // get the element id
 const walk = new Walker();
 
 let nodeType = 'Attribute';
 let nodeName = 'id';
 let returnType = { path:'value[0].raw' };
-let elementAttributes=this.customAST.attributes[0];
+let elementAttributes=this.node.attributes[0];
 //console.log("ATTR",elementAttributes);
 let matchLogic = walk.createMatchLogic(nodeType,nodeName);
 const parentIdNode = walk.deepWalker(elementAttributes, nodeType, matchLogic, returnType);
@@ -47,7 +44,7 @@ const elementId = parentIdNode[0].node.value[0].raw;
 
 const uniqueId = _generateUniqueElementId();
 const elementVar = `elem_${uniqueId}`; 
-const cleanEventName = 'on'+this.eventName;
+const cleanEventName = this.eventName.slice(2); // Remove "on" prefix
 const cleanEventFunctionName = this.eventFunction.replace('()', ''); // Remove "on" prefix
 
 return `
@@ -87,9 +84,9 @@ class Visitor {
 
 // EventHandlerProcessor (Concrete Visitor)
 export default class EventHandlerProcessor extends Visitor {
-  constructor(node, eventName, eventFunction, eventHandlerType, parentNodeandIndex) {
+  constructor(node, eventName, eventFunction, eventHandlerType, customAST) {
     super();
-    this.customAST = parentNodeandIndex.parentNode; 
+    this.customAST = customAST; 
     this.node = node;
     this.eventName = eventName;
     this.eventFunction = eventFunction;
@@ -101,7 +98,7 @@ export default class EventHandlerProcessor extends Visitor {
     let nodeType = 'Attribute';
     let nodeName = 'id';
     let returnType = { path: 'name' };
-    let elementAttributes = this.customAST.attributes[0];
+    let elementAttributes = this.node.attributes[0];
   
     let matchLogic = walk.createMatchLogic(nodeType, nodeName);
     let parentIdNode = walk.deepWalker(elementAttributes, nodeType, matchLogic, returnType);
@@ -117,15 +114,12 @@ export default class EventHandlerProcessor extends Visitor {
     // Get the appropriate event handler class
     const HandlerClass = EVENT_HANDLER_MAP[this.eventHandlerType];
     if (HandlerClass) {
-      const handlerInstance = new HandlerClass(this.node, this.eventName, this.eventFunction,this.customAST);
+      const handlerInstance = new HandlerClass(this.node, this.eventName, this.eventFunction);
       //console.log("Generated Event Code:", handlerInstance.eventListenerCode);
 
       /* HERE YOU CAN REMOVE THE EVENT HANDLER */
 
-        walk.findEventHandlerAndRemove(this.customAST, this.eventFunction);
 
-
-/*
       let enodeType = 'Attribute';
       let ereturnType = { path: 'value[0].name.name' };
       let pathValue = this.eventFunction;
@@ -150,7 +144,7 @@ export default class EventHandlerProcessor extends Visitor {
 
       }
 
-*/
+
 
 
 
@@ -164,8 +158,7 @@ export default class EventHandlerProcessor extends Visitor {
   }
 
   addIdNode() {
-    const uniqueId = _generateUniqueElementId();
-
+    const uniqueId = _generateUniqueElementId(); 
     const idAttributeNode = {
       start: 150,
       end: 164,
@@ -181,10 +174,8 @@ export default class EventHandlerProcessor extends Visitor {
         }
       ]
     };
-    this.customAST.attributes.unshift(idAttributeNode);
+    this.node.attributes.unshift(idAttributeNode);
   }
-
-
 }
 
 
