@@ -65,6 +65,9 @@ export default class ProcessEventHandlers {
       this.jsAST.body.push(...eventListenerAST.body);
 
       //console.log(this.jsAST);
+      // noe remove the event handler node from the custom ast 
+
+     // walk.findEventHandlerAndRemove(parentNodeandIndex.parentNode, eventFunctionName)
 
 
     });
