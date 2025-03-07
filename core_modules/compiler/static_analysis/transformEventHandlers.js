@@ -24,13 +24,13 @@ class MustacheAttribute {
   transform() {
     const uniqueId = _generateUniqueElementId();
     const elementVar = `elem_${uniqueId}`;
-    const cleanEventName = `on${this.eventName}`;
+    //const cleanEventName = `on${this.eventName}`;
     const cleanEventFunctionName = this.eventFunction.replace('()', '');
 
     return `
       const ${elementVar} = document.getElementById("${this.elementId}");
       if (${elementVar}) {
-        ${elementVar}.addEventListener("${cleanEventName}", ${cleanEventFunctionName});
+        ${elementVar}.addEventListener("${this.eventName}", ${cleanEventFunctionName});
       }
     `;
   }
