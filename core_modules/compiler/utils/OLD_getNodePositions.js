@@ -259,75 +259,6 @@ function childrenChecker(nodeToCheck) {
 }
 
 
-
-
-
-attributesChecker(nodeToCheck) {
-  if (Array.isArray(nodeToCheck)) {
-    for (let i = 0; i < nodeToCheck.length; ++i) {
-      if (this.findAttributes(nodeToCheck[i])) {
-        return nodeToCheck[i];
-      }
-    }
-  } else if (typeof nodeToCheck === 'object' && nodeToCheck !== null) {
-    for (let key in nodeToCheck) {
-      if (this.findAttributes(nodeToCheck[key])) {
-        return nodeToCheck[key];
-      }
-    }
-  } else {
-    return this.findAttributes(nodeToCheck);
-  }
-
-  return false; // No attributes found
-}
-
-
-
-findAttributes(node) {
-  if (node && typeof node === 'object') {
-    if (node.attributes && Array.isArray(node.attributes) && node.attributes.length > 0) {
-      return node.attributes; // Return attributes if found
-    }
-
-    // Recursively search through properties
-    for (const key in node) {
-      if (node.hasOwnProperty(key)) {
-        const result = this.findAttributes(node[key]);
-        if (result) {
-          return result;
-        }
-      }
-    }
-  }
-
-  return false;
-}
-
-
-findIndexInAttributes(parent) {
-  if (!parent.attributes || !Array.isArray(parent.attributes)) {
-    return -1;
-  }
-
-  for (let i = 0; i < parent.attributes.length; i++) {
-    const attr = parent.attributes[i];
-
-    if (
-      attr.start === this.targetNode.start &&
-      attr.end === this.targetNode.end &&
-      attr.type === this.targetNode.type &&
-      this.deepEqual(attr.name, this.targetNode.name) &&
-      this.deepEqual(attr.value, this.targetNode.value)
-    ) {
-      return i; // Return index if found
-    }
-  }
-
-  return -1; // Return -1 if not found
-}
-
-
 /**@nodeStack - careful that parent could be sibling 
  * - because parent is simply the previous node encountered in the traversal
  * - to find the parent we need to get the first node in the stack 
@@ -396,6 +327,5 @@ return nodeLocations;
 
 
 }
-
 
 
