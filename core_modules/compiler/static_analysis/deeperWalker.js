@@ -1,3 +1,6 @@
+import { _generateUniqueElementId } from '../utils/utils.js';
+
+
 export default class Walker  {
 
 traverse(ast, targetNode, eventHandlers=null) {
@@ -124,7 +127,7 @@ deepWalker(ast, nodeType = null, matchLogic, returnType = null, pathValue = null
         if (!node || visited.has(node)) return; // Stop infinite loops
         visited.add(node);
 
-        if (matchLogic(node)) {
+        if (matchLogic(node) && returnType ) {
             if (returnType.path) {
                 //results.push(getValueByPath(node, returnType.path));
                 if (pathValue) {
