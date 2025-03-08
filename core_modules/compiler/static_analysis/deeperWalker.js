@@ -403,6 +403,47 @@ findEventHandlerAndRemove(node, targetValue) {
 
 
 
+ensureIdAttribute(attributes) {
+    const idValue = _generateUniqueElementId(); // Assuming this function exists and generates a unique ID
+
+    // Check if attributes is not an array, initialize it as an empty array
+    if (!Array.isArray(attributes)) {
+        attributes = [];
+    }
+
+    // Check if an 'id' attribute already exists
+    const existingIdAttribute = attributes.find(attr => attr.name === 'id');
+    let idToUse = existingIdAttribute ? existingIdAttribute.value[0].data : idValue;
+
+    if (!existingIdAttribute) {
+        // Create the new 'id' attribute object
+        const idAttribute = {
+            start: 0, // Assuming start at the beginning; adjust as necessary
+            end: 0,   // Assuming end at the beginning; adjust as necessary
+            type: "Attribute",
+            name: "id",
+            value: [
+                {
+                    start: 0, // Adjust based on actual positioning
+                    end: 0,   // Adjust based on actual positioning
+                    type: "Text",
+                    raw: idValue,
+                    data: idValue
+                }
+            ]
+        };
+
+        // Add the 'id' attribute to the top of the attributes array
+        attributes.unshift(idAttribute);
+    }
+
+    // Return both the updated attributes and the id value
+    return {
+        attributes: attributes,
+        id: idToUse
+    };
+}
+
 
 }
 
