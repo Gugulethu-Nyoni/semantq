@@ -752,6 +752,8 @@ export default async function transformASTs(jsAST, cssAST, customSyntaxAST, file
   const layoutContent = fs.readFileSync(layoutFilePath, 'utf-8');
   const layoutAST = JSON.parse(layoutContent);
 
+  //console.log("LAPHA", filePath, layoutAST);
+
 // Extract header, main, and footer blocks from the layout AST
 let layoutAstBlocks = {
   header: null,
@@ -787,9 +789,16 @@ function traverse(node) {
 }
 
 // Start traversal from the root of the layout AST
-const rootNode = layoutAST.customAST.content[0].html.children[0].children[0];
-traverse(rootNode);
+let rootNode;
+//console.log(filePath, layoutAST);
 
+if (layoutAST.customAST) {
+  //console.log("here",layoutAST);
+  rootNode = layoutAST.customAST.content[0].html.children[0].children[0];
+  traverse(rootNode);
+}
+
+//const rootNode = layoutAST.customAST.content[0].html.children[0].children[0];
 //console.log("Extracted Blocks:", layoutAstBlocks);
 
   // Parse each block using customHtmlParser
