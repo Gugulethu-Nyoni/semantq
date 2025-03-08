@@ -65,6 +65,8 @@ class SlotResolver {
 
 
 
+
+
 resolveNamedSlots(filePath) {
   // Step 0: Prepare the parent component AST
   const parentComponentFileName = path.basename(filePath);
@@ -75,57 +77,130 @@ resolveNamedSlots(filePath) {
   const parentComponentAST = this.ast[parentComponentKey];
   const walk = new Walker();
 
-  // Iterate over all components in the registry (in reverse order)
+  // Step 1: Iterate over all components in the registry (in reverse order)
   for (const key of Object.keys(this.componentsRegistry).reverse()) {
     const childComponentKey = key.toLowerCase();
     const childComponentAstBlock = this.ast[childComponentKey];
 
-    // Step 1: Get child component slot elements and their name attribute values
-    const nodeType = 'Element';
-    const nodeName = 'slot';
-    const returnType = { path: 'attributes[0].value[0].raw' };
-    const matchLogic = walk.createMatchLogic(nodeType, nodeName);
+    // Step 2: Get all instances of the component in the parent AST
+    const pnodeType = 'Element';
+    const pnodeName = key;
+    const returnType = { path: 'name' };
+    const pmatchLogic = walk.createMatchLogic(pnodeType, pnodeName);
 
-    const slotNodes = walk.deepWalker(
-      childComponentAstBlock,
-      nodeType,
-      matchLogic,
+    const parentInstances = walk.deepWalker(
+      parentComponentAST,
+      pnodeType,
+      pmatchLogic,
       returnType
     );
 
-    // Step 2: For each slot element, get corresponding elements in the parent
-    slotNodes.forEach(slotBlock => {
+    
+
+    // Step 3: Process each instance of the component in the parent AST
+    parentInstances.forEach(parentInstance => {
+      const parentNode = parentInstance.node;
+
+      console.log("NODE",JSON.stringify(parentNode,null,2));
+
+      // Create a deep copy of the child AST for this instance
+      //const updatedChildAstBlock = JSON.parse(JSON.stringify(childComponentAstBlock));
+
+      // Step 4: Get all named slots in the child component
+      const nodeType = 'Element';
+      const nodeName = 'slot';
+      const returnType = { path: 'attributes[0].value[0].raw' };
+      const matchLogic = walk.createMatchLogic(nodeType, nodeName);
+
+      const slotNodes = walk.deepWalker(
+        childComponentAstBlock,
+        nodeType,
+        matchLogic,
+        returnType
+      );
+
+     this.nameSlotBlocks = {};
+
+
+      // Step 5: For each slot, resolve content from the parent instance
+      slotNodes.forEach(slotBlock => {
+        //const slotName = slotBlock.node.attributes?.find(attr => attr.name === "name")?.value;
+        //console.log(slotBlock.value);
+        const childSlotName = slotBlock.value; // e.g. title
+
+        if (!childSlotName) return; // Skip if the slot doesn't have a name (default slot)
+
+      // Initialize the nameSlotBlocks object if it doesn't exist
+            if (!this.nameSlotBlocks[childSlotName]) {
+              this.nameSlotBlocks[childSlotName] = [];
+            }
+
+            //console.log("HERE",parentNode.children[0]);
+
+            // get parent node (Card) -> target elememts e.g. <h1 slot='title'
+
       const pnodeType = 'Element';
       const preturnType = { path: 'attributes[0].value[0].raw' };
-      const pathValue = slotBlock.value;
+      const pathValue = childSlotName;
       const pmatchLogic = walk.createMatchLogic(pnodeType);
 
-      const parentNodes = walk.deepWalker(
-        parentComponentAST,
+      const parentSlotNodes = walk.deepWalker(
+        parentNode,
         pnodeType,
         pmatchLogic,
         preturnType,
         pathValue
       );
 
-      // Initialize the nameSlotBlocks object if it doesn't exist
-      if (!this.nameSlotBlocks[key]) {
-        this.nameSlotBlocks[slotBlock.value] = [];
-      }
 
-      // Step 3: Set content for each parent node
-      parentNodes.forEach(parentNodeBlock => {
-        let contentToSet;
-        if (parentNodeBlock.node.children && parentNodeBlock.node.children[0]?.length > 0) {
-          contentToSet = parentNodeBlock.node.children[0];
+
+
+
+       let contentToSet;
+
+      parentSlotNodes.forEach(parentSlotNode => {
+
+      //console.log(parentSlotNode.node.children);
+
+
+        if (parentSlotNode.node.children && parentSlotNode.node.children[0]?.length > 0) {
+          contentToSet = parentSlotNode.node.children[0];
+          //contentToSet = { ...parentSlotNode.node.children[0] };
         } else {
           contentToSet = slotBlock.node.children?.[0] || [];
+          //contentToSet = { ...slotBlock.node.children?.[0] } || {};
         }
 
-        this.nameSlotBlocks[slotBlock.value].push(contentToSet);
-     
+        //console.log(childSlotName, contentToSet);
 
-    // Merge all nested arrays under each key
+
+       this.nameSlotBlocks[childSlotName].push(contentToSet);
+
+
+
+
+      })
+
+  
+  
+       
+//console.log(contentToSet);
+// this.nameSlotBlocks[childSlotName].push(contentToSet);
+//return;
+
+      
+
+   
+
+
+// close slotNodes loop
+    });
+
+
+     //console.log(JSON.stringify(this.nameSlotBlocks,null,2));
+
+  
+  // Merge all nested arrays under each key
     let mergedBlocks = {};
     for (const slotKey in this.nameSlotBlocks) {
       if (Object.hasOwnProperty.call(this.nameSlotBlocks, slotKey)) {
@@ -133,7 +208,12 @@ resolveNamedSlots(filePath) {
       }
     }
 
-    // Step 4: Replace the slot element nodes in the child AST
+//console.log(key,JSON.stringify(mergedBlocks,null,2));
+//return 
+
+
+
+// Step 4: Replace the slot element nodes in the child AST
     for (const slotKey in mergedBlocks) {
       const nodeType = 'Element';
       const nodeName = 'slot';
@@ -155,65 +235,44 @@ resolveNamedSlots(filePath) {
 
         if (nodeLocations.length > 0) {
           // Replace the slot element in the child component parent node
-          const parentNode = nodeLocations[0].parentNode;
+          const childMainNode = nodeLocations[0].parentNode;
           const nodeIndex = nodeLocations[0].nodeIndex;
 
-          if (parentNode?.children?.[0]?.[nodeIndex]) {
-            parentNode.children[0][nodeIndex] = mergedBlocks[slotKey];
+          if (childMainNode?.children?.[0]?.[nodeIndex]) {
+            childMainNode.children[0][nodeIndex] = mergedBlocks[slotKey];
           }
         }
       }
     }
 
 
-    // now replace the component node in parent ast  
-    /*
 
-      const pnodeType = 'Element';
-      const pnodeName = key;
-      const returnType = { path: 'name' };
-      const pmatchLogic = walk.createMatchLogic(pnodeType, pnodeName);
-
-      const theParentNodeBlock = walk.deepWalker(
-        parentComponentAST,
-        pnodeType,
-        pmatchLogic,
-        returnType
-      );
-
-      if (theParentNodeBlock.length > 0) {
-        const getParentNodeLocations = new GetNodePositions(parentComponentAST, theParentNodeBlock[0].node);
-        const parentNodeLocations = getParentNodeLocations.init();
-
-        if (parentNodeLocations.length > 0) {
-          // Replace the slot element in the child component parent node
-          const theParentNode = parentNodeLocations[0].parentNode;
-          const theNodeIndex = parentNodeLocations[0].nodeIndex;
-
-          if (theParentNode?.children?.[0]?.[theNodeIndex]) {
-            theParentNode.children[0][theNodeIndex] = childComponentAstBlock;
-          }
-        }
-      }
-
-  */
+//console.log(key,JSON.stringify(childComponentAstBlock,null,2));
+//return 
 
 
 
-/// CLOSE for parentNodes loop
-    });
-// close for child slot nodes loop  
-
-
-    });
-
-// child ast has been fully updated at this point 
-    console.log(JSON.stringify(childComponentAstBlock,null,2));
 
 
 
+// close parentInstances. loop
+
+});
+
+
+
+    // Clean up the resolved child component from the AST registry
+    //delete this.ast[childComponentKey];
   }
+
+  // Final cleanup and file writing
+  //this.removeComponentImports();
+  //this.writeResolvedAstFile();
 }
+
+
+
+
 
 
 /*
