@@ -262,7 +262,6 @@ function childrenChecker(nodeToCheck) {
 
 
 
-
 attributesChecker(nodeToCheck) {
   if (Array.isArray(nodeToCheck)) {
     for (let i = 0; i < nodeToCheck.length; ++i) {
@@ -357,271 +356,308 @@ findIndexInAttributes(parent) {
  */
 
 init() {
-  const nodeStack = this.walk(this.ast);
-  let nodeLocations = [];
 
-  for (let i = 0; i < nodeStack.length; i++) {
-    const nodeToCheck = nodeStack[i];
+//console.log("HERE now",this.ast);
+const nodeStack = this.walk(this.ast);
+//console.log(nodeStack);
+let nodeLocations = [];
+//console.log("NODE STACK"); 
+//console.log(JSON.stringify(nodeStack,null,2));
 
-    // Check in children first
-    let result = this.childrenChecker(nodeToCheck);
-    let existsIndex = result ? this.findIndexInChildren(result) : -1;
+
+for (let i = 0; i < nodeStack.length; i++) {
+  const nodeToCheck = nodeStack[i];
+  const result = this.childrenChecker(nodeToCheck);
+
+  if (result && result.children) {
+    const existsIndex = this.findIndexInChildren(result);
+
 
     if (existsIndex > -1) {
-      nodeLocations.push({
+        nodeLocations.push({
         parentNode: nodeToCheck.node,
         nodeIndex: existsIndex,
       });
-      return nodeLocations; // Return early if found in children
-    }
 
-    // If not found in children, check attributes
-    result = this.attributesChecker(nodeToCheck);
-    existsIndex = result ? this.findIndexInAttributes(result) : -1;
-
-    if (existsIndex > -1) {
-      nodeLocations.push({
-        parentNode: nodeToCheck.node,
-        nodeIndex: existsIndex,
-      });
-      return nodeLocations; // Return early if found in attributes
+      return nodeLocations;
     }
   }
 
-  return nodeLocations; // Return empty array if not found in both
-}
-
-
-
-
-
-
 
 
 }
 
+//console.log("HERE now",nodeLocations);
+
+return nodeLocations; 
+
+}
 
 
-const ast = [ {
-  "html": {
-    "start": 0,
-    "end": 328,
-    "type": "Fragment",
-    "children": [
-      {
-        "start": 0,
-        "end": 328,
-        "type": "Element",
-        "name": "customSyntax",
-        "attributes": null,
-        "children": [
-          [
-            {
-              "start": 15,
-              "end": 312,
-              "type": "Element",
-              "name": "div",
-              "attributes": [
-                {
-                  "start": 20,
-                  "end": 32,
-                  "type": "Attribute",
-                  "name": "class",
-                  "value": [
-                    {
-                      "start": 27,
-                      "end": 31,
-                      "type": "Text",
-                      "raw": "card",
-                      "data": "card"
-                    }
-                  ]
-                }
-              ],
-              "children": [
-                [
+
+}
+
+
+
+const ast = [
+  {
+    "html": {
+      "start": 0,
+      "end": 328,
+      "type": "Fragment",
+      "children": [
+        {
+          "start": 0,
+          "end": 328,
+          "type": "Element",
+          "name": "customSyntax",
+          "attributes": null,
+          "children": [
+            [
+              {
+                "start": 15,
+                "end": 312,
+                "type": "Element",
+                "name": "div",
+                "attributes": [
                   {
-                    "start": 34,
-                    "end": 86,
-                    "type": "Element",
-                    "name": "h2",
-                    "attributes": null,
-                    "children": [
-                      [
-                        null
-                      ]
-                    ]
-                  },
-                  {
-                    "start": 88,
-                    "end": 203,
-                    "type": "Element",
-                    "name": "div",
-                    "attributes": [
+                    "start": 20,
+                    "end": 32,
+                    "type": "Attribute",
+                    "name": "class",
+                    "value": [
                       {
-                        "start": 93,
-                        "end": 108,
-                        "type": "Attribute",
-                        "name": "class",
-                        "value": [
-                          {
-                            "start": 100,
-                            "end": 107,
-                            "type": "Text",
-                            "raw": "content",
-                            "data": "content"
-                          }
-                        ]
+                        "start": 27,
+                        "end": 31,
+                        "type": "Text",
+                        "raw": "card",
+                        "data": "card"
                       }
-                    ],
-                    "children": [
-                      [
-                        {
-                          "start": 110,
-                          "end": 196,
-                          "type": "Element",
-                          "name": "slot",
-                          "attributes": [
-                            {
-                              "start": 116,
-                              "end": 130,
-                              "type": "Attribute",
-                              "name": "name",
-                              "value": [
-                                {
-                                  "start": 122,
-                                  "end": 129,
-                                  "type": "Text",
-                                  "raw": "content",
-                                  "data": "content"
-                                }
-                              ]
-                            }
-                          ],
-                          "children": [
-                            [
-                              {
-                                "start": 132,
-                                "end": 188,
-                                "type": "Element",
-                                "name": "p",
-                                "attributes": null,
-                                "children": [
-                                  [
-                                    {
-                                      "type": "Text",
-                                      "raw": "c No content provided. This is fallback content.",
-                                      "data": "c No content provided. This is fallback content."
-                                    }
-                                  ]
-                                ]
-                              }
-                            ]
-                          ]
-                        }
-                      ]
-                    ]
-                  },
-                  {
-                    "start": 205,
-                    "end": 305,
-                    "type": "Element",
-                    "name": "footer",
-                    "attributes": null,
-                    "children": [
-                      [
-                        {
-                          "start": 214,
-                          "end": 295,
-                          "type": "Element",
-                          "name": "slot",
-                          "attributes": [
-                            {
-                              "start": 220,
-                              "end": 233,
-                              "type": "Attribute",
-                              "name": "name",
-                              "value": [
-                                {
-                                  "start": 226,
-                                  "end": 232,
-                                  "type": "Text",
-                                  "raw": "footer",
-                                  "data": "footer"
-                                }
-                              ]
-                            }
-                          ],
-                          "children": [
-                            [
-                              {
-                                "start": 235,
-                                "end": 287,
-                                "type": "Element",
-                                "name": "p",
-                                "attributes": null,
-                                "children": [
-                                  [
-                                    {
-                                      "type": "Text",
-                                      "raw": "c Default footer: No custom footer provided.",
-                                      "data": "c Default footer: No custom footer provided."
-                                    }
-                                  ]
-                                ]
-                              }
-                            ]
-                          ]
-                        }
-                      ]
                     ]
                   }
+                ],
+                "children": [
+                  [
+                    {
+                      "start": 34,
+                      "end": 86,
+                      "type": "Element",
+                      "name": "h2",
+                      "attributes": null,
+                      "children": [
+                        [
+                          {
+                            "start": 38,
+                            "end": 81,
+                            "type": "Element",
+                            "name": "slot",
+                            "attributes": [
+                              {
+                                "start": 44,
+                                "end": 56,
+                                "type": "Attribute",
+                                "name": "name",
+                                "value": [
+                                  {
+                                    "start": 50,
+                                    "end": 55,
+                                    "type": "Text",
+                                    "raw": "title",
+                                    "data": "title"
+                                  }
+                                ]
+                              }
+                            ],
+                            "children": [
+                              [
+                                {
+                                  "type": "Text",
+                                  "raw": "c Default Title  ",
+                                  "data": "c Default Title  "
+                                }
+                              ]
+                            ]
+                          }
+                        ]
+                      ]
+                    },
+                    {
+                      "start": 88,
+                      "end": 203,
+                      "type": "Element",
+                      "name": "div",
+                      "attributes": [
+                        {
+                          "start": 93,
+                          "end": 108,
+                          "type": "Attribute",
+                          "name": "class",
+                          "value": [
+                            {
+                              "start": 100,
+                              "end": 107,
+                              "type": "Text",
+                              "raw": "content",
+                              "data": "content"
+                            }
+                          ]
+                        }
+                      ],
+                      "children": [
+                        [
+                          {
+                            "start": 110,
+                            "end": 196,
+                            "type": "Element",
+                            "name": "slot",
+                            "attributes": [
+                              {
+                                "start": 116,
+                                "end": 130,
+                                "type": "Attribute",
+                                "name": "name",
+                                "value": [
+                                  {
+                                    "start": 122,
+                                    "end": 129,
+                                    "type": "Text",
+                                    "raw": "content",
+                                    "data": "content"
+                                  }
+                                ]
+                              }
+                            ],
+                            "children": [
+                              [
+                                {
+                                  "start": 132,
+                                  "end": 188,
+                                  "type": "Element",
+                                  "name": "p",
+                                  "attributes": null,
+                                  "children": [
+                                    [
+                                      {
+                                        "type": "Text",
+                                        "raw": "c No content provided. This is fallback content.",
+                                        "data": "c No content provided. This is fallback content."
+                                      }
+                                    ]
+                                  ]
+                                }
+                              ]
+                            ]
+                          }
+                        ]
+                      ]
+                    },
+                    {
+                      "start": 205,
+                      "end": 305,
+                      "type": "Element",
+                      "name": "footer",
+                      "attributes": null,
+                      "children": [
+                        [
+                          {
+                            "start": 214,
+                            "end": 295,
+                            "type": "Element",
+                            "name": "slot",
+                            "attributes": [
+                              {
+                                "start": 220,
+                                "end": 233,
+                                "type": "Attribute",
+                                "name": "name",
+                                "value": [
+                                  {
+                                    "start": 226,
+                                    "end": 232,
+                                    "type": "Text",
+                                    "raw": "footer",
+                                    "data": "footer"
+                                  }
+                                ]
+                              }
+                            ],
+                            "children": [
+                              [
+                                {
+                                  "start": 235,
+                                  "end": 287,
+                                  "type": "Element",
+                                  "name": "p",
+                                  "attributes": null,
+                                  "children": [
+                                    [
+                                      {
+                                        "type": "Text",
+                                        "raw": "c Default footer: No custom footer provided.",
+                                        "data": "c Default footer: No custom footer provided."
+                                      }
+                                    ]
+                                  ]
+                                }
+                              ]
+                            ]
+                          }
+                        ]
+                      ]
+                    }
+                  ]
                 ]
-              ]
-            }
+              }
+            ]
           ]
-        ]
-      }
-    ]
-  }
-}
-];
-
-cons targetNode = {
-  "start": 38,
-  "end": 81,
-  "type": "Element",
-  "name": "slot",
-  "attributes": [
-    {
-      "start": 44,
-      "end": 56,
-      "type": "Attribute",
-      "name": "name",
-      "value": [
-        {
-          "start": 50,
-          "end": 55,
-          "type": "Text",
-          "raw": "title",
-          "data": "title"
         }
       ]
     }
-  ],
-  "children": [
-    [
-      {
-        "type": "Text",
-        "raw": "c Default Title  ",
-        "data": "c Default Title  "
-      }
-    ]
-  ]
-}; 
+  }
+];
 
 
-const getNodeLocations = new GetNodePositions(childComponentAstClone, slotNodeBlock.node);
+
+
+
+
+const targetNode = 
+    {
+      "start": 38,
+      "end": 81,
+      "type": "Element",
+      "name": "slot",
+      "attributes": [
+        {
+          "start": 44,
+          "end": 56,
+          "type": "Attribute",
+          "name": "name",
+          "value": [
+            {
+              "start": 50,
+              "end": 55,
+              "type": "Text",
+              "raw": "title",
+              "data": "title"
+            }
+          ]
+        }
+      ],
+      "children": [
+        [
+          {
+            "type": "Text",
+            "raw": "c Default Title  ",
+            "data": "c Default Title  "
+          }
+        ]
+      ]
+    };
+
+
+
+const getNodeLocations = new GetNodePositions(ast, targetNode);
 const nodeLocations = getNodeLocations.init();
 console.log(nodeLocations);
 
