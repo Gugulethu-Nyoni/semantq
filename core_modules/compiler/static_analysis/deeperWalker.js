@@ -1,6 +1,5 @@
 import { _generateUniqueElementId } from '../utils/utils.js';
 
-
 export default class Walker  {
 
 traverse(ast, targetNode, eventHandlers=null) {
@@ -196,6 +195,45 @@ deepWalker(ast, nodeType = null, matchLogic, returnType = null, pathValue = null
     return results;
 }
 
+
+
+
+findChildren(node) {
+  const _findChildren = (node) => {
+    if (node && typeof node === 'object') {
+      if (node.type === 'Element' && node.children && typeof node.children === 'object' && Object.keys(node.children).length > 0) {
+        // node has a children object which is not empty
+        return node.children;
+      } else if (node.children && typeof node.children === 'object' && Object.keys(node.children).length > 0) {
+        for (let i = 0; i < node.children.length; i++) {
+          _findChildren(node.children[i]);
+        }
+      }
+
+      if (node.type === 'Element' && Array.isArray(node.children) && node.children.length > 0) {
+        // node has a children array which is not empty
+        return node.children;
+      } else if (Array.isArray(node.children) && node.children.length > 0) {
+        for (let i = 0; i < node.children.length; i++) {
+          _findChildren(node.children[i]);
+        }
+      }
+
+      // Recursively search through the properties of the node
+      for (const key in node) {
+        if (node.hasOwnProperty(key)) {
+          const result = _findChildren(node[key]);
+          if (result) {
+            return result;
+          }
+        }
+      }
+    }
+    return false;
+  };
+
+  return _findChildren(node);
+}
 
 
 // 
