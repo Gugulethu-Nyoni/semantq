@@ -483,5 +483,39 @@ ensureIdAttribute(attributes) {
 }
 
 
+findAttributeAndRemove(node, attributeName) {
+  if (!node || typeof node !== "object") return node; // Return the node if it's invalid
+
+  // Predicate to check if the node is the target attribute
+  function predicate(n) {
+    return n?.type === "Attribute" && n?.name === attributeName;
+  }
+
+  // Traverse arrays
+  if (Array.isArray(node)) {
+    for (let i = node.length - 1; i >= 0; i--) {
+      if (predicate(node[i])) {
+        node.splice(i, 1); // Remove the attribute from the array
+      } else {
+        this.findAttributeAndRemove(node[i], attributeName); // Recurse into nested structures
+      }
+    }
+  }
+  // Traverse objects
+  else {
+    Object.keys(node).forEach((key) => {
+      if (predicate(node[key])) {
+        delete node[key]; // Remove the attribute from the object
+      } else {
+        this.findAttributeAndRemove(node[key], attributeName); // Recurse into nested structures
+      }
+    });
+  }
+
+  return node; // Return the modified node
+}
+
+
+
 }
 
