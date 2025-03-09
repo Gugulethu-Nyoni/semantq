@@ -113,6 +113,7 @@ async function readSMQHTMLFiles(directory) {
 
 
             if (fileToRead) {
+              console.log(fileToRead);
               fs.readFile(fileToRead, 'utf8', async (err, data) => {
                 if (err) {
                   console.error('Error reading file:', err);
