@@ -177,19 +177,22 @@ async function main(sourceDir, destDir, destDirBase) {
 
 
 
+
     // Step 3: Transform text nodes
     await transformTextNodes(destDir);
     await transformTextNodes(componentsDest);
 
 
     // Step 4: Resolve imports and slots
-    await importsResolution(componentsDest);
-    await slotsResolution(componentsDest);
+   await importsResolution(componentsDest);
+   await slotsResolution(componentsDest);
 
   /* RESOLVE LAYOUT FIELS HERE */
 
+
     await layoutImportsResolution(destDir);
     await layoutSlotsResolution(destDir);
+
     /* END OF DEALING WITH LAYOUTS */
 
 
@@ -197,14 +200,13 @@ async function main(sourceDir, destDir, destDirBase) {
     await importsResolution(destDir);
     await slotsResolution(destDir);
 
+
     // Step 5: Transform components
     await transformer(destDir);
     await transformer(componentsDest);
 
     // Step 6: Generate routes
     await routesGenerator(sourceDir, destDir);
-
-
 
 
     console.log('\x1b[32mCompilation completed successfully!\x1b[0m');
