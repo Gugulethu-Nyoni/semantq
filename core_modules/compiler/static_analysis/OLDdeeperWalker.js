@@ -101,19 +101,21 @@ walk(ast, targetNodeType) {
 
 
 
-deepWalker(ast, nodeType, matchLogic, returnType = null, pathValue = null) {
+
+
+deepWalker(ast, nodeType = null, matchLogic, returnType = null, pathValue = null) {
     if (!ast) {
         console.log("No AST object provided e.g. deepWalker(ast, nodeType,etc);");
         return;
     }
 
     if (!matchLogic) {
-        console.log("You need to define matchLogic e.g. deepWalker(ast, nodeType, matchLogic);");
+        console.log("You need to define matchLogic e.g. deepWalker(ast, nodeType,matchLogic);");
         return;
     }
 
     if (!nodeType) {
-        console.log('There is no target or return type in your deepWalker request! Please specify target e.g. deepWalker(ast, nodeType, returnType)');
+        console.log('There is no target or return type in your deepWalker request!. Please specify target e.g. deepWalker(ast, nodeType, returnType)');
         return;
     }
 
@@ -124,19 +126,26 @@ deepWalker(ast, nodeType, matchLogic, returnType = null, pathValue = null) {
         if (!node || visited.has(node)) return; // Stop infinite loops
         visited.add(node);
 
-        // Check if node matches the matchLogic criteria
-        if (matchLogic(node)) {
-            if (returnType && returnType.path) {
-                const valueByPath = getValueByPath(node, returnType.path);
+        if (matchLogic(node) && returnType ) {
+            if (returnType.path) {
+                //results.push(getValueByPath(node, returnType.path));
+                if (pathValue) {
 
-                if (pathValue && valueByPath === pathValue) {
-                    results.push({ value: valueByPath, node: node });
-                } else if (!pathValue) {
-                    results.push({ value: valueByPath, node: node });
-                }
-            } else {
-                // No returnType or path defined
-                results.push({ value: node, node: node });
+                    const valueByPath = getValueByPath(node, returnType.path); 
+
+                    if (valueByPath === pathValue ) {
+
+                    results.push({value: getValueByPath(node, returnType.path), node: node});
+
+                    }
+
+
+                } 
+                else  {
+            results.push({value: getValueByPath(node, returnType.path), node: node});
+
+        }
+
             }
         }
 
@@ -148,7 +157,7 @@ deepWalker(ast, nodeType, matchLogic, returnType = null, pathValue = null) {
         }
 
         // Traverse objects
-        if (typeof node === 'object' && node !== null) {
+        if (typeof node === 'object') {
             for (let key in node) {
                 if (node.hasOwnProperty(key)) {
                     _deepWalk(node[key]);
@@ -157,25 +166,30 @@ deepWalker(ast, nodeType, matchLogic, returnType = null, pathValue = null) {
         }
     }
 
-    // Helper function to get value by path (if needed)
     function getValueByPath(obj, path) {
-        const keys = path.split(/\.|\[|\]/).filter(Boolean);
-        let value = obj;
+  // Split the path into keys, handling array indices (e.g., 'value[0].name' -> ['value', '0', 'name'])
+  const keys = path.split(/\.|\[|\]/).filter(Boolean);
 
-        for (const key of keys) {
-            if (value === undefined || value === null) {
-                return undefined; // Path does not exist
-            }
+  let value = obj;
 
-            if (Array.isArray(value) && !isNaN(key)) {
-                value = value[parseInt(key)];
-            } else {
-                value = value[key];
-            }
-        }
-
-        return value;
+  // Traverse the object using the keys
+  for (const key of keys) {
+    if (value === undefined || value === null) {
+      return undefined; // Path does not exist
     }
+
+    // Handle array indices (e.g., '0' in 'value[0]')
+    if (Array.isArray(value) && !isNaN(key)) {
+      value = value[parseInt(key)]; // Convert key to number and access array index
+    } else {
+      value = value[key]; // Access object property
+    }
+  }
+
+  return value; // Return the value at the path
+}
+
+
 
     _deepWalk(ast);
     return results;
