@@ -272,8 +272,6 @@ if (layoutModule) {
             const clone = template.content.cloneNode(true);
             placeholder.appendChild(clone);
 
-            console.log("HTML LOGGED!");
-
             if (resourceId !== undefined) {
                 const scriptElement = document.createElement('script');
                 scriptElement.textContent = `window.resourceId = "${resourceId}";`;
@@ -296,10 +294,10 @@ if (layoutModule) {
             }
 
             const scriptPath = rawRoute.replace('+page.html', `${rawRoute.split('/').slice(-2, -1)[0]}.js`);
-           console.log("ROUTE", scriptPath);
+            console.log("ROUTE", scriptPath);
 
             const module = await import(/* @vite-ignore */ scriptPath);
-            //console.log("Loaded module:", module);
+            console.log("Loaded module:", module);
 
             this.loadedModules[route] = module;
 
@@ -462,7 +460,7 @@ router.calculateIndexFileHash();
 
 document.addEventListener('click', (event) => {
     const targetElement = event.target;
-    if (targetElement.tagName === 'A' && targetElement.getAttribute('href') && !targetElement.getAttribute('href').startsWith('#')) {
+    if (targetElement.tagName === 'A' && targetElement.getAttribute('href')) {
         event.preventDefault();
         router.isHandledByClickEvent = true;
         localStorage.setItem('routeEvent', 'click');
