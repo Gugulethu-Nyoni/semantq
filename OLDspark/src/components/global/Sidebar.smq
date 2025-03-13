@@ -1,0 +1,100 @@
+@style
+
+/* Sidebar styles */
+.sidebar {
+  width: 250px;
+  background: rgba(255, 255, 255, 0.1);
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding-top: 90px;
+  transition: width 0.3s ease; 
+  z-index: 10; /* Ensure the sidebar is on top */
+}
+
+.sidebar-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-menu li {
+  margin: 15px 0;
+}
+
+.sidebar-menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.3s ease;
+}
+
+.sidebar-menu a:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-menu i {
+  font-size: 1.2rem;
+}
+
+/* Hamburger menu styles */
+.sidebar-toggle {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 20;
+}
+
+/* Hide the sidebar by default on mobile */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px; /* Reduce the width to show only icons */
+  }
+
+  .sidebar-menu li {
+    margin: 10px 0; /* Reduce the margin */
+  }
+
+  .sidebar-menu a {
+    padding: 10px; /* Reduce the padding */
+    justify-content: center; /* Center the icons */
+  }
+
+  .sidebar-menu span {
+    display: none; /* Hide the text on mobile */
+  }
+
+  /* Make the sidebar toggle visible on mobile */
+  .sidebar-toggle {
+    display: block;
+  }
+}
+
+
+@end
+
+<aside class="sidebar">
+  <nav class="sidebar-menu">
+    <ul>
+      <li><a href="#"> 🏠 Dashboard</a></li>
+      <li><a href="/admin/users"> 👥 Users</a></li>
+      <li><a href="#"> 📊 Analytics</a></li>
+      <li><a href="#"> ⚙️ Settings</a></li>
+      <li><a href="#"> 📝 Reports</a></li>
+      <li><a href="/admin/purchase"> 📝 Buy </a></li>
+
+    </ul>
+  </nav>
+</aside>
+
+

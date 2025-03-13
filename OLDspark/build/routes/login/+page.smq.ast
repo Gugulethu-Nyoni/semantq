@@ -1,0 +1,635 @@
+{
+  "jsAST": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 486,
+      "body": [
+        {
+          "type": "ImportDeclaration",
+          "start": 1,
+          "end": 40,
+          "specifiers": [
+            {
+              "type": "ImportDefaultSpecifier",
+              "start": 8,
+              "end": 16,
+              "local": {
+                "type": "Identifier",
+                "start": 8,
+                "end": 16,
+                "name": "Formique"
+              }
+            }
+          ],
+          "source": {
+            "type": "Literal",
+            "start": 22,
+            "end": 39,
+            "value": "svelte-formique",
+            "raw": "'svelte-formique'"
+          }
+        },
+        {
+          "type": "VariableDeclaration",
+          "start": 42,
+          "end": 216,
+          "declarations": [
+            {
+              "type": "VariableDeclarator",
+              "start": 48,
+              "end": 215,
+              "id": {
+                "type": "Identifier",
+                "start": 48,
+                "end": 58,
+                "name": "formSchema"
+              },
+              "init": {
+                "type": "ArrayExpression",
+                "start": 61,
+                "end": 215,
+                "elements": [
+                  {
+                    "type": "ArrayExpression",
+                    "start": 63,
+                    "end": 105,
+                    "elements": [
+                      {
+                        "type": "Literal",
+                        "start": 64,
+                        "end": 71,
+                        "value": "email",
+                        "raw": "'email'"
+                      },
+                      {
+                        "type": "Literal",
+                        "start": 72,
+                        "end": 79,
+                        "value": "email",
+                        "raw": "'email'"
+                      },
+                      {
+                        "type": "Literal",
+                        "start": 80,
+                        "end": 87,
+                        "value": "Email",
+                        "raw": "'Email'"
+                      },
+                      {
+                        "type": "ObjectExpression",
+                        "start": 88,
+                        "end": 104,
+                        "properties": [
+                          {
+                            "type": "Property",
+                            "start": 89,
+                            "end": 103,
+                            "method": false,
+                            "shorthand": false,
+                            "computed": false,
+                            "key": {
+                              "type": "Identifier",
+                              "start": 89,
+                              "end": 97,
+                              "name": "required"
+                            },
+                            "value": {
+                              "type": "Literal",
+                              "start": 99,
+                              "end": 103,
+                              "value": true,
+                              "raw": "true"
+                            },
+                            "kind": "init"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ArrayExpression",
+                    "start": 107,
+                    "end": 158,
+                    "elements": [
+                      {
+                        "type": "Literal",
+                        "start": 108,
+                        "end": 118,
+                        "value": "password",
+                        "raw": "'password'"
+                      },
+                      {
+                        "type": "Literal",
+                        "start": 119,
+                        "end": 129,
+                        "value": "password",
+                        "raw": "'password'"
+                      },
+                      {
+                        "type": "Literal",
+                        "start": 130,
+                        "end": 140,
+                        "value": "Password",
+                        "raw": "'Password'"
+                      },
+                      {
+                        "type": "ObjectExpression",
+                        "start": 141,
+                        "end": 157,
+                        "properties": [
+                          {
+                            "type": "Property",
+                            "start": 142,
+                            "end": 156,
+                            "method": false,
+                            "shorthand": false,
+                            "computed": false,
+                            "key": {
+                              "type": "Identifier",
+                              "start": 142,
+                              "end": 150,
+                              "name": "required"
+                            },
+                            "value": {
+                              "type": "Literal",
+                              "start": 152,
+                              "end": 156,
+                              "value": true,
+                              "raw": "true"
+                            },
+                            "kind": "init"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ArrayExpression",
+                    "start": 160,
+                    "end": 213,
+                    "elements": [
+                      {
+                        "type": "Literal",
+                        "start": 161,
+                        "end": 169,
+                        "value": "submit",
+                        "raw": "'submit'"
+                      },
+                      {
+                        "type": "Literal",
+                        "start": 170,
+                        "end": 178,
+                        "value": "submit",
+                        "raw": "'submit'"
+                      },
+                      {
+                        "type": "Literal",
+                        "start": 179,
+                        "end": 186,
+                        "value": "Login",
+                        "raw": "'Login'"
+                      },
+                      {
+                        "type": "ObjectExpression",
+                        "start": 187,
+                        "end": 189,
+                        "properties": []
+                      },
+                      {
+                        "type": "ObjectExpression",
+                        "start": 190,
+                        "end": 212,
+                        "properties": [
+                          {
+                            "type": "Property",
+                            "start": 191,
+                            "end": 211,
+                            "method": false,
+                            "shorthand": false,
+                            "computed": false,
+                            "key": {
+                              "type": "Identifier",
+                              "start": 191,
+                              "end": 196,
+                              "name": "style"
+                            },
+                            "value": {
+                              "type": "Literal",
+                              "start": 198,
+                              "end": 211,
+                              "value": "width: 100%",
+                              "raw": "'width: 100%'"
+                            },
+                            "kind": "init"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "kind": "const"
+        },
+        {
+          "type": "VariableDeclaration",
+          "start": 218,
+          "end": 315,
+          "declarations": [
+            {
+              "type": "VariableDeclarator",
+              "start": 224,
+              "end": 315,
+              "id": {
+                "type": "Identifier",
+                "start": 224,
+                "end": 234,
+                "name": "formParams"
+              },
+              "init": {
+                "type": "ObjectExpression",
+                "start": 237,
+                "end": 315,
+                "properties": [
+                  {
+                    "type": "Property",
+                    "start": 239,
+                    "end": 253,
+                    "method": false,
+                    "shorthand": false,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 239,
+                      "end": 245,
+                      "name": "method"
+                    },
+                    "value": {
+                      "type": "Literal",
+                      "start": 247,
+                      "end": 253,
+                      "value": "POST",
+                      "raw": "\"POST\""
+                    },
+                    "kind": "init"
+                  },
+                  {
+                    "type": "Property",
+                    "start": 255,
+                    "end": 267,
+                    "method": false,
+                    "shorthand": false,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 255,
+                      "end": 257,
+                      "name": "id"
+                    },
+                    "value": {
+                      "type": "Literal",
+                      "start": 259,
+                      "end": 267,
+                      "value": "signup",
+                      "raw": "\"signup\""
+                    },
+                    "kind": "init"
+                  },
+                  {
+                    "type": "Property",
+                    "start": 269,
+                    "end": 312,
+                    "method": false,
+                    "shorthand": false,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 269,
+                      "end": 275,
+                      "name": "action"
+                    },
+                    "value": {
+                      "type": "Literal",
+                      "start": 277,
+                      "end": 312,
+                      "value": "http://localhost:3000/users/login",
+                      "raw": "\"http://localhost:3000/users/login\""
+                    },
+                    "kind": "init"
+                  }
+                ]
+              }
+            }
+          ],
+          "kind": "const"
+        },
+        {
+          "type": "VariableDeclaration",
+          "start": 317,
+          "end": 415,
+          "declarations": [
+            {
+              "type": "VariableDeclarator",
+              "start": 323,
+              "end": 415,
+              "id": {
+                "type": "Identifier",
+                "start": 323,
+                "end": 335,
+                "name": "formSettings"
+              },
+              "init": {
+                "type": "ObjectExpression",
+                "start": 338,
+                "end": 415,
+                "properties": [
+                  {
+                    "type": "Property",
+                    "start": 340,
+                    "end": 358,
+                    "method": false,
+                    "shorthand": false,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 340,
+                      "end": 352,
+                      "name": "submitOnPage"
+                    },
+                    "value": {
+                      "type": "Literal",
+                      "start": 354,
+                      "end": 358,
+                      "value": true,
+                      "raw": "true"
+                    },
+                    "kind": "init"
+                  },
+                  {
+                    "type": "Property",
+                    "start": 360,
+                    "end": 388,
+                    "method": false,
+                    "shorthand": false,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 360,
+                      "end": 382,
+                      "name": "requiredFieldIndicator"
+                    },
+                    "value": {
+                      "type": "Literal",
+                      "start": 384,
+                      "end": 388,
+                      "value": true,
+                      "raw": "true"
+                    },
+                    "kind": "init"
+                  },
+                  {
+                    "type": "Property",
+                    "start": 390,
+                    "end": 413,
+                    "method": false,
+                    "shorthand": false,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 390,
+                      "end": 395,
+                      "name": "theme"
+                    },
+                    "value": {
+                      "type": "Literal",
+                      "start": 397,
+                      "end": 413,
+                      "value": "midnight-blush",
+                      "raw": "\"midnight-blush\""
+                    },
+                    "kind": "init"
+                  }
+                ]
+              }
+            }
+          ],
+          "kind": "const"
+        },
+        {
+          "type": "VariableDeclaration",
+          "start": 417,
+          "end": 481,
+          "declarations": [
+            {
+              "type": "VariableDeclarator",
+              "start": 423,
+              "end": 480,
+              "id": {
+                "type": "Identifier",
+                "start": 423,
+                "end": 427,
+                "name": "form"
+              },
+              "init": {
+                "type": "NewExpression",
+                "start": 430,
+                "end": 480,
+                "callee": {
+                  "type": "Identifier",
+                  "start": 434,
+                  "end": 442,
+                  "name": "Formique"
+                },
+                "arguments": [
+                  {
+                    "type": "Identifier",
+                    "start": 443,
+                    "end": 453,
+                    "name": "formSchema"
+                  },
+                  {
+                    "type": "Identifier",
+                    "start": 455,
+                    "end": 465,
+                    "name": "formParams"
+                  },
+                  {
+                    "type": "Identifier",
+                    "start": 467,
+                    "end": 479,
+                    "name": "formSettings"
+                  }
+                ]
+              }
+            }
+          ],
+          "kind": "const"
+        }
+      ],
+      "sourceType": "module"
+    }
+  },
+  "cssAST": {
+    "type": "CSS",
+    "content": {
+      "raws": {
+        "after": ""
+      },
+      "type": "root",
+      "nodes": [],
+      "source": {
+        "input": {
+          "css": "",
+          "hasBOM": false,
+          "document": "",
+          "file": "/Users/gugulethu/code/semantq/spark/style"
+        },
+        "start": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        },
+        "end": null
+      }
+    }
+  },
+  "customAST": {
+    "type": "HTML",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 245,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 245,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "start": 17,
+                    "end": 229,
+                    "type": "Element",
+                    "name": "div",
+                    "attributes": [
+                      {
+                        "start": 22,
+                        "end": 45,
+                        "type": "Attribute",
+                        "name": "class",
+                        "value": [
+                          {
+                            "start": 29,
+                            "end": 43,
+                            "type": "Text",
+                            "raw": "form-container",
+                            "data": "form-container"
+                          }
+                        ]
+                      },
+                      {
+                        "start": 45,
+                        "end": 128,
+                        "type": "Attribute",
+                        "name": "style",
+                        "value": [
+                          {
+                            "start": 52,
+                            "end": 127,
+                            "type": "Text",
+                            "raw": "display: flex; justify-content: center; flex-direction: column; width: 100%",
+                            "data": "display: flex; justify-content: center; flex-direction: column; width: 100%"
+                          }
+                        ]
+                      }
+                    ],
+                    "children": [
+                      [
+                        {
+                          "start": 131,
+                          "end": 193,
+                          "type": "Element",
+                          "name": "h3",
+                          "attributes": [
+                            {
+                              "start": 135,
+                              "end": 162,
+                              "type": "Attribute",
+                              "name": "style",
+                              "value": [
+                                {
+                                  "start": 142,
+                                  "end": 161,
+                                  "type": "Text",
+                                  "raw": "text-align: center;",
+                                  "data": "text-align: center;"
+                                }
+                              ]
+                            }
+                          ],
+                          "children": [
+                            [
+                              {
+                                "start": 164,
+                                "end": 187,
+                                "type": "Element",
+                                "name": "strong",
+                                "attributes": null,
+                                "children": [
+                                  [
+                                    {
+                                      "type": "Text",
+                                      "raw": "Login ",
+                                      "data": "Login "
+                                    }
+                                  ]
+                                ]
+                              }
+                            ]
+                          ]
+                        },
+                        {
+                          "start": 195,
+                          "end": 221,
+                          "type": "Element",
+                          "name": "div",
+                          "attributes": [
+                            {
+                              "start": 200,
+                              "end": 213,
+                              "type": "Attribute",
+                              "name": "id",
+                              "value": [
+                                {
+                                  "start": 204,
+                                  "end": 212,
+                                  "type": "Text",
+                                  "raw": "formique",
+                                  "data": "formique"
+                                }
+                              ]
+                            }
+                          ],
+                          "children": [
+                            []
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

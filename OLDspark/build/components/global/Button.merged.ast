@@ -1,0 +1,253 @@
+{
+  "jsAST": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 41,
+      "body": [
+        {
+          "type": "ImportDeclaration",
+          "start": 1,
+          "end": 39,
+          "specifiers": [
+            {
+              "type": "ImportDefaultSpecifier",
+              "start": 8,
+              "end": 13,
+              "local": {
+                "type": "Identifier",
+                "start": 8,
+                "end": 13,
+                "name": "Count"
+              }
+            }
+          ],
+          "source": {
+            "type": "Literal",
+            "start": 19,
+            "end": 38,
+            "value": "$global/Count.smq",
+            "raw": "'$global/Count.smq'"
+          }
+        },
+        {
+          "type": "VariableDeclaration",
+          "start": 1,
+          "end": 17,
+          "declarations": [
+            {
+              "type": "VariableDeclarator",
+              "start": 5,
+              "end": 16,
+              "id": {
+                "type": "Identifier",
+                "start": 5,
+                "end": 12,
+                "name": "counter"
+              },
+              "init": {
+                "type": "Literal",
+                "start": 15,
+                "end": 16,
+                "value": 0,
+                "raw": "0"
+              }
+            }
+          ],
+          "kind": "let"
+        },
+        {
+          "type": "FunctionDeclaration",
+          "start": 19,
+          "end": 58,
+          "id": {
+            "type": "Identifier",
+            "start": 28,
+            "end": 39,
+            "name": "incrementer"
+          },
+          "expression": false,
+          "generator": false,
+          "async": false,
+          "params": [],
+          "body": {
+            "type": "BlockStatement",
+            "start": 43,
+            "end": 58,
+            "body": [
+              {
+                "type": "ExpressionStatement",
+                "start": 45,
+                "end": 56,
+                "expression": {
+                  "type": "UpdateExpression",
+                  "start": 45,
+                  "end": 55,
+                  "operator": "++",
+                  "prefix": false,
+                  "argument": {
+                    "type": "Identifier",
+                    "start": 45,
+                    "end": 52,
+                    "name": "counter"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "sourceType": "module"
+    }
+  },
+  "cssAST": {
+    "type": "CSS",
+    "content": {
+      "raws": {
+        "after": "\n\n"
+      },
+      "type": "root",
+      "nodes": [],
+      "source": {
+        "input": {
+          "css": "\n\n",
+          "hasBOM": false,
+          "document": "\n\n",
+          "file": "/Users/gugulethu/code/semantq/spark/style"
+        },
+        "start": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        },
+        "end": {
+          "column": 1,
+          "line": 3,
+          "offset": 2
+        }
+      }
+    }
+  },
+  "button": {
+    "type": "HTML",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 56,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 56,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "start": 15,
+                    "end": 40,
+                    "type": "Element",
+                    "name": "Count",
+                    "attributes": null,
+                    "children": [
+                      [
+                        {
+                          "type": "Text",
+                          "raw": "Click Me\n",
+                          "data": "Click Me\n"
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "count": [
+    {
+      "html": {
+        "start": 0,
+        "end": 85,
+        "type": "Fragment",
+        "children": [
+          {
+            "start": 0,
+            "end": 85,
+            "type": "Element",
+            "name": "customSyntax",
+            "attributes": null,
+            "children": [
+              [
+                {
+                  "start": 15,
+                  "end": 69,
+                  "type": "Element",
+                  "name": "button",
+                  "attributes": [
+                    {
+                      "start": 23,
+                      "end": 43,
+                      "type": "Attribute",
+                      "name": {
+                        "start": 23,
+                        "end": 29,
+                        "type": "EventHandler",
+                        "name": "click",
+                        "modifiers": [],
+                        "expression": {
+                          "type": "CallExpression",
+                          "start": 23,
+                          "end": 29
+                        }
+                      },
+                      "value": [
+                        {
+                          "start": 31,
+                          "end": 42,
+                          "type": "MustacheAttribute",
+                          "name": {
+                            "type": "Identifier",
+                            "start": {
+                              "offset": 31,
+                              "line": 2,
+                              "column": 17
+                            },
+                            "end": {
+                              "offset": 42,
+                              "line": 2,
+                              "column": 28
+                            },
+                            "name": "incrementer"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "children": [
+                    [
+                      {
+                        "start": 45,
+                        "end": 59,
+                        "type": "Element",
+                        "name": "slot",
+                        "attributes": null,
+                        "children": []
+                      }
+                    ]
+                  ]
+                }
+              ]
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+@script
+import Count from '$global/Count.smq';
+
+@end
+
+@style
+
+@end
+
+
+<Count>
+Click Me
+</Count>

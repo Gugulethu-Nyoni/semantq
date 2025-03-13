@@ -1,0 +1,957 @@
+{
+  "jsAST_Maincontent": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 0,
+      "body": [],
+      "sourceType": "module"
+    }
+  },
+  "cssAST_Maincontent": {
+    "type": "CSS",
+    "content": {
+      "raws": {
+        "semicolon": false,
+        "after": "\n"
+      },
+      "type": "root",
+      "nodes": [
+        {
+          "raws": {
+            "before": "\n",
+            "between": " ",
+            "semicolon": true,
+            "after": "\n"
+          },
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": {
+                "before": "\n",
+                "between": ": "
+              },
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": {
+                  "css": "\n.main-content {\nmargin-left: 40px;\nmargin-top: -100px;\npadding: 5px;\ntransition: margin 0.3s ease;\nwidth: 100%;\n}\n\n.content-wrapper {\nmax-width: 1200px;\nmargin: 0 auto;\nwidth: 100%\n}\n\n.stats {\ndisplay: grid;\ngrid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\ngap: 20px;\nmargin-top: 40px;\n}\n\n.stat-card {\nbackground: rgba(255, 255, 255, 0.1);\npadding: 20px;\nborder-radius: 10px;\ntext-align: center;\ntransition: transform 0.3s ease;\n}\n\n.stat-card:hover {\ntransform: translateY(-5px);\n}\n\n.stat-card h3 {\nfont-size: 1.2rem;\nmargin-bottom: 10px;\n}\n\n.stat-card p {\nfont-size: 1.5rem;\nfont-weight: 600;\n}\n",
+                  "hasBOM": false,
+                  "document": "\n.main-content {\nmargin-left: 40px;\nmargin-top: -100px;\npadding: 5px;\ntransition: margin 0.3s ease;\nwidth: 100%;\n}\n\n.content-wrapper {\nmax-width: 1200px;\nmargin: 0 auto;\nwidth: 100%\n}\n\n.stats {\ndisplay: grid;\ngrid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\ngap: 20px;\nmargin-top: 40px;\n}\n\n.stat-card {\nbackground: rgba(255, 255, 255, 0.1);\npadding: 20px;\nborder-radius: 10px;\ntext-align: center;\ntransition: transform 0.3s ease;\n}\n\n.stat-card:hover {\ntransform: translateY(-5px);\n}\n\n.stat-card h3 {\nfont-size: 1.2rem;\nmargin-bottom: 10px;\n}\n\n.stat-card p {\nfont-size: 1.5rem;\nfont-weight: 600;\n}\n",
+                  "file": "/Users/gugulethu/code/semantq/spark/style"
+                },
+                "start": {
+                  "column": 1,
+                  "line": 3,
+                  "offset": 17
+                },
+                "end": {
+                  "column": 18,
+                  "line": 3,
+                  "offset": 35
+                }
+              },
+              "prop": "margin-left",
+              "value": "40px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 4,
+                  "offset": 36
+                },
+                "end": {
+                  "column": 19,
+                  "line": 4,
+                  "offset": 55
+                }
+              },
+              "prop": "margin-top",
+              "value": "-100px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 5,
+                  "offset": 56
+                },
+                "end": {
+                  "column": 13,
+                  "line": 5,
+                  "offset": 69
+                }
+              },
+              "prop": "padding",
+              "value": "5px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 6,
+                  "offset": 70
+                },
+                "end": {
+                  "column": 29,
+                  "line": 6,
+                  "offset": 99
+                }
+              },
+              "prop": "transition",
+              "value": "margin 0.3s ease"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 7,
+                  "offset": 100
+                },
+                "end": {
+                  "column": 12,
+                  "line": 7,
+                  "offset": 112
+                }
+              },
+              "prop": "width",
+              "value": "100%"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 2,
+              "offset": 1
+            },
+            "end": {
+              "column": 1,
+              "line": 8,
+              "offset": 114
+            }
+          },
+          "selector": ".main-content"
+        },
+        {
+          "raws": {
+            "before": "\n\n",
+            "between": " ",
+            "semicolon": false,
+            "after": "\n"
+          },
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 11,
+                  "offset": 135
+                },
+                "end": {
+                  "column": 18,
+                  "line": 11,
+                  "offset": 153
+                }
+              },
+              "prop": "max-width",
+              "value": "1200px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 12,
+                  "offset": 154
+                },
+                "end": {
+                  "column": 15,
+                  "line": 12,
+                  "offset": 169
+                }
+              },
+              "prop": "margin",
+              "value": "0 auto"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 13,
+                  "offset": 170
+                },
+                "end": {
+                  "column": 11,
+                  "line": 13,
+                  "offset": 181
+                }
+              },
+              "prop": "width",
+              "value": "100%"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 10,
+              "offset": 116
+            },
+            "end": {
+              "column": 1,
+              "line": 14,
+              "offset": 183
+            }
+          },
+          "selector": ".content-wrapper"
+        },
+        {
+          "raws": {
+            "before": "\n\n",
+            "between": " ",
+            "semicolon": true,
+            "after": "\n"
+          },
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 17,
+                  "offset": 194
+                },
+                "end": {
+                  "column": 14,
+                  "line": 17,
+                  "offset": 208
+                }
+              },
+              "prop": "display",
+              "value": "grid"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 18,
+                  "offset": 209
+                },
+                "end": {
+                  "column": 60,
+                  "line": 18,
+                  "offset": 269
+                }
+              },
+              "prop": "grid-template-columns",
+              "value": "repeat(auto-fit, minmax(200px, 1fr))"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 19,
+                  "offset": 270
+                },
+                "end": {
+                  "column": 10,
+                  "line": 19,
+                  "offset": 280
+                }
+              },
+              "prop": "gap",
+              "value": "20px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 20,
+                  "offset": 281
+                },
+                "end": {
+                  "column": 17,
+                  "line": 20,
+                  "offset": 298
+                }
+              },
+              "prop": "margin-top",
+              "value": "40px"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 16,
+              "offset": 185
+            },
+            "end": {
+              "column": 1,
+              "line": 21,
+              "offset": 300
+            }
+          },
+          "selector": ".stats"
+        },
+        {
+          "raws": null,
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 24,
+                  "offset": 315
+                },
+                "end": {
+                  "column": 37,
+                  "line": 24,
+                  "offset": 352
+                }
+              },
+              "prop": "background",
+              "value": "rgba(255, 255, 255, 0.1)"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 25,
+                  "offset": 353
+                },
+                "end": {
+                  "column": 14,
+                  "line": 25,
+                  "offset": 367
+                }
+              },
+              "prop": "padding",
+              "value": "20px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 26,
+                  "offset": 368
+                },
+                "end": {
+                  "column": 20,
+                  "line": 26,
+                  "offset": 388
+                }
+              },
+              "prop": "border-radius",
+              "value": "10px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 27,
+                  "offset": 389
+                },
+                "end": {
+                  "column": 19,
+                  "line": 27,
+                  "offset": 408
+                }
+              },
+              "prop": "text-align",
+              "value": "center"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 28,
+                  "offset": 409
+                },
+                "end": {
+                  "column": 32,
+                  "line": 28,
+                  "offset": 441
+                }
+              },
+              "prop": "transition",
+              "value": "transform 0.3s ease"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 23,
+              "offset": 302
+            },
+            "end": {
+              "column": 1,
+              "line": 29,
+              "offset": 443
+            }
+          },
+          "selector": ".stat-card"
+        },
+        {
+          "raws": null,
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 32,
+                  "offset": 464
+                },
+                "end": {
+                  "column": 28,
+                  "line": 32,
+                  "offset": 492
+                }
+              },
+              "prop": "transform",
+              "value": "translateY(-5px)"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 31,
+              "offset": 445
+            },
+            "end": {
+              "column": 1,
+              "line": 33,
+              "offset": 494
+            }
+          },
+          "selector": ".stat-card:hover"
+        },
+        {
+          "raws": null,
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 36,
+                  "offset": 512
+                },
+                "end": {
+                  "column": 18,
+                  "line": 36,
+                  "offset": 530
+                }
+              },
+              "prop": "font-size",
+              "value": "1.2rem"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 37,
+                  "offset": 531
+                },
+                "end": {
+                  "column": 20,
+                  "line": 37,
+                  "offset": 551
+                }
+              },
+              "prop": "margin-bottom",
+              "value": "10px"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 35,
+              "offset": 496
+            },
+            "end": {
+              "column": 1,
+              "line": 38,
+              "offset": 553
+            }
+          },
+          "selector": ".stat-card h3"
+        },
+        {
+          "raws": null,
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 41,
+                  "offset": 570
+                },
+                "end": {
+                  "column": 18,
+                  "line": 41,
+                  "offset": 588
+                }
+              },
+              "prop": "font-size",
+              "value": "1.5rem"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 42,
+                  "offset": 589
+                },
+                "end": {
+                  "column": 17,
+                  "line": 42,
+                  "offset": 606
+                }
+              },
+              "prop": "font-weight",
+              "value": "600"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 40,
+              "offset": 555
+            },
+            "end": {
+              "column": 1,
+              "line": 43,
+              "offset": 608
+            }
+          },
+          "selector": ".stat-card p"
+        }
+      ],
+      "source": {
+        "input": null,
+        "start": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        },
+        "end": {
+          "column": 1,
+          "line": 44,
+          "offset": 609
+        }
+      }
+    }
+  },
+  "maincontent": {
+    "type": "HTML",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 365,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 365,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "start": 15,
+                    "end": 349,
+                    "type": "Element",
+                    "name": "main",
+                    "attributes": [
+                      {
+                        "start": 21,
+                        "end": 41,
+                        "type": "Attribute",
+                        "name": "class",
+                        "value": [
+                          {
+                            "start": 28,
+                            "end": 40,
+                            "type": "Text",
+                            "raw": "main-content",
+                            "data": "main-content"
+                          }
+                        ]
+                      }
+                    ],
+                    "children": [
+                      [
+                        {
+                          "start": 43,
+                          "end": 341,
+                          "type": "Element",
+                          "name": "div",
+                          "attributes": [
+                            {
+                              "start": 48,
+                              "end": 71,
+                              "type": "Attribute",
+                              "name": "class",
+                              "value": [
+                                {
+                                  "start": 55,
+                                  "end": 70,
+                                  "type": "Text",
+                                  "raw": "content-wrapper",
+                                  "data": "content-wrapper"
+                                }
+                              ]
+                            }
+                          ],
+                          "children": [
+                            [
+                              {
+                                "start": 73,
+                                "end": 127,
+                                "type": "Element",
+                                "name": "slot",
+                                "attributes": null,
+                                "children": [
+                                  [
+                                    {
+                                      "start": 80,
+                                      "end": 119,
+                                      "type": "Element",
+                                      "name": "h1",
+                                      "attributes": null,
+                                      "children": [
+                                        [
+                                          {
+                                            "type": "Text",
+                                            "raw": "Welcome to the Admin Dashboard",
+                                            "data": "Welcome to the Admin Dashboard"
+                                          }
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                ]
+                              },
+                              {
+                                "start": 130,
+                                "end": 334,
+                                "type": "Element",
+                                "name": "div",
+                                "attributes": [
+                                  {
+                                    "start": 135,
+                                    "end": 148,
+                                    "type": "Attribute",
+                                    "name": "class",
+                                    "value": [
+                                      {
+                                        "start": 142,
+                                        "end": 147,
+                                        "type": "Text",
+                                        "raw": "stats",
+                                        "data": "stats"
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "children": [
+                                  [
+                                    {
+                                      "start": 150,
+                                      "end": 208,
+                                      "type": "Element",
+                                      "name": "div",
+                                      "attributes": [
+                                        {
+                                          "start": 155,
+                                          "end": 172,
+                                          "type": "Attribute",
+                                          "name": "class",
+                                          "value": [
+                                            {
+                                              "start": 162,
+                                              "end": 171,
+                                              "type": "Text",
+                                              "raw": "stat-card",
+                                              "data": "stat-card"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "start": 174,
+                                            "end": 188,
+                                            "type": "Element",
+                                            "name": "h3",
+                                            "attributes": null,
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Users",
+                                                  "data": "Users"
+                                                }
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "start": 189,
+                                            "end": 201,
+                                            "type": "Element",
+                                            "name": "p",
+                                            "attributes": null,
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "1,234",
+                                                  "data": "1,234"
+                                                }
+                                              ]
+                                            ]
+                                          }
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "start": 209,
+                                      "end": 271,
+                                      "type": "Element",
+                                      "name": "div",
+                                      "attributes": [
+                                        {
+                                          "start": 214,
+                                          "end": 231,
+                                          "type": "Attribute",
+                                          "name": "class",
+                                          "value": [
+                                            {
+                                              "start": 221,
+                                              "end": 230,
+                                              "type": "Text",
+                                              "raw": "stat-card",
+                                              "data": "stat-card"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "start": 233,
+                                            "end": 249,
+                                            "type": "Element",
+                                            "name": "h3",
+                                            "attributes": null,
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Revenue",
+                                                  "data": "Revenue"
+                                                }
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "start": 250,
+                                            "end": 264,
+                                            "type": "Element",
+                                            "name": "p",
+                                            "attributes": null,
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "$12,345",
+                                                  "data": "$12,345"
+                                                }
+                                              ]
+                                            ]
+                                          }
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "start": 272,
+                                      "end": 327,
+                                      "type": "Element",
+                                      "name": "div",
+                                      "attributes": [
+                                        {
+                                          "start": 277,
+                                          "end": 294,
+                                          "type": "Attribute",
+                                          "name": "class",
+                                          "value": [
+                                            {
+                                              "start": 284,
+                                              "end": 293,
+                                              "type": "Text",
+                                              "raw": "stat-card",
+                                              "data": "stat-card"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "start": 296,
+                                            "end": 310,
+                                            "type": "Element",
+                                            "name": "h3",
+                                            "attributes": null,
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Tasks",
+                                                  "data": "Tasks"
+                                                }
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "start": 311,
+                                            "end": 320,
+                                            "type": "Element",
+                                            "name": "p",
+                                            "attributes": null,
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "45",
+                                                  "data": "45"
+                                                }
+                                              ]
+                                            ]
+                                          }
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                ]
+                              }
+                            ]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

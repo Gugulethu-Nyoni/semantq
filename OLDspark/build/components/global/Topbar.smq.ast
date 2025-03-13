@@ -1,0 +1,1424 @@
+{
+  "jsAST_Topbar": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 0,
+      "body": [],
+      "sourceType": "module"
+    }
+  },
+  "cssAST_Topbar": {
+    "type": "CSS",
+    "content": {
+      "raws": {
+        "semicolon": false,
+        "after": "\n"
+      },
+      "type": "root",
+      "nodes": [
+        {
+          "raws": {
+            "before": "\n",
+            "between": " ",
+            "semicolon": true,
+            "after": "\n"
+          },
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": {
+                "before": "\n",
+                "between": ": "
+              },
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": {
+                  "css": "\n.top-bar {\nwidth: 100%;\nbackground: rgba(255, 255, 255, 0.1);\npadding: 15px 20px;\nbox-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);\nposition: fixed;\ntop: 0;\nleft: 0;\nz-index: 1000;\n}\n\n.top-bar-content {\ndisplay: flex;\njustify-content: space-between;\nalign-items: center;\nmax-width: 1200px;\nmargin: 0 auto;\n\n}\n\n.dashboard-title {\nmargin-left: 190px;\nflex-basis: 30%;\nfont-size: 1.5rem;\nfont-weight: 600;\n\nmargin-align: 20px!important;\n\n}\n\n.profile-dropdown {\nposition: relative;\n}\n\n.profile-button {\nbackground: transparent;\nborder: none;\nfont-size: 1rem;\ncursor: pointer;\ndisplay: flex;\nalign-items: center;\ngap: 8px;\n}\n\n.dropdown-menu {\ndisplay: none;\nposition: absolute;\ntop: 100%;\nright: 0;\nbackground: rgba(255, 255, 255, 0.9);\nborder-radius: 8px;\nbox-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);\npadding: 10px;\nmin-width: 150px;\n}\n\n.dropdown-menu a {\ndisplay: block;\npadding: 8px 12px;\ntext-decoration: none;\ncolor: #1a1a1a;\ntransition: background 0.3s ease;\n}\n\n.dropdown-menu a:hover {\nbackground: rgba(0, 0, 0, 0.1);\n}\n\n.profile-dropdown:hover .dropdown-menu {\ndisplay: block;\n}\n",
+                  "hasBOM": false,
+                  "document": "\n.top-bar {\nwidth: 100%;\nbackground: rgba(255, 255, 255, 0.1);\npadding: 15px 20px;\nbox-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);\nposition: fixed;\ntop: 0;\nleft: 0;\nz-index: 1000;\n}\n\n.top-bar-content {\ndisplay: flex;\njustify-content: space-between;\nalign-items: center;\nmax-width: 1200px;\nmargin: 0 auto;\n\n}\n\n.dashboard-title {\nmargin-left: 190px;\nflex-basis: 30%;\nfont-size: 1.5rem;\nfont-weight: 600;\n\nmargin-align: 20px!important;\n\n}\n\n.profile-dropdown {\nposition: relative;\n}\n\n.profile-button {\nbackground: transparent;\nborder: none;\nfont-size: 1rem;\ncursor: pointer;\ndisplay: flex;\nalign-items: center;\ngap: 8px;\n}\n\n.dropdown-menu {\ndisplay: none;\nposition: absolute;\ntop: 100%;\nright: 0;\nbackground: rgba(255, 255, 255, 0.9);\nborder-radius: 8px;\nbox-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);\npadding: 10px;\nmin-width: 150px;\n}\n\n.dropdown-menu a {\ndisplay: block;\npadding: 8px 12px;\ntext-decoration: none;\ncolor: #1a1a1a;\ntransition: background 0.3s ease;\n}\n\n.dropdown-menu a:hover {\nbackground: rgba(0, 0, 0, 0.1);\n}\n\n.profile-dropdown:hover .dropdown-menu {\ndisplay: block;\n}\n",
+                  "file": "/Users/gugulethu/code/semantq/spark/style"
+                },
+                "start": {
+                  "column": 1,
+                  "line": 3,
+                  "offset": 12
+                },
+                "end": {
+                  "column": 12,
+                  "line": 3,
+                  "offset": 24
+                }
+              },
+              "prop": "width",
+              "value": "100%"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 4,
+                  "offset": 25
+                },
+                "end": {
+                  "column": 37,
+                  "line": 4,
+                  "offset": 62
+                }
+              },
+              "prop": "background",
+              "value": "rgba(255, 255, 255, 0.1)"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 5,
+                  "offset": 63
+                },
+                "end": {
+                  "column": 19,
+                  "line": 5,
+                  "offset": 82
+                }
+              },
+              "prop": "padding",
+              "value": "15px 20px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 6,
+                  "offset": 83
+                },
+                "end": {
+                  "column": 42,
+                  "line": 6,
+                  "offset": 125
+                }
+              },
+              "prop": "box-shadow",
+              "value": "0 2px 10px rgba(0, 0, 0, 0.1)"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 7,
+                  "offset": 126
+                },
+                "end": {
+                  "column": 16,
+                  "line": 7,
+                  "offset": 142
+                }
+              },
+              "prop": "position",
+              "value": "fixed"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 8,
+                  "offset": 143
+                },
+                "end": {
+                  "column": 7,
+                  "line": 8,
+                  "offset": 150
+                }
+              },
+              "prop": "top",
+              "value": "0"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 9,
+                  "offset": 151
+                },
+                "end": {
+                  "column": 8,
+                  "line": 9,
+                  "offset": 159
+                }
+              },
+              "prop": "left",
+              "value": "0"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 10,
+                  "offset": 160
+                },
+                "end": {
+                  "column": 14,
+                  "line": 10,
+                  "offset": 174
+                }
+              },
+              "prop": "z-index",
+              "value": "1000"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 2,
+              "offset": 1
+            },
+            "end": {
+              "column": 1,
+              "line": 11,
+              "offset": 176
+            }
+          },
+          "selector": ".top-bar"
+        },
+        {
+          "raws": {
+            "before": "\n\n",
+            "between": " ",
+            "semicolon": true,
+            "after": "\n\n"
+          },
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 14,
+                  "offset": 197
+                },
+                "end": {
+                  "column": 14,
+                  "line": 14,
+                  "offset": 211
+                }
+              },
+              "prop": "display",
+              "value": "flex"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 15,
+                  "offset": 212
+                },
+                "end": {
+                  "column": 31,
+                  "line": 15,
+                  "offset": 243
+                }
+              },
+              "prop": "justify-content",
+              "value": "space-between"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 16,
+                  "offset": 244
+                },
+                "end": {
+                  "column": 20,
+                  "line": 16,
+                  "offset": 264
+                }
+              },
+              "prop": "align-items",
+              "value": "center"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 17,
+                  "offset": 265
+                },
+                "end": {
+                  "column": 18,
+                  "line": 17,
+                  "offset": 283
+                }
+              },
+              "prop": "max-width",
+              "value": "1200px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 18,
+                  "offset": 284
+                },
+                "end": {
+                  "column": 15,
+                  "line": 18,
+                  "offset": 299
+                }
+              },
+              "prop": "margin",
+              "value": "0 auto"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 13,
+              "offset": 178
+            },
+            "end": {
+              "column": 1,
+              "line": 20,
+              "offset": 302
+            }
+          },
+          "selector": ".top-bar-content"
+        },
+        {
+          "raws": null,
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 23,
+                  "offset": 323
+                },
+                "end": {
+                  "column": 19,
+                  "line": 23,
+                  "offset": 342
+                }
+              },
+              "prop": "margin-left",
+              "value": "190px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 24,
+                  "offset": 343
+                },
+                "end": {
+                  "column": 16,
+                  "line": 24,
+                  "offset": 359
+                }
+              },
+              "prop": "flex-basis",
+              "value": "30%"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 25,
+                  "offset": 360
+                },
+                "end": {
+                  "column": 18,
+                  "line": 25,
+                  "offset": 378
+                }
+              },
+              "prop": "font-size",
+              "value": "1.5rem"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 26,
+                  "offset": 379
+                },
+                "end": {
+                  "column": 17,
+                  "line": 26,
+                  "offset": 396
+                }
+              },
+              "prop": "font-weight",
+              "value": "600"
+            },
+            {
+              "raws": {
+                "before": "\n\n",
+                "between": ": ",
+                "important": "!important"
+              },
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 28,
+                  "offset": 398
+                },
+                "end": {
+                  "column": 29,
+                  "line": 28,
+                  "offset": 427
+                }
+              },
+              "prop": "margin-align",
+              "important": true,
+              "value": "20px"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 22,
+              "offset": 304
+            },
+            "end": {
+              "column": 1,
+              "line": 30,
+              "offset": 430
+            }
+          },
+          "selector": ".dashboard-title"
+        },
+        {
+          "raws": {
+            "before": "\n\n",
+            "between": " ",
+            "semicolon": true,
+            "after": "\n"
+          },
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 33,
+                  "offset": 452
+                },
+                "end": {
+                  "column": 19,
+                  "line": 33,
+                  "offset": 471
+                }
+              },
+              "prop": "position",
+              "value": "relative"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 32,
+              "offset": 432
+            },
+            "end": {
+              "column": 1,
+              "line": 34,
+              "offset": 473
+            }
+          },
+          "selector": ".profile-dropdown"
+        },
+        {
+          "raws": null,
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 37,
+                  "offset": 493
+                },
+                "end": {
+                  "column": 24,
+                  "line": 37,
+                  "offset": 517
+                }
+              },
+              "prop": "background",
+              "value": "transparent"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 38,
+                  "offset": 518
+                },
+                "end": {
+                  "column": 13,
+                  "line": 38,
+                  "offset": 531
+                }
+              },
+              "prop": "border",
+              "value": "none"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 39,
+                  "offset": 532
+                },
+                "end": {
+                  "column": 16,
+                  "line": 39,
+                  "offset": 548
+                }
+              },
+              "prop": "font-size",
+              "value": "1rem"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 40,
+                  "offset": 549
+                },
+                "end": {
+                  "column": 16,
+                  "line": 40,
+                  "offset": 565
+                }
+              },
+              "prop": "cursor",
+              "value": "pointer"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 41,
+                  "offset": 566
+                },
+                "end": {
+                  "column": 14,
+                  "line": 41,
+                  "offset": 580
+                }
+              },
+              "prop": "display",
+              "value": "flex"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 42,
+                  "offset": 581
+                },
+                "end": {
+                  "column": 20,
+                  "line": 42,
+                  "offset": 601
+                }
+              },
+              "prop": "align-items",
+              "value": "center"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 43,
+                  "offset": 602
+                },
+                "end": {
+                  "column": 9,
+                  "line": 43,
+                  "offset": 611
+                }
+              },
+              "prop": "gap",
+              "value": "8px"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 36,
+              "offset": 475
+            },
+            "end": {
+              "column": 1,
+              "line": 44,
+              "offset": 613
+            }
+          },
+          "selector": ".profile-button"
+        },
+        {
+          "raws": null,
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 47,
+                  "offset": 632
+                },
+                "end": {
+                  "column": 14,
+                  "line": 47,
+                  "offset": 646
+                }
+              },
+              "prop": "display",
+              "value": "none"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 48,
+                  "offset": 647
+                },
+                "end": {
+                  "column": 19,
+                  "line": 48,
+                  "offset": 666
+                }
+              },
+              "prop": "position",
+              "value": "absolute"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 49,
+                  "offset": 667
+                },
+                "end": {
+                  "column": 10,
+                  "line": 49,
+                  "offset": 677
+                }
+              },
+              "prop": "top",
+              "value": "100%"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 50,
+                  "offset": 678
+                },
+                "end": {
+                  "column": 9,
+                  "line": 50,
+                  "offset": 687
+                }
+              },
+              "prop": "right",
+              "value": "0"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 51,
+                  "offset": 688
+                },
+                "end": {
+                  "column": 37,
+                  "line": 51,
+                  "offset": 725
+                }
+              },
+              "prop": "background",
+              "value": "rgba(255, 255, 255, 0.9)"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 52,
+                  "offset": 726
+                },
+                "end": {
+                  "column": 19,
+                  "line": 52,
+                  "offset": 745
+                }
+              },
+              "prop": "border-radius",
+              "value": "8px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 53,
+                  "offset": 746
+                },
+                "end": {
+                  "column": 42,
+                  "line": 53,
+                  "offset": 788
+                }
+              },
+              "prop": "box-shadow",
+              "value": "0 4px 15px rgba(0, 0, 0, 0.2)"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 54,
+                  "offset": 789
+                },
+                "end": {
+                  "column": 14,
+                  "line": 54,
+                  "offset": 803
+                }
+              },
+              "prop": "padding",
+              "value": "10px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 55,
+                  "offset": 804
+                },
+                "end": {
+                  "column": 17,
+                  "line": 55,
+                  "offset": 821
+                }
+              },
+              "prop": "min-width",
+              "value": "150px"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 46,
+              "offset": 615
+            },
+            "end": {
+              "column": 1,
+              "line": 56,
+              "offset": 823
+            }
+          },
+          "selector": ".dropdown-menu"
+        },
+        {
+          "raws": null,
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 59,
+                  "offset": 844
+                },
+                "end": {
+                  "column": 15,
+                  "line": 59,
+                  "offset": 859
+                }
+              },
+              "prop": "display",
+              "value": "block"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 60,
+                  "offset": 860
+                },
+                "end": {
+                  "column": 18,
+                  "line": 60,
+                  "offset": 878
+                }
+              },
+              "prop": "padding",
+              "value": "8px 12px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 61,
+                  "offset": 879
+                },
+                "end": {
+                  "column": 22,
+                  "line": 61,
+                  "offset": 901
+                }
+              },
+              "prop": "text-decoration",
+              "value": "none"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 62,
+                  "offset": 902
+                },
+                "end": {
+                  "column": 15,
+                  "line": 62,
+                  "offset": 917
+                }
+              },
+              "prop": "color",
+              "value": "#1a1a1a"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 63,
+                  "offset": 918
+                },
+                "end": {
+                  "column": 33,
+                  "line": 63,
+                  "offset": 951
+                }
+              },
+              "prop": "transition",
+              "value": "background 0.3s ease"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 58,
+              "offset": 825
+            },
+            "end": {
+              "column": 1,
+              "line": 64,
+              "offset": 953
+            }
+          },
+          "selector": ".dropdown-menu a"
+        },
+        {
+          "raws": null,
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 67,
+                  "offset": 980
+                },
+                "end": {
+                  "column": 31,
+                  "line": 67,
+                  "offset": 1011
+                }
+              },
+              "prop": "background",
+              "value": "rgba(0, 0, 0, 0.1)"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 66,
+              "offset": 955
+            },
+            "end": {
+              "column": 1,
+              "line": 68,
+              "offset": 1013
+            }
+          },
+          "selector": ".dropdown-menu a:hover"
+        },
+        {
+          "raws": null,
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 71,
+                  "offset": 1056
+                },
+                "end": {
+                  "column": 15,
+                  "line": 71,
+                  "offset": 1071
+                }
+              },
+              "prop": "display",
+              "value": "block"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 70,
+              "offset": 1015
+            },
+            "end": {
+              "column": 1,
+              "line": 72,
+              "offset": 1073
+            }
+          },
+          "selector": ".profile-dropdown:hover .dropdown-menu"
+        }
+      ],
+      "source": {
+        "input": null,
+        "start": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        },
+        "end": {
+          "column": 1,
+          "line": 73,
+          "offset": 1074
+        }
+      }
+    }
+  },
+  "topbar": {
+    "type": "HTML",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 394,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 394,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "start": 15,
+                    "end": 378,
+                    "type": "Element",
+                    "name": "header",
+                    "attributes": [
+                      {
+                        "start": 23,
+                        "end": 38,
+                        "type": "Attribute",
+                        "name": "class",
+                        "value": [
+                          {
+                            "start": 30,
+                            "end": 37,
+                            "type": "Text",
+                            "raw": "top-bar",
+                            "data": "top-bar"
+                          }
+                        ]
+                      }
+                    ],
+                    "children": [
+                      [
+                        {
+                          "start": 40,
+                          "end": 368,
+                          "type": "Element",
+                          "name": "div",
+                          "attributes": [
+                            {
+                              "start": 45,
+                              "end": 68,
+                              "type": "Attribute",
+                              "name": "class",
+                              "value": [
+                                {
+                                  "start": 52,
+                                  "end": 67,
+                                  "type": "Text",
+                                  "raw": "top-bar-content",
+                                  "data": "top-bar-content"
+                                }
+                              ]
+                            }
+                          ],
+                          "children": [
+                            [
+                              {
+                                "start": 70,
+                                "end": 118,
+                                "type": "Element",
+                                "name": "h2",
+                                "attributes": [
+                                  {
+                                    "start": 74,
+                                    "end": 97,
+                                    "type": "Attribute",
+                                    "name": "class",
+                                    "value": [
+                                      {
+                                        "start": 81,
+                                        "end": 96,
+                                        "type": "Text",
+                                        "raw": "dashboard-title",
+                                        "data": "dashboard-title"
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "children": [
+                                  [
+                                    {
+                                      "type": "Text",
+                                      "raw": "Admin Dashboard",
+                                      "data": "Admin Dashboard"
+                                    }
+                                  ]
+                                ]
+                              },
+                              {
+                                "start": 119,
+                                "end": 361,
+                                "type": "Element",
+                                "name": "div",
+                                "attributes": [
+                                  {
+                                    "start": 124,
+                                    "end": 148,
+                                    "type": "Attribute",
+                                    "name": "class",
+                                    "value": [
+                                      {
+                                        "start": 131,
+                                        "end": 147,
+                                        "type": "Text",
+                                        "raw": "profile-dropdown",
+                                        "data": "profile-dropdown"
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "children": [
+                                  [
+                                    {
+                                      "start": 150,
+                                      "end": 247,
+                                      "type": "Element",
+                                      "name": "button",
+                                      "attributes": [
+                                        {
+                                          "start": 158,
+                                          "end": 180,
+                                          "type": "Attribute",
+                                          "name": "class",
+                                          "value": [
+                                            {
+                                              "start": 165,
+                                              "end": 179,
+                                              "type": "Text",
+                                              "raw": "profile-button",
+                                              "data": "profile-button"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "start": 182,
+                                            "end": 203,
+                                            "type": "Element",
+                                            "name": "span",
+                                            "attributes": null,
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "John Doe",
+                                                  "data": "John Doe"
+                                                }
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "start": 204,
+                                            "end": 237,
+                                            "type": "Element",
+                                            "name": "i",
+                                            "attributes": [
+                                              {
+                                                "start": 207,
+                                                "end": 232,
+                                                "type": "Attribute",
+                                                "name": "class",
+                                                "value": [
+                                                  {
+                                                    "start": 214,
+                                                    "end": 231,
+                                                    "type": "Text",
+                                                    "raw": "fas fa-caret-down",
+                                                    "data": "fas fa-caret-down"
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              []
+                                            ]
+                                          }
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "start": 248,
+                                      "end": 354,
+                                      "type": "Element",
+                                      "name": "div",
+                                      "attributes": [
+                                        {
+                                          "start": 253,
+                                          "end": 274,
+                                          "type": "Attribute",
+                                          "name": "class",
+                                          "value": [
+                                            {
+                                              "start": 260,
+                                              "end": 273,
+                                              "type": "Text",
+                                              "raw": "dropdown-menu",
+                                              "data": "dropdown-menu"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "start": 276,
+                                            "end": 299,
+                                            "type": "Element",
+                                            "name": "a",
+                                            "attributes": [
+                                              {
+                                                "start": 279,
+                                                "end": 287,
+                                                "type": "Attribute",
+                                                "name": "href",
+                                                "value": [
+                                                  {
+                                                    "start": 285,
+                                                    "end": 286,
+                                                    "type": "Text",
+                                                    "raw": "#",
+                                                    "data": "#"
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Profile",
+                                                  "data": "Profile"
+                                                }
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "start": 300,
+                                            "end": 324,
+                                            "type": "Element",
+                                            "name": "a",
+                                            "attributes": [
+                                              {
+                                                "start": 303,
+                                                "end": 311,
+                                                "type": "Attribute",
+                                                "name": "href",
+                                                "value": [
+                                                  {
+                                                    "start": 309,
+                                                    "end": 310,
+                                                    "type": "Text",
+                                                    "raw": "#",
+                                                    "data": "#"
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Settings",
+                                                  "data": "Settings"
+                                                }
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "start": 325,
+                                            "end": 347,
+                                            "type": "Element",
+                                            "name": "a",
+                                            "attributes": [
+                                              {
+                                                "start": 328,
+                                                "end": 336,
+                                                "type": "Attribute",
+                                                "name": "href",
+                                                "value": [
+                                                  {
+                                                    "start": 334,
+                                                    "end": 335,
+                                                    "type": "Text",
+                                                    "raw": "#",
+                                                    "data": "#"
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Logout",
+                                                  "data": "Logout"
+                                                }
+                                              ]
+                                            ]
+                                          }
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                ]
+                              }
+                            ]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

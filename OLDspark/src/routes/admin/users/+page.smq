@@ -1,0 +1,111 @@
+@script
+import axios from 'axios';  
+import AnyGrid from 'anygridjs';
+import Topbar from '$global/Topbar.smq';
+import Sidebar from '$global/Sidebar.smq';
+import Maincontent from '$global/Maincontent.smq';
+import Footer from '$global/Footer.smq';
+
+/*
+const testData = [{"id":1,"access_level":1,"first_name":"John","surname":"Doe","mobile":"1234567890","email":"johndoe@example.com","password":"hashedpassword123","country":"USA","town_city":"New York","suburb":"Brooklyn","street_number":"123","street_name":"Main St","unit_number":"Apt 1","bank_name":"Bank of America","branch_name":"Fifth Avenue","branch_code":"12345","account_number":"123456789012","swift_number":"BOFAUS3N","routing_number":"987654321","member_status":1,"level_1":1,"level_2":2,"level_3":3,"level_4":4,"level_5":5,"level_6":6,"level_7":7,"level_8":8,"level_9":9,"created_at":"2025-02-17T12:19:49.503678"},{"id":3,"access_level":1,"first_name":"Musa","surname":"Moyo","mobile":"064738383","email":"ghd@emailer.com","password":"$argon2id$v=19$m=65536,t=3,p=4$1xXPiO8Zy52gWsUPaSAF+w$H7NGC6h8t8rhf11IPr6FVlJsTWPvrTm9T5vcFodw+dM","country":null,"town_city":null,"suburb":null,"street_number":null,"street_name":null,"unit_number":null,"bank_name":null,"branch_name":null,"branch_code":null,"account_number":null,"swift_number":null,"routing_number":null,"member_status":0,"level_1":1,"level_2":1,"level_3":2,"level_4":3,"level_5":4,"level_6":5,"level_7":6,"level_8":7,"level_9":null,"created_at":"2025-02-17T12:24:20.697751"}]
+*/
+
+
+
+
+ const columns = [
+    { name: 'id', header: 'ID', render: (value, row) => `<a href="/user/profile/${row.id}">${row.id}</a>`, sortable: true },
+    { name: 'fullName', header: 'FULL NAME', joinedColumns: ['first_name', 'surname'] },
+    { name: 'mobile', header: 'Mobile', sortable: true },
+    { name: 'email', header: 'Email' },
+    { name: 'country', header: 'Country', sortable: true,
+      actions: [
+        {
+          label: 'EDIT',
+          url: 'edit/{id}',
+          class: 'edit',
+          id: 'edit-{id}',
+        },
+        {
+          label: 'DELETE',
+          url: 'delete/{id}',
+          class: 'delete',
+          id: 'delete-{id}',
+          confirm: true,
+        }, 
+
+        {
+        label: 'View',
+        url: 'view/{id}',
+        class: 'view-btn',
+        id: 'view-{id}',
+        },
+      ], 
+    },
+  ];
+
+  const features = {
+    initialItemsPerPage: 10,
+    csvExport: true,
+    excelExport: true,
+    theme: 'pink'
+  };
+
+
+axios.get('http://localhost:3000/users/all', {
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+  .then(response => {
+    const message = response.data.message;  
+    const data = response.data.data; 
+    
+    console.log('Message:', message); 
+
+    if (Array.isArray(data)) {
+      const usersData = data;
+
+     
+      const dataGrid = new AnyGrid(usersData, columns, features);
+    } else {
+      console.error('Fetched data is not in the expected array format.', data);
+    }
+  })
+  .catch(error => {
+    console.error("Error fetching users:", error);
+  });
+
+
+
+  //Initialize AnyGrid
+  //const dataGrid = new AnyGrid(usersData, columns, features);
+ 
+
+@end
+
+@style
+
+
+@end
+
+@html
+
+
+<Sidebar />
+  <div class="main-content">
+       <Topbar />
+       <Maincontent> 
+
+       <div class="users-container"> 
+		<h2> All Members </h2>
+		<div id="anygrid"> </div> 
+		</div> 
+
+       </Maincontent>
+       <Footer />
+  </div>
+  
+
+
+
