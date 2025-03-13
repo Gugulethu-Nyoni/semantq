@@ -1,0 +1,550 @@
+{
+  "jsAST": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 240,
+      "body": [
+        {
+          "type": "ImportDeclaration",
+          "start": 1,
+          "end": 27,
+          "specifiers": [
+            {
+              "type": "ImportDefaultSpecifier",
+              "start": 8,
+              "end": 13,
+              "local": {
+                "type": "Identifier",
+                "start": 8,
+                "end": 13,
+                "name": "axios"
+              }
+            }
+          ],
+          "source": {
+            "type": "Literal",
+            "start": 19,
+            "end": 26,
+            "value": "axios",
+            "raw": "'axios'"
+          }
+        },
+        {
+          "type": "ImportDeclaration",
+          "start": 28,
+          "end": 68,
+          "specifiers": [
+            {
+              "type": "ImportDefaultSpecifier",
+              "start": 35,
+              "end": 41,
+              "local": {
+                "type": "Identifier",
+                "start": 35,
+                "end": 41,
+                "name": "Topbar"
+              }
+            }
+          ],
+          "source": {
+            "type": "Literal",
+            "start": 47,
+            "end": 67,
+            "value": "$global/Topbar.smq",
+            "raw": "'$global/Topbar.smq'"
+          }
+        },
+        {
+          "type": "ImportDeclaration",
+          "start": 69,
+          "end": 111,
+          "specifiers": [
+            {
+              "type": "ImportDefaultSpecifier",
+              "start": 76,
+              "end": 83,
+              "local": {
+                "type": "Identifier",
+                "start": 76,
+                "end": 83,
+                "name": "Sidebar"
+              }
+            }
+          ],
+          "source": {
+            "type": "Literal",
+            "start": 89,
+            "end": 110,
+            "value": "$global/Sidebar.smq",
+            "raw": "'$global/Sidebar.smq'"
+          }
+        },
+        {
+          "type": "ImportDeclaration",
+          "start": 112,
+          "end": 162,
+          "specifiers": [
+            {
+              "type": "ImportDefaultSpecifier",
+              "start": 119,
+              "end": 130,
+              "local": {
+                "type": "Identifier",
+                "start": 119,
+                "end": 130,
+                "name": "Maincontent"
+              }
+            }
+          ],
+          "source": {
+            "type": "Literal",
+            "start": 136,
+            "end": 161,
+            "value": "$global/Maincontent.smq",
+            "raw": "'$global/Maincontent.smq'"
+          }
+        },
+        {
+          "type": "ImportDeclaration",
+          "start": 163,
+          "end": 203,
+          "specifiers": [
+            {
+              "type": "ImportDefaultSpecifier",
+              "start": 170,
+              "end": 176,
+              "local": {
+                "type": "Identifier",
+                "start": 170,
+                "end": 176,
+                "name": "Footer"
+              }
+            }
+          ],
+          "source": {
+            "type": "Literal",
+            "start": 182,
+            "end": 202,
+            "value": "$global/Footer.smq",
+            "raw": "'$global/Footer.smq'"
+          }
+        },
+        {
+          "type": "ExpressionStatement",
+          "start": 207,
+          "end": 239,
+          "expression": {
+            "type": "CallExpression",
+            "start": 207,
+            "end": 238,
+            "callee": {
+              "type": "MemberExpression",
+              "start": 207,
+              "end": 218,
+              "object": {
+                "type": "Identifier",
+                "start": 207,
+                "end": 214,
+                "name": "console"
+              },
+              "property": {
+                "type": "Identifier",
+                "start": 215,
+                "end": 218,
+                "name": "log"
+              },
+              "computed": false,
+              "optional": false
+            },
+            "arguments": [
+              {
+                "type": "Literal",
+                "start": 219,
+                "end": 237,
+                "value": "inside purchases",
+                "raw": "\"inside purchases\""
+              }
+            ],
+            "optional": false
+          }
+        }
+      ],
+      "sourceType": "module"
+    }
+  },
+  "cssAST": {
+    "type": "CSS",
+    "content": {
+      "raws": {
+        "after": ""
+      },
+      "type": "root",
+      "nodes": [],
+      "source": {
+        "input": {
+          "css": "",
+          "hasBOM": false,
+          "document": "",
+          "file": "/Users/gugulethu/code/semantq/spark/style"
+        },
+        "start": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        },
+        "end": null
+      }
+    }
+  },
+  "customAST": {
+    "type": "HTML",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 726,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 726,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "start": 17,
+                    "end": 29,
+                    "type": "Element",
+                    "name": "Sidebar",
+                    "attributes": null,
+                    "children": []
+                  },
+                  {
+                    "start": 29,
+                    "end": 710,
+                    "type": "Element",
+                    "name": "div",
+                    "attributes": [
+                      {
+                        "start": 34,
+                        "end": 54,
+                        "type": "Attribute",
+                        "name": "class",
+                        "value": [
+                          {
+                            "start": 41,
+                            "end": 53,
+                            "type": "Text",
+                            "raw": "main-content",
+                            "data": "main-content"
+                          }
+                        ]
+                      }
+                    ],
+                    "children": [
+                      [
+                        {
+                          "start": 56,
+                          "end": 67,
+                          "type": "Element",
+                          "name": "Topbar",
+                          "attributes": null,
+                          "children": null
+                        },
+                        {
+                          "start": 67,
+                          "end": 692,
+                          "type": "Element",
+                          "name": "Maincontent",
+                          "attributes": null,
+                          "children": [
+                            [
+                              {
+                                "start": 82,
+                                "end": 676,
+                                "type": "Element",
+                                "name": "div",
+                                "attributes": [
+                                  {
+                                    "start": 87,
+                                    "end": 110,
+                                    "type": "Attribute",
+                                    "name": "class",
+                                    "value": [
+                                      {
+                                        "start": 94,
+                                        "end": 109,
+                                        "type": "Text",
+                                        "raw": "users-container",
+                                        "data": "users-container"
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "children": [
+                                  [
+                                    {
+                                      "start": 112,
+                                      "end": 143,
+                                      "type": "Element",
+                                      "name": "h2",
+                                      "attributes": null,
+                                      "children": [
+                                        [
+                                          {
+                                            "type": "Text",
+                                            "raw": "Purchase Our Product ",
+                                            "data": "Purchase Our Product "
+                                          }
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "start": 146,
+                                      "end": 665,
+                                      "type": "Element",
+                                      "name": "div",
+                                      "attributes": [
+                                        {
+                                          "start": 151,
+                                          "end": 214,
+                                          "type": "Attribute",
+                                          "name": "class",
+                                          "value": [
+                                            {
+                                              "start": 158,
+                                              "end": 213,
+                                              "type": "Text",
+                                              "raw": "max-w-sm rounded-2xl overflow-hidden shadow-lg bg-white",
+                                              "data": "max-w-sm rounded-2xl overflow-hidden shadow-lg bg-white"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "start": 216,
+                                            "end": 360,
+                                            "type": "Element",
+                                            "name": "img",
+                                            "attributes": [
+                                              {
+                                                "start": 221,
+                                                "end": 254,
+                                                "type": "Attribute",
+                                                "name": "class",
+                                                "value": [
+                                                  {
+                                                    "start": 228,
+                                                    "end": 252,
+                                                    "type": "Text",
+                                                    "raw": "w-full h-48 object-cover",
+                                                    "data": "w-full h-48 object-cover"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "start": 254,
+                                                "end": 340,
+                                                "type": "Attribute",
+                                                "name": "src",
+                                                "value": [
+                                                  {
+                                                    "start": 259,
+                                                    "end": 338,
+                                                    "type": "Text",
+                                                    "raw": "https://sparkyolife.co.za/wp-content/uploads/2022/01/blood-pressure-product.png",
+                                                    "data": "https://sparkyolife.co.za/wp-content/uploads/2022/01/blood-pressure-product.png"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "start": 340,
+                                                "end": 357,
+                                                "type": "Attribute",
+                                                "name": "alt",
+                                                "value": [
+                                                  {
+                                                    "start": 345,
+                                                    "end": 355,
+                                                    "type": "Text",
+                                                    "raw": "Card Image",
+                                                    "data": "Card Image"
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": null
+                                          },
+                                          {
+                                            "start": 360,
+                                            "end": 658,
+                                            "type": "Element",
+                                            "name": "div",
+                                            "attributes": [
+                                              {
+                                                "start": 365,
+                                                "end": 376,
+                                                "type": "Attribute",
+                                                "name": "class",
+                                                "value": [
+                                                  {
+                                                    "start": 372,
+                                                    "end": 375,
+                                                    "type": "Text",
+                                                    "raw": "p-4",
+                                                    "data": "p-4"
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              [
+                                                {
+                                                  "start": 378,
+                                                  "end": 441,
+                                                  "type": "Element",
+                                                  "name": "h2",
+                                                  "attributes": [
+                                                    {
+                                                      "start": 382,
+                                                      "end": 425,
+                                                      "type": "Attribute",
+                                                      "name": "class",
+                                                      "value": [
+                                                        {
+                                                          "start": 389,
+                                                          "end": 424,
+                                                          "type": "Text",
+                                                          "raw": "text-xl font-semibold text-gray-800",
+                                                          "data": "text-xl font-semibold text-gray-800"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ],
+                                                  "children": [
+                                                    [
+                                                      {
+                                                        "type": "Text",
+                                                        "raw": "Card Title",
+                                                        "data": "Card Title"
+                                                      }
+                                                    ]
+                                                  ]
+                                                },
+                                                {
+                                                  "start": 442,
+                                                  "end": 527,
+                                                  "type": "Element",
+                                                  "name": "p",
+                                                  "attributes": [
+                                                    {
+                                                      "start": 445,
+                                                      "end": 471,
+                                                      "type": "Attribute",
+                                                      "name": "class",
+                                                      "value": [
+                                                        {
+                                                          "start": 452,
+                                                          "end": 470,
+                                                          "type": "Text",
+                                                          "raw": "text-gray-600 mt-2",
+                                                          "data": "text-gray-600 mt-2"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ],
+                                                  "children": [
+                                                    [
+                                                      {
+                                                        "type": "Text",
+                                                        "raw": "This is a simple card component using Tailwind CSS.",
+                                                        "data": "This is a simple card component using Tailwind CSS."
+                                                      }
+                                                    ]
+                                                  ]
+                                                },
+                                                {
+                                                  "start": 528,
+                                                  "end": 651,
+                                                  "type": "Element",
+                                                  "name": "button",
+                                                  "attributes": [
+                                                    {
+                                                      "start": 536,
+                                                      "end": 551,
+                                                      "type": "Attribute",
+                                                      "name": "id",
+                                                      "value": [
+                                                        {
+                                                          "start": 540,
+                                                          "end": 549,
+                                                          "type": "Text",
+                                                          "raw": "buyButton",
+                                                          "data": "buyButton"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "start": 551,
+                                                      "end": 632,
+                                                      "type": "Attribute",
+                                                      "name": "class",
+                                                      "value": [
+                                                        {
+                                                          "start": 558,
+                                                          "end": 631,
+                                                          "type": "Text",
+                                                          "raw": "mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600",
+                                                          "data": "mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ],
+                                                  "children": [
+                                                    [
+                                                      {
+                                                        "type": "Text",
+                                                        "raw": "Buy Now\n",
+                                                        "data": "Buy Now\n"
+                                                      }
+                                                    ]
+                                                  ]
+                                                }
+                                              ]
+                                            ]
+                                          }
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                ]
+                              }
+                            ]
+                          ]
+                        },
+                        {
+                          "start": 693,
+                          "end": 704,
+                          "type": "Element",
+                          "name": "Footer",
+                          "attributes": null,
+                          "children": null
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
