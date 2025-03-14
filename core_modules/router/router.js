@@ -29,6 +29,13 @@ export default class Router {
   async handleFileBasedRoute(targetRoute) {
     console.log(`Handling file-based route: ${targetRoute}`);
 
+
+    if (targetRoute === 'home' || targetRoute === '/' ) {
+    window.location.href = '/';
+    return;
+  }
+
+
     // Construct the path to the +page.html file
     const pagePath = `${this.routesBase}/${targetRoute}/+page.html`;
     console.log("ROUTE",pagePath);
@@ -148,7 +155,7 @@ export default class Router {
         } else if (this.isDeclaredRoute(targetRoute)) {
           this.handleDeclaredRoute(targetRoute);
         } else {
-                    alert(targetRoute);
+                   // alert(targetRoute);
 
           this.handleRouteError(targetRoute);
         }
