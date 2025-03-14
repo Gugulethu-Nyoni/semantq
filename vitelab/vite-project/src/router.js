@@ -155,7 +155,7 @@ export default class Router {
         } else if (this.isDeclaredRoute(targetRoute)) {
           this.handleDeclaredRoute(targetRoute);
         } else {
-                    alert(targetRoute);
+                   // alert(targetRoute);
 
           this.handleRouteError(targetRoute);
         }
