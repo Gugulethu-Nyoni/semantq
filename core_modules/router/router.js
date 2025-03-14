@@ -136,6 +136,13 @@ export default class Router {
 
         alert(targetRoute);
 
+
+        // Handle the "home" term
+      if (targetRoute === 'home') {
+        window.location.href = '/';
+        return;
+      }
+
         if (this.isFileBasedRoute(targetRoute)) {
           this.handleFileBasedRoute(targetRoute);
         } else if (this.isDeclaredRoute(targetRoute)) {
