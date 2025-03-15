@@ -379,133 +379,195 @@ const ast = [
 
 
 
-function processAttributes(attributes) {
-  let processedAttributesObject = '';
 
-  attributes.forEach((attribute) => {
-    const attrName = attribute.name;
-    let attrString = '';
+function processAttributes(attributes, isSvg = false, tagName = '') {
+  let processedAttributes = '';
 
-    if (typeof attribute.value === 'boolean') {
-      if (attribute.smqtype && attribute.smqtype === 'BooleanIdentifierAttribute') {
-        attrString = ` {${attrName}}`;
-      } else {
-        attrString = ` ${attrName}`;
-      }
-    } 
+  if (attributes) {
+    attributes.forEach((attribute) => {
+      const attrName = attribute.name;
+      let attrString = '';
 
-
-    else if (Array.isArray(attribute.value) && attribute.value[0].type === 'Text') {
-      attrString = ` ${attrName}='${attribute.value[0].data}'`;
-    } else if (attrName === 'id' || attrName === 'class') {
-      if (attribute.value[0].type === 'MustacheAttribute' && attribute.value[0].name.type === 'Identifier') {
-        attrString = ` ${attrName}='{${attribute.value[0].name.name}}'`;
-      } else {
-        attrString = ` ${attrName}='${attribute.value[0].data}'`;
-      }
-    } else if (typeof attrName === 'object') {
-
-      /**@eventHandlers 
-       * attrString = ` on${attrName.name}='${attribute.value[0].name.name}()'`;
-       * we have moved this to the atomique transformer so that if nodes are 
-       * active (static or reactive) and have to be plucked off html and
-       * render via js for reactivity they are already processed 
-       * 
-       * 
-       * 
-       */
-      if (attrName.type === 'EventHandler') {
-        if (attribute.value[0].type === 'MustacheAttribute' && attribute.value[0].name.type === 'Identifier') {
-          attrString = ` ${attrName.name}='${attribute.value[0].name.name}'`;
+      if (typeof attribute.value === 'boolean') {
+        // Boolean attributes (like "checked", "disabled")
+        attrString = attribute.smqtype === 'BooleanIdentifierAttribute' ? ` {${attrName}}` : ` ${attrName}`;
+      } else if (Array.isArray(attribute.value) && attribute.value[0]?.type === 'Text') {
+        // Text attributes
+        const value = attribute.value[0].data;
+        // Handle SVG attributes like `d` for <path>
+        if (isSvg && attrName === 'd') {
+          if (tagName === 'path') {
+            // Skip empty `d` attributes for <path> elements
+            attrString = ` ${attrName}="${attribute.value[0].raw}"`;
+            //console.log("D Attribute",attribute); 
+          } else {
+            attrString = ` ${attrName}="${value}"`;
+          }
+        } else {
+          attrString = ` ${attrName}="${value}"`;
         }
+      } else if (attrName === 'id' || attrName === 'class') {
+        // Handle id and class attributes
+        const value = attribute.value[0];
+        attrString = value?.type === 'MustacheAttribute' && value?.name?.type === 'Identifier'
+          ? ` ${attrName}="{${value.name.name}}"`
+          : ` ${attrName}="${value?.data}"`;
+      } else if (attrName?.type === 'EventHandler') {
+        // Handle event handlers
+        const value = attribute.value[0];
+        attrString = value?.type === 'MustacheAttribute' && value?.name?.type === 'Identifier'
+          ? ` ${attrName.name}="{${value.name.name}}"`
+          : ` ${attrName.name}="${value?.data}"`;
+      } else if (attribute.smqtype === 'SlotPropAttribute') {
+        // Slot props (Svelte-specific syntax)
+        attrString = ` ${attrName}:${attribute.value} `;
+      } else if (attrName.toLowerCase().startsWith('smq-')) {
+        // Custom attributes (starts with smq-)
+        attrString = ` ${attrName}`;
+      } else {
+        // Other attributes (including mustache syntax)
+        const value = attribute.value[0];
+        attrString = value?.type === 'MustacheAttribute' && value?.name?.type === 'Identifier'
+          ? ` ${attrName}="{${value.name.name}}"`
+          : ` ${attrName}="${value?.raw}"`;
       }
-    } else if (
-      attrName.name !== 'object' &&
-      attribute.value[0].type === 'MustacheAttribute' &&
-      attribute.value[0].name.type === 'Identifier'
-    ) {
-      attrString = ` ${attrName}='{${attribute.value[0].name.name}}'`;
-    } else if (attribute.smqtype && attribute.smqtype === 'SlotPropAttribute') {
-      attrString = ` ${attribute.name}:${attribute.value} `
-    }
 
-    else if (attrName.toLowerCase().startsWith('smq-'.toLowerCase())) {
-      attrString = ` ${attrName}`;
-    }
+      processedAttributes += attrString;
+    });
+  }
 
-    processedAttributesObject += attrString;
-  });
-
-  return processedAttributesObject;
+  return processedAttributes;
 }
 
-  
+export default function walk(astBlock) {
+//console.log("INN",astBlock);
+let ast;
+if (Array.isArray(astBlock)) {
 
-export default function walk(ast) {
-  const selfClosingTags = [
+ast = astBlock[0].html.children; 
+
+} else {
+ast = astBlock; 
+
+}
+
+//console.log("INN",ast);
+
+  //const ast = astBlock[0].html.children
+  const selfClosingTags = new Set([
     'area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input',
     'keygen', 'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr', 'sspan'
-  ];
+  ]);
+
+  const svgTags = new Set([
+    'svg', 'path', 'circle', 'rect', 'line', 'polyline', 'polygon', 'text', 'g', 'defs', 'use'
+  ]);
 
   let regularHtml = '';
 
   const processNode = (node) => {
-     // Skip processing if the node is a <customSyntax> element
-    /*
-    if (node.type === 'Element' && node.name === 'customSyntax') {
-      return; // Skip this node and its children
-    } */
+    if (!node || typeof node !== 'object') return; // Skip invalid nodes
 
-    if (node.type === 'Element' && node.name !== 'customSyntax') {
-      let attributesData = '';
-      if (node.attributes !== null) {
-        const processedAttributes = processAttributes(node.attributes);
-        attributesData += processedAttributes;
-      }
+    if (node.type === 'Element') {
+      const isSvg = svgTags.has(node.name); // Check if the element is an SVG element
+      let openingTag;
+      let skipTag = false; 
 
-      if (!selfClosingTags.includes(node.name)) {
-        regularHtml += `<${node.name}${attributesData}>`;
+      if (node.name == 'customSyntax') {
+      // Step 1: Build the opening tag
+      openingTag = ''; 
+      skipTag = true;
+
       } else {
-        regularHtml += `<${node.name}${attributesData}/>`;
-        return; // Self-closing tags don't have children, so return early
+
+      openingTag = `<${node.name}`; 
+
+      }
+
+
+      // Add attributes
+      if (!skipTag && node.attributes) {
+        openingTag += processAttributes(node.attributes, isSvg, node.name);
+      }
+
+      // Close the opening tag
+      if (selfClosingTags.has(node.name)) {
+        if (!skipTag) {
+        openingTag += ' />';
+        regularHtml += openingTag;
+        return; // Stop processing for self-closing tags
+      } else {
+        openingTag += '';
+        regularHtml += openingTag;
+        return; // Stop processing for self-closing tags
+      }
+      } else {
+
+        if (!skipTag) {
+        openingTag += '>';
+        regularHtml += openingTag;
+      } else {
+        openingTag += '';
+        regularHtml += openingTag;
+
+      }
+      }
+
+      // Step 2: Process children
+      if (node.children) {
+        traverse(node.children); // Traverse children recursively
+      }
+
+      // Step 3: Add the closing tag
+      if (!selfClosingTags.has(node.name)) {
+
+        if (!skipTag) {
+        regularHtml += `</${node.name}>`;
+        } else {
+        regularHtml += ``;
+        }
+
+
+      }
+    } else if (node.type === 'Text') {
+      // Plain text
+      regularHtml += node.raw;
+    } else if (node.type === 'MustacheIdentifier') {
+      // Mustache attribute
+      const mustacheTagName = node.expression?.name?.name || node.expression?.name;
+      if (mustacheTagName) {
+        regularHtml += `{${mustacheTagName}}`;
       }
     }
+  };
 
-    if (node.type === 'Text') {
-      regularHtml += node.raw;
-    }
+  // Traverse the AST recursively
+  const traverse = (nodes) => {
+    //console.log(nodes);
+    if (Array.isArray(nodes)) {
+      nodes.forEach((child) => {
+        if (Array.isArray(child)) {
+          traverse(child); // Recursively traverse nested arrays
+        } else if (typeof child === 'object' && child !== null) {
+          //console.log("child",child);
+          processNode(child); // Process the current node
 
-    if (Array.isArray(node.children)) {
-      node.children.forEach(child => nestedWalker(child));
-    } else if (typeof node === 'object' && node !== null) {
-      Object.values(node).forEach(value => nestedWalker(value));
-    }
 
-    if (node.type === 'Element' && !selfClosingTags.includes(node.name) && node.name !== 'customSyntax') {
-      regularHtml += `</${node.name}>`; // Add closing tag here
-    }
+        }
+      });
+    } else if (typeof nodes === 'object' && nodes !== null) {
+      processNode(nodes); // Process the current node
+          //console.log("LAST",nodes);
 
-    if (node.type === 'MustacheIdentifier') {
-      let mustacheTagName = node.expression.name.name || node.expression.name;
-      regularHtml += `\${${mustacheTagName}}`;
     }
   };
 
-  const nestedWalker = (node) => {
-    if (Array.isArray(node)) {
-      node.forEach(item => nestedWalker(item));
-    } else if (typeof node === 'object' && node !== null) {
-      processNode(node);
-    }
-  };
-
-  nestedWalker(ast);
+  // Start traversal from the root of the AST
+  traverse(ast);
 
   return regularHtml;
 }
 
 
-
-//const htmlOutput = walk(ast[0]);
+//const htmlOutput = walk(ast);
 //console.log(htmlOutput);
-
