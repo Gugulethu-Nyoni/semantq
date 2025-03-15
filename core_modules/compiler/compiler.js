@@ -7,6 +7,8 @@ import fse from 'fs-extra';
 const rootDir = process.cwd();
 
 // Construct paths to key source and dest directories
+const src = path.join(rootDir, 'src');
+const dest = path.join(rootDir, 'build');
 const sourceDir = path.join(rootDir, 'src/routes');
 const destDir = path.join(rootDir, 'build/routes');
 const destDirBase = path.join(rootDir, 'build');
@@ -142,9 +144,10 @@ async function transformer(destDir) {
   }
 }
 
-// Generate routes
-async function routesGenerator(sourceDir, destDir) {
+// Generate routes and map all routing related files
+async function routesGenerator(sourceDir, destDir, src, dest) {
   try {
+    // Generate file-based routes
     const routesModule = await import('./fileBasedRouteGenerator.js');
     await routesModule.generateFileBasedRoutes(destDir);
 
@@ -152,6 +155,16 @@ async function routesGenerator(sourceDir, destDir) {
     const sourceRoutesFile = path.join(sourceDir, 'routes.js');
     const destRoutesFile = path.join(destDir, 'routes.js');
     await fse.copy(sourceRoutesFile, destRoutesFile);
+
+    // Copy router.js from src/semantq to destDir/semantq
+    const sourceRouterFile = path.join(src, 'semantq', 'router.js');
+    const destRouterFile = path.join(dest, 'semantq', 'router.js');
+
+    // Ensure the destination directory exists
+    await fse.ensureDir(path.dirname(destRouterFile));
+
+    // Copy the file
+    await fse.copy(sourceRouterFile, destRouterFile);
   } catch (error) {
     throw error;
   }
@@ -206,7 +219,7 @@ async function main(sourceDir, destDir, destDirBase) {
     await transformer(componentsDest);
 
     // Step 6: Generate routes
-    await routesGenerator(sourceDir, destDir);
+    await routesGenerator(sourceDir, destDir, src, dest);
 
 
     console.log('\x1b[32mCompilation completed successfully!\x1b[0m');
