@@ -610,11 +610,11 @@ if (stackCount && stackCount === 1) {
 /**
  * Main function to transform ASTs and write output to a file.
  * @param {Object} jsAST - The JavaScript AST.
- * @param {Object} cssAST - The CSS AST.
+ * @param {Object} cssCode - The CSS AST.
  * @param {Object} customSyntaxAST - The custom HTML AST.
  * @param {String} filePath - The path to the output file.
  */
-export default async function transformASTs(jsAST, cssAST, customSyntaxAST, filePath) {
+export default async function transformASTs(jsAST, cssCode, customSyntaxAST, filePath) {
   const customSyntaxObject = customSyntaxAST[0];
 
 
@@ -697,7 +697,7 @@ export default async function transformASTs(jsAST, cssAST, customSyntaxAST, file
   // --------------------
   let newJsAST = transformedASTs ? transformedASTs.transformedJsAST : jsAST;
   let newHTMLAST = transformedASTs ? transformedASTs.transformedCustomSyntaxAST : customSyntaxAST;
-
+  let routeLayout = false; 
       //console.log("NJST",JSON.stringify(newHTMLAST,null,2));
 
 
@@ -887,6 +887,9 @@ if (layoutAST.customAST) {
   let layoutAST; 
   
   if (layoutHTML) {
+
+  routeLayout = true;
+
   const layoutAST = `const layoutBlocks = {
   head: \`${layoutHTML.head}\`,
   body: \`${layoutHTML.main}\`,
@@ -918,7 +921,7 @@ if (layoutAST.customAST) {
 
 const layoutRenderer = `
 
-export async function layoutInit() {
+export default async function layoutInit() {
 
 const layoutBlocks = {
   head: \`${layoutHTML.head}\`,
@@ -1015,7 +1018,12 @@ function appendFooter(footerHTML) {
 
 }
 
-}`; 
+}
+
+// initiate it 
+layoutInit(); 
+
+`; 
 
 
 /*
@@ -1053,8 +1061,8 @@ fs.writeFile(newFileName, layoutRenderer, (err) => {
 
 
 
-  newJsAST = wrapCodeInInit(newJsAST);
-  newJsAST.__wrapped = true; // Mark as wrapped
+  //newJsAST = wrapCodeInInit(newJsAST);
+  //newJsAST.__wrapped = true; // Mark as wrapped
 }
 
 
@@ -1077,50 +1085,118 @@ jsCode = escodegen.generate(newJsAST);
 //console.log(jsCode);
 
 
-
+//console.log(newHTMLAST);
   const parsedHTML = customHtmlParser(newHTMLAST);
 
-  if (jsCode && parsedHTML) {
-    await writeCodeToFile(jsCode, parsedHTML);
-  }
+    await writeCodeToFile(jsCode, cssCode, parsedHTML);
 
   // --------------------
   // Write Transformed Code to File
   // --------------------
-  async function writeCodeToFile(jsCode, parsedHTML) {
-    const formattedJsCode = await prettier.format(jsCode, { parser: "babel" });
-    const formattedHTML = await prettier.format(parsedHTML, { parser: "html" });
+  async function writeCodeToFile(jsCode, cssCode, parsedHTML) {
+  const routeName = filePath.split("/").slice(-2, -1)[0];
+  const jsFileName = `${routeName}.js`;
+  const jsFilePath = filePath.replace(/\+page\.(resolved|smq)\.ast$/, jsFileName);
 
-   
-    
-    const routeName = filePath.split("/").slice(-2, -1)[0];
-    const jsFileName = `${routeName}.js`;
-    const jsFilePath = filePath.replace(/\+page\.(resolved|smq)\.ast$/, jsFileName);
-    const jsContent = `${formattedJsCode}\n`;
+  const cssFileName = `${routeName}.css`;
+  const cssFilePath = filePath.replace(/\+page\.(resolved|smq)\.ast$/, cssFileName);
 
-    try {
-      await fs.promises.writeFile(jsFilePath, jsContent);
-    } catch (err) {
-      console.error(err);
-    }
-
-    const newFilePath = filePath.replace(/\+page\.(resolved|smq)\.ast$/, "\+page.html");
-    try {
-      await fs.promises.unlink(newFilePath);
-    } catch (err) {
-      if (err.code !== "ENOENT") console.error(err);
-    }
-
-    try {
-      await fs.promises.writeFile(newFilePath, `<style>\n${cssAST}\n</style>\n${formattedHTML}`);
-    } catch (err) {
-      console.error(err);
-    }
+  // Ensure parsedHTML is a string (even if empty)
+  parsedHTML = parsedHTML || "";
 
 
+  //console.log(routeLayout);
 
-
-
+  if (routeLayout) {
+      jsCode = `import layoutInit from './+layout.js';\n` + jsCode; 
   }
+
+  jsCode = `import Router from '/build/semantq/router.js';\n` + jsCode; 
+
+
+  
+
+
+
+
+  // Add <script> tag to HTML if jsCode exists
+  if (jsCode) {
+    parsedHTML += `\n<script src="./${jsFileName}" type="module"></script>`;
+  }
+
+  // Add CSS import to jsCode if both jsCode and cssCode exist
+  if (cssCode && jsCode) {
+    jsCode = `import './${cssFileName}';\n${jsCode}`;
+  }
+
+  // Add <link> tag to HTML if cssCode exists but jsCode does not
+  if (cssCode && !jsCode) {
+    parsedHTML = `<link rel="stylesheet" href="./${cssFileName}">\n${parsedHTML}`;
+  }
+
+
+  // insert JS Dummy Consoles 
+  jsCode = jsCode + `\nconsole.log(Router);`;
+  if (routeLayout) {
+  jsCode = jsCode + `\nconsole.log(layoutInit);`;
+  }
+
+
+  // Format jsCode if it exists
+  let formattedJsCode = "";
+  if (jsCode) {
+    try {
+      formattedJsCode = await prettier.format(jsCode, { parser: "babel" });
+    } catch (err) {
+      console.error("Error formatting JS code:", err);
+    }
+  }
+
+  // Format parsedHTML if it exists
+  let formattedHTML = "";
+  if (parsedHTML) {
+    try {
+      formattedHTML = await prettier.format(parsedHTML, { parser: "html" });
+    } catch (err) {
+      console.error("Error formatting HTML:", err);
+    }
+  }
+
+  // Write JS file if jsCode exists
+  if (jsCode) {
+    try {
+      await fs.promises.writeFile(jsFilePath, formattedJsCode);
+      //console.log(`JS file written: ${jsFilePath}`);
+    } catch (err) {
+      console.error("Error writing JS file:", err);
+    }
+  }
+
+  // Write CSS file if cssCode exists
+  if (cssCode) {
+    try {
+      await fs.promises.writeFile(cssFilePath, cssCode);
+      //console.log(`CSS file written: ${cssFilePath}`);
+    } catch (err) {
+      console.error("Error writing CSS file:", err);
+    }
+  }
+
+  // Write HTML file if parsedHTML exists
+  if (parsedHTML) {
+    const newFilePath = filePath.replace(/\+page\.(resolved|smq)\.ast$/, "index.html");
+    try {
+      await fs.promises.unlink(newFilePath).catch((err) => {
+        if (err.code !== "ENOENT") console.error("Error deleting old HTML file:", err);
+      });
+      await fs.promises.writeFile(newFilePath, formattedHTML);
+      //console.log(`HTML file written: ${newFilePath}`);
+    } catch (err) {
+      console.error("Error writing HTML file:", err);
+    }
+  }
+}
+
+
 
 }
