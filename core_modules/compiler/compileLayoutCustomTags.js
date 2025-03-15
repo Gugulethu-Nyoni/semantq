@@ -120,7 +120,7 @@ function compileSMQContent(content, filePath) {
   // Define custom tag mappings
   const tagMappings = {
     '@script': '<script>',
-    '@head': '<header>',
+    '@head': '<head>',
     '@body': '<main>',
     '@footer': '<footer>',
     '@end': '</>',
@@ -166,7 +166,7 @@ function compileSMQContent(content, filePath) {
       if (topTag === 'script') {
         compiledContent += '</script>\n';
       } else if (topTag === 'head') {
-        compiledContent += '</header>\n';
+        compiledContent += '</head>\n';
       } else if (topTag === 'body') {
         compiledContent += '</main>\n';
       } else if (topTag === 'footer') {
