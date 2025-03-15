@@ -88,6 +88,11 @@ function cleanJSAST(node) {
         node.params = [];
     }
 
+    // Handle ObjectExpression with null properties
+    if (node.type === 'ObjectExpression' && node.properties === null) {
+        node.properties = [];
+    }
+
     // Recursively clean child nodes
     for (const key in node) {
         if (node.hasOwnProperty(key)) {
@@ -103,7 +108,6 @@ function cleanJSAST(node) {
 
     return node;
 }
-
 
 
 jsAST = cleanJSAST(jsAST);
