@@ -756,7 +756,7 @@ export default async function transformASTs(jsAST, cssAST, customSyntaxAST, file
 
 // Extract header, main, and footer blocks from the layout AST
 let layoutAstBlocks = {
-  header: null,
+  head: null,
   main: null,
   footer: null,
 };
@@ -773,8 +773,8 @@ function traverse(node) {
 
   // If the node is an object, check its type and name
   if (node.type === 'Element') {
-    if (node.name === 'header') {
-      layoutAstBlocks.header = node;
+    if (node.name === 'head') {
+      layoutAstBlocks.head = node;
     } else if (node.name === 'main') {
       layoutAstBlocks.main = node;
     } else if (node.name === 'footer') {
@@ -803,7 +803,7 @@ if (layoutAST.customAST) {
 
   // Parse each block using customHtmlParser
   const layoutHtml = {
-    header: layoutAstBlocks.header ? customHtmlParser(layoutAstBlocks.header) : '',
+    head: layoutAstBlocks.head ? customHtmlParser(layoutAstBlocks.head) : '',
     main: layoutAstBlocks.main ? customHtmlParser(layoutAstBlocks.main) : '',
     footer: layoutAstBlocks.footer ? customHtmlParser(layoutAstBlocks.footer) : '',
   };
@@ -822,39 +822,40 @@ if (layoutAST.customAST) {
 
 
 
-  // --------------------
-  // Wrap JavaScript Code in init() Only Once
-  // --------------------
   function wrapCodeInInit(ast) {
-    let imports = [];
-    let otherCode = [];
+  let imports = [];
+  let otherCode = [];
 
-    ast.body.forEach(node => {
-      if (node.type === "ImportDeclaration") {
-        imports.push(node);
-      } else {
-        otherCode.push(node);
-      }
-    });
+  // Separate import statements from other code
+  ast.body.forEach(node => {
+    if (node.type === "ImportDeclaration") {
+      imports.push(node);
+    } else {
+      otherCode.push(node);
+    }
+  });
 
-    const initFunction = {
-      type: "FunctionDeclaration",
-      id: { type: "Identifier", name: "init" },
-      params: [],
-      body: { type: "BlockStatement", body: otherCode },
-    };
+  // Create the async init function
+  const initFunction = {
+    type: "FunctionDeclaration",
+    id: { type: "Identifier", name: "init" },
+    params: [],
+    body: { type: "BlockStatement", body: otherCode },
+    async: true, // Add the async keyword
+  };
 
-    const exportInit = {
-      type: "ExportNamedDeclaration",
-      declaration: initFunction,
-      specifiers: [],
-      source: null,
-    };
+  // Create the export statement for the async init function
+  const exportInit = {
+    type: "ExportNamedDeclaration",
+    declaration: initFunction,
+    specifiers: [],
+    source: null,
+  };
 
-    ast.body = [...imports, exportInit];
-    return ast;
-  }
-
+  // Update the AST body to include imports and the async init function
+  ast.body = [...imports, exportInit];
+  return ast;
+}
 
 
 
@@ -887,7 +888,7 @@ if (layoutAST.customAST) {
   
   if (layoutHTML) {
   const layoutAST = `const layoutBlocks = {
-  header: \`${layoutHTML.header}\`,
+  head: \`${layoutHTML.head}\`,
   body: \`${layoutHTML.main}\`,
   footer: \`${layoutHTML.footer}\`
   };`;
@@ -917,10 +918,10 @@ if (layoutAST.customAST) {
 
 const layoutRenderer = `
 
-export function layoutInit() {
+export async function layoutInit() {
 
 const layoutBlocks = {
-  header: \`${layoutHTML.header}\`,
+  head: \`${layoutHTML.head}\`,
   body: \`${layoutHTML.main}\`,
   footer: \`${layoutHTML.footer}\`
   };
@@ -929,8 +930,8 @@ const layoutBlocks = {
   if (layoutBlocks) {
 
     // Step 1: Update <head> if header exists
-    if (layoutBlocks.header) {
-      updateHead(layoutBlocks.header);
+    if (layoutBlocks.head) {
+      updateHead(layoutBlocks.head);
     }
 
     // Step 2: Update <body> if body exists
@@ -976,7 +977,7 @@ function updateHead(headerHTML) {
   head.appendChild(newElements);
 
 
-   // Load scripts in the header
+   // Load scripts in the head
     const scripts = template.content.querySelectorAll('script');
     scripts.forEach(script => {
       if (script.src) {
