@@ -1106,12 +1106,22 @@ jsCode = escodegen.generate(newJsAST);
 
 
   //console.log(routeLayout);
+   if (jsCode) {
+    jsCode = `import Router from '/build/semantq/router.js';\n` + jsCode; 
+   } else {
+
+    jsCode = `import Router from '/build/semantq/router.js';\n`; 
+
+
+   }
+
+  
+
 
   if (routeLayout) {
       jsCode = `import layoutInit from './+layout.js';\n` + jsCode; 
   }
 
-  jsCode = `import Router from '/build/semantq/router.js';\n` + jsCode; 
 
 
   
@@ -1136,7 +1146,11 @@ jsCode = escodegen.generate(newJsAST);
 
 
   // insert JS Dummy Consoles 
+  //console.log(jsCode);
+  
   jsCode = jsCode + `\nconsole.log(Router);`;
+
+
   if (routeLayout) {
   jsCode = jsCode + `\nconsole.log(layoutInit);`;
   }
