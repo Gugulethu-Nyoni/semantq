@@ -31,6 +31,26 @@ async function cleanupDirectory(directory) {
   }
 }
 
+
+async function moveFilesToBuild(directory) {
+  try {
+    // Define the source and destination paths for index.html
+    const srcIndexHtml = path.join(rootDir, 'index.html');
+    const destIndexHtml = path.join(directory, 'index.html');
+
+    // Ensure the destination directory exists
+    await fse.ensureDir(directory);
+
+    // Copy index.html from the root to the specified directory
+    await fse.copy(srcIndexHtml, destIndexHtml);
+
+    console.log(`Copied index.html to ${directory}`);
+  } catch (err) {
+    console.error('Error moving index.html:', err);
+  }
+}
+
+
 // Compile custom tags
 async function compileCustomTags(sourceDir) {
   try {
@@ -175,6 +195,7 @@ async function main(sourceDir, destDir, destDirBase) {
   try {
     // Step 0: Clean up the build directory
     await cleanupDirectory(destDirBase);
+    await moveFilesToBuild(destDirBase);
 
 
     // Step 1: Compile custom tags
