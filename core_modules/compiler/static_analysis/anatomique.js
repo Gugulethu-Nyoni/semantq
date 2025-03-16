@@ -699,6 +699,8 @@ export default async function transformASTs(jsAST, cssCode, customSyntaxAST, fil
   let newHTMLAST = transformedASTs ? transformedASTs.transformedCustomSyntaxAST : customSyntaxAST;
   let routeLayout = false; 
   let layoutJS = '';
+  let imports = `import Router from '/build/semantq/router.js';\n`;
+
       //console.log("NJST",JSON.stringify(newHTMLAST,null,2));
 
 
@@ -718,6 +720,72 @@ export default async function transformASTs(jsAST, cssCode, customSyntaxAST, fil
 */
 
   //let appendtoJsScriptTag = `\n${reRendersObject}\n`;
+
+function hoistImports(ast) {
+  let importsAST = [];
+  let jsCodeAST = [];
+
+  // Separate import statements from other code
+  ast.body.forEach(node => {
+    if (node.type === "ImportDeclaration") {
+      importsAST.push(node); // Collect import statements
+    } else {
+      jsCodeAST.push(node); // Collect the rest of the code
+    }
+  });
+
+  // Return the imports and other code as separate objects
+  return {
+    importsAST,
+    jsCodeAST,
+  };
+}
+
+let jsCode ='';
+//let imports;
+
+// Validate newJsAST
+if (newJsAST.body && newJsAST.body.length > 0) {
+  //console.warn("Processing:", filePath);
+
+  const { importsAST, jsCodeAST } = hoistImports(newJsAST);
+
+  // Generate code from AST (only if AST is not empty)
+  if (importsAST.length > 0) {
+    try {
+      imports += escodegen.generate({
+        type: "Program",
+        body: importsAST,
+        sourceType: "module" // Ensure it's treated as a module
+      });
+    } catch (error) {
+      //console.error("Error generating imports:", error);
+    }
+  } else {
+    //console.warn("No import statements found in:", filePath);
+  }
+
+  if (jsCodeAST.length > 0) {
+    try {
+      jsCode = escodegen.generate({
+        type: "Program",
+        body: jsCodeAST
+      });
+    } catch (error) {
+      //console.error("Error generating JS code:", error);
+    }
+  } else {
+    //console.warn("No JavaScript code found in:", filePath);
+  }
+} else {
+  //console.error('Skipping', filePath);
+}
+
+//console.log("Imports:", imports);
+//console.log("JS Code:", jsCode);
+//return;
+
+
 
 
 
@@ -1072,14 +1140,29 @@ fs.writeFile(newFileName, layoutRenderer, (err) => {
   //const jsCode = escodegen.generate(newJsAST);
 //const jsCode = prettier.format(newJsAST, {  parser: "babel", });
 
-let jsCode;
 
+
+
+
+
+//return; 
+
+/*
 if (newJsAST && newJsAST.body && newJsAST.body.length > 0) {
-jsCode = escodegen.generate(newJsAST);
 
+    console.log(filePath,newJsAST);
+
+  const { importsAST, jsCodeAST } = hoistImports(newJsAST);
+
+ // console.log(filePath,importsAST);
+
+  // Generate code from AST
+  jsCode = escodegen.generate(jsCodeAST);
+  imports = escodegen.generate(importsAST);
 }
 
-//console.log(JSON.stringify(jsCode,null,2));
+*/
+
 //console.log(JSON.stringify(newJsAST,null,2));
 
 
@@ -1107,17 +1190,19 @@ jsCode = escodegen.generate(newJsAST);
   // Ensure parsedHTML is a string (even if empty)
   parsedHTML = parsedHTML || "";
 
+  jsCode = jsCode + `\nconsole.log(Router);`;
 
   //console.log(routeLayout);
-   if (jsCode) {
-    jsCode = `import Router from '/build/semantq/router.js';\n` + jsCode; 
+  /*
+   if (imports) {
+    imports = `import Router from '/build/semantq/router.js';\n` + imports; 
    } else {
 
-    jsCode = `import Router from '/build/semantq/router.js';\n`; 
+    imports = `import Router from '/build/semantq/router.js';\n`; 
 
 
    }
-
+*/
   
 
 
@@ -1146,7 +1231,6 @@ jsCode = escodegen.generate(newJsAST);
   // insert JS Dummy Consoles 
   //console.log(jsCode);
   
-  jsCode = jsCode + `\nconsole.log(Router);`;
 
 
 /*
@@ -1155,8 +1239,15 @@ jsCode = escodegen.generate(newJsAST);
   }
 */
   // 
+let updatedJsCode;
 
-const updatedJsCode = `async function layoutJS() {
+
+  if (routeLayout) {
+
+updatedJsCode = `
+${imports}
+
+async function layoutJS() {
   console.log("Layout script started");
 
   ${layoutJS}
@@ -1189,6 +1280,35 @@ async function main() {
 
 main();`
 
+} else {
+
+updatedJsCode = `
+${imports}
+async function pageJS() {
+  ${jsCode}
+}
+
+async function main() {
+  try {
+    await new Promise((resolve) => {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", resolve);
+      } else {
+        resolve();
+      }
+    });
+
+    console.log("DOM is ready");
+
+    await pageJS();
+  } catch (error) {
+    console.error("Error in main function:", error);
+  }
+}
+
+main();`
+
+}
 
 
   // Format jsCode if it exists
@@ -1202,11 +1322,6 @@ main();`
   }
 
 
-let layoutScript ='';
-
-  if (routeLayout) {
-    //layoutScript = `<script type="module" src="./+layout.js"> </script>`
-  }
 
 
   parsedHTML = `<!DOCTYPE html>
@@ -1218,7 +1333,6 @@ let layoutScript ='';
     <meta name="description" content="A brief and compelling summary of your page with relevant keywords.">
     <meta name="robots" content="index, follow">
     <meta name="author" content="Your Name or Brand">
-   ${layoutScript}
 </head>
 <body>
 
