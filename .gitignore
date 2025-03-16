@@ -2,10 +2,5 @@ ignores/
 .DS_Store
 node_modules/
 ARCHIVE/
-cmdapp/
-mytail/
-dev_app/
-tailapp/
-spark/
-server/*/
-myapp/
+lab/
+sites/
