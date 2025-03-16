@@ -1,1 +1,0 @@
-alert("This component js works");
