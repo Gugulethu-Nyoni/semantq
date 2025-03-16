@@ -1032,32 +1032,40 @@ const layoutBlocks = {
 function updateHead(headerHTML) {
   const head = document.head;
 
-  // Create a template for the header content
+  // Create a template for the new header content
   const template = document.createElement('template');
   template.innerHTML = headerHTML;
 
-  // Remove existing elements except those with semantq
-
-  Array.from(head.children).forEach(child => {
-    if (!child.hasAttribute('semantq')) {
-      head.removeChild(child);
+  // Preserve only Vite-injected scripts and modulepreload links
+  const preservedElements = [];
+  head.querySelectorAll("script, link[rel='modulepreload']").forEach(el => {
+    if (
+      (el.tagName === "SCRIPT" && el.type === "module") || 
+      (el.tagName === "LINK" && el.rel === "modulepreload") ||
+      el.src?.includes("/assets/router-") ||  
+      el.href?.includes("/assets/modulepreload-polyfill")
+    ) {
+      preservedElements.push(el.outerHTML); 
     }
   });
 
-  // Clone and append the template content
+  // Remove all existing head content
+  while (head.firstChild) {
+    head.removeChild(head.firstChild);
+  }
+
+  // Append new head content
   const newElements = template.content.cloneNode(true);
   head.appendChild(newElements);
 
+  // Re-add preserved Vite scripts
+  preservedElements.forEach(scriptHTML => {
+    const temp = document.createElement("template");
+    temp.innerHTML = scriptHTML;
+    head.appendChild(temp.content.firstChild);
+  });
 
-   // Load scripts in the head
-    const scripts = template.content.querySelectorAll('script');
-    scripts.forEach(script => {
-      if (script.src) {
-        loadScript(script.src)
-          .then(() => console.log('Loaded script'))
-          .catch(err => console.error('Failed to load script', err));
-      }
-    });
+  console.log("Updated head with layout content while preserving Vite scripts.");
 }
 
 
