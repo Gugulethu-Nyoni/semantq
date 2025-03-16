@@ -698,6 +698,7 @@ export default async function transformASTs(jsAST, cssCode, customSyntaxAST, fil
   let newJsAST = transformedASTs ? transformedASTs.transformedJsAST : jsAST;
   let newHTMLAST = transformedASTs ? transformedASTs.transformedCustomSyntaxAST : customSyntaxAST;
   let routeLayout = false; 
+  let layoutJS = '';
       //console.log("NJST",JSON.stringify(newHTMLAST,null,2));
 
 
@@ -921,7 +922,7 @@ if (layoutAST.customAST) {
 
 const layoutRenderer = `
 
-export default async function layoutInit() {
+function layoutInit() {
 
 const layoutBlocks = {
   head: \`${layoutHTML.head}\`,
@@ -1026,6 +1027,8 @@ layoutInit();
 `; 
 
 
+layoutJS = layoutRenderer;
+
 /*
 
     // Parse the layoutAST string into an AST
@@ -1118,11 +1121,6 @@ jsCode = escodegen.generate(newJsAST);
   
 
 
-  if (routeLayout) {
-      jsCode = `import layoutInit from './+layout.js';\n` + jsCode; 
-  }
-
-
 
   
 
@@ -1131,7 +1129,7 @@ jsCode = escodegen.generate(newJsAST);
 
   // Add <script> tag to HTML if jsCode exists
   if (jsCode) {
-    parsedHTML += `\n<script src="./${jsFileName}" type="module"></script>`;
+    parsedHTML += `\n<script src="./${jsFileName}" type="module" defer></script>`;
   }
 
   // Add CSS import to jsCode if both jsCode and cssCode exist
@@ -1151,20 +1149,82 @@ jsCode = escodegen.generate(newJsAST);
   jsCode = jsCode + `\nconsole.log(Router);`;
 
 
+/*
   if (routeLayout) {
   jsCode = jsCode + `\nconsole.log(layoutInit);`;
   }
+*/
+  // 
+
+const updatedJsCode = `async function layoutJS() {
+  console.log("Layout script started");
+
+  ${layoutJS}
+}
+
+async function pageJS() {
+  
+  ${jsCode}
+}
+
+async function main() {
+  try {
+    await new Promise((resolve) => {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", resolve);
+      } else {
+        resolve();
+      }
+    });
+
+    console.log("DOM is ready");
+
+    await layoutJS();
+
+    await pageJS();
+  } catch (error) {
+    console.error("Error in main function:", error);
+  }
+}
+
+main();`
+
 
 
   // Format jsCode if it exists
   let formattedJsCode = "";
-  if (jsCode) {
+  if (updatedJsCode) {
     try {
-      formattedJsCode = await prettier.format(jsCode, { parser: "babel" });
+      formattedJsCode = await prettier.format(updatedJsCode, { parser: "babel" });
     } catch (err) {
       console.error("Error formatting JS code:", err);
     }
   }
+
+
+let layoutScript ='';
+
+  if (routeLayout) {
+    //layoutScript = `<script type="module" src="./+layout.js"> </script>`
+  }
+
+
+  parsedHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Page Title | Primary Keyword</title>
+    <meta name="description" content="A brief and compelling summary of your page with relevant keywords.">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Your Name or Brand">
+   ${layoutScript}
+</head>
+<body>
+
+${parsedHTML}
+</body>
+</html>`; 
 
   // Format parsedHTML if it exists
   let formattedHTML = "";
@@ -1177,7 +1237,7 @@ jsCode = escodegen.generate(newJsAST);
   }
 
   // Write JS file if jsCode exists
-  if (jsCode) {
+  if (formattedJsCode) {
     try {
       await fs.promises.writeFile(jsFilePath, formattedJsCode);
       //console.log(`JS file written: ${jsFilePath}`);
