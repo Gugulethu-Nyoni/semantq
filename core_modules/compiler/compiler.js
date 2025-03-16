@@ -195,7 +195,7 @@ async function main(sourceDir, destDir, destDirBase) {
   try {
     // Step 0: Clean up the build directory
     await cleanupDirectory(destDirBase);
-    await moveFilesToBuild(destDirBase);
+    //await moveFilesToBuild(destDirBase);
 
 
     // Step 1: Compile custom tags
