@@ -24,7 +24,10 @@ export default class Router {
   }
 
   isFileBasedRoute(targetRoute) {
-    return this.fileBasedRoutes.hasOwnProperty(targetRoute);
+
+    const isfileBased = this.fileBasedRoutes.hasOwnProperty(targetRoute);
+    //alert(targetRoute, isfileBased);
+    return isfileBased; 
   }
 
   isDeclaredRoute(targetRoute) {
@@ -34,52 +37,43 @@ export default class Router {
   async handleFileBasedRoute(targetRoute) {
     const filePath = this.fileBasedRoutes[targetRoute];
     if (filePath) {
-      // Fetch and render the page
-      const response = await fetch(filePath);
-      if (response.ok) {
-        const html = await response.text();
-        document.body.innerHTML = html;
-
-        // Update the browser's URL without reloading
+        console.log(`Navigating to file-based route: ${targetRoute} -> ${filePath}`);
+        
+        // Update URL in browser history without reloading
         history.pushState({}, "", `/${targetRoute}`);
-      } else {
-        console.error(`Failed to load file-based route: ${targetRoute}`);
-        this.handleRouteError(targetRoute);
-      }
+        
+        // Redirect to the file path without full page reload
+        window.location.replace(filePath);
     } else {
-      console.error(`File-based route not found: ${targetRoute}`);
-      this.handleRouteError(targetRoute);
+        console.error(`File-based route not found: ${targetRoute}`);
+        this.handleRouteError(targetRoute);
     }
-  }
+}
 
-  async handleDeclaredRoute(targetRoute) {
+async handleDeclaredRoute(targetRoute) {
     const routeConfig = this.declaredRoutes.find(route => route.path === targetRoute);
     if (routeConfig) {
-      console.log(`Handling declared route: ${targetRoute}`);
+        console.log(`Handling declared route: ${targetRoute}`);
 
-      // Fetch and render the page using the filePath from the declared route
-      const filePath = routeConfig.filePath;
-      if (filePath) {
-        const response = await fetch(filePath);
-        if (response.ok) {
-          const html = await response.text();
-          document.body.innerHTML = html;
+        const filePath = routeConfig.filePath;
+        if (filePath) {
+            console.log(`Navigating to declared route: ${targetRoute} -> ${filePath}`);
 
-          // Update the browser's URL without reloading
-          history.pushState({}, "", `/${targetRoute}`);
+            // Update URL in browser history without reloading
+            history.pushState({}, "", `/${targetRoute}`);
+
+            // Redirect to the file path without full page reload
+            window.location.replace(filePath);
         } else {
-          console.error(`Failed to load declared route: ${targetRoute}`);
-          this.handleRouteError(targetRoute);
+            console.error(`File path not found for declared route: ${targetRoute}`);
+            this.handleRouteError(targetRoute);
         }
-      } else {
-        console.error(`File path not found for declared route: ${targetRoute}`);
-        this.handleRouteError(targetRoute);
-      }
     } else {
-      console.error(`Declared route not found: ${targetRoute}`);
-      this.handleRouteError(targetRoute);
+        console.error(`Declared route not found: ${targetRoute}`);
+        this.handleRouteError(targetRoute);
     }
-  }
+}
+
 
   handleRouteError(targetRoute) {
     console.error(`Route ${targetRoute} does not exist.`);
@@ -96,6 +90,8 @@ export default class Router {
       if (targetElement.tagName === 'A' && targetElement.getAttribute('href') && !targetElement.getAttribute('href').startsWith('#')) {
         const href = targetElement.getAttribute('href');
 
+        //alert(href);
+
         // Step 1: Check if the route is canonical
         if (this.isCanonicalRoute(href)) {
           console.log(`Canonical route detected: ${href}. Letting the browser handle it.`);
@@ -105,6 +101,9 @@ export default class Router {
         event.preventDefault();
 
         const targetRoute = this.sanitizeHref(href);
+
+              //  alert(targetRoute);
+
 
         if (this.isFileBasedRoute(targetRoute)) {
           this.handleFileBasedRoute(targetRoute);
