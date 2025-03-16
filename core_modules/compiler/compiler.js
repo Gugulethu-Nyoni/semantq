@@ -32,19 +32,19 @@ async function cleanupDirectory(directory) {
 }
 
 
-async function moveFilesToBuild(directory) {
+async function moveFilesToBuild() {
   try {
     // Define the source and destination paths for index.html
     const srcIndexHtml = path.join(rootDir, 'index.html');
-    const destIndexHtml = path.join(directory, 'index.html');
+    const destIndexHtml = path.join(rootDir, 'public', 'index.html');
 
     // Ensure the destination directory exists
-    await fse.ensureDir(directory);
+    await fse.ensureDir(path.join(rootDir, 'public'));
 
-    // Copy index.html from the root to the specified directory
+    // Copy index.html from the root to the public directory
     await fse.copy(srcIndexHtml, destIndexHtml);
 
-    console.log(`Copied index.html to ${directory}`);
+    console.log(`Copied index.html to ${path.join(rootDir, 'public')}`);
   } catch (err) {
     console.error('Error moving index.html:', err);
   }
