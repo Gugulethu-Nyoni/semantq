@@ -217,9 +217,11 @@ async function main(sourceDir, destDir, destDirBase) {
     await transformTextNodes(componentsDest);
 
 
+
     // Step 4: Resolve imports and slots
    await importsResolution(componentsDest);
    await slotsResolution(componentsDest);
+
 
   /* RESOLVE LAYOUT FIELS HERE */
 
@@ -233,6 +235,7 @@ async function main(sourceDir, destDir, destDirBase) {
 
     await importsResolution(destDir);
     await slotsResolution(destDir);
+
 
 
     // Step 5: Transform components
