@@ -4,6 +4,13 @@ import fs from 'fs-extra';
 import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
+import { InferenceClient } from "@huggingface/inference";
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
+
+const client = new InferenceClient(process.env.HUGGINGFACE_API_KEY);
 
 // Import utility functions
 import { generateResource, generateModel, generateService, generateController, generateRoute } from './cli-utils.js';
@@ -366,7 +373,8 @@ program
       fs.mkdirSync(routePath, { recursive: true });
 
       // Create necessary files
-    const pageContent = `@script
+    const pageContent = `
+    @script
 
     @end
 
@@ -380,6 +388,90 @@ program
       console.log(`✅ Route '${routeName}' created successfully!`);
     } catch (error) {
       console.error(`❌ Error creating route '${routeName}':`, error.message);
+    }
+  });
+
+
+// ===============================
+//  SEMANTQ AI COMMANDS
+// ===============================
+
+
+program
+  .command('ai <prompt>')
+  .description('Generate code using AI and save it to the specified route directory')
+  .option('-r, --route <route>', 'Specify the route directory (e.g., contact, store)')
+  .option('--full', 'Wrap the response in Semantq custom tags (@script, @style, @html)')
+  .option('--js', 'Generate only JavaScript (no wrapping tags)')
+  .option('--css', 'Generate only CSS (no wrapping tags)')
+  .option('--html', 'Generate only HTML (no wrapping tags)')
+  .option('--append', 'Append the generated code to the file instead of overwriting')
+  .action(async (prompt, options) => {
+    try {
+      // Determine the output directory based on the --route flag
+      if (!options.route) {
+        console.error("Error: --route flag is required to specify the output directory.");
+        process.exit(1);
+      }
+
+      const outputDir = path.join("src", "routes", options.route);
+      const outputPath = path.join(outputDir, "+page.html");
+
+      // Ensure the output directory exists
+      fs.ensureDirSync(outputDir);
+
+      // Append wrapping instructions to the prompt if --full is used
+      let finalPrompt = prompt;
+      if (options.full) {
+        finalPrompt += `
+          - Wrap the JavaScript code in Semantq custom JS tags: @script //code @end
+          - Wrap the CSS code in Semantq custom CSS tags: @style /* code */ @end
+          - Wrap the HTML code in Semantq custom HTML tags: @html <!-- code -->
+          - Do not include an @end tag for the HTML section.
+          - Return only the HTML code, without any additional explanation.
+        `;
+      } else if (options.js) {
+        finalPrompt += " Return only the JavaScript code, without any additional explanation.";
+      } else if (options.css) {
+        finalPrompt += " Return only the CSS code, without any additional explanation.";
+      } else if (options.html) {
+        finalPrompt += " Return only the HTML code, without any additional explanation.";
+      }
+
+      // Call the Hugging Face API
+      const chatCompletion = await client.chatCompletion({
+        model: "deepseek-ai/DeepSeek-R1",
+        messages: [
+          {
+            role: "user",
+            content: finalPrompt,
+          },
+        ],
+        provider: "novita",
+        max_tokens: 500,
+      });
+
+      const response = chatCompletion.choices[0].message.content;
+
+      // Extract code block from Markdown (if present)
+      const codeBlockRegex = /```[\s\S]*?```/g;
+      const codeMatches = response.match(codeBlockRegex);
+
+      let code = response; // Default to full response
+      if (codeMatches && codeMatches.length > 0) {
+        code = codeMatches[0].replace(/```/g, "").trim(); // Remove Markdown backticks
+      }
+
+      // Append or write the output to the file
+      if (options.append) {
+        fs.appendFileSync(outputPath, `\n\n${code}`, "utf-8");
+        console.log(`Code appended to ${outputPath}`);
+      } else {
+        fs.writeFileSync(outputPath, code, "utf-8");
+        console.log(`Code written to ${outputPath}`);
+      }
+    } catch (error) {
+      console.error("Error:", error);
     }
   });
 

@@ -1,9 +1,10 @@
 "use strict";
 
 export default class GetNodePositions {
-  constructor (ast, targetNode) {
+  constructor (ast, targetNode, mode = null) {
     this.ast=ast;
     this.targetNode=targetNode;
+    this.mode = mode;
     //console.log("inside",JSON.stringify(ast,null,2));
   }
 
@@ -106,57 +107,91 @@ walk() {
     let matchFound = false;
     let nodeStack = [];
     let visitedNodes = new Set();
+    let checkNode; 
+
+    // Helper function to check if the node's attribute matches the target node
+    const checkAttributesForTargetNode = (node) => {
+        if (node.attributes) {
+            node.attributes.forEach(attribute => {
+                if (
+                    attribute.start === this.targetNode.start &&
+                    attribute.end === this.targetNode.end &&
+                    attribute.type === this.targetNode.type
+                    
+                ) {
+                    matchFound = true;
+                }
+            });
+        }
+    };
 
     const processNode = (node) => {
-      if (node && (node.type === 'Element' || node.type === 'Text' || node.type === 'MustacheIdentifier' || node.type === 'Attribute')) {
-        const nodeKey = `${node.type}-${node.start}-${node.end}`;
-        if (!visitedNodes.has(nodeKey)) {
-          visitedNodes.add(nodeKey);
-          nodeStack.push({
-            node: node,
-            nodeName: node.name || node.type,
-            nodeType: node.type,
-            nodeText: node.type === 'Text' ? node.text : null,
-          });
+        // Add to node stack for elements, text, mustache, and attributes
+        if (node && (node.type === 'Element' || node.type === 'Text' || node.type === 'MustacheIdentifier' || node.type === 'Attribute')) {
+            //console.log("Inside");
+            const nodeKey = `${node.type}-${node.start}-${node.end}`;
+            if (!visitedNodes.has(nodeKey)) {
+                visitedNodes.add(nodeKey);
+                nodeStack.push({
+                    node: node,
+                    nodeName: node.name || node.type,
+                    nodeType: node.type,
+                    nodeText: node.type === 'Text' ? node.text : null,
+                });
+            }
         }
-      }
 
-      if (
-        node.start === this.targetNode.start &&
-        node.end === this.targetNode.end &&
-        node.type === this.targetNode.type &&
-        node.name === this.targetNode.name &&
-        this.deepEqual(node.attributes, this.targetNode.attributes) &&
-        this.deepEqual(node.children, this.targetNode.children)
-      ) {
-        matchFound = true;
-      }
-
-      if (!matchFound) {
-        if (Array.isArray(node.children)) {
-          node.children.forEach((child) => nestedWalker(child));
-        } else if (typeof node === 'object' && node !== null) {
-          Object.values(node).forEach((value) => nestedWalker(value));
+        // Check the target node against attributes of the current element
+        if (node.type === 'Element') {
+            checkAttributesForTargetNode(node);
         }
-      }
+
+        // Check if the current node matches the target node
+        if (
+            node.start === this.targetNode.start &&
+            node.end === this.targetNode.end &&
+            node.type === this.targetNode.type
+        ) {
+            matchFound = true;
+            //checkNode = node;
+            //return checkNode;
+         
+        }
+
+        // If no match is found, continue traversing nested children and attributes
+        if (!matchFound) {
+            if (Array.isArray(node.children)) {
+                node.children.forEach((child) => nestedWalker(child));
+            } else if (typeof node === 'object' && node !== null) {
+                Object.values(node).forEach((value) => nestedWalker(value));
+            }
+        }
     };
 
     const nestedWalker = (node) => {
-      if (!matchFound) {
-        if (Array.isArray(node)) {
-          node.forEach((item) => nestedWalker(item));
-        } else if (typeof node === 'object' && node !== null) {
-          processNode(node);
-          if (node.children) {
-            node.children.forEach((child) => nestedWalker(child));
-          }
+        if (!matchFound) {
+            if (Array.isArray(node)) {
+                node.forEach((item) => nestedWalker(item));
+            } else if (typeof node === 'object' && node !== null) {
+                processNode(node);
+                if (node.children) {
+                    node.children.forEach((child) => nestedWalker(child));
+                }
+            }
         }
-      }
     };
 
+    // Start walking through the AST from the root
     nestedWalker(this.ast);
+
+    // Return the collected nodes
+    //console.log(nodeStack);
     return nodeStack;
-  }
+}
+
+
+
+
 
 
  findChildren(node) {
@@ -320,6 +355,7 @@ findIndexInAttributes(parent) {
       this.deepEqual(attr.name, this.targetNode.name) &&
       this.deepEqual(attr.value, this.targetNode.value)
     ) {
+      //console.log("FOUND");
       return i; // Return index if found
     }
   }
@@ -359,11 +395,38 @@ init() {
 
 //console.log("HERE now",this.ast);
 const nodeStack = this.walk(this.ast);
-//console.log(nodeStack);
+//console.log("HERE",nodeStack);
 let nodeLocations = [];
 //console.log("NODE STACK"); 
 //console.log(JSON.stringify(nodeStack,null,2));
 
+if (this.mode === 'attribute') {
+
+for (let i = 0; i < nodeStack.length; i++) {
+  const nodeToCheck = nodeStack[i];
+  const result = this.attributesChecker(nodeToCheck);
+
+  //console.log("RESULT",result);
+
+
+  if (result && result.attributes) {
+    const existsIndex = this.findIndexInAttributes(result);
+
+
+    if (existsIndex > -1) {
+        nodeLocations.push({
+        parentNode: nodeToCheck.node,
+        nodeIndex: existsIndex,
+      });
+
+      return nodeLocations;
+    }
+  }
+
+}
+
+}
+  else {
 
 for (let i = 0; i < nodeStack.length; i++) {
   const nodeToCheck = nodeStack[i];
@@ -383,6 +446,7 @@ for (let i = 0; i < nodeStack.length; i++) {
     }
   }
 
+}
 
 
 }
@@ -399,71 +463,68 @@ return nodeLocations;
 
 
 
-const ast = [
-  {
-    "html": {
-      "start": 0,
-      "end": 328,
-      "type": "Fragment",
-      "children": [
-        {
-          "start": 0,
-          "end": 328,
-          "type": "Element",
-          "name": "customSyntax",
-          "attributes": null,
-          "children": [
+const ast = {
+  "html": {
+    "start": 0,
+    "end": 218,
+    "type": "Fragment",
+    "children": [
+      {
+        "start": 0,
+        "end": 218,
+        "type": "Element",
+        "name": "customSyntax",
+        "attributes": null,
+        "children": [
+          [
             [
               {
-                "start": 15,
-                "end": 312,
-                "type": "Element",
-                "name": "div",
-                "attributes": [
-                  {
-                    "start": 20,
-                    "end": 32,
-                    "type": "Attribute",
-                    "name": "class",
-                    "value": [
-                      {
-                        "start": 27,
-                        "end": 31,
-                        "type": "Text",
-                        "raw": "card",
-                        "data": "card"
-                      }
-                    ]
-                  }
-                ],
-                "children": [
-                  [
+                "html": {
+                  "start": 0,
+                  "end": 156,
+                  "type": "Fragment",
+                  "children": [
                     {
-                      "start": 34,
-                      "end": 86,
+                      "start": 0,
+                      "end": 156,
                       "type": "Element",
-                      "name": "h2",
+                      "name": "customSyntax",
                       "attributes": null,
                       "children": [
                         [
                           {
-                            "start": 38,
-                            "end": 81,
+                            "start": 17,
+                            "end": 140,
                             "type": "Element",
-                            "name": "slot",
+                            "name": "div",
                             "attributes": [
                               {
-                                "start": 44,
-                                "end": 56,
+                                "start": 22,
+                                "end": 49,
                                 "type": "Attribute",
-                                "name": "name",
+                                "name": "class",
                                 "value": [
                                   {
-                                    "start": 50,
-                                    "end": 55,
+                                    "start": 29,
+                                    "end": 47,
                                     "type": "Text",
-                                    "raw": "title",
-                                    "data": "title"
+                                    "raw": "animated-underline",
+                                    "data": "animated-underline"
+                                  }
+                                ]
+                              },
+                              {
+                                "start": 49,
+                                "end": 82,
+                                "type": "Attribute",
+                                "name": "style",
+                                "value": [
+                                  {
+                                    "start": 56,
+                                    "end": 81,
+                                    "type": "Text",
+                                    "raw": "color: var(--text-color);",
+                                    "data": "color: var(--text-color);"
                                   }
                                 ]
                               }
@@ -472,132 +533,8 @@ const ast = [
                               [
                                 {
                                   "type": "Text",
-                                  "raw": "c Default Title  ",
-                                  "data": "c Default Title  "
-                                }
-                              ]
-                            ]
-                          }
-                        ]
-                      ]
-                    },
-                    {
-                      "start": 88,
-                      "end": 203,
-                      "type": "Element",
-                      "name": "div",
-                      "attributes": [
-                        {
-                          "start": 93,
-                          "end": 108,
-                          "type": "Attribute",
-                          "name": "class",
-                          "value": [
-                            {
-                              "start": 100,
-                              "end": 107,
-                              "type": "Text",
-                              "raw": "content",
-                              "data": "content"
-                            }
-                          ]
-                        }
-                      ],
-                      "children": [
-                        [
-                          {
-                            "start": 110,
-                            "end": 196,
-                            "type": "Element",
-                            "name": "slot",
-                            "attributes": [
-                              {
-                                "start": 116,
-                                "end": 130,
-                                "type": "Attribute",
-                                "name": "name",
-                                "value": [
-                                  {
-                                    "start": 122,
-                                    "end": 129,
-                                    "type": "Text",
-                                    "raw": "content",
-                                    "data": "content"
-                                  }
-                                ]
-                              }
-                            ],
-                            "children": [
-                              [
-                                {
-                                  "start": 132,
-                                  "end": 188,
-                                  "type": "Element",
-                                  "name": "p",
-                                  "attributes": null,
-                                  "children": [
-                                    [
-                                      {
-                                        "type": "Text",
-                                        "raw": "c No content provided. This is fallback content.",
-                                        "data": "c No content provided. This is fallback content."
-                                      }
-                                    ]
-                                  ]
-                                }
-                              ]
-                            ]
-                          }
-                        ]
-                      ]
-                    },
-                    {
-                      "start": 205,
-                      "end": 305,
-                      "type": "Element",
-                      "name": "footer",
-                      "attributes": null,
-                      "children": [
-                        [
-                          {
-                            "start": 214,
-                            "end": 295,
-                            "type": "Element",
-                            "name": "slot",
-                            "attributes": [
-                              {
-                                "start": 220,
-                                "end": 233,
-                                "type": "Attribute",
-                                "name": "name",
-                                "value": [
-                                  {
-                                    "start": 226,
-                                    "end": 232,
-                                    "type": "Text",
-                                    "raw": "footer",
-                                    "data": "footer"
-                                  }
-                                ]
-                              }
-                            ],
-                            "children": [
-                              [
-                                {
-                                  "start": 235,
-                                  "end": 287,
-                                  "type": "Element",
-                                  "name": "p",
-                                  "attributes": null,
-                                  "children": [
-                                    [
-                                      {
-                                        "type": "Text",
-                                        "raw": "c Default footer: No custom footer provided.",
-                                        "data": "c Default footer: No custom footer provided."
-                                      }
-                                    ]
-                                  ]
+                                  "raw": "Welcome to Semantq ",
+                                  "data": "Welcome to Semantq "
                                 }
                               ]
                             ]
@@ -606,58 +543,318 @@ const ast = [
                       ]
                     }
                   ]
-                ]
+                }
               }
-            ]
-          ]
-        }
-      ]
-    }
-  }
-];
-
-
-
-
-
-
-const targetNode = 
-    {
-      "start": 38,
-      "end": 81,
-      "type": "Element",
-      "name": "slot",
-      "attributes": [
-        {
-          "start": 44,
-          "end": 56,
-          "type": "Attribute",
-          "name": "name",
-          "value": [
+            ],
             {
-              "start": 50,
-              "end": 55,
-              "type": "Text",
-              "raw": "title",
-              "data": "title"
+              "start": 62,
+              "end": 82,
+              "type": "Element",
+              "name": "h1",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "type": "Text",
+                    "raw": "Test Page ",
+                    "data": "Test Page "
+                  }
+                ]
+              ]
+            },
+            {
+              "start": 84,
+              "end": 109,
+              "type": "Element",
+              "name": "h3",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "type": "Text",
+                    "raw": "Count: ",
+                    "data": "Count: "
+                  },
+                  {
+                    "type": "MustacheIdentifier",
+                    "start": {
+                      "offset": 96,
+                      "line": 8,
+                      "column": 13
+                    },
+                    "end": {
+                      "offset": 103,
+                      "line": 8,
+                      "column": 20
+                    },
+                    "expression": {
+                      "type": "Identifier",
+                      "start": null,
+                      "end": null,
+                      "name": {
+                        "type": "Identifier",
+                        "start": {
+                          "offset": 97,
+                          "line": 8,
+                          "column": 14
+                        },
+                        "end": {
+                          "offset": 102,
+                          "line": 8,
+                          "column": 19
+                        },
+                        "name": "count"
+                      },
+                      "loc": {
+                        "start": {
+                          "line": 1,
+                          "column": 2
+                        },
+                        "end": {
+                          "line": 1,
+                          "column": 3
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "Text",
+                    "raw": " ",
+                    "data": " "
+                  }
+                ]
+              ]
+            },
+            {
+              "start": 111,
+              "end": 150,
+              "type": "Element",
+              "name": "button",
+              "attributes": [
+                {
+                  "start": 150,
+                  "end": 164,
+                  "type": "Attribute",
+                  "name": "id",
+                  "value": [
+                    {
+                      "start": 154,
+                      "end": 163,
+                      "type": "Text",
+                      "raw": "m8cw0lo8",
+                      "data": "m8cw0lo8"
+                    }
+                  ]
+                },
+                {
+                  "start": 119,
+                  "end": 137,
+                  "type": "Attribute",
+                  "name": {
+                    "start": 119,
+                    "end": 125,
+                    "type": "EventHandler",
+                    "name": "click",
+                    "modifiers": [],
+                    "expression": {
+                      "type": "CallExpression",
+                      "start": 119,
+                      "end": 125
+                    }
+                  },
+                  "value": [
+                    {
+                      "start": 127,
+                      "end": 136,
+                      "type": "MustacheAttribute",
+                      "name": {
+                        "type": "Identifier",
+                        "start": {
+                          "offset": 127,
+                          "line": 10,
+                          "column": 17
+                        },
+                        "end": {
+                          "offset": 136,
+                          "line": 10,
+                          "column": 26
+                        },
+                        "name": "increment"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "children": [
+                [
+                  {
+                    "type": "Text",
+                    "raw": "+ ",
+                    "data": "+ "
+                  }
+                ]
+              ]
+            },
+            {
+              "start": 151,
+              "end": 157,
+              "type": "Element",
+              "name": "br",
+              "attributes": null,
+              "children": null
+            },
+            {
+              "start": 157,
+              "end": 196,
+              "type": "Element",
+              "name": "button",
+              "attributes": [
+                {
+                  "start": 165,
+                  "end": 183,
+                  "type": "Attribute",
+                  "name": {
+                    "start": 165,
+                    "end": 171,
+                    "type": "EventHandler",
+                    "name": "click",
+                    "modifiers": null,
+                    "expression": {
+                      "type": "CallExpression",
+                      "start": 165,
+                      "end": 171
+                    }
+                  },
+                  "value": [
+                    {
+                      "start": 173,
+                      "end": 182,
+                      "type": "MustacheAttribute",
+                      "name": {
+                        "type": "Identifier",
+                        "start": {
+                          "offset": 173,
+                          "line": 11,
+                          "column": 17
+                        },
+                        "end": {
+                          "offset": 182,
+                          "line": 11,
+                          "column": 26
+                        },
+                        "name": "decrement"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "children": null
+            },
+            {
+              "start": 197,
+              "end": 203,
+              "type": "Element",
+              "name": "br",
+              "attributes": null,
+              "children": null
             }
           ]
-        }
-      ],
-      "children": [
-        [
-          {
-            "type": "Text",
-            "raw": "c Default Title  ",
-            "data": "c Default Title  "
-          }
         ]
-      ]
-    };
+      }
+    ]
+  }
+};
 
 
 
-const getNodeLocations = new GetNodePositions(ast, targetNode);
+
+
+
+/*
+const targetNode = 
+    {
+  "start": 118,
+  "end": 136,
+  "type": "Attribute",
+  "name": {
+    "start": 118,
+    "end": 124,
+    "type": "EventHandler",
+    "name": "click",
+    "modifiers": [],
+    "expression": {
+      "type": "CallExpression",
+      "start": 118,
+      "end": 124
+    }
+  },
+  "value": [
+    {
+      "start": 126,
+      "end": 135,
+      "type": "MustacheAttribute",
+      "name": {
+        "type": "Identifier",
+        "start": {
+          "offset": 126,
+          "line": 10,
+          "column": 17
+        },
+        "end": {
+          "offset": 135,
+          "line": 10,
+          "column": 26
+        },
+        "name": "increment"
+      }
+    }
+  ]
+}; 
+
+*/
+
+const targetNode = {
+  "start": 165,
+  "end": 183,
+  "type": "Attribute",
+  "name": {
+    "start": 165,
+    "end": 171,
+    "type": "EventHandler",
+    "name": "click",
+    "modifiers": null,
+    "expression": {
+      "type": "CallExpression",
+      "start": 165,
+      "end": 171
+    }
+  },
+  "value": [
+    {
+      "start": 173,
+      "end": 182,
+      "type": "MustacheAttribute",
+      "name": {
+        "type": "Identifier",
+        "start": {
+          "offset": 173,
+          "line": 11,
+          "column": 17
+        },
+        "end": {
+          "offset": 182,
+          "line": 11,
+          "column": 26
+        },
+        "name": "decrement"
+      }
+    }
+  ]
+};
+
+
+
+const getNodeLocations = new GetNodePositions(ast, targetNode, 'attribute');
 const nodeLocations = getNodeLocations.init();
 console.log(nodeLocations);
 
