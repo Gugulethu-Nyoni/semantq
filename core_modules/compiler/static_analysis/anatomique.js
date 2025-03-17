@@ -332,41 +332,29 @@ function visitMustacheIdentifierNodes(ast) {
 
 function visitEventHandlerNodes(ast,jsAST) {
 
-  // Function to find the customSyntax node
-  const findCustomSyntaxNode = (node) => {
-    if (!node) return null;
+const walk = new Walker();
+    const nodeType = 'Attribute';
+    const returnType = { path: 'value[0].type' };
+    const pathValue = 'MustacheAttribute';
+    const matchLogic = walk.createMatchLogic(nodeType);
 
-    if (node.type === 'Element' && node.name === 'customSyntax') {
-      return node;
-    }
+    const eventHandlers = walk.deepWalker(
+      ast,
+      nodeType,
+      matchLogic,
+      returnType,
+      pathValue
+    );
 
-    if (node.children && Array.isArray(node.children)) {
-      for (let i = 0; i < node.children.length; i++) {
-        const child = node.children[i];
-        const result = findCustomSyntaxNode(child);
-        if (result) {
-          return result;
-        }
-      }
-    }
+    //console.log(eventHandlers);
 
-    return null;
-  };
-
-  // Find the customSyntax node within the AST
-  const customSyntaxNode = findCustomSyntaxNode(ast.html);
-  
-  //console.log(customSyntaxNode);
-  if (!customSyntaxNode) return;
-
-  // Transform text nodes
-  //const eventHandlerNodesInstance = new TransformEventHandlerNodes();
-  if (customSyntaxNode && jsAST) {
-
-  const eventHandlerNodesInstance = new ProcessEventHandlers(customSyntaxNode, jsAST);
-  
-  }
-  
+    // Process all event handlers
+    eventHandlers.forEach(attr => {
+      const attributeNode = attr; 
+      //console.log(attributeNode);
+  const eventHandlerNodesInstance = new ProcessEventHandlers(ast,jsAST,attributeNode);
+});
+//return;
 
 }
 
@@ -1178,9 +1166,25 @@ if (newJsAST && newJsAST.body && newJsAST.body.length > 0) {
 //const jsCode = generate.default(newJsAST).code;
 //console.log(jsCode);
 
+console.log("AST",JSON.stringify(newHTMLAST,null,2));
+let newHTMLASTFormatted; 
 
-//console.log(newHTMLAST);
-  const parsedHTML = customHtmlParser(newHTMLAST);
+    if(!Array.isArray(newHTMLAST))  {
+    newHTMLASTFormatted = [newHTMLAST]; 
+
+    } else {
+
+    newHTMLASTFormatted = newHTMLAST; 
+
+
+    }
+
+
+  const parsedHTML = customHtmlParser(newHTMLASTFormatted);
+
+
+  //console.log("HTML",JSON.stringify(parsedHTML,null,2));
+
 
     await writeCodeToFile(jsCode, cssCode, parsedHTML);
 
@@ -1227,7 +1231,7 @@ if (newJsAST && newJsAST.body && newJsAST.body.length > 0) {
 
   // Add CSS import to jsCode if both jsCode and cssCode exist
   if (cssCode && jsCode) {
-    jsCode = `import './${cssFileName}';\n${jsCode}`;
+    imports = `${imports} \n import './${cssFileName}';`;
   }
 
   // Add <link> tag to HTML if cssCode exists but jsCode does not
