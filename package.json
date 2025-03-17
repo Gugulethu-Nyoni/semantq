@@ -12,12 +12,13 @@
     "build": "babel src -d dist",
     "test": "jest",
     "install:silent": "npm install --no-warnings --no-audit --no-fund",
-    "audit:fix": "npm audit fix --force"    
+    "audit:fix": "npm audit fix --force"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@huggingface/inference": "^3.5.2",
     "@supabase/supabase-js": "^2.48.1",
     "commander": "^8.1.0",
     "dotenv": "^16.4.7",
