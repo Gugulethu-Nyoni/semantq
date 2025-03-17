@@ -1,9 +1,10 @@
 "use strict";
 
 export default class GetNodePositions {
-  constructor (ast, targetNode) {
+  constructor (ast, targetNode, mode = null) {
     this.ast=ast;
     this.targetNode=targetNode;
+    this.mode = mode;
     //console.log("inside",JSON.stringify(ast,null,2));
   }
 
@@ -106,57 +107,91 @@ walk() {
     let matchFound = false;
     let nodeStack = [];
     let visitedNodes = new Set();
+    let checkNode; 
+
+    // Helper function to check if the node's attribute matches the target node
+    const checkAttributesForTargetNode = (node) => {
+        if (node.attributes) {
+            node.attributes.forEach(attribute => {
+                if (
+                    attribute.start === this.targetNode.start &&
+                    attribute.end === this.targetNode.end &&
+                    attribute.type === this.targetNode.type
+                    
+                ) {
+                    matchFound = true;
+                }
+            });
+        }
+    };
 
     const processNode = (node) => {
-      if (node && (node.type === 'Element' || node.type === 'Text' || node.type === 'MustacheIdentifier' || node.type === 'Attribute')) {
-        const nodeKey = `${node.type}-${node.start}-${node.end}`;
-        if (!visitedNodes.has(nodeKey)) {
-          visitedNodes.add(nodeKey);
-          nodeStack.push({
-            node: node,
-            nodeName: node.name || node.type,
-            nodeType: node.type,
-            nodeText: node.type === 'Text' ? node.text : null,
-          });
+        // Add to node stack for elements, text, mustache, and attributes
+        if (node && (node.type === 'Element' || node.type === 'Text' || node.type === 'MustacheIdentifier' || node.type === 'Attribute')) {
+            //console.log("Inside");
+            const nodeKey = `${node.type}-${node.start}-${node.end}`;
+            if (!visitedNodes.has(nodeKey)) {
+                visitedNodes.add(nodeKey);
+                nodeStack.push({
+                    node: node,
+                    nodeName: node.name || node.type,
+                    nodeType: node.type,
+                    nodeText: node.type === 'Text' ? node.text : null,
+                });
+            }
         }
-      }
 
-      if (
-        node.start === this.targetNode.start &&
-        node.end === this.targetNode.end &&
-        node.type === this.targetNode.type &&
-        node.name === this.targetNode.name &&
-        this.deepEqual(node.attributes, this.targetNode.attributes) &&
-        this.deepEqual(node.children, this.targetNode.children)
-      ) {
-        matchFound = true;
-      }
-
-      if (!matchFound) {
-        if (Array.isArray(node.children)) {
-          node.children.forEach((child) => nestedWalker(child));
-        } else if (typeof node === 'object' && node !== null) {
-          Object.values(node).forEach((value) => nestedWalker(value));
+        // Check the target node against attributes of the current element
+        if (node.type === 'Element') {
+            checkAttributesForTargetNode(node);
         }
-      }
+
+        // Check if the current node matches the target node
+        if (
+            node.start === this.targetNode.start &&
+            node.end === this.targetNode.end &&
+            node.type === this.targetNode.type
+        ) {
+            matchFound = true;
+            //checkNode = node;
+            //return checkNode;
+         
+        }
+
+        // If no match is found, continue traversing nested children and attributes
+        if (!matchFound) {
+            if (Array.isArray(node.children)) {
+                node.children.forEach((child) => nestedWalker(child));
+            } else if (typeof node === 'object' && node !== null) {
+                Object.values(node).forEach((value) => nestedWalker(value));
+            }
+        }
     };
 
     const nestedWalker = (node) => {
-      if (!matchFound) {
-        if (Array.isArray(node)) {
-          node.forEach((item) => nestedWalker(item));
-        } else if (typeof node === 'object' && node !== null) {
-          processNode(node);
-          if (node.children) {
-            node.children.forEach((child) => nestedWalker(child));
-          }
+        if (!matchFound) {
+            if (Array.isArray(node)) {
+                node.forEach((item) => nestedWalker(item));
+            } else if (typeof node === 'object' && node !== null) {
+                processNode(node);
+                if (node.children) {
+                    node.children.forEach((child) => nestedWalker(child));
+                }
+            }
         }
-      }
     };
 
+    // Start walking through the AST from the root
     nestedWalker(this.ast);
+
+    // Return the collected nodes
+    //console.log(nodeStack);
     return nodeStack;
-  }
+}
+
+
+
+
 
 
  findChildren(node) {
@@ -359,11 +394,35 @@ init() {
 
 //console.log("HERE now",this.ast);
 const nodeStack = this.walk(this.ast);
-//console.log(nodeStack);
+//console.log("HERE",nodeStack);
 let nodeLocations = [];
 //console.log("NODE STACK"); 
 //console.log(JSON.stringify(nodeStack,null,2));
 
+if (this.mode === 'attribute') {
+
+for (let i = 0; i < nodeStack.length; i++) {
+  const nodeToCheck = nodeStack[i];
+  const result = this.attributesChecker(nodeToCheck);
+
+  if (result && result.attributes) {
+    const existsIndex = this.findIndexInAttributes(result);
+
+
+    if (existsIndex > -1) {
+        nodeLocations.push({
+        parentNode: nodeToCheck.node,
+        nodeIndex: existsIndex,
+      });
+
+      return nodeLocations;
+    }
+  }
+
+}
+
+}
+  else {
 
 for (let i = 0; i < nodeStack.length; i++) {
   const nodeToCheck = nodeStack[i];
@@ -383,6 +442,7 @@ for (let i = 0; i < nodeStack.length; i++) {
     }
   }
 
+}
 
 
 }
@@ -396,6 +456,8 @@ return nodeLocations;
 
 
 }
+
+
 
 
 
