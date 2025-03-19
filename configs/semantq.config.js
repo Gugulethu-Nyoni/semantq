@@ -2,10 +2,11 @@ import path from 'path';
 const rootDir = process.cwd();
 
 export default {
-  domain: process.env.DOMAIN || 'localhost', // Local development domain
-  targetHost: process.env.TARGET_HOST || 'https://example.com', // Live production domain
-  pageTitle: 'My Awesome Website', // Default page title
-  envFilePath: path.join(rootDir, '.env'), // Path to the .env file in the root of the project
+  domain: process.env.DOMAIN || 'localhost',
+  targetHost: process.env.TARGET_HOST || 'https://example.com',
+  pageTitle: 'My Awesome Website',
+  envFilePath: path.join(rootDir, '.env'),
+  sitemap: true,
 
   routes: {
     declaredRoutes: path.join(rootDir, 'build/routes/routes.js'),
