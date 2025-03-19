@@ -190,6 +190,27 @@ async function routesGenerator(sourceDir, destDir, src, dest) {
   }
 }
 
+
+
+
+async function sitemapGenerator() {
+  try {
+    // Dynamically import the sitemapGenerator module
+    const sitemapModule = await import('./sitemapGenerator.js');
+
+    // Access the default export (generateSitemap function)
+    const generateSitemap = sitemapModule.default;
+
+    // Call the function
+    await generateSitemap();
+  } catch (err) {
+    console.error('Error during sitemap generation:', err);
+  }
+}
+
+
+
+
 // Main function to execute the pipeline sequentially
 async function main(sourceDir, destDir, destDirBase) {
   try {
@@ -245,6 +266,9 @@ async function main(sourceDir, destDir, destDirBase) {
     // Step 6: Generate routes
     await routesGenerator(sourceDir, destDir, src, dest);
 
+
+    // Step 7: Sitemap Generator
+    await sitemapGenerator();
 
     console.log('\x1b[32mCompilation completed successfully!\x1b[0m');
   } catch (error) {
