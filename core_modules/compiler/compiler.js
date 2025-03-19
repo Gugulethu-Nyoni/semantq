@@ -3,6 +3,8 @@
 import path from 'path';
 import fs from 'fs/promises';
 import fse from 'fs-extra';
+import config from '../../semantq.config.js';
+
 
 const rootDir = process.cwd();
 
@@ -269,6 +271,10 @@ async function main(sourceDir, destDir, destDirBase) {
 
     // Step 7: Sitemap Generator
     await sitemapGenerator();
+
+     if (config.sitemap) {
+       await sitemapGenerator();
+  }
 
     console.log('\x1b[32mCompilation completed successfully!\x1b[0m');
   } catch (error) {
