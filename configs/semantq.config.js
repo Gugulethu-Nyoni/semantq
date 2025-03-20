@@ -9,7 +9,12 @@ export default {
   sitemap: true,
   base: '/', // Base path for the site (e.g., '/' or '/subdir/')
 
-    globalComponents: {
+  components: {
+    '$components': path.join(rootDir, 'src/components'),
+  },
+
+
+  globalComponents: {
     '$global': path.join(rootDir, 'src/components/global'),
   },
 
