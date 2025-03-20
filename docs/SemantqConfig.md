@@ -87,6 +87,78 @@ The `semantq.config.js` file is the central configuration file for Semantq, an A
 
 ---
 
+
+### **`components.$components`**
+- **Type:** `string`
+- **Default:** `path.join(rootDir, 'src/components')`
+- **Description:**  
+  Specifies the directory where your application components are stored. By defining the `$components` alias, you can simplify the process of importing components in your pages or other components. This eliminates the need to write lengthy relative paths and saves development time.
+
+  **Example:**
+  ```javascript
+  components: {
+    '$components': path.join(rootDir, 'src/components'),
+  }
+  ```
+
+  In Semantq, all component files use the `.smq` extension (e.g., `Card.smq`, `Button.smq`). However, when importing these components, you can choose to include or omit the `.smq` extension. Both approaches are valid and work seamlessly.
+
+  **Example Imports:**
+  ```javascript
+  import Card from '$components/Card';      // Without .smq extension
+  import Button from '$components/Button.smq'; // With .smq extension
+  ```
+
+  Instead of writing the full path:
+  ```javascript
+  import Card from '../../../src/components/Card.smq';
+  ```
+
+  This makes your code cleaner, more readable, and easier to maintain.
+
+---
+
+### **Key Benefits**
+1. **Simplified Imports:**  
+   The `$components` alias allows you to import components from a centralized location without worrying about relative paths.
+   
+2. **Time-Saving:**  
+   You no longer need to manually calculate and update relative paths when moving files or components around.
+
+3. **Consistency:**  
+   Using aliases ensures a consistent import pattern across your entire application.
+
+4. **Flexibility:**  
+   You can choose to include or omit the `.smq` extension when importing components, providing flexibility and reducing verbosity.
+
+---
+
+### **Example Usage**
+If your `src/components` directory looks like this:
+```
+src/
+  components/
+    Card.smq
+    Button.smq
+    Header.smq
+```
+
+You can import these components in your pages or other components like this:
+```javascript
+import Card from '$components/Card';      // Without .smq extension
+import Button from '$components/Button'; // Without .smq extension
+import Header from '$components/Header.smq'; // With .smq extension
+```
+
+---
+
+### **Why Use `.smq` Files?**
+- **Standardization:**  
+  All component files in Semantq use the `.smq` extension to maintain consistency and make it clear that these files are part of the Semantq framework.
+- **Framework Integration:**  
+  The `.smq` extension ensures that Semantq's build tools and optimizations are applied correctly to these files.
+
+
 ## **2. Global Components Configuration**
 
 
