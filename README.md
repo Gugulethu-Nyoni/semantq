@@ -54,6 +54,8 @@ Your app will be available in the browser at http://localhost:5173 (or the defau
 
 Semantq is an AI-First JavaScript Framework. See this guide on how to use Semantq AI to generate Semantq compliant code using the Semantq AI CLI: [Semantq AI CLI Guide](docs/SemantqAI.md).
 
+Semantq Config. See this guide on how to use Semantq Config to manage you app: [Semantq AI CLI Guide](docs/SemantqConfig.md).
+
 For a detailed syntax guide, check out the [Semantq Syntax Guide](docs/Semantq-Syntax.md).
 
 For a detailed slot composition guide, see: [Semantq Slot Composition Guide](docs/Semantq-slots.md).
