@@ -2,19 +2,14 @@ import fs from 'fs';
 import path from 'path';
 import { walk } from 'estree-walker';
 import { fileURLToPath } from 'url';
+import config from '../../semantq.config.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { components, globalComponents } = config;
+const actualComponentsPath = components['$components'];
+const actualGlobalComponentsPath = globalComponents['$global'];
 
 
-// Define alias resolution (match your Vite config)
-const aliasMap = {
-  "$components": path.resolve(__dirname, "../../src/components"),
-  "$global": path.resolve(__dirname, "../../src/components/global"),
-  "$lib": path.resolve(__dirname, "../../src/lib"),  
-};
 
-//console.warn("ALIAS",aliasMap.$components)
 
 
 
@@ -127,6 +122,7 @@ function mergeComponents(imports, baseDir, astFile) {
             componentAST = JSON.parse(fs.readFileSync(componentPath, 'utf-8'));
         }
 
+
         // Determine keys for accessing component ASTs
         const importJsKey = isResolved ? 'jsAST' : `jsAST_${componentName}`;
         const importCssKey = isResolved ? 'cssAST' : `cssAST_${componentName}`;
@@ -135,6 +131,10 @@ function mergeComponents(imports, baseDir, astFile) {
         const componentJSAST = componentAST[importJsKey] || { content: { body: [] } };
         const componentCSSAST = componentAST[importCssKey] || { content: { nodes: [] } };
         const componentHtmlAST = componentAST[importHtmlKey] || { content: [] };
+
+        //console.log("HERE",componentHtmlAST.content[0].html.children[0].children[0][0]);
+
+
 
         // Merge JS AST
         mergedAST.jsAST = {
@@ -157,12 +157,17 @@ function mergeComponents(imports, baseDir, astFile) {
         // Merge HTML AST
         mergedAST = {
             ...mergedAST,
-            [importHtmlKey]: componentHtmlAST.content,
+            [importHtmlKey]: componentHtmlAST.content[0].html.children[0].children[0],
         };
     }
 
+            //console.log("HERE",componentHtmlAST.content);
+
+
     // Write the merged AST to a new file
     const newFileName = path.join(path.dirname(astFile), `${resourceName}.merged.ast`);
+            //console.log("file",newFileName);
+
     fs.writeFileSync(newFileName, JSON.stringify(mergedAST, null, 2), 'utf-8');
 }
 
@@ -185,21 +190,40 @@ function resolveImports(astFilePath) {
     walk(ast, {
       enter(node) {
         if (node.type === 'ImportDeclaration' && node.source.value.startsWith('$')) {
-          const source = node.source.value; //$components/Button.smq
+          let source = node.source.value; //$global/SemantqNav.smq
+         
+          if (source.includes('$global')) {
+           source = source.replace('$global', actualGlobalComponentsPath); 
+            //console.log("NT",source);
+
+          } 
+
+          if (source.includes('$components')) {
+           source = source.replace('$components', actualComponentsPath); 
+
+          } 
+
+          // check if a .smq extension exists
+
+          let fileName = path.basename(source);
+
+          if (!fileName.endsWith('.smq')) {
+            source = source + '.smq';
+          }
+
+
+          //console.log("NT",source);
+
           let updatedSource = source; 
 
-          if (source.startsWith('$')) {
-            const firstChunk = source.split('/')[0]; // Extract the first chunk (e.g. $components)
-            const alias = aliasMap[firstChunk]; // Get the alias from the alias map
-            updatedSource = source.replace(firstChunk, alias); // Replace the first chunk with the alias
-            //console.log(updatedSource);
-
-          }
+          
           const specifiers = node.specifiers.map((s) => s.local.name);
           imports.push({ updatedSource, specifiers });
         }
       },
     });
+
+    //console.log(imports);
 
     return imports;
   } catch (error) {
@@ -228,7 +252,7 @@ export async function importsResolver(destDir) {
         return null; // Return null if no imports
       }
 
-      //console.log(imports);
+      //console.log("HERE NOW",imports);
 
       const baseDir = path.dirname(astFile);
 
