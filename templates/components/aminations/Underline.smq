@@ -4,6 +4,16 @@
 
 @style
 
+:root {
+  --text-color: #7003a6;              
+  --underline-color: #ff66cc;
+  --gradient-start: #8f00ff;
+  --gradient-end: #ff66cc;
+  --hover-color: #e48bff;
+  --bg-color: #2a1a3b;
+  --accent-color: #ff79d1;
+  --animation-duration: 0.6s;
+}
 
 
 .animated-underline {
