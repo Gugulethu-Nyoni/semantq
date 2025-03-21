@@ -5,6 +5,7 @@ export default {
   domain: process.env.DOMAIN || 'localhost',
   targetHost: process.env.TARGET_HOST || 'https://example.com',
   pageTitle: 'My Awesome Website',
+  metaDescription: 'My Awesome Website',
   envFilePath: path.join(rootDir, '.env'),
   sitemap: true,
   base: '/', // Base path for the site (e.g., '/' or '/subdir/')
