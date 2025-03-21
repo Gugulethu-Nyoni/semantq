@@ -1,6 +1,6 @@
 {
   "name": "semantq",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "type": "module",
   "description": "Semantq is an AI-first JavaScript framework for building reactive web apps, mobile applications, and IoT (4IR) hardware, firmware, and systems.",
   "main": "index.js",
