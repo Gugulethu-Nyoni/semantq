@@ -1,0 +1,44 @@
+
+
+<style>
+:root {
+--text-color: #4104b3;
+--border-right-color: #b30472;
+--font-size-desktop: 1.6rem;
+--font-size-mobile: 1.2rem;
+}
+
+.twe-container {
+display: inline-block;
+}
+
+.typer-effect {
+overflow: hidden;
+border-right: 0.15em solid var(--border-right-color);
+white-space: nowrap;
+animation: typing 1s forwards;
+font-size: var(--font-size-desktop);
+width: 0;
+color: var(--text-color);
+}
+
+@keyframes typing {
+from { width: 0 }
+to { width: 100% }
+}
+
+@media (max-width: 768px) {
+.typer-effect {
+font-size: var(--font-size-mobile);
+}
+}
+</style>
+
+<customSyntax>
+
+<div class="twe-container">
+<div class="typer-effect">
+<slot> I am a type writer effect  </slot>
+</div>
+</div>
+</customSyntax>

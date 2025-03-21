@@ -1,8 +1,8 @@
 {
   "name": "semantq",
-  "version": "1.1.10",
+  "version": "1.2.0",
   "type": "module",
-  "description": "Elegant Purpose Driven JS Framework",
+  "description": "Semantq is an AI-first JavaScript framework for building reactive web apps, mobile applications, and IoT (4IR) hardware, firmware, and systems.",
   "main": "index.js",
   "bin": {
     "semantq": "./cli.js"
@@ -11,22 +11,31 @@
     "start": "node cli.js",
     "build": "babel src -d dist",
     "test": "jest",
-    "install:silent": "npm install --no-warnings --no-audit --no-fund",
+    "install:silent": "npm install --silent --no-warnings --no-audit --no-fund > /dev/null 2>&1",
     "audit:fix": "npm audit fix --force"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@huggingface/inference": "^3.5.2",
-    "@supabase/supabase-js": "^2.48.1",
     "commander": "^8.1.0",
     "dotenv": "^16.4.7",
-    "fs-extra": "^10.0.0"
+    "fs-extra": "^11.3.0",
+    "lru-cache": "^7.17.1"
   },
   "devDependencies": {
-    "jest": "^29.6.0",
+    "jest": "^29.7.0",
     "vite": "^6.1.1",
-    "vite-plugin-html": "^3.2.2"
+    "vite-plugin-html": "^3.2.2",
+    "@huggingface/inference": "^3.5.2"
+
+  },
+  "resolutions": {
+    "glob": "^9.0.0",
+    "inflight": "^2.0.0",
+    "npmlog": "^6.0.0",
+    "rimraf": "^4.0.0",
+    "are-we-there-yet": "^3.0.0",
+    "gauge": "^4.0.0"
   }
 }

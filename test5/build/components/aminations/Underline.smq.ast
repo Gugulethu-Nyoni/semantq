@@ -1,0 +1,932 @@
+{
+  "jsAST_Underline": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 2,
+      "body": [],
+      "sourceType": "module"
+    }
+  },
+  "cssAST_Underline": {
+    "type": "CSS",
+    "content": {
+      "raws": {
+        "semicolon": false,
+        "after": "\n\n"
+      },
+      "type": "root",
+      "nodes": [
+        {
+          "raws": {
+            "before": "\n\n",
+            "between": " ",
+            "semicolon": true,
+            "after": "\n"
+          },
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": {
+                "before": "\n",
+                "between": ": "
+              },
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": {
+                  "css": "\n\n:root {\n--text-color: #7003a6;\n--underline-color: #ff66cc;\n--gradient-start: #8f00ff;\n--gradient-end: #ff66cc;\n--hover-color: #e48bff;\n--bg-color: #2a1a3b;\n--accent-color: #ff79d1;\n--animation-duration: 0.6s;\n}\n\n\n.animated-underline {\ndisplay: inline-block;\nposition: relative;\nfont-size: 2rem;\nfont-weight: bold;\ncolor: var(--text-color);\nmargin: 0;\npadding: 0;\n}\n\n.animated-underline::after {\ncontent: \"\";\nposition: absolute;\nleft: 0;\nbottom: -5px;\nwidth: 0;\nheight: 4px;\nbackground: var(--underline-color);\nanimation: underlineHalfway var(--animation-duration) ease-in-out forwards;\n}\n\n.animated-underline:hover::after {\nanimation: underlineHalfway var(--animation-duration) ease-in-out forwards;\n}\n\n@keyframes underlineHalfway {\nfrom {\nwidth: 0;\n}\nto {\nwidth: 50%; /* Stops at half the width of the text */\n}\n}\n\n/* Responsive Design */\n@media (max-width: 768px) {\n.animated-underline {\nfont-size: 1.5rem;\n}\n}\n\n",
+                  "hasBOM": false,
+                  "document": "\n\n:root {\n--text-color: #7003a6;\n--underline-color: #ff66cc;\n--gradient-start: #8f00ff;\n--gradient-end: #ff66cc;\n--hover-color: #e48bff;\n--bg-color: #2a1a3b;\n--accent-color: #ff79d1;\n--animation-duration: 0.6s;\n}\n\n\n.animated-underline {\ndisplay: inline-block;\nposition: relative;\nfont-size: 2rem;\nfont-weight: bold;\ncolor: var(--text-color);\nmargin: 0;\npadding: 0;\n}\n\n.animated-underline::after {\ncontent: \"\";\nposition: absolute;\nleft: 0;\nbottom: -5px;\nwidth: 0;\nheight: 4px;\nbackground: var(--underline-color);\nanimation: underlineHalfway var(--animation-duration) ease-in-out forwards;\n}\n\n.animated-underline:hover::after {\nanimation: underlineHalfway var(--animation-duration) ease-in-out forwards;\n}\n\n@keyframes underlineHalfway {\nfrom {\nwidth: 0;\n}\nto {\nwidth: 50%; /* Stops at half the width of the text */\n}\n}\n\n/* Responsive Design */\n@media (max-width: 768px) {\n.animated-underline {\nfont-size: 1.5rem;\n}\n}\n\n",
+                  "file": "/Users/gugulethu/code/semantq/test5/style"
+                },
+                "start": {
+                  "column": 1,
+                  "line": 4,
+                  "offset": 10
+                },
+                "end": {
+                  "column": 22,
+                  "line": 4,
+                  "offset": 32
+                }
+              },
+              "prop": "--text-color",
+              "value": "#7003a6"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 5,
+                  "offset": 33
+                },
+                "end": {
+                  "column": 27,
+                  "line": 5,
+                  "offset": 60
+                }
+              },
+              "prop": "--underline-color",
+              "value": "#ff66cc"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 6,
+                  "offset": 61
+                },
+                "end": {
+                  "column": 26,
+                  "line": 6,
+                  "offset": 87
+                }
+              },
+              "prop": "--gradient-start",
+              "value": "#8f00ff"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 7,
+                  "offset": 88
+                },
+                "end": {
+                  "column": 24,
+                  "line": 7,
+                  "offset": 112
+                }
+              },
+              "prop": "--gradient-end",
+              "value": "#ff66cc"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 8,
+                  "offset": 113
+                },
+                "end": {
+                  "column": 23,
+                  "line": 8,
+                  "offset": 136
+                }
+              },
+              "prop": "--hover-color",
+              "value": "#e48bff"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 9,
+                  "offset": 137
+                },
+                "end": {
+                  "column": 20,
+                  "line": 9,
+                  "offset": 157
+                }
+              },
+              "prop": "--bg-color",
+              "value": "#2a1a3b"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 10,
+                  "offset": 158
+                },
+                "end": {
+                  "column": 24,
+                  "line": 10,
+                  "offset": 182
+                }
+              },
+              "prop": "--accent-color",
+              "value": "#ff79d1"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 11,
+                  "offset": 183
+                },
+                "end": {
+                  "column": 27,
+                  "line": 11,
+                  "offset": 210
+                }
+              },
+              "prop": "--animation-duration",
+              "value": "0.6s"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 3,
+              "offset": 2
+            },
+            "end": {
+              "column": 1,
+              "line": 12,
+              "offset": 212
+            }
+          },
+          "selector": ":root"
+        },
+        {
+          "raws": {
+            "before": "\n\n\n",
+            "between": " ",
+            "semicolon": true,
+            "after": "\n"
+          },
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 16,
+                  "offset": 237
+                },
+                "end": {
+                  "column": 22,
+                  "line": 16,
+                  "offset": 259
+                }
+              },
+              "prop": "display",
+              "value": "inline-block"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 17,
+                  "offset": 260
+                },
+                "end": {
+                  "column": 19,
+                  "line": 17,
+                  "offset": 279
+                }
+              },
+              "prop": "position",
+              "value": "relative"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 18,
+                  "offset": 280
+                },
+                "end": {
+                  "column": 16,
+                  "line": 18,
+                  "offset": 296
+                }
+              },
+              "prop": "font-size",
+              "value": "2rem"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 19,
+                  "offset": 297
+                },
+                "end": {
+                  "column": 18,
+                  "line": 19,
+                  "offset": 315
+                }
+              },
+              "prop": "font-weight",
+              "value": "bold"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 20,
+                  "offset": 316
+                },
+                "end": {
+                  "column": 25,
+                  "line": 20,
+                  "offset": 341
+                }
+              },
+              "prop": "color",
+              "value": "var(--text-color)"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 21,
+                  "offset": 342
+                },
+                "end": {
+                  "column": 10,
+                  "line": 21,
+                  "offset": 352
+                }
+              },
+              "prop": "margin",
+              "value": "0"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 22,
+                  "offset": 353
+                },
+                "end": {
+                  "column": 11,
+                  "line": 22,
+                  "offset": 364
+                }
+              },
+              "prop": "padding",
+              "value": "0"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 15,
+              "offset": 215
+            },
+            "end": {
+              "column": 1,
+              "line": 23,
+              "offset": 366
+            }
+          },
+          "selector": ".animated-underline"
+        },
+        {
+          "raws": null,
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 26,
+                  "offset": 397
+                },
+                "end": {
+                  "column": 12,
+                  "line": 26,
+                  "offset": 409
+                }
+              },
+              "prop": "content",
+              "value": "\"\""
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 27,
+                  "offset": 410
+                },
+                "end": {
+                  "column": 19,
+                  "line": 27,
+                  "offset": 429
+                }
+              },
+              "prop": "position",
+              "value": "absolute"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 28,
+                  "offset": 430
+                },
+                "end": {
+                  "column": 8,
+                  "line": 28,
+                  "offset": 438
+                }
+              },
+              "prop": "left",
+              "value": "0"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 29,
+                  "offset": 439
+                },
+                "end": {
+                  "column": 13,
+                  "line": 29,
+                  "offset": 452
+                }
+              },
+              "prop": "bottom",
+              "value": "-5px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 30,
+                  "offset": 453
+                },
+                "end": {
+                  "column": 9,
+                  "line": 30,
+                  "offset": 462
+                }
+              },
+              "prop": "width",
+              "value": "0"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 31,
+                  "offset": 463
+                },
+                "end": {
+                  "column": 12,
+                  "line": 31,
+                  "offset": 475
+                }
+              },
+              "prop": "height",
+              "value": "4px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 32,
+                  "offset": 476
+                },
+                "end": {
+                  "column": 35,
+                  "line": 32,
+                  "offset": 511
+                }
+              },
+              "prop": "background",
+              "value": "var(--underline-color)"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 33,
+                  "offset": 512
+                },
+                "end": {
+                  "column": 75,
+                  "line": 33,
+                  "offset": 587
+                }
+              },
+              "prop": "animation",
+              "value": "underlineHalfway var(--animation-duration) ease-in-out forwards"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 25,
+              "offset": 368
+            },
+            "end": {
+              "column": 1,
+              "line": 34,
+              "offset": 589
+            }
+          },
+          "selector": ".animated-underline::after"
+        },
+        {
+          "raws": null,
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 37,
+                  "offset": 626
+                },
+                "end": {
+                  "column": 75,
+                  "line": 37,
+                  "offset": 701
+                }
+              },
+              "prop": "animation",
+              "value": "underlineHalfway var(--animation-duration) ease-in-out forwards"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 36,
+              "offset": 591
+            },
+            "end": {
+              "column": 1,
+              "line": 38,
+              "offset": 703
+            }
+          },
+          "selector": ".animated-underline:hover::after"
+        },
+        {
+          "raws": {
+            "before": "\n\n",
+            "between": " ",
+            "afterName": " ",
+            "semicolon": false,
+            "after": "\n"
+          },
+          "type": "atrule",
+          "name": "keyframes",
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 40,
+              "offset": 705
+            },
+            "end": {
+              "column": 1,
+              "line": 47,
+              "offset": 816
+            }
+          },
+          "params": "underlineHalfway",
+          "nodes": [
+            {
+              "raws": {
+                "before": "\n",
+                "between": " ",
+                "semicolon": true,
+                "after": "\n"
+              },
+              "type": "rule",
+              "nodes": [
+                {
+                  "raws": null,
+                  "type": "decl",
+                  "parent": null,
+                  "source": {
+                    "input": null,
+                    "start": {
+                      "column": 1,
+                      "line": 42,
+                      "offset": 742
+                    },
+                    "end": {
+                      "column": 9,
+                      "line": 42,
+                      "offset": 751
+                    }
+                  },
+                  "prop": "width",
+                  "value": "0"
+                }
+              ],
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 41,
+                  "offset": 735
+                },
+                "end": {
+                  "column": 1,
+                  "line": 43,
+                  "offset": 753
+                }
+              },
+              "selector": "from"
+            },
+            {
+              "raws": null,
+              "type": "rule",
+              "nodes": [
+                {
+                  "raws": null,
+                  "type": "decl",
+                  "parent": null,
+                  "source": {
+                    "input": null,
+                    "start": {
+                      "column": 1,
+                      "line": 45,
+                      "offset": 759
+                    },
+                    "end": {
+                      "column": 11,
+                      "line": 45,
+                      "offset": 770
+                    }
+                  },
+                  "prop": "width",
+                  "value": "50%"
+                },
+                {
+                  "raws": {
+                    "before": " ",
+                    "left": " ",
+                    "right": " "
+                  },
+                  "type": "comment",
+                  "parent": null,
+                  "source": {
+                    "input": null,
+                    "start": {
+                      "column": 13,
+                      "line": 45,
+                      "offset": 771
+                    },
+                    "end": {
+                      "column": 53,
+                      "line": 45,
+                      "offset": 812
+                    }
+                  },
+                  "text": "Stops at half the width of the text"
+                }
+              ],
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 44,
+                  "offset": 754
+                },
+                "end": {
+                  "column": 1,
+                  "line": 46,
+                  "offset": 814
+                }
+              },
+              "selector": "to"
+            }
+          ]
+        },
+        {
+          "raws": {
+            "before": "\n\n",
+            "left": " ",
+            "right": " "
+          },
+          "type": "comment",
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 49,
+              "offset": 818
+            },
+            "end": {
+              "column": 23,
+              "line": 49,
+              "offset": 841
+            }
+          },
+          "text": "Responsive Design"
+        },
+        {
+          "raws": {
+            "before": "\n",
+            "between": " ",
+            "afterName": " ",
+            "semicolon": false,
+            "after": "\n"
+          },
+          "type": "atrule",
+          "name": "media",
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 50,
+              "offset": 842
+            },
+            "end": {
+              "column": 1,
+              "line": 54,
+              "offset": 914
+            }
+          },
+          "params": "(max-width: 768px)",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "rule",
+              "nodes": [
+                {
+                  "raws": null,
+                  "type": "decl",
+                  "parent": null,
+                  "source": {
+                    "input": null,
+                    "start": {
+                      "column": 1,
+                      "line": 52,
+                      "offset": 892
+                    },
+                    "end": {
+                      "column": 18,
+                      "line": 52,
+                      "offset": 910
+                    }
+                  },
+                  "prop": "font-size",
+                  "value": "1.5rem"
+                }
+              ],
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 51,
+                  "offset": 870
+                },
+                "end": {
+                  "column": 1,
+                  "line": 53,
+                  "offset": 912
+                }
+              },
+              "selector": ".animated-underline"
+            }
+          ]
+        }
+      ],
+      "source": {
+        "input": null,
+        "start": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        },
+        "end": {
+          "column": 1,
+          "line": 56,
+          "offset": 916
+        }
+      }
+    }
+  },
+  "underline": {
+    "type": "HTML",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 156,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 156,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "start": 17,
+                    "end": 140,
+                    "type": "Element",
+                    "name": "div",
+                    "attributes": [
+                      {
+                        "start": 22,
+                        "end": 49,
+                        "type": "Attribute",
+                        "name": "class",
+                        "value": [
+                          {
+                            "start": 29,
+                            "end": 47,
+                            "type": "Text",
+                            "raw": "animated-underline",
+                            "data": "animated-underline"
+                          }
+                        ]
+                      },
+                      {
+                        "start": 49,
+                        "end": 82,
+                        "type": "Attribute",
+                        "name": "style",
+                        "value": [
+                          {
+                            "start": 56,
+                            "end": 81,
+                            "type": "Text",
+                            "raw": "color: var(--text-color);",
+                            "data": "color: var(--text-color);"
+                          }
+                        ]
+                      }
+                    ],
+                    "children": [
+                      [
+                        {
+                          "start": 84,
+                          "end": 133,
+                          "type": "Element",
+                          "name": "slot",
+                          "attributes": null,
+                          "children": [
+                            [
+                              {
+                                "type": "Text",
+                                "raw": "Next-Level Animation Heading Here  ",
+                                "data": "Next-Level Animation Heading Here  "
+                              }
+                            ]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

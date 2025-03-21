@@ -4,19 +4,21 @@
   "description": "",
   "type": "module",
   "main": "src/index.js",
-"scripts": {
-  "start": "node server.js",
-  "compile": "node core_modules/compiler/compiler.js",
-  "dev": "npm run compile && vite",
-  "dev-s": "npm run compile && concurrently \"npm run app-server\" \"vite\"",
-  "app-server": "node ./server/server.js",
-  "build": "npm run compile && vite build",
-  "postbuild": "node core_modules/post-build.js"
-},
+  "scripts": {
+    "start": "node server.js",
+    "compile": "node core_modules/compiler/compiler.js",
+    "dev": "npm run compile && vite",
+    "dev-s": "npm run compile && concurrently \"npm run app-server\" \"vite\"",
+    "app-server": "node ./server/server.js",
+    "build": "npm run compile && vite build",
+    "postbuild": "node core_modules/post-build.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@huggingface/inference": "^3.5.2",
+    "@supabase/supabase-js": "^2.48.1",
     "@types/node": "^20.12.2",
     "acorn": "^8.11.3",
     "autoprefixer": "^10.4.19",
@@ -30,12 +32,9 @@
     "tailwindcss": "^3.4.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.3",
-    "vite": "^6.2.1",
+    "vite": "^6.2.2",
     "vite-plugin-html": "^3.2.2",
-    "vite-plugin-inspect": "^11.0.0",
-    "@huggingface/inference": "^3.5.2",
-    "@supabase/supabase-js": "^2.48.1"
-
+    "vite-plugin-inspect": "^11.0.0"
   },
   "dependencies": {
     "axios": "^1.6.8",
