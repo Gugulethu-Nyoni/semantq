@@ -32,6 +32,7 @@ function traverseDirectory(directoryPath, relativePath, fileBasedRoutes) {
 
 function writeRoutesToFile(basePath, fileBasedRoutes) {
     const filePath = path.join(basePath, 'fileBasedRoutes.js');
+    //console.log(filePath);
     const fileContent = `const fileBasedRoutes = ${JSON.stringify(fileBasedRoutes, null, 2)};\n\nexport default fileBasedRoutes;`;
     fs.writeFileSync(filePath, fileContent);
 }
