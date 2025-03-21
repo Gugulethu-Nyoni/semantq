@@ -9,51 +9,56 @@ import postcss from 'postcss';
  * @param {Object} cssAST - The CSS AST object.
  * @returns {String} - The CSS string.
  */
-function convertCssASTToString(cssAST) {
+function convertCssASTToString(cssAST, indentLevel = 0) {
   if (!cssAST || !cssAST.content || !Array.isArray(cssAST.content.nodes)) {
     console.error('Invalid CSS AST object:', cssAST);
     return '';
   }
 
   let cssString = '';
+  const indent = '  '.repeat(indentLevel); // Indentation based on nesting level
 
-  cssAST.content.nodes.forEach(rule => {
-    if (rule.type === "rule" && rule.selector && Array.isArray(rule.nodes)) {
-      // Process normal CSS rules
-      cssString += `${rule.selector} {\n`;
-
-      rule.nodes.forEach(decl => {
-        if (decl.type === "decl" && decl.prop && decl.value) {
-          cssString += `  ${decl.prop}: ${decl.value};\n`;
-        }
-      });
-
-      cssString += `}\n`;
-
-    } else if (rule.type === "atrule" && rule.name === "keyframes") {
-      // Process @keyframes blocks
-      cssString += `@keyframes ${rule.params} {\n`;
-
-      rule.nodes.forEach(frame => {
-        if (frame.type === "rule" && Array.isArray(frame.nodes)) {
-          cssString += `  ${frame.selector} {\n`;
-
-          frame.nodes.forEach(decl => {
-            if (decl.type === "decl" && decl.prop && decl.value) {
-              cssString += `    ${decl.prop}: ${decl.value};\n`;
+  cssAST.content.nodes.forEach(node => {
+    switch (node.type) {
+      case 'rule':
+        // Handle regular CSS rules
+        if (node.selector && Array.isArray(node.nodes)) {
+          cssString += `${indent}${node.selector} {\n`;
+          node.nodes.forEach(decl => {
+            if (decl.type === 'decl' && decl.prop && decl.value) {
+              cssString += `${indent}  ${decl.prop}: ${decl.value};\n`;
             }
           });
-
-          cssString += `  }\n`;
+          cssString += `${indent}}\n\n`;
         }
-      });
+        break;
 
-      cssString += `}\n`;
+      case 'atrule':
+        // Handle at-rules like @media, @keyframes, etc.
+        if (node.name && Array.isArray(node.nodes)) {
+          cssString += `${indent}@${node.name} ${node.params || ''} {\n`;
+          cssString += convertCssASTToString({ content: { nodes: node.nodes } }, indentLevel + 1);
+          cssString += `${indent}}\n\n`;
+        }
+        break;
+
+      case 'comment':
+        // Handle CSS comments
+        if (node.text) {
+          cssString += `${indent}/* ${node.text} */\n\n`;
+        }
+        break;
+
+      default:
+        // Handle unknown node types (optional)
+        console.warn(`Unsupported node type: ${node.type}`);
+        break;
     }
   });
 
   return cssString;
 }
+
 
 /**
  * Read and process files in a directory recursively.
@@ -138,7 +143,9 @@ async function readSMQHTMLFiles(directory) {
                   const customSyntaxAST = astObject.customAST.content;
                   const customSyntaxObject = customSyntaxAST[0];
 
-                  // Dynamically import the module and apply transformations
+
+                  /* EXRACT JS IMPORTS */
+                // Dynamically import the module and apply transformations
                   try {
                     if (jsAST.content.body.length > 0 || customSyntaxAST[0].html.children[0].children[0].length > 0) {
                       //console.log(jsAST.content.body);
