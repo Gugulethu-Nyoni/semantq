@@ -33,6 +33,30 @@ async function cleanupDirectory(directory) {
   }
 }
 
+async function mapDirectories(sourceDir, destDir) {
+  try {
+    // Ensure the destination directory exists
+    await fse.ensureDir(destDir);
+
+    // Read the contents of the source directory
+    const items = await fs.readdir(sourceDir, { withFileTypes: true });
+
+    for (const item of items) {
+      const sourcePath = path.join(sourceDir, item.name);
+      const destPath = path.join(destDir, item.name);
+
+      if (item.isDirectory()) {
+        // If the item is a directory, recursively map its contents
+        await mapDirectories(sourcePath, destPath);
+      }
+    }
+
+    //console.log(`Mapped directories from ${sourceDir} to ${destDir}`);
+  } catch (error) {
+    console.error(`Error mapping directories: ${error.message}`);
+  }
+}
+
 
 async function moveFilesToBuild() {
   try {
@@ -210,6 +234,23 @@ async function sitemapGenerator() {
   }
 }
 
+async function semantqNavGenerator() {
+  try {
+    // Dynamically import the sitemapGenerator module
+    const navModule = await import('./semantqNav.js');
+
+    // Access the default export (generateSitemap function)
+    const generateNavigation = navModule.default;
+
+    // Call the function
+    await generateNavigation();
+  } catch (err) {
+    console.error('Error during navigation generation:', err);
+  }
+}
+
+
+
 
 
 
@@ -221,13 +262,32 @@ async function main(sourceDir, destDir, destDirBase) {
     //await moveFilesToBuild(destDirBase);
 
 
-    // Step 1: Compile custom tags
+    await mapDirectories(sourceDir, destDir);
+
+
+    // Step 1: Generate routes
+    await routesGenerator(sourceDir, destDir, src, dest);
+
+
+    // Step 2: Sitemap Generator
+    //await sitemapGenerator();
+
+    
+
+     // Step 3: Navigation Generator
+     if (config.semantqNav.enable) {
+       await semantqNavGenerator();
+    }
+
+
+
+    // Step 4: Compile custom tags
     await compileCustomTags(sourceDir);
     await compileCustomTags(componentsSrc);
     await compileLayoutCustomTags(sourceDir);
 
 
-    // Step 2: Parse components
+    // Step 5: Parse components
     await componentParser(destDir);
     await componentParser(componentsDest);
     await layoutComponentParser(destDir);
@@ -235,46 +295,40 @@ async function main(sourceDir, destDir, destDirBase) {
 
 
 
-    // Step 3: Transform text nodes
+    // Step 6: Transform text nodes
     await transformTextNodes(destDir);
     await transformTextNodes(componentsDest);
 
 
 
-    // Step 4: Resolve imports and slots
+    // Step 7: Resolve imports and slots
    await importsResolution(componentsDest);
    await slotsResolution(componentsDest);
 
 
   /* RESOLVE LAYOUT FIELS HERE */
 
-
+    // Step 8: Resolve imports and slots
     await layoutImportsResolution(destDir);
     await layoutSlotsResolution(destDir);
 
     /* END OF DEALING WITH LAYOUTS */
 
 
-
+    // Step 9: Resolve imports and slots
     await importsResolution(destDir);
     await slotsResolution(destDir);
 
 
 
-    // Step 5: Transform components
+    // Step 10: Transform components
     await transformer(destDir);
     await transformer(componentsDest);
 
-    // Step 6: Generate routes
-    await routesGenerator(sourceDir, destDir, src, dest);
-
-
-    // Step 7: Sitemap Generator
-    await sitemapGenerator();
-
      if (config.sitemap) {
        await sitemapGenerator();
-  }
+    }
+
 
     console.log('\x1b[32mCompilation completed successfully!\x1b[0m');
   } catch (error) {
