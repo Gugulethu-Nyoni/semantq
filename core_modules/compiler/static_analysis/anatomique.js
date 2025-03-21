@@ -1166,7 +1166,7 @@ if (newJsAST && newJsAST.body && newJsAST.body.length > 0) {
 //const jsCode = generate.default(newJsAST).code;
 //console.log(jsCode);
 
-console.log("AST",JSON.stringify(newHTMLAST,null,2));
+//console.log("AST",JSON.stringify(newHTMLAST,null,2));
 let newHTMLASTFormatted; 
 
     if(!Array.isArray(newHTMLAST))  {
