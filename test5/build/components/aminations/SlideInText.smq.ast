@@ -1,0 +1,1280 @@
+{
+  "jsAST_SlideInText": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 548,
+      "body": [
+        {
+          "type": "FunctionDeclaration",
+          "start": 2,
+          "end": 188,
+          "id": {
+            "type": "Identifier",
+            "start": 11,
+            "end": 22,
+            "name": "wrapLetters"
+          },
+          "expression": false,
+          "generator": false,
+          "async": false,
+          "params": [
+            {
+              "type": "Identifier",
+              "start": 23,
+              "end": 30,
+              "name": "element"
+            }
+          ],
+          "body": {
+            "type": "BlockStatement",
+            "start": 32,
+            "end": 188,
+            "body": [
+              {
+                "type": "VariableDeclaration",
+                "start": 34,
+                "end": 67,
+                "declarations": [
+                  {
+                    "type": "VariableDeclarator",
+                    "start": 40,
+                    "end": 66,
+                    "id": {
+                      "type": "Identifier",
+                      "start": 40,
+                      "end": 44,
+                      "name": "text"
+                    },
+                    "init": {
+                      "type": "MemberExpression",
+                      "start": 47,
+                      "end": 66,
+                      "object": {
+                        "type": "Identifier",
+                        "start": 47,
+                        "end": 54,
+                        "name": "element"
+                      },
+                      "property": {
+                        "type": "Identifier",
+                        "start": 55,
+                        "end": 66,
+                        "name": "textContent"
+                      },
+                      "computed": false,
+                      "optional": false
+                    }
+                  }
+                ],
+                "kind": "const"
+              },
+              {
+                "type": "ExpressionStatement",
+                "start": 68,
+                "end": 186,
+                "expression": {
+                  "type": "AssignmentExpression",
+                  "start": 68,
+                  "end": 185,
+                  "operator": "=",
+                  "left": {
+                    "type": "MemberExpression",
+                    "start": 68,
+                    "end": 85,
+                    "object": {
+                      "type": "Identifier",
+                      "start": 68,
+                      "end": 75,
+                      "name": "element"
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "start": 76,
+                      "end": 85,
+                      "name": "innerHTML"
+                    },
+                    "computed": false,
+                    "optional": false
+                  },
+                  "right": {
+                    "type": "CallExpression",
+                    "start": 88,
+                    "end": 185,
+                    "callee": {
+                      "type": "MemberExpression",
+                      "start": 88,
+                      "end": 181,
+                      "object": {
+                        "type": "CallExpression",
+                        "start": 88,
+                        "end": 176,
+                        "callee": {
+                          "type": "MemberExpression",
+                          "start": 88,
+                          "end": 106,
+                          "object": {
+                            "type": "CallExpression",
+                            "start": 88,
+                            "end": 102,
+                            "callee": {
+                              "type": "MemberExpression",
+                              "start": 88,
+                              "end": 98,
+                              "object": {
+                                "type": "Identifier",
+                                "start": 88,
+                                "end": 92,
+                                "name": "text"
+                              },
+                              "property": {
+                                "type": "Identifier",
+                                "start": 93,
+                                "end": 98,
+                                "name": "split"
+                              },
+                              "computed": false,
+                              "optional": false
+                            },
+                            "arguments": [
+                              {
+                                "type": "Literal",
+                                "start": 99,
+                                "end": 101,
+                                "value": "",
+                                "raw": "''"
+                              }
+                            ],
+                            "optional": false
+                          },
+                          "property": {
+                            "type": "Identifier",
+                            "start": 103,
+                            "end": 106,
+                            "name": "map"
+                          },
+                          "computed": false,
+                          "optional": false
+                        },
+                        "arguments": [
+                          {
+                            "type": "ArrowFunctionExpression",
+                            "start": 107,
+                            "end": 175,
+                            "id": null,
+                            "expression": false,
+                            "generator": false,
+                            "async": false,
+                            "params": [
+                              {
+                                "type": "Identifier",
+                                "start": 107,
+                                "end": 111,
+                                "name": "char"
+                              }
+                            ],
+                            "body": {
+                              "type": "BlockStatement",
+                              "start": 115,
+                              "end": 175,
+                              "body": [
+                                {
+                                  "type": "ReturnStatement",
+                                  "start": 117,
+                                  "end": 173,
+                                  "argument": {
+                                    "type": "TemplateLiteral",
+                                    "start": 124,
+                                    "end": 172,
+                                    "expressions": [
+                                      {
+                                        "type": "ConditionalExpression",
+                                        "start": 133,
+                                        "end": 163,
+                                        "test": {
+                                          "type": "BinaryExpression",
+                                          "start": 133,
+                                          "end": 145,
+                                          "left": {
+                                            "type": "Identifier",
+                                            "start": 133,
+                                            "end": 137,
+                                            "name": "char"
+                                          },
+                                          "operator": "===",
+                                          "right": {
+                                            "type": "Literal",
+                                            "start": 142,
+                                            "end": 145,
+                                            "value": " ",
+                                            "raw": "' '"
+                                          }
+                                        },
+                                        "consequent": {
+                                          "type": "Literal",
+                                          "start": 148,
+                                          "end": 156,
+                                          "value": "&nbsp;",
+                                          "raw": "'&nbsp;'"
+                                        },
+                                        "alternate": {
+                                          "type": "Identifier",
+                                          "start": 159,
+                                          "end": 163,
+                                          "name": "char"
+                                        }
+                                      }
+                                    ],
+                                    "quasis": [
+                                      {
+                                        "type": "TemplateElement",
+                                        "start": 125,
+                                        "end": 131,
+                                        "value": {
+                                          "raw": "<span>",
+                                          "cooked": "<span>"
+                                        },
+                                        "tail": false
+                                      },
+                                      {
+                                        "type": "TemplateElement",
+                                        "start": 164,
+                                        "end": 171,
+                                        "value": {
+                                          "raw": "</span>",
+                                          "cooked": "</span>"
+                                        },
+                                        "tail": true
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ],
+                        "optional": false
+                      },
+                      "property": {
+                        "type": "Identifier",
+                        "start": 177,
+                        "end": 181,
+                        "name": "join"
+                      },
+                      "computed": false,
+                      "optional": false
+                    },
+                    "arguments": [
+                      {
+                        "type": "Literal",
+                        "start": 182,
+                        "end": 184,
+                        "value": "",
+                        "raw": "''"
+                      }
+                    ],
+                    "optional": false
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "FunctionDeclaration",
+          "start": 191,
+          "end": 397,
+          "id": {
+            "type": "Identifier",
+            "start": 200,
+            "end": 219,
+            "name": "applyAnimationDelay"
+          },
+          "expression": false,
+          "generator": false,
+          "async": false,
+          "params": [
+            {
+              "type": "Identifier",
+              "start": 220,
+              "end": 227,
+              "name": "element"
+            }
+          ],
+          "body": {
+            "type": "BlockStatement",
+            "start": 229,
+            "end": 397,
+            "body": [
+              {
+                "type": "VariableDeclaration",
+                "start": 231,
+                "end": 278,
+                "declarations": [
+                  {
+                    "type": "VariableDeclarator",
+                    "start": 237,
+                    "end": 277,
+                    "id": {
+                      "type": "Identifier",
+                      "start": 237,
+                      "end": 242,
+                      "name": "spans"
+                    },
+                    "init": {
+                      "type": "CallExpression",
+                      "start": 245,
+                      "end": 277,
+                      "callee": {
+                        "type": "MemberExpression",
+                        "start": 245,
+                        "end": 269,
+                        "object": {
+                          "type": "Identifier",
+                          "start": 245,
+                          "end": 252,
+                          "name": "element"
+                        },
+                        "property": {
+                          "type": "Identifier",
+                          "start": 253,
+                          "end": 269,
+                          "name": "querySelectorAll"
+                        },
+                        "computed": false,
+                        "optional": false
+                      },
+                      "arguments": [
+                        {
+                          "type": "Literal",
+                          "start": 270,
+                          "end": 276,
+                          "value": "span",
+                          "raw": "'span'"
+                        }
+                      ],
+                      "optional": false
+                    }
+                  }
+                ],
+                "kind": "const"
+              },
+              {
+                "type": "ExpressionStatement",
+                "start": 279,
+                "end": 395,
+                "expression": {
+                  "type": "CallExpression",
+                  "start": 279,
+                  "end": 394,
+                  "callee": {
+                    "type": "MemberExpression",
+                    "start": 279,
+                    "end": 292,
+                    "object": {
+                      "type": "Identifier",
+                      "start": 279,
+                      "end": 284,
+                      "name": "spans"
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "start": 285,
+                      "end": 292,
+                      "name": "forEach"
+                    },
+                    "computed": false,
+                    "optional": false
+                  },
+                  "arguments": [
+                    {
+                      "type": "ArrowFunctionExpression",
+                      "start": 293,
+                      "end": 393,
+                      "id": null,
+                      "expression": false,
+                      "generator": false,
+                      "async": false,
+                      "params": [
+                        {
+                          "type": "Identifier",
+                          "start": 294,
+                          "end": 298,
+                          "name": "span"
+                        },
+                        {
+                          "type": "Identifier",
+                          "start": 300,
+                          "end": 305,
+                          "name": "index"
+                        }
+                      ],
+                      "body": {
+                        "type": "BlockStatement",
+                        "start": 310,
+                        "end": 393,
+                        "body": [
+                          {
+                            "type": "ExpressionStatement",
+                            "start": 312,
+                            "end": 359,
+                            "expression": {
+                              "type": "AssignmentExpression",
+                              "start": 312,
+                              "end": 358,
+                              "operator": "=",
+                              "left": {
+                                "type": "MemberExpression",
+                                "start": 312,
+                                "end": 337,
+                                "object": {
+                                  "type": "MemberExpression",
+                                  "start": 312,
+                                  "end": 322,
+                                  "object": {
+                                    "type": "Identifier",
+                                    "start": 312,
+                                    "end": 316,
+                                    "name": "span"
+                                  },
+                                  "property": {
+                                    "type": "Identifier",
+                                    "start": 317,
+                                    "end": 322,
+                                    "name": "style"
+                                  },
+                                  "computed": false,
+                                  "optional": false
+                                },
+                                "property": {
+                                  "type": "Identifier",
+                                  "start": 323,
+                                  "end": 337,
+                                  "name": "animationDelay"
+                                },
+                                "computed": false,
+                                "optional": false
+                              },
+                              "right": {
+                                "type": "TemplateLiteral",
+                                "start": 340,
+                                "end": 358,
+                                "expressions": [
+                                  {
+                                    "type": "BinaryExpression",
+                                    "start": 343,
+                                    "end": 355,
+                                    "left": {
+                                      "type": "Identifier",
+                                      "start": 343,
+                                      "end": 348,
+                                      "name": "index"
+                                    },
+                                    "operator": "*",
+                                    "right": {
+                                      "type": "Literal",
+                                      "start": 351,
+                                      "end": 355,
+                                      "value": 0.05,
+                                      "raw": "0.05"
+                                    }
+                                  }
+                                ],
+                                "quasis": [
+                                  {
+                                    "type": "TemplateElement",
+                                    "start": 341,
+                                    "end": 341,
+                                    "value": {
+                                      "raw": "",
+                                      "cooked": ""
+                                    },
+                                    "tail": false
+                                  },
+                                  {
+                                    "type": "TemplateElement",
+                                    "start": 356,
+                                    "end": 357,
+                                    "value": {
+                                      "raw": "s",
+                                      "cooked": "s"
+                                    },
+                                    "tail": true
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "optional": false
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "VariableDeclaration",
+          "start": 400,
+          "end": 462,
+          "declarations": [
+            {
+              "type": "VariableDeclarator",
+              "start": 406,
+              "end": 461,
+              "id": {
+                "type": "Identifier",
+                "start": 406,
+                "end": 418,
+                "name": "animatedText"
+              },
+              "init": {
+                "type": "CallExpression",
+                "start": 421,
+                "end": 461,
+                "callee": {
+                  "type": "MemberExpression",
+                  "start": 421,
+                  "end": 443,
+                  "object": {
+                    "type": "Identifier",
+                    "start": 421,
+                    "end": 429,
+                    "name": "document"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "start": 430,
+                    "end": 443,
+                    "name": "querySelector"
+                  },
+                  "computed": false,
+                  "optional": false
+                },
+                "arguments": [
+                  {
+                    "type": "Literal",
+                    "start": 444,
+                    "end": 460,
+                    "value": ".slide-in-text",
+                    "raw": "'.slide-in-text'"
+                  }
+                ],
+                "optional": false
+              }
+            }
+          ],
+          "kind": "const"
+        },
+        {
+          "type": "IfStatement",
+          "start": 463,
+          "end": 546,
+          "test": {
+            "type": "Identifier",
+            "start": 467,
+            "end": 479,
+            "name": "animatedText"
+          },
+          "consequent": {
+            "type": "BlockStatement",
+            "start": 481,
+            "end": 546,
+            "body": [
+              {
+                "type": "ExpressionStatement",
+                "start": 483,
+                "end": 509,
+                "expression": {
+                  "type": "CallExpression",
+                  "start": 483,
+                  "end": 508,
+                  "callee": {
+                    "type": "Identifier",
+                    "start": 483,
+                    "end": 494,
+                    "name": "wrapLetters"
+                  },
+                  "arguments": [
+                    {
+                      "type": "Identifier",
+                      "start": 495,
+                      "end": 507,
+                      "name": "animatedText"
+                    }
+                  ],
+                  "optional": false
+                }
+              },
+              {
+                "type": "ExpressionStatement",
+                "start": 510,
+                "end": 544,
+                "expression": {
+                  "type": "CallExpression",
+                  "start": 510,
+                  "end": 543,
+                  "callee": {
+                    "type": "Identifier",
+                    "start": 510,
+                    "end": 529,
+                    "name": "applyAnimationDelay"
+                  },
+                  "arguments": [
+                    {
+                      "type": "Identifier",
+                      "start": 530,
+                      "end": 542,
+                      "name": "animatedText"
+                    }
+                  ],
+                  "optional": false
+                }
+              }
+            ]
+          },
+          "alternate": null
+        }
+      ],
+      "sourceType": "module"
+    }
+  },
+  "cssAST_SlideInText": {
+    "type": "CSS",
+    "content": {
+      "raws": {
+        "semicolon": false,
+        "after": "\n"
+      },
+      "type": "root",
+      "nodes": [
+        {
+          "raws": {
+            "before": "\n\n\n\n",
+            "between": " ",
+            "semicolon": true,
+            "after": "\n"
+          },
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": {
+                "before": "\n",
+                "between": ": "
+              },
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": {
+                  "css": "\n\n\n\n.slide-in-text-container {\ndisplay: flex;\njustify-content: center;\nalign-items: center;\nmin-height: 100vh;\npadding: 20px;\nbox-sizing: border-box;\nbackground-color: var(--background-color);\n}\n\n.slide-in-text {\nfont-size: clamp(2rem, 8vw, 3rem);\nfont-weight: bold;\ncolor: var(--primary-color);\noverflow: hidden;\nwhite-space: nowrap;\ntext-align: center;\n}\n\n.slide-in-text span {\ndisplay: inline-block;\nopacity: 0;\ntransform: translateX(-100%);\nanimation: slideIn var(--animation-duration) forwards;\n}\n\n@keyframes slideIn {\nto {\nopacity: 1;\ntransform: translateX(0);\n}\n}\n",
+                  "hasBOM": false,
+                  "document": "\n\n\n\n.slide-in-text-container {\ndisplay: flex;\njustify-content: center;\nalign-items: center;\nmin-height: 100vh;\npadding: 20px;\nbox-sizing: border-box;\nbackground-color: var(--background-color);\n}\n\n.slide-in-text {\nfont-size: clamp(2rem, 8vw, 3rem);\nfont-weight: bold;\ncolor: var(--primary-color);\noverflow: hidden;\nwhite-space: nowrap;\ntext-align: center;\n}\n\n.slide-in-text span {\ndisplay: inline-block;\nopacity: 0;\ntransform: translateX(-100%);\nanimation: slideIn var(--animation-duration) forwards;\n}\n\n@keyframes slideIn {\nto {\nopacity: 1;\ntransform: translateX(0);\n}\n}\n",
+                  "file": "/Users/gugulethu/code/semantq/test5/style"
+                },
+                "start": {
+                  "column": 1,
+                  "line": 6,
+                  "offset": 31
+                },
+                "end": {
+                  "column": 14,
+                  "line": 6,
+                  "offset": 45
+                }
+              },
+              "prop": "display",
+              "value": "flex"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 7,
+                  "offset": 46
+                },
+                "end": {
+                  "column": 24,
+                  "line": 7,
+                  "offset": 70
+                }
+              },
+              "prop": "justify-content",
+              "value": "center"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 8,
+                  "offset": 71
+                },
+                "end": {
+                  "column": 20,
+                  "line": 8,
+                  "offset": 91
+                }
+              },
+              "prop": "align-items",
+              "value": "center"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 9,
+                  "offset": 92
+                },
+                "end": {
+                  "column": 18,
+                  "line": 9,
+                  "offset": 110
+                }
+              },
+              "prop": "min-height",
+              "value": "100vh"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 10,
+                  "offset": 111
+                },
+                "end": {
+                  "column": 14,
+                  "line": 10,
+                  "offset": 125
+                }
+              },
+              "prop": "padding",
+              "value": "20px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 11,
+                  "offset": 126
+                },
+                "end": {
+                  "column": 23,
+                  "line": 11,
+                  "offset": 149
+                }
+              },
+              "prop": "box-sizing",
+              "value": "border-box"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 12,
+                  "offset": 150
+                },
+                "end": {
+                  "column": 42,
+                  "line": 12,
+                  "offset": 192
+                }
+              },
+              "prop": "background-color",
+              "value": "var(--background-color)"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 5,
+              "offset": 4
+            },
+            "end": {
+              "column": 1,
+              "line": 13,
+              "offset": 194
+            }
+          },
+          "selector": ".slide-in-text-container"
+        },
+        {
+          "raws": {
+            "before": "\n\n",
+            "between": " ",
+            "semicolon": true,
+            "after": "\n"
+          },
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 16,
+                  "offset": 213
+                },
+                "end": {
+                  "column": 34,
+                  "line": 16,
+                  "offset": 247
+                }
+              },
+              "prop": "font-size",
+              "value": "clamp(2rem, 8vw, 3rem)"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 17,
+                  "offset": 248
+                },
+                "end": {
+                  "column": 18,
+                  "line": 17,
+                  "offset": 266
+                }
+              },
+              "prop": "font-weight",
+              "value": "bold"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 18,
+                  "offset": 267
+                },
+                "end": {
+                  "column": 28,
+                  "line": 18,
+                  "offset": 295
+                }
+              },
+              "prop": "color",
+              "value": "var(--primary-color)"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 19,
+                  "offset": 296
+                },
+                "end": {
+                  "column": 17,
+                  "line": 19,
+                  "offset": 313
+                }
+              },
+              "prop": "overflow",
+              "value": "hidden"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 20,
+                  "offset": 314
+                },
+                "end": {
+                  "column": 20,
+                  "line": 20,
+                  "offset": 334
+                }
+              },
+              "prop": "white-space",
+              "value": "nowrap"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 21,
+                  "offset": 335
+                },
+                "end": {
+                  "column": 19,
+                  "line": 21,
+                  "offset": 354
+                }
+              },
+              "prop": "text-align",
+              "value": "center"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 15,
+              "offset": 196
+            },
+            "end": {
+              "column": 1,
+              "line": 22,
+              "offset": 356
+            }
+          },
+          "selector": ".slide-in-text"
+        },
+        {
+          "raws": null,
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 25,
+                  "offset": 380
+                },
+                "end": {
+                  "column": 22,
+                  "line": 25,
+                  "offset": 402
+                }
+              },
+              "prop": "display",
+              "value": "inline-block"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 26,
+                  "offset": 403
+                },
+                "end": {
+                  "column": 11,
+                  "line": 26,
+                  "offset": 414
+                }
+              },
+              "prop": "opacity",
+              "value": "0"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 27,
+                  "offset": 415
+                },
+                "end": {
+                  "column": 29,
+                  "line": 27,
+                  "offset": 444
+                }
+              },
+              "prop": "transform",
+              "value": "translateX(-100%)"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 28,
+                  "offset": 445
+                },
+                "end": {
+                  "column": 54,
+                  "line": 28,
+                  "offset": 499
+                }
+              },
+              "prop": "animation",
+              "value": "slideIn var(--animation-duration) forwards"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 24,
+              "offset": 358
+            },
+            "end": {
+              "column": 1,
+              "line": 29,
+              "offset": 501
+            }
+          },
+          "selector": ".slide-in-text span"
+        },
+        {
+          "raws": {
+            "before": "\n\n",
+            "between": " ",
+            "afterName": " ",
+            "semicolon": false,
+            "after": "\n"
+          },
+          "type": "atrule",
+          "name": "keyframes",
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 31,
+              "offset": 503
+            },
+            "end": {
+              "column": 1,
+              "line": 36,
+              "offset": 570
+            }
+          },
+          "params": "slideIn",
+          "nodes": [
+            {
+              "raws": {
+                "before": "\n",
+                "between": " ",
+                "semicolon": true,
+                "after": "\n"
+              },
+              "type": "rule",
+              "nodes": [
+                {
+                  "raws": null,
+                  "type": "decl",
+                  "parent": null,
+                  "source": {
+                    "input": null,
+                    "start": {
+                      "column": 1,
+                      "line": 33,
+                      "offset": 529
+                    },
+                    "end": {
+                      "column": 11,
+                      "line": 33,
+                      "offset": 540
+                    }
+                  },
+                  "prop": "opacity",
+                  "value": "1"
+                },
+                {
+                  "raws": null,
+                  "type": "decl",
+                  "parent": null,
+                  "source": {
+                    "input": null,
+                    "start": {
+                      "column": 1,
+                      "line": 34,
+                      "offset": 541
+                    },
+                    "end": {
+                      "column": 25,
+                      "line": 34,
+                      "offset": 566
+                    }
+                  },
+                  "prop": "transform",
+                  "value": "translateX(0)"
+                }
+              ],
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 32,
+                  "offset": 524
+                },
+                "end": {
+                  "column": 1,
+                  "line": 35,
+                  "offset": 568
+                }
+              },
+              "selector": "to"
+            }
+          ]
+        }
+      ],
+      "source": {
+        "input": null,
+        "start": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        },
+        "end": {
+          "column": 1,
+          "line": 37,
+          "offset": 571
+        }
+      }
+    }
+  },
+  "slideintext": {
+    "type": "HTML",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 148,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 148,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "start": 17,
+                    "end": 132,
+                    "type": "Element",
+                    "name": "div",
+                    "attributes": [
+                      {
+                        "start": 22,
+                        "end": 53,
+                        "type": "Attribute",
+                        "name": "class",
+                        "value": [
+                          {
+                            "start": 29,
+                            "end": 52,
+                            "type": "Text",
+                            "raw": "slide-in-text-container",
+                            "data": "slide-in-text-container"
+                          }
+                        ]
+                      }
+                    ],
+                    "children": [
+                      [
+                        {
+                          "start": 55,
+                          "end": 125,
+                          "type": "Element",
+                          "name": "div",
+                          "attributes": [
+                            {
+                              "start": 60,
+                              "end": 81,
+                              "type": "Attribute",
+                              "name": "class",
+                              "value": [
+                                {
+                                  "start": 67,
+                                  "end": 80,
+                                  "type": "Text",
+                                  "raw": "slide-in-text",
+                                  "data": "slide-in-text"
+                                }
+                              ]
+                            }
+                          ],
+                          "children": [
+                            [
+                              {
+                                "start": 84,
+                                "end": 117,
+                                "type": "Element",
+                                "name": "slot",
+                                "attributes": null,
+                                "children": [
+                                  [
+                                    {
+                                      "type": "Text",
+                                      "raw": "Slide In Text Here ",
+                                      "data": "Slide In Text Here "
+                                    }
+                                  ]
+                                ]
+                              }
+                            ]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

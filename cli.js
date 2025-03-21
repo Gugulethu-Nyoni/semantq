@@ -109,6 +109,7 @@ program
   .description('Create the server directory and initialize server.js')
   .action(() => {
     const targetBaseDir = process.cwd(); // Use the current working directory as the target
+    const targetBasePublic = path.join(targetBaseDir, 'public');
     const serverDir = resolvePath(targetBaseDir, 'server');
     const serverFilePath = resolvePath(serverDir, 'server.js');
 
@@ -231,11 +232,6 @@ program
       const directories = [
         'src/components/global',
         'src/routes',
-        'build/components',
-        'build/routes',
-        'src/utils',
-        'src/styles',
-        'tests',
         'docs',
         'examples',
         'public',
@@ -251,27 +247,41 @@ program
 
       // Copy specific template files
       await copyIfExists(resolvePath(templateDirectory, 'index.html'), resolvePath(targetBaseDir, 'index.html'));
-      await copyIfExists(resolvePath(templateDirectory, 'global.js'), resolvePath(targetBaseDir, 'global.js'));
-      await copyIfExists(resolvePath(templateDirectory, 'global.css'), resolvePath(targetBaseDir, 'global.css'));
-      await copyIfExists(resolvePath(templateDirectory, 'Button.smq'), resolvePath(targetBaseDir, 'src/components/global/Button.smq'));
-      await copyIfExists(resolvePath(templateDirectory, 'Count.smq'), resolvePath(targetBaseDir, 'src/components/global/Count.smq'));
-      await copyIfExists(resolvePath(templateDirectory, '+404.smq'), resolvePath(targetBaseDir, 'src/routes/+404.smq'));
+      //await copyIfExists(resolvePath(templateDirectory, 'global.js'), resolvePath(targetBasePublic, 'global.js'));
+      //await copyIfExists(resolvePath(templateDirectory, 'global.css'), resolvePath(targetBasePublic, 'global.css'));
 
-      // Copy the public directory
-      safeCopySync(resolvePath(sourceBaseDir, 'templates/public'), resolvePath(targetBaseDir, 'public'));
+      // PLACE (Copy) the router into src/semantq/router.js
+      const sourceFile = path.resolve(sourceBaseDir, 'core_modules', 'router', 'router.js');
+      const targetDir = path.resolve(targetBaseDir, 'src', 'semantq');
+      const targetFile = path.join(targetDir, 'router.js');
 
-      // Create empty routes.js in build/routes
-      await fs.writeFile(resolvePath(targetBaseDir, 'build/routes/routes.js'), 'export default [];');
+      // Ensure that the target directory exists
+      fs.ensureDirSync(targetDir);  // Creates the target directory if it doesn't exist
+
+      // Copy the file from source to target
+      fs.copySync(sourceFile, targetFile);
+
+
+      //safeCopySync(resolvePath(sourceBaseDir, 'templates/public'), resolvePath(targetBaseDir, 'public'));
+      // Copy the public directory recursively 
+      fs.copySync(resolvePath(sourceBaseDir, 'templates/public'), resolvePath(targetBaseDir, 'public'));
+      
+      // Copy the public directory recursively 
+      fs.copySync(resolvePath(sourceBaseDir, 'templates/components'), resolvePath(targetBaseDir, 'src/components'));
+      // Create empty routes.js in src/routes
+      await fs.writeFile(resolvePath(targetBaseDir, 'src/routes/routes.js'), 'export default [];');
 
       // Copy config files
-      ['package.json', 'tsconfig.json', 'vite.config.js'].forEach(file =>
+      ['semantq.config.js','package.json', 'tsconfig.json', 'vite.config.js'].forEach(file =>
         safeCopySync(resolvePath(configDirectory, file), resolvePath(targetBaseDir, file))
       );
 
       // Install dependencies in the target project
       console.log('Installing dependencies...');
-      execSync('npm install', { cwd: targetBaseDir, stdio: 'inherit' });
-      execSync('npm install --save-dev vite@latest vite-plugin-html@latest', { cwd: targetBaseDir, stdio: 'inherit' });
+      // Install npm packages with suppressed warnings
+      execSync('npm install --silent --no-warnings --no-audit --no-fund', { cwd: targetBaseDir, stdio: 'inherit' });
+      // Install development dependencies with suppressed warnings
+      execSync('npm install --save-dev --silent --no-warnings --no-audit --no-fund vite@latest vite-plugin-html@latest', { cwd: targetBaseDir, stdio: 'inherit' });
 
       console.log(`✅ Project structure generated successfully at ${targetBaseDir}`);
       console.log(`Now you can run this command to go to ${projectName} project directory: cd ${projectName}`);

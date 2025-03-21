@@ -1,0 +1,68 @@
+<script type="module">
+
+</script>
+
+<style>
+
+:root {
+--text-color: #7003a6;
+--underline-color: #ff66cc;
+--gradient-start: #8f00ff;
+--gradient-end: #ff66cc;
+--hover-color: #e48bff;
+--bg-color: #2a1a3b;
+--accent-color: #ff79d1;
+--animation-duration: 0.6s;
+}
+
+
+.animated-underline {
+display: inline-block;
+position: relative;
+font-size: 2rem;
+font-weight: bold;
+color: var(--text-color);
+margin: 0;
+padding: 0;
+}
+
+.animated-underline::after {
+content: "";
+position: absolute;
+left: 0;
+bottom: -5px;
+width: 0;
+height: 4px;
+background: var(--underline-color);
+animation: underlineHalfway var(--animation-duration) ease-in-out forwards;
+}
+
+.animated-underline:hover::after {
+animation: underlineHalfway var(--animation-duration) ease-in-out forwards;
+}
+
+@keyframes underlineHalfway {
+from {
+width: 0;
+}
+to {
+width: 50%; /* Stops at half the width of the text */
+}
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+.animated-underline {
+font-size: 1.5rem;
+}
+}
+
+</style>
+
+<customSyntax>
+
+
+<div class="animated-underline" style="color: var(--text-color);">
+<slot> Next-Level Animation Heading Here  </slot>
+</div>
+</customSyntax>

@@ -12,11 +12,11 @@ const generateSitemap = async () => {
   try {
     // Dynamically import the fileBasedRoutes module
     const fileBasedRoutesModule = await import(config.routes.fileBasedRoutes);
-    //console.log('Imported fileBasedRoutes module:', fileBasedRoutesModule);
+    console.log('Imported fileBasedRoutes module:', fileBasedRoutesModule);
 
     // Access the default export
     const fileBasedRoutes = fileBasedRoutesModule.default;
-    //console.log('fileBasedRoutes:', JSON.stringify(fileBasedRoutes, null, 2));
+    console.log('fileBasedRoutes:', JSON.stringify(fileBasedRoutes, null, 2));
 
     // Check if fileBasedRoutes is defined
     if (!fileBasedRoutes || typeof fileBasedRoutes !== 'object') {
@@ -57,7 +57,7 @@ const generateSitemap = async () => {
     }
 
     fs.writeFileSync(xmlSitemapPath, xml, 'utf8');
-    //console.log(`XML sitemap generated successfully at ${xmlSitemapPath}`);
+    console.log(`XML sitemap generated successfully at ${xmlSitemapPath}`);
 
     // Generate HTML Sitemap
     let html = `<!DOCTYPE html>
@@ -101,7 +101,7 @@ const generateSitemap = async () => {
     }
 
     fs.writeFileSync(htmlSitemapPath, html, 'utf8');
-    //console.log(`HTML sitemap generated successfully at ${htmlSitemapPath}`);
+    console.log(`HTML sitemap generated successfully at ${htmlSitemapPath}`);
 
     // Generate sitemap.js
     const sitemapJsContent = `import Router from "/build/semantq/router.js";
@@ -133,7 +133,7 @@ main();
 
     const sitemapJsPath = path.join(sitemapDir, 'sitemap.js');
     fs.writeFileSync(sitemapJsPath, sitemapJsContent, 'utf8');
-    //console.log(`sitemap.js generated successfully at ${sitemapJsPath}`);
+    console.log(`sitemap.js generated successfully at ${sitemapJsPath}`);
   } catch (err) {
     console.error('Error generating sitemaps:', err);
   }

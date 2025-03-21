@@ -1,0 +1,103 @@
+@style
+:root {
+  --icon-box-bg: #ffffff;
+  --icon-box-text: #333333;
+  --icon-box-border: #e0e0e0;
+  --icon-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --icon-box-border-radius: 12px;
+  --icon-color: #6a1b9a;
+  --icon-hover-color: #8a2be2;
+  --font-family: 'Arial', sans-serif;
+  --font-title: 1.25rem;
+  --font-text: 1rem;
+  --gap: 1.5rem;
+  --padding: 1.5rem;
+}
+
+.row {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--gap);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+}
+
+.icon-box {
+  background: var(--icon-box-bg);
+  border: 1px solid var(--icon-box-border);
+  border-radius: var(--icon-box-border-radius);
+  box-shadow: var(--icon-box-shadow);
+  padding: var(--padding);
+  flex: 1 1 calc(33.333% - var(--gap));
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.icon-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.icon-box .icon {
+  width: 48px;
+  height: 48px;
+  fill: var(--icon-color);
+  margin-bottom: 1rem;
+  transition: fill 0.3s ease;
+}
+
+.icon-box:hover .icon {
+  fill: var(--icon-hover-color);
+}
+
+.icon-box .title {
+  font-size: var(--font-title);
+  font-weight: bold;
+  color: var(--icon-box-text);
+  margin: 0 0 0.5rem 0;
+}
+
+.icon-box .text {
+  font-size: var(--font-text);
+  color: var(--icon-box-text);
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .icon-box {
+    flex: 1 1 100%;
+  }
+}
+@end
+
+@html
+  <div class="row">
+    <div class="icon-box">
+      <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M12 2L2 22h20L12 2zm0 4.5l7.5 13.5h-15L12 6.5z"/>
+      </svg>
+      <h3 class="title">Feature One</h3>
+      <p class="text">This is a description for the first feature. It can be longer and span multiple lines.</p>
+    </div>
+    <div class="icon-box">
+      <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+        <path d="M12 7c-.55 0-1 .45-1 1v5c0 .55.45 1 1 1s1-.45 1-1V8c0-.55-.45-1-1-1zm0 9c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/>
+      </svg>
+      <h3 class="title">Feature Two</h3>
+      <p class="text">This is a description for the second feature. It can be longer and span multiple lines.</p>
+    </div>
+    <div class="icon-box">
+      <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+        <path d="M12 7c-.55 0-1 .45-1 1v5c0 .55.45 1 1 1s1-.45 1-1V8c0-.55-.45-1-1-1zm0 9c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/>
+      </svg>
+      <h3 class="title">Feature Three</h3>
+      <p class="text">This is a description for the third feature. It can be longer and span multiple lines.</p>
+    </div>
+  </div>
