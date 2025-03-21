@@ -4,13 +4,13 @@ import fs from 'fs-extra';
 import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
-import { InferenceClient } from "@huggingface/inference";
+//import { InferenceClient } from "@huggingface/inference";
 import dotenv from 'dotenv';
 
 // Load environment variables from .env file
 dotenv.config();
 
-const client = new InferenceClient(process.env.HUGGINGFACE_API_KEY);
+//const client = new InferenceClient(process.env.HUGGINGFACE_API_KEY);
 
 // Import utility functions
 import { generateResource, generateModel, generateService, generateController, generateRoute } from './cli-utils.js';
@@ -186,6 +186,16 @@ program
       console.error('❌ Failed to install dotenv:', error);
       process.exit(1);
     }
+
+    // Step 2: Install @huggingface/inference
+try {
+  execSync('npm install @huggingface/inference', { cwd: targetBaseDir, stdio: 'inherit' });
+  console.log('✅ @huggingface/inference installed successfully!');
+} catch (error) {
+  console.error('❌ Failed to install @huggingface/inference:', error);
+  process.exit(1);
+}
+
 
     // Step 3: Create lib/supabaseConfig.js
     const libDir = resolvePath(targetBaseDir, 'lib');
@@ -418,6 +428,12 @@ program
   .option('--append', 'Append the generated code to the file instead of overwriting')
   .action(async (prompt, options) => {
     try {
+      // Dynamically import the Hugging Face Inference package
+      const { InferenceClient } = await import('@huggingface/inference');
+
+      // Initialize the client with the API key from .env
+      const client = new InferenceClient(process.env.HUGGINGFACE_API_KEY);
+
       // Determine the output directory based on the --route flag
       if (!options.route) {
         console.error("Error: --route flag is required to specify the output directory.");
@@ -484,7 +500,6 @@ program
       console.error("Error:", error);
     }
   });
-
 
 // Parse CLI arguments
 program.parse(process.argv);
