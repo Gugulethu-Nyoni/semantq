@@ -1,6 +1,8 @@
 "use strict";
 import fs from "fs";
 import path from "path";
+import config from '../../semantq.config.js';
+
 
 import { walk } from "estree-walker";
 import { traverse } from "estraverse";
@@ -14,6 +16,12 @@ class SlotResolver {
     this.filePath = filePath;
     this.ast = ast;
     this.componentName = "";
+
+    //
+    const { components, globalComponents } = config;
+    const actualComponentsPath = components['$components'];
+    const actualGlobalComponentsPath = globalComponents['$global'];
+
     
     const fileName = path.basename(filePath, ".merged.ast");
     this.isPage = fileName.startsWith("+page");
@@ -39,6 +47,14 @@ class SlotResolver {
     this.resolvedAst = this.resolveNamedSlots(this.filePath);
     this.finalResolvedAst = this.resolveDefaultSlots(this.filePath);
 
+    //
+    this.removeComponentImports();
+    // console.log(JSON.stringify(this.ast['jsAST'],null,2));
+    this.writeResolvedAstFile();
+
+
+
+
   }
 
   getJSContent() {
@@ -55,7 +71,11 @@ class SlotResolver {
           let componentPath = source.value;
 
           if (componentPath.includes("$global")) {
-            componentPath = componentPath.replace("$global", "$components/global");
+            componentPath = componentPath.replace("$global", this.actualGlobalComponentsPath);
+          }
+
+          if (componentPath.includes("$components")) {
+            componentPath = componentPath.replace("$components", this.actualComponentsPath);
           }
 
           if (elementWalker(this.customAST, "name", componentName)) {
@@ -449,6 +469,8 @@ processNamedSlots(newNodes, childAST) {
       const childComponentAstBlock = this.ast[childComponentKey];
 
 
+
+
       //const nodeType = "Element";
             //console.log(typeof walk.createMatchLogic(nodeType, key));
 
@@ -464,7 +486,7 @@ processNamedSlots(newNodes, childAST) {
         returnType         
       );
 
-      //console.log(getTargetNode.length);
+      //console.log(getTargetNode);
 
       if (getTargetNode.length === 0) continue; // skip this one
       const targetNode = getTargetNode[0].node;
@@ -482,16 +504,20 @@ processNamedSlots(newNodes, childAST) {
         returnType             
       );
 
-      //console.log(getSlotNode);
+      //console.log("HERE",getSlotNode);
       //return;
 
+      let contentToSet = '';
 
-      if (getSlotNode) {
+      if (getSlotNode.length !== 0) {
+
         const slotNode = getSlotNode[0].node;
         const slotFallBackChildren = walk.findChildren(slotNode);
-        const contentToSet = targetNodeChildren?.[0]?.length > 0
+        contentToSet = targetNodeChildren?.[0]?.length > 0
           ? targetNodeChildren[0][0]
           : slotFallBackChildren?.[0]?.[0];
+
+        
 
         const slotNodeLocations = new GetNodePositions(childComponentAstBlock, slotNode).init();
         const parentNode = slotNodeLocations[0]?.parentNode;
@@ -499,22 +525,30 @@ processNamedSlots(newNodes, childAST) {
 
         if (parentNode?.children?.[0]?.[targetNodeIndex]) {
           parentNode.children[0][targetNodeIndex] = contentToSet;
-        }
+        }  
+
+
       }
+      
 
       const parentNodeLocations = new GetNodePositions(parentComponentAST, targetNode).init();
       const actualParentNode = parentNodeLocations[0]?.parentNode;
       const actualTargetNodeIndex = parentNodeLocations[0]?.nodeIndex;
 
       if (actualParentNode?.children?.[0]?.[actualTargetNodeIndex]) {
+        //console.log("Ngena???");
         actualParentNode.children[0][actualTargetNodeIndex] = childComponentAstBlock;
+        //console.log(JSON.stringify(actualParentNode,null,2));
       }
 
+
       delete this.ast[childComponentKey];
+
+            //console.log("HERE JS",JSON.stringify(this.ast['jsAST'],null,2));
+
     }
 
-    this.removeComponentImports();
-    this.writeResolvedAstFile();
+    //this.writeResolvedAstFile();
   }
 
   writeResolvedAstFile(parentComponentKey) {
@@ -522,9 +556,13 @@ processNamedSlots(newNodes, childAST) {
     const resolvedFilePath = this.filePath.replace(/merged/, "resolved");
     const resolvedDir = path.dirname(resolvedFilePath);
     if (!fs.existsSync(resolvedDir)) fs.mkdirSync(resolvedDir, { recursive: true });
+
+    //console.log("HERE JS",JSON.stringify(this.ast['jsAST'],null,2));
+
     fs.writeFileSync(resolvedFilePath, JSON.stringify(this.ast, null, 2), "utf8");
   }
 
+/*
   removeComponentImports() {
     for (const componentName in this.componentsRegistry) {
       walk(this.ast["jsAST"], {
@@ -547,7 +585,7 @@ processNamedSlots(newNodes, childAST) {
     }
   }
 
-
+*/
 
 removeComponentImports() {
     for (const componentName in this.componentsRegistry) {
@@ -559,9 +597,14 @@ removeComponentImports() {
                 specifier.type === "ImportDefaultSpecifier" &&
                 specifier.local.name === componentName
               ) {
+
+
                 if (parent && Array.isArray(parent.body)) {
                   parent.body = parent.body.filter((n) => n !== node);
+
                 }
+
+
                 return false;
               }
             });
@@ -569,8 +612,9 @@ removeComponentImports() {
         },
       });
     }
-  }
 
+
+  }
 
 
 }
