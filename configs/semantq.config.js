@@ -30,11 +30,12 @@ export default {
   // New configuration for menu generation
   semantqNav: {
     enable: true, // Enable or disable framework menu generation
-    containerClass: 'smq-menu-container', // Class name for the container div
-    ulClass: 'smq-menu-list', // Class name for the ul element
-    liClass: 'smq-menu-item', // Class name for the li elements
+    containerClass: 'semantq-nav-container', // Class name for the container div
+    ulClass: 'semantq-nav-list', // Class name for the ul element
+    liClass: 'semantq-nav-item', // Class name for the li elements
     excludeRoutes: [], // Routes to exclude from the menu
     hierarchical: true, // Enable hierarchical dropdown for nested routes
+    parentMenuDisplay: 'stacked', // Options: 'inline' or 'stacked'
     customLinkTexts: {}, // e.g.'services/asia': 'Asia',
 // 'products/europe': 'Europe Products',
 // 'about-us/team': 'Our Team'
