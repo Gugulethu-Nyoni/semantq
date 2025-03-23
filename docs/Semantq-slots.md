@@ -23,7 +23,7 @@ In Semantq, **slots** allow you to pass content from a parent component or page 
 ### Parent Component (e.g., `+page.smq`)
 
 ```javascript
-import Card from '$component/Card.smq';
+import Card from '$component/Card';
 ```
 
 ### Usage in HTML
@@ -80,9 +80,9 @@ Slots can be nested within other components, allowing you to build complex layou
 For **nested slots** to work correctly, you need to ensure that your `import` statements in JavaScript are in the **correct descending order**. In the example above, the order of imports must be:
 
 ```javascript
-import Card from '$component/Card.smq';
-import Header from '$component/Header.smq';
-import Button from '$component/Button.smq';
+import Card from '$component/Card';
+import Header from '$component/Header';
+import Button from '$component/Button';
 ```
 
 ### Why Order Matters
