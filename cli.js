@@ -402,7 +402,10 @@ program
 
     @end
 
-    @html`;
+    @html
+      ${routeName} Page 
+
+    `;
 
     fs.writeFileSync(resolvePath(routePath, '+page.smq'), pageContent, 'utf-8');
       console.log(`✅ Route '${routeName}' created successfully!`);
