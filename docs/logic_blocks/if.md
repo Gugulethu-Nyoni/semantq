@@ -234,12 +234,37 @@ Bitwise operations in condition tests:
 @endif
 ```
 
+## Bitwise Expressions
+
+Semantq supports all JavaScript bitwise operations in condition tests:
+
 ### Supported Bitwise Operators
-| Operator | Example               | Description                     |
-|----------|-----------------------|---------------------------------|
-| `&`      | `a & b`               | Bitwise AND                     |
-| `\|`     | `permissions \| READ` | Bitwise OR                      |
-| `^`      | `mask ^ TOGGLE_BIT`   | Bitwise XOR                     |
+
+| Operator | Name                      | Example                      | Description |
+|----------|---------------------------|------------------------------|-------------|
+| `&`      | AND                       | `flags & ADMIN`              | Sets bits that exist in both values |
+| `\|`     | OR                        | `permissions \| READ`        | Sets bits that exist in either value |
+| `^`      | XOR                       | `mask ^ TOGGLE`              | Toggles bits that differ between values |
+| `<<`     | Left Shift                | `value << 2`                 | Shifts bits left by specified number |
+| `>>`     | Sign-Propagating Right Shift | `value >> 1`              | Preserves sign when shifting right |
+| `>>>`    | Zero-Fill Right Shift     | `color >>> 8`                | Shifts right filling with zeros |
+| `~`      | NOT (Unary)               | `~visibility`                | Inverts all bits |
+
+### Usage Examples
+
+```semantq
+@if(permissions & (READ | WRITE))
+  <!-- Content when either read or write permission exists -->
+@endif
+
+@if((flags << 2) > MAX_VALUE)
+  <!-- Content after bit shifting -->
+@endif
+
+@if(~visibility & HIDDEN)
+  <!-- Content when NOT hidden -->
+@endif
+```
 
 ### Operator Precedence
 Bitwise operations have precedence between equality checks and logical AND:
@@ -264,6 +289,100 @@ Bitwise operations have precedence between equality checks and logical AND:
 - Bitwise operations work with numeric values
 - Parentheses can be used to override precedence
 - Works with all existing expression types
+
+
+
+# If Logic Block Consequent Expressions
+
+Consequent expressions within `@if` blocks support these expression types:
+
+## Basic Literals
+```semantq
+@if(showNumbers)
+  {42}               <!-- Number -->
+  {3.14}             <!-- Float -->
+@endif
+
+@if(showGreeting)
+  {"hello"}          <!-- Double-quoted string -->
+  {'world'}          <!-- Single-quoted string -->
+@endif
+
+@if(showBools)
+  {true}             <!-- Boolean true -->
+  {false}            <!-- Boolean false -->
+@endif
+```
+
+## Variables & Properties
+```semantq
+@if(hasItems)
+  {count}            <!-- Simple variable -->
+@endif
+
+@if(userExists)
+  {user}             <!-- Object reference -->
+  {user.name}        <!-- Dot notation -->
+  {user.profile.id}  <!-- Nested properties -->
+@endif
+```
+
+## Arithmetic Operations
+```semantq
+@if(shouldCalculate)
+  {a + b}            <!-- Addition -->
+  {width * 0.5}      <!-- Multiplication -->
+  {10 % 3}           <!-- Modulo -->
+  {(a + b) * c}      <!-- Grouped operations -->
+@endif
+```
+
+## Comparisons
+```semantq
+@if(score > 60)      <!-- Greater than -->
+  <passBadge/>
+@endif
+
+@if(temp <= 0)       <!-- Less than or equal -->
+  <FreezeWarning/>
+@endif
+```
+
+## Logical Operators
+```semantq
+@if(!isLoading)      <!-- NOT operator -->
+  {content}
+@endif
+
+@if(isAdmin && isActive)  <!-- AND -->
+  <adminPanel/>
+@endif
+```
+
+## Function Calls
+```semantq
+@if(shouldRender)
+  {getUserName()}              <!-- No args -->
+  {formatDate(timestamp)}      <!-- With args -->
+@endif
+```
+
+## Complete Example
+```semantq
+@if(user.isActive && items.length > 0)
+  <h2>{user.name}'s Items</h2>
+  {showCount && <p>Total: {items.length}</p>}
+  {items.map(item => 
+    <item-card name={item.name} price={item.price}/>
+  )}
+@endif
+```
+
+### Notes:
+1. All expressions must be wrapped in `{ }`
+2. Works alongside HTML content
+3. Maintains JavaScript expression semantics
+4. Supports all standard operator precedence
 
 
 **License**
