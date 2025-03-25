@@ -438,4 +438,4 @@ The `semantq.config.js` file is a powerful tool for configuring your Semantq app
 
 Semantq is open-source software licensed under the **MIT License**.
 
-## Semantq Main Documentation: [Semantq Syntax Guide](https://github.com/Gugulethu-Nyoni/semantq).
+## Semantq Main Documentation: [Semantq](https://github.com/Gugulethu-Nyoni/semantq).
