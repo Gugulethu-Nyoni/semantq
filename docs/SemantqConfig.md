@@ -390,9 +390,14 @@ export default {
   domain: process.env.DOMAIN || 'localhost',
   targetHost: process.env.TARGET_HOST || 'https://example.com',
   pageTitle: 'My Awesome Website',
+  metaDescription: 'My Awesome Website',
   envFilePath: path.join(rootDir, '.env'),
   sitemap: true,
-  base: '/',
+  base: '/', // Base path for the site (e.g., '/' or '/subdir/')
+
+  components: {
+    '$components': path.join(rootDir, 'src/components'),
+  },
 
   globalComponents: {
     '$global': path.join(rootDir, 'src/components/global'),
@@ -403,21 +408,24 @@ export default {
   },
 
   routes: {
-    declaredRoutes: path.join(rootDir, 'src/routes/routes.js'),
+    declaredRoutes: path.join(rootDir, 'build/routes/routes.js'),
     fileBasedRoutes: path.join(rootDir, 'build/routes/fileBasedRoutes.js'),
   },
 
   semantqNav: {
-    enable: true,
-    containerClass: 'semantq-nav-container',
-    ulClass: 'semantq-nav-list',
-    liClass: 'semantq-nav-item',
-    excludeRoutes: ['/login', '/admin','/'],
-    hierarchical: true,
+    enable: true, // Enable or disable framework menu generation
+    containerClass: 'semantq-nav-container', // Class name for the container div
+    ulClass: 'semantq-nav-list', // Class name for the ul element
+    liClass: 'semantq-nav-item', // Class name for the li elements
+    excludeRoutes: ['/login', '/admin', '/'], // Routes to exclude from the menu
+    hierarchical: true, // Enable hierarchical dropdown for nested routes
+    parentMenuDisplay: 'stacked', // Options: 'inline' or 'stacked'
     customLinkTexts: {
       'services/europe': 'Europe Services',
       'products/africa': 'Africa Products',
-    },
+    }, // e.g.'services/asia': 'Asia',
+    // 'products/europe': 'Europe Products',
+    // 'about-us/team': 'Our Team'
   },
 };
 ```
