@@ -219,7 +219,11 @@ Semantq now supports JavaScript-style function calls in condition tests, includi
 @if(emptyArgs())  <!-- Empty parentheses -->
 ```
 
-> Note: Function calls follow the same precedence rules as JavaScript, evaluating arguments before the function call itself.
-```
+**Note:** Function calls follow the same precedence rules as JavaScript, evaluating arguments before the function call itself.
 
 
+**License**
+
+Semantq is open-source software licensed under the **MIT License**.
+
+## Semantq Main Documentation: [Semantq](https://github.com/Gugulethu-Nyoni/semantq).
