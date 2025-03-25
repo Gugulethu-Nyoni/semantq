@@ -3,7 +3,9 @@
 The `semantq.config.js` file is the central configuration file for Semantq, an AI-first JavaScript framework. It allows you to define global settings, components, libraries, routes, and menu generation for your application. Below is a detailed breakdown of each configuration option, presented in the same order as they appear in the file.
 
 
-**Note:** You don't need to create the configuration file from scratch—it is included with the Semantq installation. However, it is important to familiarize yourself with it to make customizations or extensions as needed.
+**Note:** You don't need to create the configuration file from scratch—it is included with the Semantq installation. However, it is important to familiarize yourself with it to make customizations or extensions as needed. 
+
+The configuration file is located in the root of your Semantq project e.g. `my_app/semantq.config.js`
 
 ---
 
