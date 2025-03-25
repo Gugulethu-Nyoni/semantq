@@ -389,8 +389,8 @@ const rootDir = process.cwd();
 export default {
   domain: process.env.DOMAIN || 'localhost',
   targetHost: process.env.TARGET_HOST || 'https://example.com',
-  pageTitle: 'My Awesome Website',
-  metaDescription: 'My Awesome Website',
+  pageTitle: 'ExampleSite | Premium Urban Fashion & Streetwear Collections',
+  metaDescription: 'Discover the latest urban fashion trends at UrbanStyle. Shop high-quality streetwear, sneakers, and accessories with fast shipping & easy returns',
   envFilePath: path.join(rootDir, '.env'),
   sitemap: true,
   base: '/', // Base path for the site (e.g., '/' or '/subdir/')
@@ -421,11 +421,9 @@ export default {
     hierarchical: true, // Enable hierarchical dropdown for nested routes
     parentMenuDisplay: 'stacked', // Options: 'inline' or 'stacked'
     customLinkTexts: {
-      'services/europe': 'Europe Services',
-      'products/africa': 'Africa Products',
-    }, // e.g.'services/asia': 'Asia',
-    // 'products/europe': 'Europe Products',
-    // 'about-us/team': 'Our Team'
+      'brands/sneakers': 'Brands',
+      'sale/sneakers': 'Sneaker On Sale',
+    }, 
   },
 };
 ```
