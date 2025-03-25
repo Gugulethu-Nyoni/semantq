@@ -132,9 +132,7 @@ Example combining multiple features:
 ```
 
 
-Here's the Markdown documentation for the new function call support:
 
-```markdown
 ## Function Call Expressions
 
 Semantq now supports JavaScript-style function calls in condition tests, including nested calls and method invocations.
