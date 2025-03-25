@@ -220,6 +220,52 @@ Semantq now supports JavaScript-style function calls in condition tests, includi
 **Note:** Function calls follow the same precedence rules as JavaScript, evaluating arguments before the function call itself.
 
 
+Here's the documentation addition for bitwise expressions in GitHub Markdown format, focusing just on the new capability while maintaining your existing style:
+
+
+## Bitwise Expressions
+
+Bitwise operations in condition tests:
+
+### Bitwise AND
+```semantq
+@if(flags & ADMIN_FLAG)
+  <!-- Content when flag is set -->
+@endif
+```
+
+### Supported Bitwise Operators
+| Operator | Example               | Description                     |
+|----------|-----------------------|---------------------------------|
+| `&`      | `a & b`               | Bitwise AND                     |
+| `\|`     | `permissions \| READ` | Bitwise OR                      |
+| `^`      | `mask ^ TOGGLE_BIT`   | Bitwise XOR                     |
+
+### Operator Precedence
+Bitwise operations have precedence between equality checks and logical AND:
+
+1. Equality (`==`, `!=`)
+2. **Bitwise (`&`, `|`, `^`)**
+3. Logical AND (`&&`)
+4. Logical OR (`||`)
+
+### Examples
+```semantq
+@if((user.roles & ADMIN) && !isSuspended)
+  <!-- Admin-specific content -->
+@endif
+
+@if(config.flags & (FEATURE_A | FEATURE_B))
+  <!-- Feature-flagged content -->
+@endif
+```
+
+### Notes
+- Bitwise operations work with numeric values
+- Parentheses can be used to override precedence
+- Works with all existing expression types
+
+
 **License**
 
 Semantq is open-source software licensed under the **MIT License**.
