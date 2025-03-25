@@ -56,6 +56,14 @@ Semantq is an AI-First JavaScript Framework. See this guide on how to use Semant
 
 Semantq Config. See this guide on how to use Semantq Config to manage you app: [Semantq Config Guide](docs/SemantqConfig.md).
 
+
+Semantq ships with intuitive and declarative logic block capabilities in your HTML, combining the power of programmatic logic with the simplicity of declarative templates. See the logic block guides below: 
+
+[IF Logic Block Guide](docs/logic_blocks/if.md)
+
+Semantq Config. See this guide on how to use Semantq Config to manage you app: [Semantq Config Guide](docs/SemantqConfig.md).
+
+
 For a detailed syntax guide, check out the [Semantq Syntax Guide](docs/Semantq-Syntax.md).
 
 For a detailed slot composition guide, see: [Semantq Slot Composition Guide](docs/Semantq-slots.md).
