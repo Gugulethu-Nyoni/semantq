@@ -2,6 +2,9 @@
 
 The `semantq.config.js` file is the central configuration file for Semantq, an AI-first JavaScript framework. It allows you to define global settings, components, libraries, routes, and menu generation for your application. Below is a detailed breakdown of each configuration option, presented in the same order as they appear in the file.
 
+
+**Note:** You don't need to create the configuration file from scratch—it is included with the Semantq installation. However, it is important to familiarize yourself with it to make customizations or extensions as needed.
+
 ---
 
 ## **1. Basic Configuration**
@@ -15,7 +18,7 @@ The `semantq.config.js` file is the central configuration file for Semantq, an A
 
   **Example:**
   ```javascript
-  domain: process.env.DOMAIN || 'localhost'
+  domain: process.env.DOMAIN || 'http://localhost:3000'
   ```
 
 ---
@@ -387,7 +390,7 @@ import path from 'path';
 const rootDir = process.cwd();
 
 export default {
-  domain: process.env.DOMAIN || 'localhost',
+  domain: process.env.DOMAIN || 'http://localhost:3000',
   targetHost: process.env.TARGET_HOST || 'https://example.com',
   pageTitle: 'ExampleSite | Premium Urban Fashion & Streetwear Collections',
   metaDescription: 'Discover the latest urban fashion trends at UrbanStyle. Shop high-quality streetwear, sneakers, and accessories with fast shipping & easy returns',
