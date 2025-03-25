@@ -130,3 +130,96 @@ Example combining multiple features:
   Premium active user content
 @endif
 ```
+
+
+Here's the Markdown documentation for the new function call support:
+
+```markdown
+## Function Call Expressions
+
+Semantq now supports JavaScript-style function calls in condition tests, including nested calls and method invocations.
+
+### Basic Syntax
+```semantq
+@if(functionName())
+@if(functionName(arg1, arg2))
+@if(object.method())
+```
+
+### Supported Patterns
+
+#### 1. Simple Function Calls
+```semantq
+@if(isActive()) 
+  <!-- Content -->
+@endif
+
+@if(checkPermission())
+  <!-- Content -->
+@endif
+```
+
+#### 2. With Arguments
+```semantq
+@if(hasAccess(user, 'admin'))
+  <!-- Content -->
+@endif
+
+@if(between(value, 0, 100))
+  <!-- Content -->
+@endif
+```
+
+#### 3. Method Calls
+```semantq
+@if(user.isAdmin())
+  <!-- Content -->
+@endif
+
+@if(profile.hasPermission('edit'))
+  <!-- Content -->
+@endif
+```
+
+#### 4. Nested Calls
+```semantq
+@if(getUser().isVerified())
+  <!-- Content -->
+@endif
+
+@if(validate(input, getRules()))
+  <!-- Content -->
+@endif
+```
+
+#### 5. Complex Arguments
+```semantq
+@if(verify(user, { strict: true }))
+  <!-- Content -->
+@endif
+
+@if(check(status, ['active', 'pending']))
+  <!-- Content -->
+@endif
+```
+
+### Rules and Limitations
+1. **Whitespace**: Flexible around parentheses and commas
+   - Valid: `@if(func(a,b))` or `@if(func( a, b ))`
+2. **Arguments**: Can be any valid expression
+   - Includes literals, variables, other function calls
+3. **Method Chains**: Currently supports single-level calls
+   - `obj.method()` works
+   - `obj.method().another()` not yet supported
+
+### Edge Cases Handled
+```semantq
+@if(noArgFunc())  <!-- No arguments -->
+@if(trailingComma(a,))  <!-- Trailing comma -->
+@if(emptyArgs())  <!-- Empty parentheses -->
+```
+
+> Note: Function calls follow the same precedence rules as JavaScript, evaluating arguments before the function call itself.
+```
+
+
