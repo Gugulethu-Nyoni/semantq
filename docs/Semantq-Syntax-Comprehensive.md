@@ -156,3 +156,15 @@ Standard HTML tags with attributes and content:
 This documentation covers all currently supported syntax patterns in a hierarchical organization, from basic elements to complex nested structures.
 
 More blocks to be added. 
+
+### Semantq Syntax Philosophy:
+
+Consistency, intuition, flexibility, elegance and efficiency. 
+
+---
+
+## License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+
+For more details, check out the [Semantq documentation](https://github.com/Gugulethu-Nyoni/semantq)
