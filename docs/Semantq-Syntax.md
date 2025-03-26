@@ -428,4 +428,4 @@ Consistency, intuition, flexibility, elegance and efficiency.
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-Check out the comprehensive syntax guide here: [Semantq Comprehensive Syntax Guide](Semantq-Syntax.md) 
+Check out the comprehensive syntax guide here: [Semantq Comprehensive Syntax Guide](Semantq-Syntax-Comprehensive.md) 
