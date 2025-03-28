@@ -265,5 +265,9 @@ import Button from '$component/Button.smq';
 
 Slots in Semantq provide a powerful way to compose components and build flexible, reusable layouts. By leveraging **default slots**, **fallback content**, and **nested slots**, you can create highly modular and maintainable applications.
 
-For more details, check out the [Semantq documentation](https://github.com/Gugulethu-Nyoni/semantq) or explore the.
+## **License**
+
+Semantq is open-source software licensed under the **MIT License**.
+
+## Semantq Main Documentation: [Semantq](https://github.com/Gugulethu-Nyoni/semantq).
 
