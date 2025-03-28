@@ -1,5 +1,10 @@
 # **Semantq State Management Documentation**  
-**Version 1.0**
+
+# Core Philosophy  
+Semantq redefines state management by treating state as a real-time stream rather than static snapshots. This ensures fine-grained reactivity, eliminating unnecessary re-renders while maintaining a unified and consistent approach to managing state across the client, server, and distributed systems.  
+
+It follows a zero-boilerplate, yet explicit approach—balancing simplicity without resorting to hidden "magic."  
+
 
 Semantq’s state management system is designed around **fine-grained reactivity**, **predictable workflows**, and **seamless full-stack sync**. It combines the best of modern patterns (signals, state machines, CRDTs) with a unified API that works across code, low-code, and no-code environments.  
 
