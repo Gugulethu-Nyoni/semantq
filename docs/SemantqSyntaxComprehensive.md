@@ -163,8 +163,8 @@ Consistency, intuition, flexibility, elegance and efficiency.
 
 ---
 
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+## **License**
 
+Semantq is open-source software licensed under the **MIT License**.
 
-For more details, check out the [Semantq documentation](https://github.com/Gugulethu-Nyoni/semantq)
+## Semantq Main Documentation: [Semantq](https://github.com/Gugulethu-Nyoni/semantq).
