@@ -36,15 +36,32 @@ import { trace } from "@semantq/state/debug";
 
 In your index.html you can import state this way: 
 ```html
-<script src="https://cdn.semantq.dev/state@1.0/core.js"></script>
 <script>
   const { pulse, reState } = SemantqState;
 </script>
 ```
 
-In your components or +pages you can import state this way:
+In your /src/routes/about/+layout.smq you can add the script this way:
 
+```semantq
+@head
+<script src="https://cdn.semantq.dev/state@1.0/core.js"></script>
+@end
+```
 
+Then in your components or +pages you can import state this way:
+```semantq
+@script
+  const { pulse, reState } = SemantqState;
+@end
+```
+This will also work:
+
+```semantq
+<script>
+  const { pulse, reState } = SemantqState;
+</script>
+```
 
 #### **B. Semantq Custom Script Tag**
 ```html
@@ -63,7 +80,6 @@ In your components or +pages you can import state this way:
 ```javascript
 // main.js
 import { pulse } from "@semantq/state/reactivity";
-
 const count = pulse(0);
 ```
 
