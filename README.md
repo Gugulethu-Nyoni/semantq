@@ -60,7 +60,7 @@ Your app will be available at `http://localhost:5173` (or the default port).
 
 ### Template System
 - [Logic Blocks](docs/logicBlocks/if.md) - Declarative programmatic logic in HTML
-- [Syntax Guide](docs/SemantqSyntax.md) - Comprehensive syntax reference
+- [Syntax Guide](docs/SemantqSyntaxComprehensive.md) - Comprehensive syntax reference
 - [Slot Composition](docs/SemantqSlots.md) - Component slot patterns
 - [Layout System](docs/SemantqLayouts.md) - Application layout management
 
