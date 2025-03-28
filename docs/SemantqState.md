@@ -349,3 +349,11 @@ Semantq’s state management draws from:
 **Next Steps**:  
 - [Try the Tutorial](https://semantq.dev/learn)  
 - [Explore the API](https://semantq.dev/docs/state)  
+
+
+## **License**
+
+Semantq is open-source software licensed under the **MIT License**.
+
+## Semantq Main Documentation: [Semantq](https://github.com/Gugulethu-Nyoni/semantq).
+
