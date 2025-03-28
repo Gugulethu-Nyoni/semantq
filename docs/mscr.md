@@ -406,11 +406,15 @@ const form = new Formique(formSchema, formParams, formSettings);
 
 ---
 
-## 🚀 TO DO
+##  TO DO
 
 - Add additional database adapters (e.g., Firebase, MySQL).
 - Extend the CLI to support more advanced features (such as middleware and testing templates).
 
 Happy coding! 🎉
 
-## Semantq Main Documentation: [Semantq Syntax Guide](https://github.com/Gugulethu-Nyoni/semantq).
+## **License**
+
+Semantq is open-source software licensed under the **MIT License**.
+
+## Semantq Main Documentation: [Semantq](https://github.com/Gugulethu-Nyoni/semantq).
