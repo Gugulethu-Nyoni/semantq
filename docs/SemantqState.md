@@ -325,7 +325,7 @@ const edgeCache = sync.edge("/data"); // Works in Cloudflare Workers
 Semantq’s state management draws from:  
 1. **Reactive Programming**  
    - [*The Introduction to Reactive Programming* (André Staltz)](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754)  
-   - [*Deprecating the Observer Pattern* (ACM Paper, 2010)](https://dl.acm.org/doi/10.1145/1869459.1869484)  
+   - [Maier, Ingo & Rompf, Tiark & Odersky, Martin. (2010). *Deprecating the Observer Pattern.* ](https://dl.acm.org/doi/10.1145/1869459.1869484)  
 
 2. **State Machines**  
    - [*Statecharts: A Visual Formalism for Complex Systems* (David Harel, 1987)](https://www.sciencedirect.com/science/article/pii/0167642387900359)  
