@@ -144,19 +144,15 @@ import type { Pulse } from "@semantq/state/reactivity";
 ```
 
 ---
--->
+
 **Next Steps**:  
 - [Explore Module APIs](https://semantq.dev/docs/state/imports)  
 - [Try the Interactive Tutorial](https://semantq.dev/learn/state-management)  
 
+-->
 
 
 
-
-
-
-
----
 
 ## **Core Concepts**  
 ### **1. `pulse` (Reactive State)**  
