@@ -257,4 +257,4 @@ We welcome contributions to the Semantq AI CLI! If you'd like to contribute, ple
 
 Semantq is open-source software licensed under the **MIT License**.
 
-## Semantq Main Documentation: [Semantq Syntax Guide](https://github.com/Gugulethu-Nyoni/semantq).
+## Semantq Main Documentation: [Semantq](https://github.com/Gugulethu-Nyoni/semantq).
