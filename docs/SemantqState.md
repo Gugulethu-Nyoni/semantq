@@ -331,10 +331,12 @@ Semantq’s state management draws from:
    - [*Statecharts: A Visual Formalism for Complex Systems* (David Harel, 1987)](https://www.sciencedirect.com/science/article/pii/0167642387900359)  
 
 3. **CRDTs (Conflict-Free Replicated Data Types)**  
-   - [*A Comprehensive Study of CRDTs* (arXiv, 2021)](https://arxiv.org/abs/2006.02752)  
+   - [Jacob, Bayreuther, & Hartenstein (2021)](https://arxiv.org/pdf/2109.10554) - On Conflict-Free Replicated Data Types and Equivocation in Byzantine Environments.
+   - [Ignat, Elvinger, & Ba (2024)](https://link.springer.com/chapter/10.1007/978-3-031-62638-8_2) - Synql: A CRDT-Based Approach for Replicated Relational Databases with Integrity Constraints. *Distributed Applications and Interoperable Systems (DAIS 2024), Lecture Notes in Computer Science, vol 14677*.
+
 
 4. **Fine-Grained Reactivity**  
-   - [*SolidJS: The True Next-Gen Reactivity* (Ryan Carniato)](https://dev.to/ryansolid/a-hands-on-introduction-to-fine-grained-reactivity-3ndf)  
+   - [*SolidJS: A Hands-on Introduction to Fine-Grained Reactivity* (Ryan Carniato)](https://dev.to/ryansolid/a-hands-on-introduction-to-fine-grained-reactivity-3ndf)  
 
 ---
 
