@@ -59,18 +59,25 @@ Semantq Config. See this guide on how to use Semantq Config to manage you app: [
 
 Semantq ships with intuitive and declarative logic block capabilities in your HTML, combining the power of programmatic logic with the simplicity of declarative templates. See the logic block guides below: 
 
-[IF Logic Block Guide](docs/logic_blocks/if.md)
+[IF Logic Block Guide](docs/logicBlocks/if.md)
 
-Semantq Config. See this guide on how to use Semantq Config to manage you app: [Semantq Config Guide](docs/SemantqConfig.md).
+Semantq Config. See this guide on how to use Semantq Config to manage your app: [Semantq Config Guide](docs/SemantqConfig.md).
+
+Semantq State. See this guide on how to use Semantq State to manage state in your app: [Semantq Config Guide](docs/SemantqState.md).
 
 
-For a detailed syntax guide, check out the [Semantq Syntax Guide](docs/Semantq-Syntax.md).
 
-For a detailed slot composition guide, see: [Semantq Slot Composition Guide](docs/Semantq-slots.md).
+For a detailed syntax guide, check out the [Semantq Syntax Guide](docs/SemantqSyntax.md).
 
-For Semantq Layouts Guide: [Semantq Layouts Guide](docs/Semantq-Layouts.md).
+For a detailed syntax guide, check out the [Semantq Syntax Guide](docs/SemantqSyntaxComprehensive.md).
 
-For Semantq CLI commands see this guide: [Semantq CLI Guide](docs/Semantq-cli.md).
+SemantqSyntaxComprehensive
+
+For a detailed slot composition guide, see: [Semantq Slot Composition Guide](docs/SemantqSlots.md).
+
+For Semantq Layouts Guide: [Semantq Layouts Guide](docs/SemantqLayouts.md).
+
+For Semantq CLI commands see this guide: [Semantq CLI Guide](docs/SemantqCli.md).
 For Semantq's full stack's Model-Service-Controller-Routes (MSCR) architecture CLI commands please see: [Semantq MSCR CLI Guide](docs/mscr.md).
 
 
