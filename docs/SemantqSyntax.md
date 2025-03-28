@@ -588,4 +588,8 @@ Standard HTML tags with attributes and content:
 </div>
 ```
 
-This documentation covers all currently supported syntax patterns in a hierarchical organization, from basic elements to complex nested structures. Each example has been verified to work with the current parser implementation.
+## **License**
+
+Semantq is open-source software licensed under the **MIT License**.
+
+## Semantq Main Documentation: [Semantq](https://github.com/Gugulethu-Nyoni/semantq).
