@@ -190,4 +190,8 @@ Create a `+layout.smq` file in the `dashboard` directory:
 
 Layouts in Semantq provide a powerful way to customize the structure of your pages and components. By using `+layout.smq` files, you can define base layouts for groups of routes or create custom layouts for specific routes. This flexibility allows you to build complex applications while maintaining a clean and organized codebase.
 
-For more information, refer to the [Semantq JS Framework Documentation](https://github.com/Gugulethu-Nyoni/semantq).
+## **License**
+
+Semantq is open-source software licensed under the **MIT License**.
+
+## Semantq Main Documentation: [Semantq](https://github.com/Gugulethu-Nyoni/semantq).
