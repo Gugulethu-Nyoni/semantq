@@ -24,7 +24,7 @@ To install the Supabase client and set up the configuration file, run:
 semantq install:supabase
 ```
 
-This will:
+This will action the following:
 - Install the `@supabase/supabase-js` package.
 - Create a `lib/supabaseConfig.js` file with the Supabase configuration.
 
