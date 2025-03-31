@@ -15,7 +15,7 @@ export default class Router {
   }
 
   sanitizeHref(href) {
-    return href.replace(/^\/+|\/+$/g, '').replace(/[^a-zA-Z0-9\/-]/g, '');
+    return href.replace(/[\s<>'"\x00-\x1F\x7F]/g, '');
   }
 
   isCanonicalRoute(href) {
