@@ -93,42 +93,55 @@ export default class Router {
     localStorage.removeItem(this.localStorageKey);
   }
 
-  interceptClicks() {
-    document.addEventListener('click', (event) => {
-      const targetElement = event.target;
-      if (targetElement.tagName === 'A' && targetElement.getAttribute('href') && !targetElement.getAttribute('href').startsWith('#')) {
-        const href = targetElement.getAttribute('href');
+interceptClicks() {
+  document.addEventListener('click', (event) => {
+    // Find the nearest parent anchor (works for direct clicks or nested elements)
+    const anchor = event.target.closest('a[href]');
+    
+    if (anchor && !anchor.getAttribute('href').startsWith('#')) {
+      const href = anchor.getAttribute('href');
+      console.log("Route flow --1", anchor);
+      console.log("Route flow 0)): raw", href);
 
-        if (this.isCanonicalRoute(href)) {
-          console.log(`Canonical route detected: ${href}. Letting the browser handle it.`);
-          return;
-        }
-
-        event.preventDefault();
-
-        const targetRoute = this.sanitizeHref(href);
-
-        // Skip if the route is already being processed
-        if (this.isRouteBeingProcessed(targetRoute)) {
-          console.log(`Route ${targetRoute} is already being processed. Skipping.`);
-          return;
-        }
-
-        // Set the current route in localStorage
-        this.setCurrentRoute(targetRoute);
-
-        // Prioritize declared routes over file-based routes
-        if (this.isDeclaredRoute(targetRoute)) {
-          this.handleDeclaredRoute(targetRoute);
-        } else if (this.isFileBasedRoute(targetRoute)) {
-          this.handleFileBasedRoute(targetRoute);
-        } else {
-          this.handleRouteError(targetRoute);
-        }
+      if (this.isCanonicalRoute(href)) {
+        console.log("Route flow 0: isCanonicalRoute", href);
+        console.log(`Canonical route detected: ${href}. Letting the browser handle it.`);
+        return;
       }
-    });
-  }
+
+      event.preventDefault();
+
+      const targetRoute = this.sanitizeHref(href);
+      console.log("Route flow 1: isNoTCanonicalRoute", targetRoute);
+
+      // Skip if the route is already being processed
+      if (this.isRouteBeingProcessed(targetRoute)) {
+        console.log("Route flow 2: processedAlready", targetRoute);
+        console.log(`Route ${targetRoute} is already being processed. Skipping.`);
+        return;
+      }
+
+      // Set the current route in localStorage
+      this.setCurrentRoute(targetRoute);
+
+      // Prioritize declared routes over file-based routes
+      if (this.isDeclaredRoute(targetRoute)) {
+        console.log("Route flow 3: isDeclared", targetRoute);
+        this.handleDeclaredRoute(targetRoute);
+      } else if (this.isFileBasedRoute(targetRoute)) {
+        console.log("Route flow 3: isFBased", targetRoute);
+        this.handleFileBasedRoute(targetRoute);
+      } else {
+        this.handleRouteError(targetRoute);
+      }
+    }
+  });
 }
+
+}
+
+
+
 
 // Initialize the router
 const router = new Router(declaredRoutes, fileBasedRoutes);
