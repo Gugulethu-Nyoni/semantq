@@ -10,8 +10,7 @@ export default class Router {
   }
 
   cleanUrl(targetRoute) {
-    return targetRoute.replace(/^\/+|\/+$/g, '') // Remove leading/trailing slashes
-                     .replace(/build\/routes/g, ''); // Remove /build/routes
+    return targetRoute.replace(/build\/routes/g, ''); // Remove /build/routes
   }
 
   sanitizeHref(href) {
@@ -41,7 +40,16 @@ export default class Router {
       console.log(`Navigating to file-based route: ${targetRoute} -> ${filePath}`);
 
       // Navigate to the file path using window.location
-      window.location.href = filePath;
+      //window.location.href = filePath;
+      let goTo;
+      if (filePath === this.basePath) { 
+        goTo = this.basePath;  
+      } else {
+        goTo = this.basePath+'/'+filePath;
+      }
+
+      console.log("Going to:", goTo);
+      window.location.href = goTo; //this.basePath+'/'+filePath;
     } else {
       console.error(`File-based route not found: ${targetRoute}`);
       this.handleRouteError(targetRoute);
@@ -58,7 +66,15 @@ export default class Router {
         console.log(`Navigating to declared route: ${targetRoute} -> ${filePath}`);
 
         // Navigate to the file path using window.location
-        window.location.href = filePath;
+      let goTo;
+      if (filePath === this.basePath) { 
+        goTo = this.basePath;  
+      } else {
+        goTo = this.basePath+'/'+filePath;
+      }
+
+      console.log("Going to:", goTo);
+      window.location.href = goTo; //this.basePath+'/'+filePath;
       } else {
         console.error(`File path not found for declared route: ${targetRoute}`);
         this.handleRouteError(targetRoute);
@@ -100,7 +116,7 @@ interceptClicks() {
     
     if (anchor && !anchor.getAttribute('href').startsWith('#')) {
       const href = anchor.getAttribute('href');
-      console.log("Route flow --1", anchor);
+      console.log("Route flow --1", href);
       console.log("Route flow 0)): raw", href);
 
       if (this.isCanonicalRoute(href)) {
