@@ -117,7 +117,7 @@ function cleanJSAST(node) {
 
 jsAST = cleanJSAST(jsAST);
 
-console.log("Cleaned",JSON.stringify(jsAST, null, 2));
+//console.log("Cleaned",JSON.stringify(jsAST, null, 2));
 
     /* CLEAN UP JS AST CODE END */
 
