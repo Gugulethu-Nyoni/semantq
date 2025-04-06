@@ -74,6 +74,11 @@ function cleanJSAST(node) {
         node.arguments = [];
     }
 
+    // Handle NewExpression argument null issue
+    if (node.type === 'NewExpression' && node.arguments === null) {
+        node.arguments = [];
+    }
+
     // Handle null params in FunctionExpression, ArrowFunctionExpression, and MethodDefinition
     if ((node.type === 'FunctionExpression' || node.type === 'ArrowFunctionExpression') && node.params === null) {
         node.params = [];
@@ -112,7 +117,7 @@ function cleanJSAST(node) {
 
 jsAST = cleanJSAST(jsAST);
 
-//console.log(JSON.stringify(jsAST, null, 2));
+console.log("Cleaned",JSON.stringify(jsAST, null, 2));
 
     /* CLEAN UP JS AST CODE END */
 
