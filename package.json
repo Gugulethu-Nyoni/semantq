@@ -25,9 +25,10 @@
   },
   "devDependencies": {
     "@huggingface/inference": "^3.5.2",
-    "chalk": "^5.4.1",
+    "chalk": "^5.0.0",
     "inquirer": "^12.5.2",
     "jest": "^29.7.0",
+    "nanospinner": "^1.2.2",
     "vite": "^6.1.1",
     "vite-plugin-html": "^3.2.2"
   },
