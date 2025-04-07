@@ -50,6 +50,18 @@ const copyIfExists = async (source, destination) => {
   }
 };
 
+
+ // Color palette
+    const purple = chalk.hex('#b56ef0');
+    const purpleBright = chalk.hex('#d8a1ff');
+    const blue = chalk.hex('#6ec7ff');
+    const errorRed = chalk.hex('#ff4d4d');
+    const gray = chalk.hex('#aaaaaa');
+
+   
+
+
+
 // ===============================
 //  MAKE:RESOURCE COMMAND
 // ===============================
@@ -118,7 +130,7 @@ program
     // Create the server directory if it doesn't exist
     if (!fs.existsSync(serverDir)) {
       fs.mkdirSync(serverDir, { recursive: true });
-      console.log(`✅ Created directory: ${serverDir}`);
+      console.log(`${purpleBright('✓')} ${blue('Created directory:')} ${purple(serverDir)}`);
     }
 
     // Write the server.js file
@@ -137,7 +149,7 @@ const baseDir = path.dirname(fileURLToPath(import.meta.url));
 app.use(cors());
 app.use(express.json());
 
-// 🔄 Automatically load all routes from the \`routes\` folder
+// Automatically load all routes from the \`routes\` folder
 const routesPath = path.join(baseDir, 'routes');
 fs.readdirSync(routesPath).forEach((file) => {
   if (file.endsWith('Routes.js')) {
@@ -145,8 +157,8 @@ fs.readdirSync(routesPath).forEach((file) => {
     import(route).then((module) => {
       const routeName = file.replace('Routes.js', '').toLowerCase();
       app.use(\`/api/\${routeName}\`, module.default);
-      console.log(\`✅ Loaded route: /api/\${routeName}\`);
-    }).catch((err) => console.error(\`❌ Failed to load \${file}:\`, err));
+      console.log(\`\${purpleBright('✓')} \${blue('Loaded route:')} /api/\${purple(routeName)}\`);
+    }).catch((err) => console.error(\`\${errorRed('✖')} \${blue('Failed to load')} \${purple(file)}: \${errorRed(err.message || err)}\`));
   }
 });
 
@@ -154,11 +166,13 @@ fs.readdirSync(routesPath).forEach((file) => {
 app.get('/', (req, res) => res.send('API is running 🚀'));
 
 // Start server
-app.listen(PORT, () => console.log(\`🟢 Server running on port \${PORT}\`));
+app.listen(PORT, () => console.log(\`\${chalk.green('●')} \${purple('Server running on')} \${blue(\`port \${PORT}\`)}\`));
 `;
 
     fs.writeFileSync(serverFilePath, serverCode.trim());
-    console.log(`✅ Server created file successfully. Now you can create resources for your database or api driven apps.`);
+console.log(
+  `${purpleBright('✓')} ${blue('Server created file successfully.')} ${gray('Now you can create resources for your database or API-driven apps.')}`
+);
   });
 
 // ===============================
@@ -171,30 +185,35 @@ program
     const targetBaseDir = process.cwd(); // Use the current working directory as the target
 
     // Step 1: Install @supabase/supabase-js
-    console.log('Installing @supabase/supabase-js...');
-    try {
-      execSync('npm install @supabase/supabase-js', { cwd: targetBaseDir, stdio: 'inherit' });
-      console.log('✅ Successfully installed @supabase/supabase-js');
-    } catch (error) {
-      console.error('❌ Failed to install @supabase/supabase-js:', error);
-      process.exit(1);
-    }
+console.log(`${blue('Installing')} ${purple('@supabase/supabase-js')}${gray('...')}`);
 
-    // Step 2: Install dotenv
-    try {
-      execSync('npm install dotenv', { cwd: targetBaseDir, stdio: 'inherit' });
-      console.log('✅ dotenv installed successfully!');
-    } catch (error) {
-      console.error('❌ Failed to install dotenv:', error);
-      process.exit(1);
-    }
+try {
+  execSync('npm install @supabase/supabase-js', { cwd: targetBaseDir, stdio: 'inherit' });
+  console.log(`${purpleBright('✓')} ${blue('Successfully installed')} ${purple('@supabase/supabase-js')}`);
+} catch (error) {
+  console.error(`${errorRed('✖')} ${blue('Failed to install')} ${purple('@supabase/supabase-js')}: ${errorRed(error.message)}`);
+  process.exit(1);
+}
 
-    // Step 2: Install @huggingface/inference
+// Step 2: Install dotenv
+console.log(`${blue('Installing')} ${purple('dotenv')}${gray('...')}`);
+
+try {
+  execSync('npm install dotenv', { cwd: targetBaseDir, stdio: 'inherit' });
+  console.log(`${purpleBright('✓')} ${blue('dotenv installed successfully!')}`);
+} catch (error) {
+  console.error(`${errorRed('✖')} ${blue('Failed to install')} ${purple('dotenv')}: ${errorRed(error.message)}`);
+  process.exit(1);
+}
+
+// Step 3: Install @huggingface/inference
+console.log(`${blue('Installing')} ${purple('@huggingface/inference')}${gray('...')}`);
+
 try {
   execSync('npm install @huggingface/inference', { cwd: targetBaseDir, stdio: 'inherit' });
-  console.log('✅ @huggingface/inference installed successfully!');
+  console.log(`${purpleBright('✓')} ${blue('@huggingface/inference installed successfully!')}`);
 } catch (error) {
-  console.error('❌ Failed to install @huggingface/inference:', error);
+  console.error(`${errorRed('✖')} ${blue('Failed to install')} ${purple('@huggingface/inference')}: ${errorRed(error.message)}`);
   process.exit(1);
 }
 
@@ -206,7 +225,7 @@ try {
     // Create the lib directory if it doesn't exist
     if (!fs.existsSync(libDir)) {
       fs.mkdirSync(libDir, { recursive: true });
-      console.log(`✅ Created directory: ${libDir}`);
+      console.log(`${purpleBright('✓')} ${blue('Created directory:')} ${purple(libDir)}`);
     }
 
     // Write the supabaseConfig.js file
@@ -221,12 +240,10 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY;
 export const supabase = createClient(supabaseUrl, supabaseKey);
 `;
 
-    fs.writeFileSync(supabaseConfigPath, supabaseConfigCode.trim());
-    console.log(`✅ Created file: ${supabaseConfigPath}`);
-
-    console.log('🟢 Supabase setup complete!');
-    console.log('👉 Make sure that you have the correct .env set up for your SUPABASE_URL and SUPABASE_ANON_KEY in the root of your project.');
-  });
+   fs.writeFileSync(supabaseConfigPath, supabaseConfigCode.trim());
+console.log(`${purpleBright('✓')} ${blue('Created file:')} ${purple(supabaseConfigPath)}`);
+console.log(`${chalk.green('●')} ${purpleBright('Supabase setup complete!')}`);
+console.log(`${purpleBright('›')} ${gray('Make sure that you have the correct')} ${purple('.env')} ${gray('set up for your')} ${purple('SUPABASE_URL')} ${gray('and')} ${purple('SUPABASE_ANON_KEY')} ${gray('in the root of your project.')}`);
 
 // ===============================
 //  CREATE NEW PROJECT COMMAND
