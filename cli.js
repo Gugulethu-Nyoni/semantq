@@ -244,7 +244,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 console.log(`${purpleBright('✓')} ${blue('Created file:')} ${purple(supabaseConfigPath)}`);
 console.log(`${chalk.green('●')} ${purpleBright('Supabase setup complete!')}`);
 console.log(`${purpleBright('›')} ${gray('Make sure that you have the correct')} ${purple('.env')} ${gray('set up for your')} ${purple('SUPABASE_URL')} ${gray('and')} ${purple('SUPABASE_ANON_KEY')} ${gray('in the root of your project.')}`);
-
+ });
 // ===============================
 //  CREATE NEW PROJECT COMMAND
 // ===============================
@@ -383,7 +383,7 @@ console.log(`${purpleBright('✨')} ${blue('Tailwind CSS installed and configure
 } catch (error) {
   console.error(`${errorRed('✖')} ${blue('Error installing Tailwind CSS:')} ${errorRed(error.message)}`);
 }
-    
+
   });
 
 // ===========================================

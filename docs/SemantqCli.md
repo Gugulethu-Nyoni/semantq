@@ -2,7 +2,49 @@
 
 Welcome to the Semantq CLI Commands Guide! This document provides an overview of the available commands for the Semantq CLI tool, which helps you streamline your project setup and development process.
 
-## How This Works
+## Quick Summary of Available Commands (Overview)
+
+### Project Commands
+1. `semantq create <projectName>` - Generate new project structure
+2. `semantq update` - Update Semantq to latest version
+   - `semantq --dry-run` - Preview changes without applying
+
+### Resource Generation
+3. `semantq make:resource <name>` - Generate full resource (model+service+controller+route)
+   - `-a, --adapter` - Specify database adapter (mongo/supabase)
+4. `semantq make:model <name>` - Generate model only
+   - `-a, --adapter` - Specify database adapter
+5. `semantq make:service <name>` - Generate service only
+   - `-a, --adapter` - Specify database adapter
+6. `semantq make:controller <name>` - Generate controller only
+7. `semantq make:apiRoute <name>` - Generate route only
+
+### Installation Commands
+8. `semantq install:server` - Set up server directory
+9. `semantq install:supabase` - Configure Supabase
+10. `semantq install:tailwind` - Install Tailwind CSS
+
+### Route System
+11. `semantq make:route <routeName>` - Create new route with templates
+   - `-l, --layout` - Include layout file @layout.smq
+   - `-c, --config` - Include config file config.js
+   - `-s, --server` - Include server handlers server.js
+   - `-a, --all` - Create all resources (@page.smq,@layout.smq,config.js,server.js)
+
+### AI Commands
+12. `semantq ai <prompt>` - Generate code using AI
+   - `-r, --route` - Specify target route directory (required)
+   - `--full` - Wrap in Semantq tags
+   - `--js`/`--css`/`--html` - Generate specific code type
+   - `--append` - Append to existing file
+
+#### Utility
+13. `semantq -v, --version` - Show version number
+
+The CLI handles everything from project scaffolding to AI-assisted development.
+
+
+## Semantq CLI Commands (Comprehensive)
 
 The Semantq CLI provides a set of commands to quickly scaffold and configure your projects. Below is a list of available commands and their descriptions.
 
