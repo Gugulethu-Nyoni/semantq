@@ -26,7 +26,7 @@ export function findAstFiles(dir) {
     if (fs.statSync(fullPath).isDirectory()) {
       files = files.concat(findAstFiles(fullPath)); // Recursive call for subdirectories
     } 
-    else if (file === '+layout.smq.ast') {
+    else if (file === '@layout.smq.ast') {
       //console.log("Got it", file);
       files.push(fullPath);
     }
@@ -88,7 +88,7 @@ function loadComponent(componentPath) {
 function mergeComponents(imports, baseDir, astFile) {
     const mainAst = JSON.parse(fs.readFileSync(astFile, 'utf-8'));
     let resourceName = path.basename(astFile, '.smq.ast').split('.')[0];
-    const isLayout = resourceName === '+layout';
+    const isLayout = resourceName === '@layout';
     const fileExtension = '.smq.ast';
 
     // Keys for accessing ASTs 
@@ -96,7 +96,7 @@ function mergeComponents(imports, baseDir, astFile) {
     const cssKey = isLayout ? 'cssAST' : `cssAST_${resourceName}`;
     const htmlKey = isLayout ? 'customAST' : resourceName.toLowerCase();
 
-    // Main AST objects for either +layout or component
+    // Main AST objects for either @layout or component
     const mainJSAST = mainAst[jsKey] || { content: { body: [] } };
     const mainCSSAST = mainAst[cssKey] || { content: { nodes: [] } };
     const mainHtmlAST = mainAst[htmlKey] || { content: [] };
@@ -233,7 +233,7 @@ export async function importsResolver(destDir) {
 
       //console.log("SEEEEEE 2",imports);
 
-      // Merge components into the page and write to +layout.merged.ast
+      // Merge components into the page and write to @layout.merged.ast
       const mergedContent = mergeComponents(imports, baseDir, astFile);
 
       return { astFile, imports, mergedContent };
