@@ -173,7 +173,7 @@ async function writeToFile(astObjects) {
   let jsKey = "jsAST";
   let cssKey = "cssAST";
 
-  if (!fileName.startsWith("+page")) {
+  if (!fileName.startsWith("@page")) {
     const componentName = fileName.split(".")[0]; // Extract component name
     htmlKey = componentName.toLowerCase();
     jsKey = `jsAST_${componentName}`;

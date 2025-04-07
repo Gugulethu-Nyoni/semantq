@@ -371,51 +371,112 @@ export default defineConfig({
     }
   });
 
-// ===============================
-//  MAKE:ROUTE COMMAND
-// ===============================
+// ===========================================
+//  MAKE:ROUTE COMMAND - FULL RESOURCES 
+// ===========================================
 program
   .command('make:route <routeName>')
-  .description('Create a new route in src/routes')
-  .action((routeName) => {
-    const targetBaseDir = process.cwd(); // Use the current working directory as the target
-    const routesDir = resolvePath(targetBaseDir, 'src/routes');
-    const routePath = resolvePath(routesDir, routeName);
+  .description('Create a new route with stylish feedback')
+  .option('-l, --layout', 'Add layout file')
+  .option('-c, --config', 'Add config file')
+  .option('-s, --server', 'Add server handlers')
+  .option('-a, --all', 'Create all resources at once')
+  .action(async (routeName, options) => {
+    const { default: chalk } = await import('chalk');
+    const { createSpinner } = await import('nanospinner');
+
+    // Color palette
+    const purple = chalk.hex('#b56ef0');
+    const purpleBright = chalk.hex('#d8a1ff');
+    const blue = chalk.hex('#6ec7ff');
+    const errorRed = chalk.hex('#ff4d4d');
+    const gray = chalk.hex('#aaaaaa');
 
     try {
-      if (!fs.existsSync(routesDir)) {
-        fs.mkdirSync(routesDir, { recursive: true });
-      }
-
+      const routePath = resolvePath(process.cwd(), 'src/routes', routeName);
+      
+      // Check if route exists
       if (fs.existsSync(routePath)) {
-        console.warn(`⚠️ Route '${routeName}' already exists.`);
+        const spinner = createSpinner(purple(`Checking route ${routeName}...`)).start();
+        spinner.error({ text: errorRed('Route already exists!') });
         return;
       }
 
+      // Create all resources if -a flag is set
+      if (options.all) {
+        options.layout = true;
+        options.config = true;
+        options.server = true;
+      }
+
+      // Create directory
+      const dirSpinner = createSpinner(purple('Creating route structure...')).start();
       fs.mkdirSync(routePath, { recursive: true });
+      dirSpinner.success({ text: purpleBright('Route directory created') });
 
-      // Create necessary files
-    const pageContent = `
-    @script
+      // File templates
+      const files = {
+        '@page.smq': `@script\n\n@end\n\n@style\n\n@end\n\n@html\n  ${routeName} Page\n`,
+        '@layout.smq': options.layout ? `@script\n// Imports only\n@end\n\n@head\n\n@end\n\n@body\n\n@end\n\n@footer\n\n@end\n` : null,
+'config.js': options.config ? `export default {
+  meta: {
+    title: '${routeName}',
+    description: '',
+    keywords: '',
+    author: '',
+    viewport: 'width=device-width, initial-scale=1'
+  },
+  seo: {
+    canonicalUrl: '',
+    ogImage: ''
+  },
+  transition: {
+    type: 'fade',
+    duration: 300
+  },
+  middleware: []
+}` : null,
+'server.js': options.server ? `export default {\n  get() { /* ... */ }\n};` : null
+      };
 
-    @end
+      // File creation with visual feedback
+      for (const [filename, content] of Object.entries(files)) {
+        if (content) {
+          const spinner = createSpinner(purple(`Creating ${filename}`)).start();
+          await new Promise(resolve => setTimeout(resolve, 200)); // Visual delay
+          fs.writeFileSync(resolvePath(routePath, filename), content.trim());
+          spinner.success({ 
+            text: `${purpleBright('✓')} ${purple(filename)} ${blue('created')}`
+          });
+        }
+      }
 
-    @style
+      // Success message
+      console.log(`
+${purple.bold('» Route created successfully!')}
 
-    @end
+${purpleBright.bold('Files:')}
+${purpleBright('•')} ${purple('@page.smq')} ${gray('(base template)')}
+${options.layout ? `${purpleBright('•')} ${purple('@layout.smq')}` : ''}
+${options.config ? `${purpleBright('•')} ${purple('config.js')}` : ''}
+${options.server ? `${purpleBright('•')} ${purple('server.js')}` : ''}
 
-    @html
-      ${routeName} Page 
+${blue.italic('Next steps:')}
+  ${purpleBright('›')} Add route to ${purple('src/routes/routes.js')}
+  ${purpleBright('›')} Run ${purple('semantq dev')} to test
+`);
 
-    `;
-
-    fs.writeFileSync(resolvePath(routePath, '+page.smq'), pageContent, 'utf-8');
-      console.log(`✅ Route '${routeName}' created successfully!`);
     } catch (error) {
-      console.error(`❌ Error creating route '${routeName}':`, error.message);
+      console.log(`
+${errorRed('✖ Error:')} ${error.message}
+
+${blue('Troubleshooting:')}
+  ${purpleBright('›')} Check directory permissions
+  ${purpleBright('›')} Verify disk space
+`);
+      process.exit(1);
     }
   });
-
 
 // ===============================
 //  SEMANTQ AI COMMANDS
@@ -446,7 +507,7 @@ program
       }
 
       const outputDir = path.join("src", "routes", options.route);
-      const outputPath = path.join(outputDir, "+page.html");
+      const outputPath = path.join(outputDir, "@page.html");
 
       // Ensure the output directory exists
       fs.ensureDirSync(outputDir);
