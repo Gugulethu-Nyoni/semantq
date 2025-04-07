@@ -312,12 +312,10 @@ program
       // Install development dependencies with suppressed warnings
       execSync('npm install --save-dev --silent --no-warnings --no-audit --no-fund vite@latest vite-plugin-html@latest', { cwd: targetBaseDir, stdio: 'inherit' });
 
-      console.log(`✅ Project structure generated successfully at ${targetBaseDir}`);
-      console.log(`Now you can run this command to go to ${projectName} project directory: cd ${projectName}`);
-    } catch (error) {
-      console.error('❌ Error generating project:', error.message);
-      console.error('Stack trace:', error.stack);
-    }
+console.log(`${purpleBright('✓')} ${blue('Project structure generated successfully at')} ${purple(targetBaseDir)}`);
+console.log(`${gray('Now you can run this command to go to')} ${purple(projectName)} ${gray('project directory:')} ${blue(`cd ${projectName}`)}`);    } catch (error) {
+console.error(`${errorRed('✖')} ${blue('Error generating project:')} ${errorRed(error.message)}`);
+console.error(`${purpleBright('›')} ${gray('Stack trace:')} ${gray(error.stack)}`);    }
   });
 
 // ===============================
@@ -330,8 +328,7 @@ program
     const targetBaseDir = process.cwd(); // Use the current working directory as the target
 
     try {
-      console.log('📦 Installing Tailwind CSS and dependencies...');
-
+      console.log(`${purpleBright('📦')} ${blue('Installing')} ${purple('Tailwind CSS')} ${blue('and dependencies')}${gray('...')}`);
       // Step 1: Install Tailwind CSS v3, PostCSS, and Autoprefixer
       execSync('npm install -D tailwindcss@3 postcss autoprefixer', { cwd: targetBaseDir, stdio: 'inherit' });
 
@@ -349,8 +346,7 @@ program
 };`;
 
       fs.writeFileSync(tailwindConfigPath, tailwindConfigContent);
-      console.log('✅ Configured content paths in tailwind.config.js');
-
+      console.log(`${purpleBright('✓')} ${blue('Configured content paths in')} ${purple('tailwind.config.js')}`);
       // Step 4: Create or update vite.config.js
       const viteConfigPath = resolvePath(targetBaseDir, 'vite.config.js');
       const viteConfigContent = `import { defineConfig } from 'vite';
@@ -363,29 +359,31 @@ export default defineConfig({
 });`;
 
       fs.writeFileSync(viteConfigPath, viteConfigContent);
-      console.log('✅ Created/updated vite.config.js');
+      console.log(`${purpleBright('✓')} ${blue('Updated')} ${purple('vite.config.js')}`); // or 'Created' based on actual operation
 
       // Step 5: Append Tailwind directives to global.css
       const globalCSSPath = resolvePath(targetBaseDir, 'global.css');
       const tailwindDirectives = `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`;
 
       if (fs.existsSync(globalCSSPath)) {
-        // Read the existing content
-        const existingContent = fs.readFileSync(globalCSSPath, 'utf-8');
-        
-        // Write Tailwind directives at the top and append the existing content
-        fs.writeFileSync(globalCSSPath, tailwindDirectives + existingContent);
-        console.log('✅ Appended Tailwind directives to the top of global.css');
-      } else {
-        // Create global.css with Tailwind directives if it doesn't exist
-        fs.writeFileSync(globalCSSPath, tailwindDirectives);
-        console.log('✅ Created global.css with Tailwind directives');
-      }
+  // Read the existing content
+  const existingContent = fs.readFileSync(globalCSSPath, 'utf-8');
+  
+  // Write Tailwind directives at the top and append the existing content
+  fs.writeFileSync(globalCSSPath, tailwindDirectives + existingContent);
+  console.log(`${purpleBright('✓')} ${blue('Appended Tailwind directives to the top of')} ${purple('global.css')}`);
+} else {
+  // Create global.css with Tailwind directives if it doesn't exist
+  fs.writeFileSync(globalCSSPath, tailwindDirectives);
+  console.log(`${purpleBright('✓')} ${blue('Created')} ${purple('global.css')} ${blue('with Tailwind directives')}`);
+}
 
-      console.log('🎉 Tailwind CSS installed and configured successfully!');
-    } catch (error) {
-      console.error('❌ Error installing Tailwind CSS:', error.message);
-    }
+console.log(`${purpleBright('✨')} ${blue('Tailwind CSS installed and configured successfully!')}`);
+
+} catch (error) {
+  console.error(`${errorRed('✖')} ${blue('Error installing Tailwind CSS:')} ${errorRed(error.message)}`);
+}
+    
   });
 
 // ===========================================
