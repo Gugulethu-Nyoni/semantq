@@ -22,7 +22,7 @@ export function findAstFiles(dir) {
       files = files.concat(findAstFiles(fullPath)); // Recursive call for subdirectories
     } 
     else if (file.endsWith('.ast')) {
-      if (file !== '+layout.smq.ast') {
+      if (file !== '@layout.smq.ast') {
       files.push(fullPath);
     }
     }
@@ -84,7 +84,7 @@ function loadComponent(componentPath) {
 function mergeComponents(imports, baseDir, astFile) {
     const mainAst = JSON.parse(fs.readFileSync(astFile, 'utf-8'));
     let resourceName = path.basename(astFile, '.smq.ast').split('.')[0];
-    const isPage = resourceName === '+page';
+    const isPage = resourceName === '@page';
     const fileExtension = '.smq.ast';
 
     // Keys for accessing ASTs based on whether it's a page or a component
@@ -92,7 +92,7 @@ function mergeComponents(imports, baseDir, astFile) {
     const cssKey = isPage ? 'cssAST' : `cssAST_${resourceName}`;
     const htmlKey = isPage ? 'customAST' : resourceName.toLowerCase();
 
-    // Main AST objects for either +page or component
+    // Main AST objects for either @page or component
     const mainJSAST = mainAst[jsKey] || { content: { body: [] } };
     const mainCSSAST = mainAst[cssKey] || { content: { nodes: [] } };
     const mainHtmlAST = mainAst[htmlKey] || { content: [] };
@@ -258,7 +258,7 @@ export async function importsResolver(destDir) {
 
       //console.log("SEEEEEE 2",imports);
 
-      // Merge components into the page and write to +page.merged.ast
+      // Merge components into the page and write to @page.merged.ast
       const mergedContent = mergeComponents(imports, baseDir, astFile);
 
       return { astFile, imports, mergedContent };

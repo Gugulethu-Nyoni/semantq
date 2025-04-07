@@ -90,8 +90,8 @@ async function writeAstFile(filePath, ast) {
 // Helper function: Determine if the file is a page or component
 function getFileMetadata(fileName) {
   const baseName = fileName.replace('.smq.ast', '');
-  const isPage = baseName === '+page';
-  const isLayout = baseName === '+layout';
+  const isPage = baseName === '@page';
+  const isLayout = baseName === '@layout';
   const isComponent = !isPage;
   const componentName = isComponent ? baseName : null;
   let htmlAstKey;  //= isPage ? 'customAST' : componentName.toLowerCase();
