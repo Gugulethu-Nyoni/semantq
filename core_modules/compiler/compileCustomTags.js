@@ -23,12 +23,12 @@ function readSMQFiles(directory) {
           readSMQFiles(filePath); // Recursively call on subdirectory
         } 
 
-        //else if (path.basename(file).toLowerCase() === '.smq' && path.basename(file).toLowerCase() !== '+layout.smq') {
+        //else if (path.basename(file).toLowerCase() === '.smq' && path.basename(file).toLowerCase() !== '@layout.smq') {
 
         else if (path.basename(file).endsWith('.smq')) {
-            const fileName = path.basename(file).replace('.smq',''); // +page or +layout or Button
+            const fileName = path.basename(file).replace('.smq',''); // @page or @layout or Button
            // console.log(`Found.smq file: ${filePath} ${fileName}`);
-            if (fileName !== '+layout') {
+            if (fileName !== '@layout') {
                 //console.log(`We compile ${fileName}`);
             readAndCompileSMQFile(filePath);
           }

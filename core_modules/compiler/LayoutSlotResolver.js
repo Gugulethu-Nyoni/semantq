@@ -14,7 +14,7 @@ class SlotResolver {
   
   constructor(ast, filePath) {
     this.filePath = filePath;
-    this.ast = ast; // The merged AST from either +layout.merged.ast or Component.merged.ast
+    this.ast = ast; // The merged AST from either @layout.merged.ast or Component.merged.ast
     //console.log(filePath, JSON.stringify(this.ast.customAST,null,2));
     this.componentName='';
     // Extract component name dynamically (e.g., "Card" from "Card.merged.ast")
@@ -22,7 +22,7 @@ class SlotResolver {
     this.isLayout = false; 
     this.isComponent = false; 
 
-    if (fileName.startsWith('+layout')) {
+    if (fileName.startsWith('@layout')) {
       this.isLayout=true; 
 
     }
@@ -88,7 +88,7 @@ buildComponentRegistry() {
 
 
  resolveDefaultSlots(filePath) {
-    // Extract filename (e.g., Card.merged.ast or +layout.merged.ast)
+    // Extract filename (e.g., Card.merged.ast or @layout.merged.ast)
     const parentComponentFileName = path.basename(filePath);
     const parentComponentKey = this.isLayout
         ? "customAST" // Pages use 'customAST'
@@ -362,9 +362,9 @@ function findMergedAstFiles(dir) {
   const directoryScope = dir.split('/').pop(); 
   //console.log("DRRRRRRRRRR", directoryScope);
   if (directoryScope === 'components') {
-    targetFileName = '+layout.merged.ast'; //
+    targetFileName = '@layout.merged.ast'; //
    } else {
-   targetFileName = '+layout.merged.ast';
+   targetFileName = '@layout.merged.ast';
 
    }
 
