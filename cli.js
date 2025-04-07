@@ -6,6 +6,8 @@ import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 //import { InferenceClient } from "@huggingface/inference";
 import dotenv from 'dotenv';
+import inquirer from 'inquirer';
+import chalk from 'chalk';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -503,6 +505,93 @@ program
       console.error("Error:", error);
     }
   });
+
+
+
+// ===============================
+//  UPDATE COMMAND
+// ===============================
+program
+  .command('update')
+  .description('Update Semantq to the latest version (backup your project first)')
+  .option('--dry-run', 'Show what would be updated without making changes')
+  .action(async (options) => {
+    const chalk = (await import('chalk')).default;
+    const inquirer = (await import('inquirer')).default;
+    const { execSync } = await import('child_process');
+    const targetDir = process.cwd();
+
+    try {
+      // Get versions
+      const latestVersion = execSync('npm view semantq version', { encoding: 'utf-8' }).trim();
+      const currentVersion = JSON.parse(fs.readFileSync('package.json', 'utf-8')).version;
+
+      if (latestVersion === currentVersion) {
+        console.log(chalk.green('✓ Already on latest version (v' + currentVersion + ')'));
+        return;
+      }
+
+      // Confirmation prompt
+      const { proceed } = await inquirer.prompt([{
+        type: 'confirm',
+        name: 'proceed',
+        message: `Update from v${currentVersion} to v${latestVersion}? ${chalk.yellow('Backup your project first!')}`,
+        default: false
+      }]);
+
+      if (!proceed) {
+        console.log(chalk.yellow('Update cancelled.'));
+        return;
+      }
+
+      // Dry run mode
+      if (options.dryRun) {
+        console.log(chalk.blue('[Dry Run] Would update:'));
+        console.log('• core_modules/');
+        console.log('• docs/');
+        console.log('• examples/');
+        console.log(chalk.gray('(Add --force to actually apply changes)'));
+        return;
+      }
+
+      // Perform update
+      console.log(chalk.blue('Updating Semantq...'));
+      
+      // 1. Install latest version
+      execSync('npm install semantq@latest', { stdio: 'inherit' });
+
+      // 2. Update core directories (force overwrite)
+      const dirsToUpdate = ['core_modules', 'docs', 'examples'];
+      dirsToUpdate.forEach(dir => {
+        const source = path.join('node_modules', 'semantq', dir);
+        const dest = path.join(targetDir, dir);
+        
+        fs.rmSync(dest, { recursive: true, force: true });
+        fs.copySync(source, dest);
+        console.log(chalk.green(`✓ Updated ${dir}/`));
+      });
+
+      // 3. Preserve config (show diff if modified)
+      const userConfigPath = path.join(targetDir, 'semantq.config.js');
+      const defaultConfigPath = path.join('node_modules', 'semantq', 'semantq.config.default.js');
+      
+      if (fs.existsSync(userConfigPath)) {
+        console.log(chalk.yellow('⚠️ semantq.config.js was preserved (may need manual updates)'));
+        if (fs.existsSync(defaultConfigPath)) {
+          console.log(chalk.gray('Compare with default config:'));
+          console.log(chalk.gray(`  ${defaultConfigPath}`));
+        }
+      }
+
+      console.log(chalk.green.bold('\n✓ Update complete!'));
+      console.log(chalk.blue('Restart your dev server to apply changes.'));
+
+    } catch (error) {
+      console.error(chalk.red('✖ Update failed:'), error.message);
+      process.exit(1);
+    }
+  });
+
 
 // Parse CLI arguments
 program.parse(process.argv);
