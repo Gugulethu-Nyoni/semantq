@@ -84,14 +84,14 @@ async function readSMQHTMLFiles(directory) {
           readSMQHTMLFiles(filePath); // Recursively call on subdirectory
         } else {
           const fileName = path.basename(file).toLowerCase();
-          const resolvedASTPath = path.join(directory, '+page.resolved.ast');
-          const smqASTPath = path.join(directory, '+page.smq.ast');
-          //const layoutSmqASTPath = path.join(directory, '+layout.smq.ast');
-          //const layoutResolvedASTPath = path.join(directory, '+layout.resolved.ast');
+          const resolvedASTPath = path.join(directory, '@page.resolved.ast');
+          const smqASTPath = path.join(directory, '@page.smq.ast');
+          //const layoutSmqASTPath = path.join(directory, '@layout.smq.ast');
+          //const layoutResolvedASTPath = path.join(directory, '@layout.resolved.ast');
 
-          // Check for +page.resolved.ast first
-          // || fileName === '+layout.smq.ast' || fileName === '+layout.resolved.ast'
-          if (fileName === '+page.resolved.ast' || fileName === '+page.smq.ast') {
+          // Check for @page.resolved.ast first
+          // || fileName === '@layout.smq.ast' || fileName === '@layout.resolved.ast'
+          if (fileName === '@page.resolved.ast' || fileName === '@page.smq.ast') {
             
             let fileToRead = null;
 
@@ -151,7 +151,7 @@ async function readSMQHTMLFiles(directory) {
                       //console.log(jsAST.content.body);
                       const fileName = path.basename(filePath);
                       // exclude transformation of layout ast files for now
-                      if (fileName.includes('+page')) {
+                      if (fileName.includes('@page')) {
                       const atomiqueModule = await import('./static_analysis/anatomique.js');
                       const transformASTs = atomiqueModule.default; // If using default export
                       //console.log(JSON.stringify(cssAST,null,2));
@@ -213,9 +213,9 @@ function processDirectory(dir) {
     if (fs.statSync(filePath).isDirectory()) {
       // Recursively process subdirectories
       processDirectory(filePath);
-    } else if (file.startsWith('+page.') && file.endsWith('.resolved.ast')) {
+    } else if (file.startsWith('@page.') && file.endsWith('.resolved.ast')) {
       hasPageResolved = true;
-    } else if (file.startsWith('+layout.') && file.endsWith('.resolved.ast')) {
+    } else if (file.startsWith('@layout.') && file.endsWith('.resolved.ast')) {
       hasLayoutResolved = true;
     }
   });
@@ -225,20 +225,20 @@ function processDirectory(dir) {
     const filePath = path.join(dir, file);
 
     if (!fs.statSync(filePath).isDirectory()) {
-      if (file.startsWith('+page.')) {
-        if (hasPageResolved && file !== '+page.resolved.ast') {
-          // Delete all +page.* files except +page.resolved.ast
+      if (file.startsWith('@page.')) {
+        if (hasPageResolved && file !== '@page.resolved.ast') {
+          // Delete all @page.* files except @page.resolved.ast
           fs.unlinkSync(filePath);
         } else if (!hasPageResolved && !file.endsWith('.smq.ast')) {
-          // Delete all +page.* files except +page.smq.ast
+          // Delete all @page.* files except @page.smq.ast
           fs.unlinkSync(filePath);
         }
-      } else if (file.startsWith('+layout.')) {
-        if (hasLayoutResolved && file !== '+layout.resolved.ast') {
-          // Delete all +layout.* files except +layout.resolved.ast
+      } else if (file.startsWith('@layout.')) {
+        if (hasLayoutResolved && file !== '@layout.resolved.ast') {
+          // Delete all @layout.* files except @layout.resolved.ast
           fs.unlinkSync(filePath);
         } else if (!hasLayoutResolved && !file.endsWith('.smq.ast')) {
-          // Delete all +layout.* files except +layout.smq.ast
+          // Delete all @layout.* files except @layout.smq.ast
           fs.unlinkSync(filePath);
         }
       }

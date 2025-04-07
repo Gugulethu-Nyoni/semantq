@@ -20,9 +20,9 @@ function readSMQFiles(directory) {
 
         if (stats.isDirectory()) {
           readSMQFiles(filePath); // Recursively call on subdirectory
-        } else if (file === '+layout.smq') {
-          // Only pick up files named +layout.smq
-          // console.log(`Found +layout.smq file: ${filePath}`);
+        } else if (file === '@layout.smq') {
+          // Only pick up files named @layout.smq
+          // console.log(`Found @layout.smq file: ${filePath}`);
           readAndCompileSMQFile(filePath);
         }
       });

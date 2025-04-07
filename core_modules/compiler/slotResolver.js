@@ -24,7 +24,7 @@ class SlotResolver {
 
     
     const fileName = path.basename(filePath, ".merged.ast");
-    this.isPage = fileName.startsWith("+page");
+    this.isPage = fileName.startsWith("@page");
     this.isComponent = !this.isPage;
     
     if (!this.isPage) this.componentName = fileName;
@@ -621,7 +621,7 @@ removeComponentImports() {
 
 // Helper function: Recursively find all `.merged.ast` files
 function findMergedAstFiles(dir) {
-    const targetFileName = '+page.merged.ast';
+    const targetFileName = '@page.merged.ast';
     let files = [];
     
     fs.readdirSync(dir).forEach(file => {
