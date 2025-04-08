@@ -215,6 +215,81 @@ This example:
 
 ---
 
+
+## Range Input Binding
+
+Bind a range slider to a reactive state and display the value as text.
+
+### Example
+
+```html
+<label for="volume-slider">
+  Volume: <span id="volume-display"></span>
+</label>
+<input id="volume-slider" type="range" min="0" max="100">
+```
+
+```js
+@script
+const volume = $state(50);
+
+// Bind the range slider to state
+bind('#volume-slider', volume);
+
+// Bind text output with formatting
+bindText('#volume-display', volume, {
+  format: val => `${val}%`
+});
+@end
+```
+
+### Notes
+- `bind()` syncs the range's value with state.
+- `bindText()` reflects changes in real-time with optional formatting.
+- Works with `type="range"` inputs the same way as text/number inputs.
+
+
+## Class Binding
+
+Toggle a CSS class dynamically based on a reactive boolean state.
+
+### Example
+
+```html
+<input id="toggle-active" type="checkbox"> Toggle Active State
+
+<div id="status-box">
+  This box changes style when active
+</div>
+
+<style>
+  .active {
+    background-color: #4caf50;
+    color: white;
+    font-weight: bold;
+    border: 2px solid #388e3c;
+  }
+</style>
+```
+
+```js
+@script
+const isActive = $state(false);
+
+// Sync checkbox with state
+bind('#toggle-active', isActive);
+
+// Conditionally toggle class on element
+bindClass('#status-box', 'active', isActive);
+@end
+```
+
+### Notes
+- `bindClass()` adds/removes the specified class (`'active'` in this case) based on truthiness of the bound state.
+- You can combine this with custom styles to change UI appearance reactively.
+- Use multiple `bindClass()` calls if you want to toggle multiple classes independently.
+
+
 ## Effects
 
 Effects allow you to run side effects based on state changes. They are ideal for scenarios like logging or executing other tasks when a state updates.
