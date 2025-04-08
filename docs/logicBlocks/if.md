@@ -16,6 +16,7 @@ Semantq enables intuitive JavaScript syntax right in your HTML, combining the po
     Welcome back, premium member!
   </div>
 @endif
+```
 
 Conditional logic with `@if` blocks in Semantq currently supports the following test expressions:
 
@@ -27,9 +28,32 @@ Conditional logic with `@if` blocks in Semantq currently supports the following 
 @endif
 ```
 
+## Complex Syntax
+
+```semantq
+@if(test)
+<li>{item}</li>
+@else 
+<li>{item.name}</li>
+<!-- my comment here -->
+@endif 
+```
+
+**Note:** In the complex `@if` syntax structure, you can specify a condition within parentheses, just like in the basic `@if` syntax. The condition inside `@if(condition)` follows the same structure and rules as the condition in a basic `@if` statement.
+
+For both the basic `@if` and `@if-else` blocks, the syntax and types for the **test** (condition), **consequent** (code executed when the condition is true), and **alternate** (code executed when the condition is false) are identical.
+
+- **Test:** The condition is evaluated in both `@if(condition)` and `@if-else`. Both follow the same syntax rules.
+- **Consequent:** The content after `@if()` (when the condition is true) and after `@if()` in `@if-else` (when the condition is true) uses the same syntax and types.
+- **Alternate:** Similarly, the content between `@else` and `@endif` in an `@if-else` block is treated the same way as the content between `@if()` and `@endif` in the basic `@if` block.
+
+This ensures consistency in syntax and allows for flexible logic handling across both basic and complex `@if-else` constructs.
+
+
+
 ## Supported Test Expressions
 
-### 1. Boolean Literals
+### Boolean Literals
 ```semantq
 @if(true)
   This will always render
@@ -38,7 +62,7 @@ Conditional logic with `@if` blocks in Semantq currently supports the following 
 @if(false)
   This will never render
 @endif
-```
+``` 
 
 ### 2. Variable Checks
 ```semantq
