@@ -56,7 +56,8 @@ Your app will be available at `http://localhost:5173` (or the default port).
 ### Core Features
 - [Semantq AI CLI Guide](docs/SemantqAI.md) - Generate compliant code using AI
 - [Semantq Config Guide](docs/SemantqConfig.md) - Manage app configuration
-- [Semantq State Guide](docs/SemantqState.md) - Reactive state management
+- [Semantq State Guide](docs/SemantqState.md) - Reactive state management system
+- [Semantq Core State Guide](docs/SemantqStateCore.md) - Core state management
 - [Semantq Reactivity Guide](docs/SemantqCoreReactivity.md) - Semantq Reactivity Guide
 
 ### Template System
