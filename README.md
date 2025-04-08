@@ -61,7 +61,8 @@ Your app will be available at `http://localhost:5173` (or the default port).
 - [Semantq Reactivity Guide](docs/SemantqCoreReactivity.md) - Semantq Reactivity Guide
 
 ### Template System
-- [Logic Blocks](docs/logicBlocks/if.md) - Declarative programmatic logic in HTML
+- [If Logic Block](docs/logicBlocks/if.md) - If Logic Block Guide
+- [Each Logic Block](docs/logicBlocks/each.md) - Each Logic Block Guide
 - [Syntax Guide](docs/SemantqSyntaxComprehensive.md) - Comprehensive syntax reference
 - [Slot Composition](docs/SemantqSlots.md) - Component slot patterns
 - [Layout System](docs/SemantqLayouts.md) - Application layout management
