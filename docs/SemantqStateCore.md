@@ -223,23 +223,15 @@ Bind a range slider to a reactive state and display the value as text.
 ### Example
 
 ```html
-<label for="volume-slider">
-  Volume: <span id="volume-display"></span>
-</label>
-<input id="volume-slider" type="range" min="0" max="100">
+<label>
+    Volume: <span @text={volume} @format={(val) => val }></span>
+  </label>
+  <input type="range" min="0" max="100" @bind={volume} />
 ```
 
 ```js
 @script
-const volume = $state(50);
-
-// Bind the range slider to state
-bind('#volume-slider', volume);
-
-// Bind text output with formatting
-bindText('#volume-display', volume, {
-  format: val => `${val}%`
-});
+  let volume = $state(50);
 @end
 ```
 
@@ -256,31 +248,25 @@ Toggle a CSS class dynamically based on a reactive boolean state.
 ### Example
 
 ```html
-<input id="toggle-active" type="checkbox"> Toggle Active State
+ <input type="checkbox" @bind={isActive} /> Toggle Active
 
-<div id="status-box">
-  This box changes style when active
-</div>
+  <div id="status-box" @class:active={isActive}>
+    This box changes style when active
+  </div>
 
-<style>
-  .active {
-    background-color: #4caf50;
-    color: white;
-    font-weight: bold;
-    border: 2px solid #388e3c;
-  }
-</style>
+  <style>
+    .active {
+      background-color: #4caf50;
+      color: white;
+      font-weight: bold;
+      border: 2px solid #388e3c;
+    }
+  </style>
 ```
 
 ```js
 @script
 const isActive = $state(false);
-
-// Sync checkbox with state
-bind('#toggle-active', isActive);
-
-// Conditionally toggle class on element
-bindClass('#status-box', 'active', isActive);
 @end
 ```
 
