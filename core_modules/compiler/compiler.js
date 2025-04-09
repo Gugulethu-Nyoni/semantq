@@ -301,21 +301,21 @@ async function main(sourceDir, destDir, destDirBase) {
 
 
 
-    // Step 7: Resolve imports and slots
+    // Step 7: Resolve imports and slots @components
    await importsResolution(componentsDest);
    await slotsResolution(componentsDest);
 
 
   /* RESOLVE LAYOUT FIELS HERE */
 
-    // Step 8: Resolve imports and slots
+    // Step 8: Resolve imports and slots @layouts
     await layoutImportsResolution(destDir);
     await layoutSlotsResolution(destDir);
 
     /* END OF DEALING WITH LAYOUTS */
 
 
-    // Step 9: Resolve imports and slots
+    // Step 9: Resolve imports and slots @pages
     await importsResolution(destDir);
     await slotsResolution(destDir);
 
