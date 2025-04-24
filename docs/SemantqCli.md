@@ -54,7 +54,7 @@ The Semantq CLI provides a set of commands to quickly scaffold and configure you
 |-----------------------------|-----------------------------------------------------------------------------|
 | `semantq create myapp`      | Creates a new project with required folders. Run this where you want to install the new project. |
 | `semantq install:tailwind`  | Installs Tailwind CSS and configures it. Run this inside the project root.  |
-| `semantq make:route myroute`| Creates a new route folder with `+page.smq`, `+layout.smq`, and `+server.js`. Run this inside the project root. |
+| `semantq make:route myroute`| Creates a new route folder with `@page.smq`, `@layout.smq`, and `+server.js`. Run this inside the project root. |
 
 ## Usage Examples
 
@@ -275,9 +275,9 @@ semantq make:route myroute
 ```
 
 This will generate a new route folder with the following files:
-- `+page.smq`
-- `+layout.smq`
-- `+server.js`
+- `@page.smq`
+- `@layout.smq`
+- `server.js`
 
 ## Contributing
 

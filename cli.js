@@ -133,13 +133,20 @@ program
       console.log(`${purpleBright('✓')} ${blue('Created directory:')} ${purple(serverDir)}`);
     }
 
-    // Write the server.js file
     const serverCode = `
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import chalk from 'chalk';
+
+// Color palette
+const purple = chalk.hex('#b56ef0');
+const purpleBright = chalk.hex('#d8a1ff');
+const blue = chalk.hex('#6ec7ff');
+const errorRed = chalk.hex('#ff4d4d');
+const gray = chalk.hex('#aaaaaa');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -158,16 +165,22 @@ fs.readdirSync(routesPath).forEach((file) => {
       const routeName = file.replace('Routes.js', '').toLowerCase();
       app.use(\`/api/\${routeName}\`, module.default);
       console.log(\`\${purpleBright('✓')} \${blue('Loaded route:')} /api/\${purple(routeName)}\`);
-    }).catch((err) => console.error(\`\${errorRed('✖')} \${blue('Failed to load')} \${purple(file)}: \${errorRed(err.message || err)}\`));
+    }).catch((err) => {
+      console.error(\`\${errorRed('✖')} \${blue('Failed to load')} \${purple(file)}: \${errorRed(err.message || err)}\`);
+    });
   }
 });
 
 // Default route
-app.get('/', (req, res) => res.send('API is running 🚀'));
+app.get('/', (req, res) => res.send('API is running'));
 
 // Start server
-app.listen(PORT, () => console.log(\`\${chalk.green('●')} \${purple('Server running on')} \${blue(\`port \${PORT}\`)}\`));
+app.listen(PORT, () => {
+  console.log(\`\${chalk.green('●')} \${purple('Server running on')} \${blue(\`port \${PORT}\`)}\`);
+});
 `;
+
+
 
     fs.writeFileSync(serverFilePath, serverCode.trim());
 console.log(
@@ -470,15 +483,15 @@ program
       console.log(`
 ${purple.bold('» Route created successfully!')}
 
-${purpleBright.bold('Files:')}
+${purpleBright.bold('Files created:')}
 ${purpleBright('•')} ${purple('@page.smq')} ${gray('(base template)')}
 ${options.layout ? `${purpleBright('•')} ${purple('@layout.smq')}` : ''}
 ${options.config ? `${purpleBright('•')} ${purple('config.js')}` : ''}
 ${options.server ? `${purpleBright('•')} ${purple('server.js')}` : ''}
 
 ${blue.italic('Next steps:')}
-  ${purpleBright('›')} Add route to ${purple('src/routes/routes.js')}
-  ${purpleBright('›')} Run ${purple('semantq dev')} to test
+  ${purpleBright('›')} Go to ${purple(routeName)} to edit your route files
+  ${purpleBright('›')} Then run ${purple('npm run dev')} to test
 `);
 
     } catch (error) {
