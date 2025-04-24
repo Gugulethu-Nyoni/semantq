@@ -1,0 +1,239 @@
+@style
+:root {
+  --card-bg: #ffffff;
+  --card-text: #333333;
+  --card-subtext: #666666;
+  --card-border: #e0e0e0;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --card-border-radius: 12px;
+
+  --button-bg: #6a1b9a;
+  --button-text: #ffffff;
+  --button-hover-bg: #8a2be2;
+
+  --font-family: 'Arial', sans-serif;
+  --font-title: 1.5rem;
+  --font-description: 1rem;
+  --font-button: 0.875rem;
+
+  --container-padding: 2rem;
+  --gap: 1.5rem;
+
+  .dark {
+    --card-bg: #1a1a1a;
+    --card-text: #ffffff;
+    --card-subtext: #cccccc;
+    --card-border: #333333;
+  }
+}
+
+.row {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  padding: var(--container-padding);
+}
+
+.row.boxed {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  flex: 1 1 calc(33.333% - var(--gap));
+  max-width: calc(33.333% - var(--gap));
+  font-family: var(--font-family);
+}
+
+.card-cover {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.card-content {
+  padding: 1.5rem;
+}
+
+.card-title {
+  font-size: var(--font-title);
+  font-weight: bold;
+  color: var(--card-text);
+  margin: 0 0 0.5rem 0;
+  text-decoration: none;
+}
+
+.card-content a.card-title-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.card-content a.card-title-link h5 {
+  text-decoration: none;
+}
+
+.card-description {
+  font-size: var(--font-description);
+  color: var(--card-subtext);
+  margin: 0 0 1.5rem 0;
+}
+
+.card-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  font-size: var(--font-button);
+  font-weight: 500;
+  color: var(--button-text);
+  background: var(--button-bg);
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.card-button:hover {
+  background: var(--button-hover-bg);
+}
+
+.card-button-icon {
+  width: 1rem;
+  height: 1rem;
+  margin-left: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .card {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .row {
+    padding: 1rem;
+  }
+}
+@end
+
+@html
+<div class="row">
+
+  <div class="card">
+    <a href="#">
+      <img class="card-cover" src="https://images.pexels.com/photos/2422287/pexels-photo-2422287.jpeg" alt="Card Cover" />
+    </a>
+    <div class="card-content">
+      <a href="#" class="card-title-link">
+        <h5 class="card-title">Card Title 1</h5>
+      </a>
+      <p class="card-description">This is a description for the first card. It can be longer and span multiple lines.</p>
+      <a href="#" class="card-button">
+        Read More
+        <svg class="card-button-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+
+  <div class="card">
+    <a href="#">
+      <img class="card-cover" src="https://images.pexels.com/photos/2422287/pexels-photo-2422287.jpeg" alt="Card Cover"/>
+    </a>
+    <div class="card-content">
+      <a href="#" class="card-title-link">
+        <h5 class="card-title">Card Title 2</h5>
+      </a>
+      <p class="card-description">This is a description for the second card. It can be longer and span multiple lines.</p>
+      <a href="#" class="card-button">
+        Read More
+        <svg class="card-button-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+
+  <div class="card">
+    <a href="#">
+      <img class="card-cover" src="https://images.pexels.com/photos/2422287/pexels-photo-2422287.jpeg" alt="Card Cover" />
+    </a>
+    <div class="card-content">
+      <a href="#" class="card-title-link">
+        <h5 class="card-title">Card Title 3</h5>
+      </a>
+      <p class="card-description">This is a description for the third card. It can be longer and span multiple lines.</p>
+      <a href="#" class="card-button">
+        Read More
+        <svg class="card-button-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+
+<div class="row boxed">
+  <div class="card">
+    <a href="#">
+      <img class="card-cover" src="https://images.pexels.com/photos/2422287/pexels-photo-2422287.jpeg" alt="Card Cover" />
+    </a>
+    <div class="card-content">
+      <a href="#" class="card-title-link">
+        <h5 class="card-title">Card Title 1</h5>
+      </a>
+      <p class="card-description">This is a description for the first card. It can be longer and span multiple lines.</p>
+      <a href="#" class="card-button">
+        Read More
+        <svg class="card-button-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <a href="#">
+      <img class="card-cover" src="https://images.pexels.com/photos/2422287/pexels-photo-2422287.jpeg" alt="Card Cover" />
+    </a>
+    <div class="card-content">
+      <a href="#" class="card-title-link">
+        <h5 class="card-title">Card Title 2</h5>
+      </a>
+      <p class="card-description">This is a description for the second card. It can be longer and span multiple lines.</p>
+      <a href="#" class="card-button">
+        Read More
+        <svg class="card-button-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <a href="#">
+      <img class="card-cover" src="https://images.pexels.com/photos/2422287/pexels-photo-2422287.jpeg" alt="Card Cover" />
+    </a>
+    <div class="card-content">
+      <a href="#" class="card-title-link">
+        <h5 class="card-title">Card Title 3</h5>
+      </a>
+      <p class="card-description">This is a description for the third card. It can be longer and span multiple lines.</p>
+      <a href="#" class="card-button">
+        Read More
+        <svg class="card-button-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+</div>

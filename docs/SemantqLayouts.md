@@ -1,6 +1,6 @@
 # **Layouts in Semantq JS Framework**
 
-In the Semantq JS Framework, **layouts** allow you to define custom structures for your pages and components. By default, all components and pages rely on the `index.html` file for their layout. However, you can override this behavior by creating a `+layout.smq` file in specific routes or base directories.
+In the Semantq JS Framework, **layouts** allow you to define custom structures for your pages and components. By default, all components and pages rely on the `index.html` file for their layout. However, you can override this behavior by creating a `@layout.smq` file in specific routes or base directories.
 
 This documentation explains how to use layouts effectively in your Semantq project.
 
@@ -19,29 +19,29 @@ This documentation explains how to use layouts effectively in your Semantq proje
 
 ## **1. Introduction to Layouts**
 
-By default, all components and pages in Semantq rely on the `index.html` file for their layout. However, you can define custom layouts for specific routes or groups of routes using the `+layout.smq` file.
+By default, all components and pages in Semantq rely on the `index.html` file for their layout. However, you can define custom layouts for specific routes or groups of routes using the `@layout.smq` file.
 
 ### **Key Concepts**
-- **`+layout.smq`**: A layout file that defines the structure for a route or group of routes.
+- **`@layout.smq`**: A layout file that defines the structure for a route or group of routes.
 - **Layout Inheritance**: Layouts can be inherited from parent directories, allowing you to define a base layout for a group of routes.
-- **Override Behavior**: You can override the default layout or a base layout by defining a `+layout.smq` file in a specific route.
+- **Override Behavior**: You can override the default layout or a base layout by defining a `@layout.smq` file in a specific route.
 - **Optional Sections**: The `@script`, `@head`, `@body`, and `@footer` sections are optional. You can include only the sections you need.
 
 ---
 
 ## **2. Creating a Layout File**
 
-To create a custom layout, add a `+layout.smq` file in the desired route or base directory.
+To create a custom layout, add a `@layout.smq` file in the desired route or base directory.
 
 ### **File Placement**
-- **Base Route Layout**: Place the `+layout.smq` file in the base route directory (e.g., `src/routes/admin/+layout.smq`). This layout will apply to all routes under the `admin` directory.
-- **Specific Route Layout**: Place the `+layout.smq` file in a specific route directory (e.g., `src/routes/admin/dashboard/+layout.smq`). This layout will apply only to the `dashboard` route.
+- **Base Route Layout**: Place the `@layout.smq` file in the base route directory (e.g., `src/routes/admin/@layout.smq`). This layout will apply to all routes under the `admin` directory.
+- **Specific Route Layout**: Place the `@layout.smq` file in a specific route directory (e.g., `src/routes/admin/dashboard/@layout.smq`). This layout will apply only to the `dashboard` route.
 
 ---
 
 ## **3. Layout File Structure**
 
-The `+layout.smq` file follows a specific structure with four main sections. All sections (`@script`, `@head`, `@body`, `@footer`) are **optional**, and you can include only the sections you need.
+The `@layout.smq` file follows a specific structure with four main sections. All sections (`@script`, `@head`, `@body`, `@footer`) are **optional**, and you can include only the sections you need.
 
 ### **Sections**
 1. **`@script`**: Include JavaScript for importing necessary components.  
@@ -93,17 +93,17 @@ The `+layout.smq` file follows a specific structure with four main sections. All
 
 Layouts in Semantq follow a hierarchical inheritance model. This means that:
 
-- If a `+layout.smq` file is defined in a base route directory (e.g., `src/routes/admin/+layout.smq`), it will apply to all routes under that directory.
-- If a specific route defines its own `+layout.smq` file (e.g., `src/routes/admin/dashboard/+layout.smq`), it will override the base layout for that route.
+- If a `@layout.smq` file is defined in a base route directory (e.g., `src/routes/admin/@layout.smq`), it will apply to all routes under that directory.
+- If a specific route defines its own `@layout.smq` file (e.g., `src/routes/admin/dashboard/@layout.smq`), it will override the base layout for that route.
 
 ### **Example**
 ```
 src/
   routes/
     admin/
-      +layout.smq              # Base layout for all admin routes
+      @layout.smq              # Base layout for all admin routes
       dashboard/
-        +layout.smq            # Custom layout for the dashboard route
+        @layout.smq            # Custom layout for the dashboard route
       users/
         +page.smq              # Uses the base admin layout
       subscribers/
@@ -115,7 +115,7 @@ src/
 ## **5. Examples**
 
 ### **Example 1: Base Layout for Admin Routes**
-Create a `+layout.smq` file in the `admin` directory:
+Create a `@layout.smq` file in the `admin` directory:
 ```smq
 @script
 import TopBar from '$global/TopBar';
@@ -144,7 +144,7 @@ import Footer from '$global/Footer';
 ```
 
 ### **Example 2: Custom Layout for Bootstrap Dashboard Route**
-Create a `+layout.smq` file in the `dashboard` directory:
+Create a `@layout.smq` file in the `dashboard` directory:
 ```smq
 @head
 
@@ -167,7 +167,7 @@ Create a `+layout.smq` file in the `dashboard` directory:
 ## **6. Best Practices**
 
 1. **Maintain the `id="app"` Container (Optional)**:  
-   If you want to have fine grained control over Semantq's default app container you must include a `<div id="app"></div>` in the `@body` section of your +layout.file.
+   If you want to have fine grained control over Semantq's default app container you must include a `<div id="app"></div>` in the `@body` section of your @layout.file.
 
 2. **Use CDN Resources Wisely**:  
    When using CDN css and js resources (e.g., Bootstrap), ensure they are loaded in the `@head` section.
@@ -188,7 +188,7 @@ Create a `+layout.smq` file in the `dashboard` directory:
 
 ## **Conclusion**
 
-Layouts in Semantq provide a powerful way to customize the structure of your pages and components. By using `+layout.smq` files, you can define base layouts for groups of routes or create custom layouts for specific routes. This flexibility allows you to build complex applications while maintaining a clean and organized codebase.
+Layouts in Semantq provide a powerful way to customize the structure of your pages and components. By using `@layout.smq` files, you can define base layouts for groups of routes or create custom layouts for specific routes. This flexibility allows you to build complex applications while maintaining a clean and organized codebase.
 
 ## **License**
 
