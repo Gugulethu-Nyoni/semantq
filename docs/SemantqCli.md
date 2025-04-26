@@ -73,7 +73,6 @@ This will generate a new project with the required folder structure.
 
 With Semantq, you only need to run one command to install Tailwind CSS. Semantq will automatically install all required dependencies and set up the necessary configurations. However, if you prefer, you can manually install Tailwind CSS by following the guide below.
 
----
 
 ## One-Command Approach
 
@@ -83,7 +82,7 @@ To install and configure Tailwind CSS, simply run the following command in your 
 semantq install:tailwind
 ```
 
-This single command handles everything for you, from installing dependencies to configuring files. No manual setup is required!
+This single command handles everything for you, from installing dependencies to configuring files. No manual setup is required.
 
 
 At this point you are done installing Tailwind CSS. 
