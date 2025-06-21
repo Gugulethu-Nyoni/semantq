@@ -1,0 +1,172 @@
+{
+  "jsAST": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 23,
+      "body": [
+        {
+          "type": "ExpressionStatement",
+          "start": 1,
+          "end": 22,
+          "expression": {
+            "type": "CallExpression",
+            "start": 1,
+            "end": 22,
+            "callee": {
+              "type": "MemberExpression",
+              "start": 1,
+              "end": 12,
+              "object": {
+                "type": "Identifier",
+                "start": 1,
+                "end": 8,
+                "name": "console"
+              },
+              "property": {
+                "type": "Identifier",
+                "start": 9,
+                "end": 12,
+                "name": "log"
+              },
+              "computed": false,
+              "optional": false
+            },
+            "arguments": [
+              {
+                "type": "Literal",
+                "start": 13,
+                "end": 21,
+                "value": "Hello!",
+                "raw": "'Hello!'"
+              }
+            ],
+            "optional": false
+          }
+        }
+      ],
+      "sourceType": "module"
+    }
+  },
+  "cssAST": {
+    "type": "CSS",
+    "content": {
+      "raws": {
+        "semicolon": false,
+        "after": "\n"
+      },
+      "type": "root",
+      "nodes": [
+        {
+          "raws": {
+            "before": "\n",
+            "between": " ",
+            "semicolon": true,
+            "after": ""
+          },
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": {
+                "before": "",
+                "between": ": "
+              },
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": {
+                  "css": "\nh1 {font-size: 40px;}\n",
+                  "hasBOM": false,
+                  "document": "\nh1 {font-size: 40px;}\n",
+                  "file": "/Users/gugulethu/code/semantq/fixa/style"
+                },
+                "start": {
+                  "column": 5,
+                  "line": 2,
+                  "offset": 5
+                },
+                "end": {
+                  "column": 20,
+                  "line": 2,
+                  "offset": 21
+                }
+              },
+              "prop": "font-size",
+              "value": "40px"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 2,
+              "offset": 1
+            },
+            "end": {
+              "column": 21,
+              "line": 2,
+              "offset": 22
+            }
+          },
+          "selector": "h1"
+        }
+      ],
+      "source": {
+        "input": null,
+        "start": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        },
+        "end": {
+          "column": 1,
+          "line": 3,
+          "offset": 23
+        }
+      }
+    }
+  },
+  "customAST": {
+    "type": "HTML",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 55,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 55,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "start": 18,
+                    "end": 39,
+                    "type": "Element",
+                    "name": "h1",
+                    "attributes": null,
+                    "children": [
+                      [
+                        {
+                          "type": "Text",
+                          "raw": "about Page ",
+                          "data": "about Page "
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

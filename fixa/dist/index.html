@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Semantq - AI-Powered JS Framework</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <script type="module" crossorigin src="/assets/index-B4VLifGi.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="stylesheet" crossorigin href="/assets/index-BZBR8MPa.css">
+</head>
+<body>
+  <div class="jumbotron">
+    <!-- Title -->
+    <div class="title">My Semantq App</div>
+
+    <!-- Subtitle -->
+    <div class="subtitle">An AI-First JavaScript Framework For Building 4IR Systems</div>
+
+    <!-- Counter Button -->
+    <div class="counter-title">Click Me!</div>
+    <button class="counter-button" id="counter">0</button>
+
+    <!-- Links -->
+    <div class="links">
+      <a href="https://semantq.com" target="_blank">
+        <i class="fas fa-globe"></i> Website
+      </a>
+      <a href="https://github.com/Gugulethu-Nyoni/semantq" target="_blank">
+        <i class="fab fa-github"></i> GitHub
+      </a>
+    </div>
+  </div>
+
+<a href="about"> About Test </a>
+  <!-- Updated script implementation -->
+  <script>
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      // Simple Counter Logic
+      let count = 0;
+      const counterButton = document.getElementById('counter');
+      
+      counterButton.addEventListener('click', () => {
+        count++;
+        counterButton.textContent = count;
+      });
+    });
+  </script>
+  
+  <!-- Keep your module import if still needed for other functionality -->
+</body>
+</html>
