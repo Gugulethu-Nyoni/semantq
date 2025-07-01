@@ -55,7 +55,7 @@ async function parseComponent(filePath) {
       customCode = code.substring(startIndex, endIndex + endMarker.length).trim();
     }
 
-    console.log("SEE",customCode);
+    //console.log("SEE",customCode);
 
     let jsAST = parse(jsCode, { ecmaVersion: 2023, sourceType: "module" });
     //let jsAST = esprima.parseScript(code);
@@ -191,7 +191,7 @@ async function writeToFile(astObjects) {
     [htmlKey]: { type: 'HTML', content: astObjects.customAST },
   };
 
-  console.log("HERE",astObjects.customAST);
+  //console.log("HERE",astObjects.customAST);
 
   const jsonString = JSON.stringify(astObject, null, 2);
   const newFilePath = astObjects.newFilePath;

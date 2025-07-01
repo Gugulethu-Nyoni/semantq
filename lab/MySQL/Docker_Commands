@@ -1,0 +1,23 @@
+1.Run MySQL container (if not running)
+
+docker run --name my-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -p 3306:3306 -d mysql:8
+
+
+2. Check running containers
+docker ps
+
+then:
+
+3. start mysql
+docker start my-mysql
+
+
+4. Connect to MySQL inside the container
+docker exec -it my-mysql mysql -uroot -p
+
+
+Password is: my-secret-pw
+
+5. Stop MySQL container
+docker stop my-mysql
+

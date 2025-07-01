@@ -1,0 +1,1 @@
+import"../../../modulepreload-polyfill-B5Qt9EMX.js";import{R as n}from"../../../router-Cp7XF-GP.js";async function e(){console.log("Hello!"),console.log(n)}async function t(){try{await new Promise(o=>{document.readyState==="loading"?document.addEventListener("DOMContentLoaded",o):o()}),console.log("DOM is ready"),await e()}catch(o){console.error("Error in main function:",o)}}t();

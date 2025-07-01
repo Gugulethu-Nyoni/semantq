@@ -203,7 +203,7 @@ async function routesGenerator(sourceDir, destDir, src, dest) {
     await fse.copy(sourceRoutesFile, destRoutesFile);
 
     // Copy router.js from src/semantq to destDir/semantq
-    const sourceRouterFile = path.join(src, 'semantq', 'router.js');
+    const sourceRouterFile = path.join(src,'semantq', 'router.js');
     const destRouterFile = path.join(dest, 'semantq', 'router.js');
 
     // Ensure the destination directory exists

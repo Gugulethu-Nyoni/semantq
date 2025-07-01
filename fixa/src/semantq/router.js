@@ -1,3 +1,8 @@
+//import fileBasedRoutes from '../../build/routes/fileBasedRoutes.js';
+//import declaredRoutes from '../..build/routes/routes.js';
+
+
+
 export default class Router {
   constructor(declaredRoutes, fileBasedRoutes) {
     this.declaredRoutes = declaredRoutes;
@@ -6,17 +11,26 @@ export default class Router {
     this.localStorageKey = 'Semantq.currentRoute';
   }
 
-  // Normalize path by removing leading/trailing slashes
+  // Essential route management methods
+  setCurrentRoute(targetRoute) {
+    localStorage.setItem(this.localStorageKey, targetRoute);
+  }
+
+  clearCurrentRoute() {
+    localStorage.removeItem(this.localStorageKey);
+  }
+
+  isRouteBeingProcessed(targetRoute) {
+    const currentRoute = localStorage.getItem(this.localStorageKey);
+    return currentRoute === targetRoute;
+  }
+
+  // Route handling methods
   normalizePath(path) {
     return path.replace(/^\/|\/$/g, '');
   }
 
-  cleanUrl(targetRoute) {
-    return targetRoute.replace(/build\/routes/g, '');
-  }
-
   sanitizeHref(href) {
-    // Remove domain if it's a local URL
     const localHref = href.replace(this.basePath, '');
     return localHref.replace(/[\s<>'"\x00-\x1F\x7F]/g, '');
   }
@@ -52,77 +66,78 @@ export default class Router {
 
     if (foundRoute) {
       const [route, filePath] = foundRoute;
-      console.log(`Navigating to file-based route: ${route} -> ${filePath}`);
-      
       const goTo = filePath === '/' ? this.basePath : `${this.basePath}/${filePath}`;
-      console.log("Going to:", goTo);
       window.location.href = goTo;
     } else {
-      console.error(`File-based route not found: ${targetRoute}`);
       this.handleRouteError(targetRoute);
     }
   }
 
-  // ... rest of your methods remain the same ...
+  async handleDeclaredRoute(targetRoute) {
+    const routeConfig = this.declaredRoutes.find(route => route.path === targetRoute);
+    if (routeConfig && routeConfig.filePath) {
+      const goTo = routeConfig.filePath === '/' ? this.basePath : `${this.basePath}/${routeConfig.filePath}`;
+      window.location.href = goTo;
+    } else {
+      this.handleRouteError(targetRoute);
+    }
+  }
 
+  handleRouteError(targetRoute) {
+    console.error(`Route ${targetRoute} does not exist.`);
+    const errorPage = this.fileBasedRoutes['/404'];
+    if (errorPage) {
+      window.location.href = errorPage;
+    }
+  }
+
+  // Event handling
   interceptClicks() {
     document.addEventListener('click', (event) => {
       const anchor = event.target.closest('a[href]');
-      
       if (anchor && !anchor.getAttribute('href').startsWith('#')) {
         const href = anchor.getAttribute('href');
         
         if (this.isCanonicalRoute(href)) {
-          console.log(`Canonical route detected: ${href}. Letting the browser handle it.`);
-          return;
+          return; // Let browser handle external links
         }
 
         event.preventDefault();
         const targetRoute = this.sanitizeHref(href);
 
-        if (this.isRouteBeingProcessed(targetRoute)) {
-          console.log(`Route ${targetRoute} is already being processed. Skipping.`);
-          return;
-        }
-
-        this.setCurrentRoute(targetRoute);
-
-        if (this.isDeclaredRoute(targetRoute)) {
-          this.handleDeclaredRoute(targetRoute);
-        } else if (this.isFileBasedRoute(targetRoute)) {
-          this.handleFileBasedRoute(targetRoute);
-        } else {
-          this.handleRouteError(targetRoute);
+        if (!this.isRouteBeingProcessed(targetRoute)) {
+          this.setCurrentRoute(targetRoute);
+          if (this.isDeclaredRoute(targetRoute)) {
+            this.handleDeclaredRoute(targetRoute);
+          } else if (this.isFileBasedRoute(targetRoute)) {
+            this.handleFileBasedRoute(targetRoute);
+          } else {
+            this.handleRouteError(targetRoute);
+          }
         }
       }
     });
   }
 }
 
-// Initialize the router
+// Initialize router
 const router = new Router(declaredRoutes, fileBasedRoutes);
 router.interceptClicks();
 
-// Handle initial load
+// Handle initial page load
 window.addEventListener('load', () => {
   const targetRoute = router.sanitizeHref(window.location.pathname);
-  
-  if (router.isRouteBeingProcessed(targetRoute)) {
-    console.log(`Route ${targetRoute} is already being processed. Skipping.`);
-    return;
-  }
-
-  router.setCurrentRoute(targetRoute);
-
-  if (router.isDeclaredRoute(targetRoute)) {
-    router.handleDeclaredRoute(targetRoute);
-  } else if (router.isFileBasedRoute(targetRoute)) {
-    router.handleFileBasedRoute(targetRoute);
-  } else {
-    router.handleRouteError(targetRoute);
+  if (!router.isRouteBeingProcessed(targetRoute)) {
+    router.setCurrentRoute(targetRoute);
+    if (router.isDeclaredRoute(targetRoute)) {
+      router.handleDeclaredRoute(targetRoute);
+    } else if (router.isFileBasedRoute(targetRoute)) {
+      router.handleFileBasedRoute(targetRoute);
+    }
   }
 });
 
+// Clean up on page unload
 window.addEventListener('unload', () => {
   router.clearCurrentRoute();
 });

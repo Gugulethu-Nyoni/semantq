@@ -1,0 +1,77 @@
+{
+  "jsAST": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 2,
+      "body": [],
+      "sourceType": "module"
+    }
+  },
+  "cssAST": {
+    "type": "CSS",
+    "content": {
+      "raws": {
+        "after": "\n\n"
+      },
+      "type": "root",
+      "nodes": [],
+      "source": {
+        "input": {
+          "css": "\n\n",
+          "hasBOM": false,
+          "document": "\n\n",
+          "file": "/Users/gugulethu/code/semantq/fixa/style"
+        },
+        "start": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        },
+        "end": {
+          "column": 1,
+          "line": 3,
+          "offset": 2
+        }
+      }
+    }
+  },
+  "customAST": {
+    "type": "HTML",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 45,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 45,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "type": "Element",
+                    "name": "span",
+                    "attributes": [],
+                    "children": [
+                      {
+                        "type": "Text",
+                        "raw": "contacts Page\n",
+                        "data": "contacts Page\n"
+                      }
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

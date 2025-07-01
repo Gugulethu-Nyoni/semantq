@@ -1,0 +1,1245 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --font-family: 'Poppins', sans-serif; /* Modern clean font */
+  --theme-primary: #ffffff; /* Crisp white background */
+  --theme-secondary: #f8f8f8; /* Soft off-white for subtle contrast */
+  --theme-text: #222222; /* Darker text for readability */
+  --theme-text-secondary: #666666; /* Softer secondary text color */
+  --theme-border: #e0e0e0; /* Light, modern border */
+  --theme-accent: #2a2a2a; /* Subtle modern accent color */
+  --theme-shadow: 0 6px 12px rgba(0, 0, 0, 0.08); /* Soft, modern shadow */
+
+  /* Button styling */
+  --btn-bg: #ffffff; /* White button background */
+  --btn-border: #000000; /* Black border for sharp contrast */
+  --btn-text: #000000; /* Black text */
+  --btn-hover-bg: #000000; /* Black background on hover */
+  --btn-hover-text: #ffffff; /* White text on hover */
+
+  --spv-btn-bg: #000000; /* Black button background */
+  --spv-btn-border: #ffffff; /* White border */
+  --spv-btn-text: #ffffff; /* White text */
+  --spv-btn-hover-bg: #ffffff; /* White background on hover */
+  --spv-btn-hover-text: #000000; /* Black text on hover */
+}
+
+[data-theme="dark"] {
+  --theme-primary: #1a1a1a; /* Deep modern black */
+  --theme-secondary: #252525; /* Soft dark gray */
+  --theme-text: #ffffff; /* Clean white text */
+  --theme-text-secondary: #bbbbbb; /* Softer secondary text */
+  --theme-border: #444444; /* Modern dark border */
+  --theme-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Deeper shadow effect */
+
+  /* Dark theme button styling */
+  --btn-bg: #000000; /* Black button background */
+  --btn-border: #ffffff; /* White border */
+  --btn-text: #ffffff; /* White text */
+  --btn-hover-bg: #ffffff; /* White background on hover */
+  --btn-hover-text: #000000; /* Black text on hover */
+
+  
+}
+
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Main container */
+.cartique-container {
+    display: flex;
+    flex-direction: column; /* Stack sidebar and main content vertically on mobile */
+    min-height: 100vh;
+    background-color: #f9fafb; /* Light background for modern look */
+    /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */ /* Modern font */
+    font-family: var(--font-family);
+    padding: 1rem; /* Add padding to the container for consistent spacing */
+}
+
+/* Left sidebar (30% width on desktop, full width on mobile) */
+.cartique-sidebar {
+    width: 100%; /* Full width on mobile */
+    background-color: #ffffff; /* White background */
+    padding: 1.5rem;
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle drop shadow */
+    margin-bottom: 1rem; /* Add margin below the sidebar for spacing */
+}
+
+/* Right column (70% width on desktop, full width on mobile) */
+.cartique-main-content {
+    width: 100%; /* Full width on mobile */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Add gap between controls and product displays */
+}
+
+/* When sidebar is hidden, make main content take full width */
+.cartique-sidebar[style*="display: none"] + .cartique-main-content {
+    width: 100%; /* Full width when sidebar is hidden */
+}
+
+/* Top controls */
+.cartique-controls {
+    display: flex;
+    flex-direction: column; /* Stack controls vertically on mobile */
+    gap: 1rem;
+    background-color: var(--theme-primary); /* Use theme's primary color */
+    padding: 1.5rem;
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: var(--theme-shadow); /* Use theme's shadow */
+}
+
+.cartique-controls .cartique-search {
+    width: 100%; /* Full width on mobile */
+    padding: 0.75rem;
+    border: 1px solid var(--theme-border); /* Use theme's border color */
+    border-radius: 10px; /* Rounded corners */
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.cartique-controls .cartique-search:focus {
+    border-color: var(--theme-accent); /* Highlight on focus with accent color */
+}
+
+.cartique-controls .cartique-sort {
+    width: 100%; /* Full width on mobile */
+    padding: 0.75rem;
+    border: 1px solid var(--theme-border); /* Use theme's border color */
+    border-radius: 10px; /* Rounded corners */
+    font-size: 1rem;
+    background-color: var(--theme-primary); /* Use theme's primary background */
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.cartique-controls .cartique-sort:focus {
+    border-color: var(--theme-accent); /* Highlight on focus with accent color */
+}
+
+.cartique-view-toggles {
+    display: flex;
+    gap: 1rem;
+}
+
+.cartique-controls .cartique-view-toggle {
+    flex: 1; /* Equal width for grid/list buttons */
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 10px; /* Rounded corners */
+    background-color: var(--theme-border);  /* Use accent color */
+    color: var(--theme-text); /* Use theme's text color */
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.cartique-controls .cartique-view-toggle:hover {
+    background-color: var(--theme-accent); /* Hover with theme border color */
+}
+
+/* Shopping Cart Icon */
+.cartique-controls .shopping-cart-icon {
+    position: fixed; /* Keeps it visible while scrolling */
+    top: 20px; /* Distance from the top */
+    right: 20px; /* Distance from the right */
+    background-color: var(--theme-primary); /* Use theme's primary background */
+    border: 1px solid var(--theme-border); /* Use theme's border color */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--theme-shadow); /* Use theme's shadow */
+    z-index: 1000; /* Ensures it stays on top of other elements */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+/* Hover Effect */
+.cartique-controls .shopping-cart-icon:hover {
+    background-color: var(--theme-secondary); /* Hover with secondary theme color */
+    transform: scale(1.1);
+}
+
+/* Mobile-Friendly Adjustments */
+@media (max-width: 768px) {
+   .cartique-controls .shopping-cart-icon {
+        top: 10px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* Grid view */
+
+/* PRODUCT CARD FOR GRID */
+
+/* Grid Layout Container */
+.cartique-product-displays {
+    flex: 1;
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Grid Layout Container */
+.cartique-product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: minmax(100px, auto);
+    gap: 20px;
+}
+
+/* Product Card */
+/* Updated Product Card */
+.cartique-product-grid .cartique_product_card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    padding: 0 0 60px 0; /* Keep padding only at bottom for slide-up container */
+}
+
+
+.cartique-product-grid .cartique_product_card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Product Image Container */
+/* Updated Product Image Container */
+.cartique-product-grid .cartique_product_image_container {
+    position: relative;
+    margin: -4px -6px 0 -4px; /* Negative margin to pull image to edges */
+    padding-top: 100%; /* Maintain aspect ratio */
+    overflow: hidden;
+    border-top-left-radius: 8px; /* Match parent card radius */
+    border-top-right-radius: 8px;
+    width: calc(100% + 5px); /* Extend beyond container */
+}
+
+/* Updated Product Image */
+.cartique-product-grid .cartique_product_image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block; /* Remove any default spacing */
+}
+
+/* IMAGE ANIMATION */
+
+.cartique_product_image {
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  transform-origin: center; /* Zoom from the center */
+}
+
+.cartique_product_image:hover {
+  transform: scale(1.2);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); /* Add shadow on hover */
+}
+
+/* Product Details */
+.cartique-product-grid .cartique_product_title {
+    font-size: 18px;
+    margin: 15px 15px 10px;
+    color: #333;
+    text-align: center;
+}
+
+.cartique-product-grid .cartique_product_description {
+    font-size: 14px;
+    color: #777;
+    margin: 0 15px 10px;
+    text-align: center;
+}
+
+/* Pricing */
+.cartique-product-grid .currency-price-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 10px;
+}
+
+.cartique-product-grid .currency-price-display span {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.cartique-product-grid .cartique_product_price {
+    font-size: 16px;
+    color: #333;
+    text-align: center;
+}
+
+.cartique-product-grid .cartique_saleprice_price {
+    font-size: 16px;
+    color: #ff4757;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Call to Action */
+.cartique-product-grid .cartique_cta {
+    display: block;
+    background-color: var(--theme-accent); /* Accent color */
+    color: var(--theme-primary); /* Text color */
+    text-align: center;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    margin: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.cartique-product-grid .cartique_cta:hover {
+    background-color: var(--theme-accent); /* Accent color on hover */
+    background-color: darken(var(--theme-accent), 10%); /* Darker shade on hover (using a CSS preprocessor) */
+}
+
+/* Slide Up Container */
+.cartique-product-grid .slide.up {
+    position: absolute;
+    bottom: -60px; /* Initially hidden */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Adjust for centering */
+    width: 98%; /* Slightly less than full width for margins */
+    background-color: var(--theme-primary);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 10px;
+    box-sizing: border-box;
+    text-align: center;
+    transition: bottom 0.3s ease, border 0.3s ease, border-radius 0.3s ease;
+    z-index: 1;
+    margin-bottom: 10px;
+}
+
+.cartique-product-grid .cartique_product_card:hover .slide.up {
+    bottom: 0; /* Slide up to reveal */
+    border: 1px solid var(--theme-border);
+    border-radius: 8px;
+}
+
+/* Add to Cart Button */
+.cartique-product-grid .cartique_add_to_cart {
+    width: 100%; /* Full width of the container */
+    padding: 10px; /* Adjusted height */
+    background-color: var(--btn-bg); /* White background */
+    color: var(--btn-text); /* Black text */
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border: 0.5px solid var(--theme-border); /* Lighter gray border with theme variable */
+    border-radius: 10px;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease; /* Transition for shadow as well */
+    display: block; /* Makes the button a block-level element */
+    margin-left: auto;
+    margin-right: auto; /* Ensures it centers within the parent container */
+    box-shadow: var(--theme-shadow); /* Drop shadow based on the theme */
+}
+
+.cartique-product-grid .cartique_product_card:hover .cartique_add_to_cart {
+    opacity: 1;
+    background-color: var(--btn-hover-bg); /* Black background on hover */
+    color: var(--btn-hover-text); /* White text on hover */
+    transform: translateY(0);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow on hover */
+}
+
+/* Optional: Add focus style for accessibility */
+.cartique-product-grid .cartique_add_to_cart:focus {
+    outline: 0.5px solid var(--theme-border);
+}
+
+/* Cart Item Styling */
+.cartique-product-grid .cart-item {
+    padding: 10px;
+    border-bottom: 1px solid var(--theme-border); /* Light border */
+    border-radius: 10px;
+    box-shadow: var(--theme-shadow); /* Shadow effect for cart item */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+    .cartique-product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .cartique-product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .cartique-product-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+
+
+
+/* PRODUCT LIST CSS */
+
+/* Base styles for the product listing */
+.cartique_product_listings .cartique_product_listing {
+    display: none; /* Hidden by default */
+  display: flex;
+  flex-direction: row; /* Horizontal layout for desktop */
+  align-items: flex-start; /* Align items to the top */
+  gap: 20px; /* Space between image and details */
+  padding: 20px;
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+  background-color: var(--theme-primary);
+  box-shadow: var(--theme-shadow);
+  margin-bottom: 20px; /* Space between listings */
+}
+
+/* Product image container */
+.cartique_product_listings .cartique_product_image_container {
+  flex: 0 0 40%; /* Fixed width for image container */
+  max-width: 40%; /* Ensure image doesn't overflow */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.cartique_product_listings .cartique_product_image {
+  width: 100%;
+  height: auto;
+  object-fit: cover; /* Ensure image covers the container */
+  border-radius: 8px;
+}
+
+/* Product details container */
+.cartique_product_listings .product-details-animate {
+  flex: 1; /* Take remaining space */
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Reduced gap between elements */
+}
+
+/* Product title */
+.cartique_product_listings .cartique_product_title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--theme-text);
+  margin: 0;
+}
+
+/* Product description */
+.cartique_product_listings .cartique_product_description {
+  font-size: 1rem;
+  color: var(--theme-text-secondary);
+  margin: 0;
+}
+
+/* Currency and price display */
+.cartique_product_listings .currency-price-display {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* Reduced gap between price and sale price */
+}
+
+.cartique_product_listings .cartique_product_price {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--theme-text);
+}
+
+.cartique_product_listings .cartique_saleprice_price {
+  font-size: 1rem;
+  color: var(--theme-text-secondary);
+  text-decoration: line-through;
+}
+
+/* Add to cart button */
+.cartique_product_listings .slide.up {
+  margin-top: 10px; /* Space between price and button */
+}
+
+.cartique_product_listings .cartique_add_to_cart {
+  background-color: var(--btn-bg);
+  border: 2px solid var(--btn-border);
+  color: var(--btn-text);
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cartique_product_listings .cartique_add_to_cart:hover {
+  background-color: var(--btn-hover-bg);
+  color: var(--btn-hover-text);
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .cartique_product_listings .cartique_product_listing {
+    flex-direction: column; /* Stack vertically on mobile */
+    gap: 15px; /* Space between stacked elements */
+  }
+
+  .cartique_product_listings .cartique_product_image_container {
+    flex: 0 0 auto; /* Reset fixed width */
+    max-width: 100%; /* Full width on mobile */
+  }
+
+  .cartique_product_listings .cartique_product_image {
+    height: auto; /* Ensure image scales properly */
+  }
+
+  .cartique_product_listings .product-details-animate {
+    gap: 6px; /* Further reduced gap between elements */
+  }
+
+  .cartique_product_listings .cartique_product_title {
+    font-size: 1.25rem; /* Slightly smaller title on mobile */
+  }
+
+  .cartique_product_listings .cartique_product_description {
+    font-size: 0.9rem; /* Slightly smaller description on mobile */
+  }
+
+  .cartique_product_listings .cartique_product_price {
+    font-size: 1.1rem; /* Slightly smaller price on mobile */
+  }
+
+  .cartique_product_listings .cartique_saleprice_price {
+    font-size: 0.9rem; /* Slightly smaller sale price on mobile */
+  }
+
+  .cartique_product_listings .cartique_add_to_cart {
+    width: 100%; /* Full-width button on mobile */
+    padding: 12px 20px; /* Slightly larger padding for better touch targets */
+  }
+}
+
+
+
+
+
+/* List view specific styles */
+.cartique-product-list .cartique-product-card {
+    width: 100%;
+}
+
+/* Product display footer */
+.cartique-product-footer {
+    padding: 1.5rem;
+    background-color: #ffffff;
+    text-align: center;
+    margin-top: auto; /* Push to bottom */
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    order: 999; /* Ensure it stays last in flex order */
+}
+
+/* Desktop layout */
+@media (min-width: 769px) {
+    .cartique-container {
+        flex-direction: row; /* Sidebar and main content side by side on desktop */
+        gap: 1.5rem; /* Add gap between sidebar and main content */
+        padding: 1.5rem; /* Increase padding for desktop */
+    }
+
+    .cartique-sidebar {
+        width: 30%; /* 30% width on desktop */
+        margin-bottom: 0; /* Remove margin-bottom on desktop */
+    }
+
+    .cartique-main-content {
+        width: 70%; /* 70% width on desktop */
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh; /* Take full viewport height */
+    }
+
+    /* When sidebar is hidden on desktop, make main content take full width */
+    .cartique-sidebar[style*="display: none"] + .cartique-main-content {
+        width: 100%; /* Full width when sidebar is hidden */
+    }
+
+    .cartique-controls {
+        flex-direction: row; /* Controls in a row on desktop */
+    }
+
+    .cartique-controls .cartique-search {
+        flex: 1; /* Search bar takes remaining space */
+    }
+
+    .cartique-controls .cartique-sort {
+        width: auto; /* Sort dropdown auto width on desktop */
+    }
+
+    .cartique-view-toggles {
+        flex: 0; /* Grid/list buttons take minimal space */
+    }
+}
+
+
+
+/* CART OVERLAY CSS */
+
+/* Main container for the cart slide-in */
+.cart-slide {
+  font-family: var(--font-family);
+  position: fixed;
+  top: 0;
+  right: -100%; /* Initially hidden off-screen */
+  width: 350px;
+  height: 100%;
+  background-color: var(--theme-primary); /* Primary background color */
+  box-shadow: -2px 0 15px var(--theme-shadow); /* Shadow effect */
+  transition: right 0.3s ease;
+  z-index: 1000;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Open state to slide the cart in */
+.cart-slide.open {
+  right: 0;
+}
+
+/* Close button */
+.cart-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 30px;
+  color: var(--theme-text);
+  cursor: pointer;
+  z-index: 1001;
+  transition: color 0.3s ease;
+}
+
+.cart-close-btn:hover {
+  color: var(--theme-accent);
+}
+
+.cart-header h2 {
+  font-size: 22px;
+  color: var(--theme-text);
+  margin-bottom: 15px;
+}
+
+/* Cart Items */
+.cart-items {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* Individual cart item */
+.cart-item {
+  padding: 10px;
+  border: 0px solid var(--theme-border);
+  border-radius: 10px;
+  background-color: var(--theme-secondary);
+  color: var(--theme-text);
+  box-shadow: var(--theme-shadow); /* Add shadow effect */
+  transition: box-shadow 0.3s ease-in-out, transform 0.2s ease-in-out;
+  margin-bottom: 15px;
+
+}
+
+/* Hover effect for a more dynamic look */
+.cart-item:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px); /* Slight lift effect */
+}
+
+
+/* Two-row layout for cart items */
+.cart-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+/* Thumbnail */
+.cart-item-thumbnail img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+/* Product Details */
+.cart-item-details {
+  flex-grow: 1;
+  padding-left: 10px;
+}
+
+.cart-item-details h5 {
+  font-size: 16px;
+  margin: 0;
+  color: var(--theme-text);
+}
+
+.cart-item-details p {
+  font-size: 14px;
+  margin: 5px 0;
+  color: var(--theme-text-secondary);
+}
+
+.cart-item-details span {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--theme-text);
+}
+
+/* Quantity & Remove Section */
+.cart-item-quantity {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.qty-btn {
+  background: var(--theme-accent);
+  color: white;
+  border: none;
+  width: 25px;
+  height: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.qty-btn:hover {
+  background: var(--theme-text);
+}
+
+.cart-item-quantity input {
+  width: 35px;
+  text-align: center;
+  font-size: 14px;
+  border: 1px solid var(--theme-border);
+  padding: 5px;
+  background: var(--theme-input-bg);
+  color: var(--theme-text);
+  border-radius: 3px;
+}
+
+.cart-item-remove button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--theme-danger);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.cart-item-remove button:hover {
+  color: red;
+}
+
+/* Cart Footer */
+.cart-footer {
+  padding-top: 10px;
+  border-top: 1px solid var(--theme-border);
+}
+
+.cart-subtotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--theme-text);
+  margin-bottom: 10px;
+}
+
+.cart-footer .cart-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
+  border: 0.5px solid var(--btn-border); /* Added border property */
+  cursor: pointer;
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-family: var(--font-family); /* Use the theme's font-family */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Added color transition */
+}
+
+.cart-footer .cart-btn:hover {
+  background-color: var(--btn-hover-bg);
+  color: var(--btn-hover-text);
+}
+
+/* Optional: Add focus style for accessibility */
+.cart-footer .cart-btn:focus {
+  outline: 2px solid var(--theme-border);
+}
+
+.cart-footer a {
+    text-transform: none; /* Ensure no text transformation */
+    text-decoration: none; /* Remove the underline */
+}
+
+/* Overlay (darkens the background when cart is open) */
+.cart-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  z-index: 999;
+  transition: background 0.3s ease;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .cart-slide {
+    width: 100%;
+  }
+
+  .cart-header h2 {
+    font-size: 18px;
+  }
+
+  .cart-item-thumbnail img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .cart-item-details h5 {
+    font-size: 14px;
+  }
+
+  .cart-item-details p {
+    font-size: 12px;
+  }
+
+  .qty-btn {
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+  }
+
+  .cart-footer .cart-btn {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+
+/* SHOPPING EMPTY */
+/* Hide the shopping cart empty message initially */
+#shopping-cart-empty {
+  display: none;
+  font-family: var(--font-family);
+  color: var(--theme-text);
+  background-color: var(--theme-secondary);
+  border: 1px solid var(--theme-border);
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: var(--theme-shadow);
+  font-size: 16px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+/* Optionally, add style when it is displayed */
+#shopping-cart-empty.show {
+  display: block;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+
+
+
+/* CHECKOUT SUCCESS TOAST */
+
+/* CHECKOUT SUCCESS TOAST */
+#toast-container {
+  position: fixed;
+  top: 25px;
+  right: 30px;
+  z-index: 9999;
+}
+
+#toast-container .toast {
+  position: absolute;
+  right: 0;
+  border-radius: 12px;
+  background: #d4edda;
+  padding: 20px 35px 20px 25px;
+  box-shadow: 0 6px 20px -5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transform: translateX(calc(100% + 30px));
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.35);
+  opacity: 0;
+  pointer-events: none;
+}
+
+#toast-container .toast.active {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Rest of your existing toast CSS remains the same */
+
+#toast-container .toast.active {
+  transform: translateX(0%);
+}
+
+#toast-container .toast .toast-content {
+  display: flex;
+  align-items: center;
+}
+
+#toast-container .toast-content .check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 35px;
+  min-width: 35px;
+  background-color: #28a745; /* Darker green for the check icon */
+  color: #fff;
+  font-size: 20px;
+  border-radius: 50%;
+}
+
+#toast-container .toast-content .svg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 35px;
+  width: 35px;
+  background-color: #28a745; /* Dark green for the check icon */
+  border-radius: 50%;
+  padding: 5px;
+}
+
+#toast-container .toast-content .svg svg {
+  width: 20px; /* Size of the check icon */
+  height: 20px;
+  fill: #fff; /* White color for the SVG icon */
+}
+
+#toast-container .toast-content .message {
+  display: flex;
+  flex-direction: column;
+  margin: 0 20px;
+}
+
+#toast-container .message .text {
+  font-size: 16px;
+  font-weight: 400;
+  color: #666666;
+}
+
+#toast-container .message .text.text-1 {
+  font-weight: 600;
+  color: #333;
+}
+
+#toast-container .toast .close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  padding: 5px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+#toast-container .toast .close:hover {
+  opacity: 1;
+}
+
+#toast-container .toast .progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+}
+
+#toast-container .toast .progress:before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  background-color: #28a745; /* Dark green for the progress */
+}
+
+#toast-container .progress.active:before {
+  animation: progress 5s linear forwards;
+}
+
+@keyframes progress {
+  100% {
+    right: 100%;
+  }
+}
+
+#toast-container button {
+  padding: 12px 20px;
+  font-size: 20px;
+  outline: none;
+  border: none;
+  background-color: #28a745; /* Bootstrap success green */
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#toast-container button:hover {
+  background-color: #218838; /* Slightly darker green on hover */
+}
+
+#toast-container .toast.active ~ button {
+  pointer-events: none;
+}
+
+body.toast-active {
+  overflow: hidden;
+  padding-right: 17px; /* Adjust for scrollbar width */
+}
+
+
+
+
+/* Single Product View CSS */
+
+
+/* Single product view container */
+#single-product-view-container {
+    flex: 1; /* Take remaining space */
+    margin-bottom: 20px; /* Space before footer */
+}
+
+.single-product-view {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.product-content-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.product-image-column {
+  position: relative;
+}
+
+.product-image-column img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* Update the product info column layout */
+.product-info-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Consistent spacing between elements */
+}
+
+.product-info-column h2 {
+  font-size: 28px;
+  margin-bottom: 15px;
+  color: var(--theme-text);
+}
+
+.price-container {
+  margin: 15px 0;
+  font-size: 24px;
+}
+
+.sale-price {
+  color: #e63946;
+  font-weight: bold;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #666;
+  margin-right: 10px;
+}
+
+.product-description {
+margin-bottom: 30px; /* Space before Add to Cart button */
+text-align: justify;
+
+/*  margin: 20px 0;
+  line-height: 1.6;
+  color: var(--theme-text-secondary);
+  */
+}
+
+
+
+/* Add this to improve vertical rhythm */
+.product-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+
+
+
+/* Tabs Section */
+.product-tabs-container {
+  grid-column: 1 / -1;
+  margin-top: 40px;
+  border-top: 1px solid var(--theme-border);
+  padding-top: 30px;
+}
+
+/* Update the tabs header styling */
+.product-tabs-header {
+  display: flex;
+  justify-content: center; /* Center the tabs */
+  border-bottom: 1px solid var(--theme-border);
+  margin-bottom: 20px;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--theme-text-secondary);
+  position: relative;
+  margin: 0 10px; /* Add some spacing between tabs */
+}
+
+.tab-button.active {
+  color: var(--theme-text);
+  font-weight: bold;
+}
+
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--theme-accent);
+}
+
+.tab-content {
+  display: none;
+  padding: 20px 0;
+  line-height: 1.6;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Add to Cart Button */
+/* Remove margin-top: auto from the button */
+.spv-cartique_add_to_cart {
+  width: 100%;
+  max-width: 300px;
+  padding: 12px;
+  background-color: var(--spv-btn-bg);
+  color: var(--spv-btn-text);
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: 0.5px solid var(--theme-border);
+  border-radius: 10px;
+  cursor: pointer;
+  /* Remove margin-top: auto */
+  box-shadow: var(--theme-shadow);
+  transition: all 0.2s ease;
+  align-self: flex-start; /* Align left within the column */
+}
+
+.spv-cartique_add_to_cart:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.back-to-products {
+  background: none;
+  border: none;
+  color: var(--theme-text);
+  cursor: pointer;
+  margin-bottom: 30px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .product-content-wrapper {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .spv-cartique_add_to_cart {
+    max-width: 100%;
+  }
+}

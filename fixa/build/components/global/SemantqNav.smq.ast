@@ -2424,12 +2424,12 @@
       {
         "html": {
           "start": 0,
-          "end": 565,
+          "end": 691,
           "type": "Fragment",
           "children": [
             {
               "start": 0,
-              "end": 565,
+              "end": 691,
               "type": "Element",
               "name": "customSyntax",
               "attributes": null,
@@ -2437,7 +2437,7 @@
                 [
                   {
                     "start": 18,
-                    "end": 549,
+                    "end": 675,
                     "type": "Element",
                     "name": "div",
                     "attributes": [
@@ -2587,7 +2587,7 @@
                         },
                         {
                           "start": 214,
-                          "end": 542,
+                          "end": 668,
                           "type": "Element",
                           "name": "ul",
                           "attributes": [
@@ -2853,6 +2853,124 @@
                                             "type": "Text",
                                             "raw": "About",
                                             "data": "About"
+                                          }
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                ]
+                              },
+                              {
+                                "start": 537,
+                                "end": 604,
+                                "type": "Element",
+                                "name": "li",
+                                "attributes": [
+                                  {
+                                    "start": 541,
+                                    "end": 566,
+                                    "type": "Attribute",
+                                    "name": "class",
+                                    "value": [
+                                      {
+                                        "start": 548,
+                                        "end": 565,
+                                        "type": "Text",
+                                        "raw": "semantq-nav-item ",
+                                        "data": "semantq-nav-item "
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "children": [
+                                  [
+                                    {
+                                      "start": 567,
+                                      "end": 599,
+                                      "type": "Element",
+                                      "name": "a",
+                                      "attributes": [
+                                        {
+                                          "start": 570,
+                                          "end": 586,
+                                          "type": "Attribute",
+                                          "name": "href",
+                                          "value": [
+                                            {
+                                              "start": 576,
+                                              "end": 585,
+                                              "type": "Text",
+                                              "raw": "/contacts",
+                                              "data": "/contacts"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "type": "Text",
+                                            "raw": "Contacts",
+                                            "data": "Contacts"
+                                          }
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                ]
+                              },
+                              {
+                                "start": 604,
+                                "end": 663,
+                                "type": "Element",
+                                "name": "li",
+                                "attributes": [
+                                  {
+                                    "start": 608,
+                                    "end": 633,
+                                    "type": "Attribute",
+                                    "name": "class",
+                                    "value": [
+                                      {
+                                        "start": 615,
+                                        "end": 632,
+                                        "type": "Text",
+                                        "raw": "semantq-nav-item ",
+                                        "data": "semantq-nav-item "
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "children": [
+                                  [
+                                    {
+                                      "start": 634,
+                                      "end": 658,
+                                      "type": "Element",
+                                      "name": "a",
+                                      "attributes": [
+                                        {
+                                          "start": 637,
+                                          "end": 649,
+                                          "type": "Attribute",
+                                          "name": "href",
+                                          "value": [
+                                            {
+                                              "start": 643,
+                                              "end": 648,
+                                              "type": "Text",
+                                              "raw": "/shop",
+                                              "data": "/shop"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "type": "Text",
+                                            "raw": "Shop",
+                                            "data": "Shop"
                                           }
                                         ]
                                       ]
