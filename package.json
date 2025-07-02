@@ -20,11 +20,13 @@
   "dependencies": {
     "chalk": "^5.0.0",
     "commander": "^8.1.0",
+    "degit": "^2.8.4",
     "dotenv": "^16.4.7",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.5.2",
     "lru-cache": "^7.17.1",
-    "nanospinner": "^1.2.2"
+    "nanospinner": "^1.2.2",
+    "ora": "^8.2.0"
   },
   "devDependencies": {
     "@huggingface/inference": "^3.5.2",

@@ -60,204 +60,6 @@ const copyIfExists = async (source, destination) => {
 
    
 
-
-
-// ===============================
-//  MAKE:RESOURCE COMMAND
-// ===============================
-program
-  .command('make:resource <name>')
-  .description('Generate a full resource (model, service, controller, and routes)')
-  .option('-a, --adapter <adapter>', 'Specify the database adapter (mongo or supabase)', 'mongo')
-  .action((name, options) => {
-    generateResource(name, options.adapter, process.cwd()); // Pass targetBaseDir
-  });
-
-// ===============================
-//  MAKE:MODEL COMMAND
-// ===============================
-program
-  .command('make:model <name>')
-  .description('Generate a model')
-  .option('-a, --adapter <adapter>', 'Specify the database adapter (mongo or supabase)', 'mongo')
-  .action((name, options) => {
-    generateModel(name, options.adapter, process.cwd()); // Pass targetBaseDir
-  });
-
-// ===============================
-//  MAKE:SERVICE COMMAND
-// ===============================
-program
-  .command('make:service <name>')
-  .description('Generate a service')
-  .option('-a, --adapter <adapter>', 'Specify the database adapter (mongo or supabase)', 'mongo')
-  .action((name, options) => {
-    generateService(name, options.adapter, process.cwd()); // Pass targetBaseDir
-  });
-
-// ===============================
-//  MAKE:CONTROLLER COMMAND
-// ===============================
-program
-  .command('make:controller <name>')
-  .description('Generate a controller')
-  .action((name) => {
-    generateController(name, process.cwd()); // Pass targetBaseDir
-  });
-
-// ===============================
-//  MAKE:ROUTE COMMAND
-// ===============================
-program
-  .command('make:apiRoute <name>')
-  .description('Generate a route')
-  .action((name) => {
-    generateRoute(name, process.cwd()); // Pass targetBaseDir
-  });
-
-// ===============================
-//  INSTALL:SERVER COMMAND
-// ===============================
-program
-  .command('install:server')
-  .description('Create the server directory and initialize server.js')
-  .action(() => {
-    const targetBaseDir = process.cwd(); // Use the current working directory as the target
-    const targetBasePublic = path.join(targetBaseDir, 'public');
-    const serverDir = resolvePath(targetBaseDir, 'server');
-    const serverFilePath = resolvePath(serverDir, 'server.js');
-
-    // Create the server directory if it doesn't exist
-    if (!fs.existsSync(serverDir)) {
-      fs.mkdirSync(serverDir, { recursive: true });
-      console.log(`${purpleBright('✓')} ${blue('Created directory:')} ${purple(serverDir)}`);
-    }
-
-    const serverCode = `
-import express from 'express';
-import cors from 'cors';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import chalk from 'chalk';
-
-// Color palette
-const purple = chalk.hex('#b56ef0');
-const purpleBright = chalk.hex('#d8a1ff');
-const blue = chalk.hex('#6ec7ff');
-const errorRed = chalk.hex('#ff4d4d');
-const gray = chalk.hex('#aaaaaa');
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-const baseDir = path.dirname(fileURLToPath(import.meta.url));
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// Automatically load all routes from the \`routes\` folder
-const routesPath = path.join(baseDir, 'routes');
-fs.readdirSync(routesPath).forEach((file) => {
-  if (file.endsWith('Routes.js')) {
-    const route = \`./routes/\${file}\`;
-    import(route).then((module) => {
-      const routeName = file.replace('Routes.js', '').toLowerCase();
-      app.use(\`/api/\${routeName}\`, module.default);
-      console.log(\`\${purpleBright('✓')} \${blue('Loaded route:')} /api/\${purple(routeName)}\`);
-    }).catch((err) => {
-      console.error(\`\${errorRed('✖')} \${blue('Failed to load')} \${purple(file)}: \${errorRed(err.message || err)}\`);
-    });
-  }
-});
-
-// Default route
-app.get('/', (req, res) => res.send('API is running'));
-
-// Start server
-app.listen(PORT, () => {
-  console.log(\`\${chalk.green('●')} \${purple('Server running on')} \${blue(\`port \${PORT}\`)}\`);
-});
-`;
-
-
-
-    fs.writeFileSync(serverFilePath, serverCode.trim());
-console.log(
-  `${purpleBright('✓')} ${blue('Server created file successfully.')} ${gray('Now you can create resources for your database or API-driven apps.')}`
-);
-  });
-
-// ===============================
-//  INSTALL:SUPABASE COMMAND
-// ===============================
-program
-  .command('install:supabase')
-  .description('Install Supabase and set up configuration')
-  .action(() => {
-    const targetBaseDir = process.cwd(); // Use the current working directory as the target
-
-    // Step 1: Install @supabase/supabase-js
-console.log(`${blue('Installing')} ${purple('@supabase/supabase-js')}${gray('...')}`);
-
-try {
-  execSync('npm install @supabase/supabase-js', { cwd: targetBaseDir, stdio: 'inherit' });
-  console.log(`${purpleBright('✓')} ${blue('Successfully installed')} ${purple('@supabase/supabase-js')}`);
-} catch (error) {
-  console.error(`${errorRed('✖')} ${blue('Failed to install')} ${purple('@supabase/supabase-js')}: ${errorRed(error.message)}`);
-  process.exit(1);
-}
-
-// Step 2: Install dotenv
-console.log(`${blue('Installing')} ${purple('dotenv')}${gray('...')}`);
-
-try {
-  execSync('npm install dotenv', { cwd: targetBaseDir, stdio: 'inherit' });
-  console.log(`${purpleBright('✓')} ${blue('dotenv installed successfully!')}`);
-} catch (error) {
-  console.error(`${errorRed('✖')} ${blue('Failed to install')} ${purple('dotenv')}: ${errorRed(error.message)}`);
-  process.exit(1);
-}
-
-// Step 3: Install @huggingface/inference
-console.log(`${blue('Installing')} ${purple('@huggingface/inference')}${gray('...')}`);
-
-try {
-  execSync('npm install @huggingface/inference', { cwd: targetBaseDir, stdio: 'inherit' });
-  console.log(`${purpleBright('✓')} ${blue('@huggingface/inference installed successfully!')}`);
-} catch (error) {
-  console.error(`${errorRed('✖')} ${blue('Failed to install')} ${purple('@huggingface/inference')}: ${errorRed(error.message)}`);
-  process.exit(1);
-}
-
-
-    // Step 3: Create lib/supabaseConfig.js
-    const libDir = resolvePath(targetBaseDir, 'lib');
-    const supabaseConfigPath = resolvePath(libDir, 'supabaseConfig.js');
-
-    // Create the lib directory if it doesn't exist
-    if (!fs.existsSync(libDir)) {
-      fs.mkdirSync(libDir, { recursive: true });
-      console.log(`${purpleBright('✓')} ${blue('Created directory:')} ${purple(libDir)}`);
-    }
-
-    // Write the supabaseConfig.js file
-    const supabaseConfigCode = `
-import { createClient } from '@supabase/supabase-js';
-import dotenv from 'dotenv';
-dotenv.config(); // Load environment variables
-
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-
-export const supabase = createClient(supabaseUrl, supabaseKey);
-`;
-
-   fs.writeFileSync(supabaseConfigPath, supabaseConfigCode.trim());
-console.log(`${purpleBright('✓')} ${blue('Created file:')} ${purple(supabaseConfigPath)}`);
-console.log(`${chalk.green('●')} ${purpleBright('Supabase setup complete!')}`);
-console.log(`${purpleBright('›')} ${gray('Make sure that you have the correct')} ${purple('.env')} ${gray('set up for your')} ${purple('SUPABASE_URL')} ${gray('and')} ${purple('SUPABASE_ANON_KEY')} ${gray('in the root of your project.')}`);
- });
 // ===============================
 //  CREATE NEW PROJECT COMMAND
 // ===============================
@@ -505,6 +307,59 @@ ${blue('Troubleshooting:')}
       process.exit(1);
     }
   });
+
+
+
+// ===============================
+//  SEMANTQ INSTALL SERVER
+// ===============================
+
+program
+  .command('install:server')
+  .description('Install the Semantq server package into your project')
+  .action(async () => {
+    const { default: chalk } = await import('chalk');
+    const { execSync } = await import('child_process');
+    const degit = (await import('degit')).default;
+    const ora = (await import('ora')).default;
+
+    const targetBaseDir = process.cwd();
+    const serverDir = path.join(targetBaseDir, 'semantq_server');
+    const repoURL = 'github:yourorg/semantq_server'; // or 'https://github.com/yourorg/semantq_server.git'
+
+    try {
+      // Check if semantq_server already exists
+      if (fs.existsSync(serverDir)) {
+        console.error(chalk.red(`✖ Directory 'semantq_server' already exists in this project.`));
+        console.log(chalk.yellow(`› Remove it or rename it before running this command.`));
+        process.exit(1);
+      }
+
+      const spinner = ora(chalk.cyan(`Cloning Semantq server package into ${chalk.magenta('semantq_server/')}`)).start();
+
+      // Clone using degit
+      const emitter = degit(repoURL, { cache: false, force: true });
+      await emitter.clone(serverDir);
+
+      spinner.succeed(chalk.green(`✓ Semantq server installed at ${chalk.magenta('semantq_server/')}`));
+
+      // Install dependencies in the new server directory
+      console.log(chalk.blue(`Installing dependencies in ${chalk.magenta('semantq_server/')}`));
+      execSync('npm install --silent --no-audit --no-fund', { cwd: serverDir, stdio: 'inherit' });
+
+      console.log(chalk.green(`✓ Server dependencies installed successfully.`));
+      console.log(chalk.cyan.bold(`\n› Next:`));
+      console.log(chalk.gray(`  › Run ${chalk.yellow('cd semantq_server')}`));
+      console.log(chalk.gray(`  › Start your server with ${chalk.yellow('npm run dev')}`));
+
+    } catch (error) {
+      console.error(chalk.red(`✖ Failed to install Semantq server: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+
+
 
 // ===============================
 //  SEMANTQ AI COMMANDS
