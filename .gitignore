@@ -3,4 +3,5 @@ ignores/
 node_modules/
 ARCHIVE/
 sites/
-.envfstack/
+fstack/
+fixa

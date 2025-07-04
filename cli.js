@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { program } from 'commander';
-import fs from 'fs-extra';
+import fs from 'fs-extra'; // fs-extra is imported as fs
 import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
@@ -14,7 +14,7 @@ dotenv.config();
 
 //const client = new InferenceClient(process.env.HUGGINGFACE_API_KEY);
 
-// Import utility functions
+// Import utility functions (ensure these are available in ./cli-utils.js)
 import { generateResource, generateModel, generateService, generateController, generateRoute } from './cli-utils.js';
 
 // Get the current module's filename and directory (sourceBaseDir)
@@ -51,14 +51,13 @@ const copyIfExists = async (source, destination) => {
 };
 
 
- // Color palette
-    const purple = chalk.hex('#b56ef0');
-    const purpleBright = chalk.hex('#d8a1ff');
-    const blue = chalk.hex('#6ec7ff');
-    const errorRed = chalk.hex('#ff4d4d');
-    const gray = chalk.hex('#aaaaaa');
+// Color palette (already defined in your CLI, ensuring consistency)
+const purple = chalk.hex('#b56ef0');
+const purpleBright = chalk.hex('#d8a1ff');
+const blue = chalk.hex('#6ec7ff');
+const errorRed = chalk.hex('#ff4d4d');
+const gray = chalk.hex('#aaaaaa');
 
-   
 
 // ===============================
 //  CREATE NEW PROJECT COMMAND
@@ -107,10 +106,10 @@ program
 
 
       //safeCopySync(resolvePath(sourceBaseDir, 'templates/public'), resolvePath(targetBaseDir, 'public'));
-      // Copy the public directory recursively 
+      // Copy the public directory recursively
       fs.copySync(resolvePath(sourceBaseDir, 'templates/public'), resolvePath(targetBaseDir, 'public'));
-      
-      // Copy the public directory recursively 
+
+      // Copy the public directory recursively
       fs.copySync(resolvePath(sourceBaseDir, 'templates/components'), resolvePath(targetBaseDir, 'src/components'));
       // Create empty routes.js in src/routes
       await fs.writeFile(resolvePath(targetBaseDir, 'src/routes/routes.js'), 'export default [];');
@@ -183,7 +182,7 @@ export default defineConfig({
       if (fs.existsSync(globalCSSPath)) {
   // Read the existing content
   const existingContent = fs.readFileSync(globalCSSPath, 'utf-8');
-  
+
   // Write Tailwind directives at the top and append the existing content
   fs.writeFileSync(globalCSSPath, tailwindDirectives + existingContent);
   console.log(`${purpleBright('✓')} ${blue('Appended Tailwind directives to the top of')} ${purple('global.css')}`);
@@ -202,7 +201,7 @@ console.log(`${purpleBright('✨')} ${blue('Tailwind CSS installed and configure
   });
 
 // ===========================================
-//  MAKE:ROUTE COMMAND - FULL RESOURCES 
+//  MAKE:ROUTE COMMAND - FULL RESOURCES
 // ===========================================
 program
   .command('make:route <routeName>')
@@ -212,10 +211,11 @@ program
   .option('-s, --server', 'Add server handlers')
   .option('-a, --all', 'Create all resources at once')
   .action(async (routeName, options) => {
+    // Note: chalk and nanospinner are imported here, ensure they are available
     const { default: chalk } = await import('chalk');
     const { createSpinner } = await import('nanospinner');
 
-    // Color palette
+    // Color palette (already defined globally, but re-defined here for local scope consistency)
     const purple = chalk.hex('#b56ef0');
     const purpleBright = chalk.hex('#d8a1ff');
     const blue = chalk.hex('#6ec7ff');
@@ -224,7 +224,7 @@ program
 
     try {
       const routePath = resolvePath(process.cwd(), 'src/routes', routeName);
-      
+
       // Check if route exists
       if (fs.existsSync(routePath)) {
         const spinner = createSpinner(purple(`Checking route ${routeName}...`)).start();
@@ -275,7 +275,7 @@ program
           const spinner = createSpinner(purple(`Creating ${filename}`)).start();
           await new Promise(resolve => setTimeout(resolve, 200)); // Visual delay
           fs.writeFileSync(resolvePath(routePath, filename), content.trim());
-          spinner.success({ 
+          spinner.success({
             text: `${purpleBright('✓')} ${purple(filename)} ${blue('created')}`
           });
         }
@@ -322,6 +322,8 @@ program
     const { execSync } = await import('child_process');
     const degit = (await import('degit')).default;
     const ora = (await import('ora')).default;
+    // Import fs from promises for consistent async operations
+    const fs = await import('fs/promises'); // Use fs.promises
 
     const targetBaseDir = process.cwd();
     const serverDir = path.join(targetBaseDir, 'semantq_server');
@@ -329,10 +331,17 @@ program
 
     try {
       // Check if semantq_server already exists
-      if (fs.existsSync(serverDir)) {
+      // Use fs.promises.access for async check
+      try {
+        await fs.access(serverDir);
         console.error(chalk.red(`✖ Directory 'semantq_server' already exists in this project.`));
         console.log(chalk.yellow(`› Remove it or rename it before running this command.`));
         process.exit(1);
+      } catch (err) {
+        // Directory does not exist, which is what we want, so continue
+        if (err.code !== 'ENOENT') {
+          throw err; // Re-throw other errors
+        }
       }
 
       const spinner = ora(chalk.cyan(`Cloning Semantq server package into ${chalk.magenta('semantq_server/')}`)).start();
@@ -348,6 +357,21 @@ program
       execSync('npm install --silent --no-audit --no-fund', { cwd: serverDir, stdio: 'inherit' });
 
       console.log(chalk.green(`✓ Server dependencies installed successfully.`));
+
+      // --- IMPORTANT ADDITION FOR PERMISSIONS ---
+      const initScriptPath = path.join(serverDir, 'bin', 'init.js');
+      console.log(chalk.blue(`Setting execute permissions for ${chalk.magenta('bin/init.js')}`));
+      try {
+        // Use 'inherit' for stdio if you want to see any chmod output (usually none)
+        // Or 'pipe' for completely silent and capture output if needed for debugging
+        execSync(`chmod +x ${initScriptPath}`, { stdio: 'pipe' });
+        console.log(chalk.green(`✓ Permissions set successfully for bin/init.js.`));
+      } catch (permissionError) {
+        console.warn(chalk.yellow(`⚠️ Could not set execute permissions for init.js: ${permissionError.message}`));
+        console.warn(chalk.yellow(`   You might need to run 'chmod +x ${initScriptPath}' manually.`));
+      }
+      // --- END IMPORTANT ADDITION ---
+
       console.log(chalk.cyan.bold(`\n› Next:`));
       console.log(chalk.gray(`  › Run ${chalk.yellow('cd semantq_server')}`));
       console.log(chalk.gray(`  › Start your server with ${chalk.yellow('npm run dev')}`));
@@ -357,8 +381,6 @@ program
       process.exit(1);
     }
   });
-
-
 
 
 // ===============================
@@ -493,14 +515,14 @@ program
         console.log(chalk.blue('[Dry Run] Would update:'));
         console.log('• core_modules/');
         console.log('• docs/');
-        console.log('• examples/');
+        console.log('• • examples/');
         console.log(chalk.gray('(Add --force to actually apply changes)'));
         return;
       }
 
       // Perform update
       console.log(chalk.blue('Updating Semantq...'));
-      
+
       // 1. Install latest version
       execSync('npm install semantq@latest', { stdio: 'inherit' });
 
@@ -509,7 +531,7 @@ program
       dirsToUpdate.forEach(dir => {
         const source = path.join('node_modules', 'semantq', dir);
         const dest = path.join(targetDir, dir);
-        
+
         fs.rmSync(dest, { recursive: true, force: true });
         fs.copySync(source, dest);
         console.log(chalk.green(`✓ Updated ${dir}/`));
@@ -518,7 +540,7 @@ program
       // 3. Preserve config (show diff if modified)
       const userConfigPath = path.join(targetDir, 'semantq.config.js');
       const defaultConfigPath = path.join('node_modules', 'semantq', 'semantq.config.default.js');
-      
+
       if (fs.existsSync(userConfigPath)) {
         console.log(chalk.yellow('⚠️ semantq.config.js was preserved (may need manual updates)'));
         if (fs.existsSync(defaultConfigPath)) {
@@ -532,6 +554,70 @@ program
 
     } catch (error) {
       console.error(chalk.red('✖ Update failed:'), error.message);
+      process.exit(1);
+    }
+  });
+
+
+// ===============================
+//  ADD MODULE COMMAND
+// ===============================
+program
+  .command('add <moduleName>')
+  .description('Add a Semantq module (e.g., @semantq/auth) to your project')
+  .action((moduleName) => { // No async needed if only execSync
+    console.log(`${purpleBright('📦')} ${blue('Adding module:')} ${purple(moduleName)}${gray('...')}`);
+    try {
+      // Ensure it's a scoped @semantq module if that's the convention
+      const fullModuleName = moduleName.startsWith('@semantq/') ? moduleName : `@semantq/${moduleName}`;
+      const projectRoot = process.cwd(); // Ensure we're installing in the current project root
+
+      // This command will run npm install in the current directory (project root)
+      execSync(`npm install ${fullModuleName}`, { cwd: projectRoot, stdio: 'inherit' });
+
+      console.log(`${purpleBright('✓')} ${blue('Module')} ${purple(fullModuleName)} ${blue('added successfully!')}`);
+      console.log(`${gray('›')} ${blue('Remember to run')} ${purple('semantq migrate')} ${blue('to apply any new database migrations for the module.')}`);
+
+    } catch (error) {
+      console.error(`${errorRed('✖')} ${blue('Failed to add module')} ${errorRed(moduleName)}: ${errorRed(error.message)}`);
+      // execSync will throw an error if the command fails, so we catch it
+      process.exit(1);
+    }
+  });
+
+// ===============================
+//  MIGRATE COMMAND
+// ===============================
+program
+  .command('migrate')
+  .description('Run database migrations for the project and its modules')
+  .action(() => { // No async needed if only execSync
+    const projectRoot = process.cwd();
+    console.log(`${purpleBright('🚀')} ${blue('Running migrations...')}`);
+    try {
+      // Assuming 'npm run migrate' is defined in your project's package.json
+      execSync('npm run migrate', { cwd: projectRoot, stdio: 'inherit' });
+      console.log(`${purpleBright('✓')} ${blue('Migrations complete.')}`);
+    } catch (error) {
+      console.error(`${errorRed('✖')} ${blue('Migration failed:')} ${errorRed(error.message)}`);
+      process.exit(1);
+    }
+  });
+
+// ===============================
+//  START SERVER COMMAND
+// ===============================
+program
+  .command('start')
+  .description('Start the Semantq server in development mode')
+  .action(() => { // No async needed if only execSync
+    const projectRoot = process.cwd();
+    console.log(`${purpleBright('⚡')} ${blue('Starting Semantq server (development mode)...')}`);
+    try {
+      // Use 'npm run dev' which typically uses nodemon for live reloading
+      execSync('npm run dev', { cwd: projectRoot, stdio: 'inherit' });
+    } catch (error) {
+      console.error(`${errorRed('✖')} ${blue('Failed to start server:')} ${errorRed(error.message)}`);
       process.exit(1);
     }
   });
