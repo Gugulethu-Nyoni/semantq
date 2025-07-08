@@ -1,0 +1,662 @@
+{
+  "jsAST": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 36,
+      "body": [
+        {
+          "type": "ImportDeclaration",
+          "start": 1,
+          "end": 35,
+          "specifiers": [],
+          "source": {
+            "type": "Literal",
+            "start": 8,
+            "end": 34,
+            "value": "/public/auth/js/login.js",
+            "raw": "'/public/auth/js/login.js'"
+          }
+        }
+      ],
+      "sourceType": "module"
+    }
+  },
+  "cssAST": {
+    "type": "CSS",
+    "content": {
+      "raws": {
+        "after": "\n\n"
+      },
+      "type": "root",
+      "nodes": [],
+      "source": {
+        "input": {
+          "css": "\n\n",
+          "hasBOM": false,
+          "document": "\n\n",
+          "file": "/Users/gugulethu/code/semantq/asta/style"
+        },
+        "start": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        },
+        "end": {
+          "column": 1,
+          "line": 3,
+          "offset": 2
+        }
+      }
+    }
+  },
+  "customAST": {
+    "type": "HTML",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 728,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 728,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "start": 16,
+                    "end": 712,
+                    "type": "Element",
+                    "name": "div",
+                    "attributes": [
+                      {
+                        "start": 21,
+                        "end": 43,
+                        "type": "Attribute",
+                        "name": "class",
+                        "value": [
+                          {
+                            "start": 28,
+                            "end": 42,
+                            "type": "Text",
+                            "raw": "auth-container",
+                            "data": "auth-container"
+                          }
+                        ]
+                      }
+                    ],
+                    "children": [
+                      [
+                        {
+                          "start": 45,
+                          "end": 705,
+                          "type": "Element",
+                          "name": "div",
+                          "attributes": [
+                            {
+                              "start": 50,
+                              "end": 67,
+                              "type": "Attribute",
+                              "name": "class",
+                              "value": [
+                                {
+                                  "start": 57,
+                                  "end": 66,
+                                  "type": "Text",
+                                  "raw": "auth-card",
+                                  "data": "auth-card"
+                                }
+                              ]
+                            }
+                          ],
+                          "children": [
+                            [
+                              {
+                                "start": 70,
+                                "end": 653,
+                                "type": "Element",
+                                "name": "form",
+                                "attributes": [
+                                  {
+                                    "start": 76,
+                                    "end": 94,
+                                    "type": "Attribute",
+                                    "name": "class",
+                                    "value": [
+                                      {
+                                        "start": 83,
+                                        "end": 92,
+                                        "type": "Text",
+                                        "raw": "auth-form",
+                                        "data": "auth-form"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "start": 94,
+                                    "end": 110,
+                                    "type": "Attribute",
+                                    "name": "id",
+                                    "value": [
+                                      {
+                                        "start": 98,
+                                        "end": 108,
+                                        "type": "Text",
+                                        "raw": "login-form",
+                                        "data": "login-form"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "start": 110,
+                                    "end": 121,
+                                    "type": "Attribute",
+                                    "name": "action",
+                                    "value": [
+                                      {
+                                        "start": 118,
+                                        "end": 119,
+                                        "type": "Text",
+                                        "raw": "#",
+                                        "data": "#"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "start": 121,
+                                    "end": 135,
+                                    "type": "Attribute",
+                                    "name": "method",
+                                    "value": [
+                                      {
+                                        "start": 129,
+                                        "end": 133,
+                                        "type": "Text",
+                                        "raw": "post",
+                                        "data": "post"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "start": 135,
+                                    "end": 145,
+                                    "type": "Attribute",
+                                    "name": "novalidate",
+                                    "value": true
+                                  }
+                                ],
+                                "children": [
+                                  [
+                                    {
+                                      "start": 147,
+                                      "end": 168,
+                                      "type": "Element",
+                                      "name": "h2",
+                                      "attributes": null,
+                                      "children": [
+                                        [
+                                          {
+                                            "type": "Text",
+                                            "raw": "Welcome Back",
+                                            "data": "Welcome Back"
+                                          }
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "start": 170,
+                                      "end": 302,
+                                      "type": "Element",
+                                      "name": "div",
+                                      "attributes": [
+                                        {
+                                          "start": 175,
+                                          "end": 193,
+                                          "type": "Attribute",
+                                          "name": "class",
+                                          "value": [
+                                            {
+                                              "start": 182,
+                                              "end": 192,
+                                              "type": "Text",
+                                              "raw": "form-group",
+                                              "data": "form-group"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "start": 195,
+                                            "end": 233,
+                                            "type": "Element",
+                                            "name": "label",
+                                            "attributes": [
+                                              {
+                                                "start": 202,
+                                                "end": 219,
+                                                "type": "Attribute",
+                                                "name": "for",
+                                                "value": [
+                                                  {
+                                                    "start": 207,
+                                                    "end": 218,
+                                                    "type": "Text",
+                                                    "raw": "login-email",
+                                                    "data": "login-email"
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Email",
+                                                  "data": "Email"
+                                                }
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "start": 234,
+                                            "end": 296,
+                                            "type": "Element",
+                                            "name": "input",
+                                            "attributes": [
+                                              {
+                                                "start": 241,
+                                                "end": 254,
+                                                "type": "Attribute",
+                                                "name": "name",
+                                                "value": [
+                                                  {
+                                                    "start": 247,
+                                                    "end": 252,
+                                                    "type": "Text",
+                                                    "raw": "email",
+                                                    "data": "email"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "start": 254,
+                                                "end": 267,
+                                                "type": "Attribute",
+                                                "name": "type",
+                                                "value": [
+                                                  {
+                                                    "start": 260,
+                                                    "end": 265,
+                                                    "type": "Text",
+                                                    "raw": "email",
+                                                    "data": "email"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "start": 267,
+                                                "end": 284,
+                                                "type": "Attribute",
+                                                "name": "id",
+                                                "value": [
+                                                  {
+                                                    "start": 271,
+                                                    "end": 282,
+                                                    "type": "Text",
+                                                    "raw": "login-email",
+                                                    "data": "login-email"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "start": 284,
+                                                "end": 293,
+                                                "type": "Attribute",
+                                                "name": "required",
+                                                "value": true
+                                              }
+                                            ],
+                                            "children": []
+                                          }
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "start": 304,
+                                      "end": 451,
+                                      "type": "Element",
+                                      "name": "div",
+                                      "attributes": [
+                                        {
+                                          "start": 309,
+                                          "end": 327,
+                                          "type": "Attribute",
+                                          "name": "class",
+                                          "value": [
+                                            {
+                                              "start": 316,
+                                              "end": 326,
+                                              "type": "Text",
+                                              "raw": "form-group",
+                                              "data": "form-group"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "start": 329,
+                                            "end": 373,
+                                            "type": "Element",
+                                            "name": "label",
+                                            "attributes": [
+                                              {
+                                                "start": 336,
+                                                "end": 356,
+                                                "type": "Attribute",
+                                                "name": "for",
+                                                "value": [
+                                                  {
+                                                    "start": 341,
+                                                    "end": 355,
+                                                    "type": "Text",
+                                                    "raw": "login-password",
+                                                    "data": "login-password"
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Password",
+                                                  "data": "Password"
+                                                }
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "start": 374,
+                                            "end": 445,
+                                            "type": "Element",
+                                            "name": "input",
+                                            "attributes": [
+                                              {
+                                                "start": 381,
+                                                "end": 397,
+                                                "type": "Attribute",
+                                                "name": "name",
+                                                "value": [
+                                                  {
+                                                    "start": 387,
+                                                    "end": 395,
+                                                    "type": "Text",
+                                                    "raw": "password",
+                                                    "data": "password"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "start": 397,
+                                                "end": 413,
+                                                "type": "Attribute",
+                                                "name": "type",
+                                                "value": [
+                                                  {
+                                                    "start": 403,
+                                                    "end": 411,
+                                                    "type": "Text",
+                                                    "raw": "password",
+                                                    "data": "password"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "start": 413,
+                                                "end": 433,
+                                                "type": "Attribute",
+                                                "name": "id",
+                                                "value": [
+                                                  {
+                                                    "start": 417,
+                                                    "end": 431,
+                                                    "type": "Text",
+                                                    "raw": "login-password",
+                                                    "data": "login-password"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "start": 433,
+                                                "end": 442,
+                                                "type": "Attribute",
+                                                "name": "required",
+                                                "value": true
+                                              }
+                                            ],
+                                            "children": null
+                                          }
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "start": 453,
+                                      "end": 490,
+                                      "type": "Element",
+                                      "name": "button",
+                                      "attributes": [
+                                        {
+                                          "start": 461,
+                                          "end": 474,
+                                          "type": "Attribute",
+                                          "name": "type",
+                                          "value": [
+                                            {
+                                              "start": 467,
+                                              "end": 473,
+                                              "type": "Text",
+                                              "raw": "submit",
+                                              "data": "submit"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "type": "Text",
+                                            "raw": "Log In",
+                                            "data": "Log In"
+                                          }
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "start": 492,
+                                      "end": 571,
+                                      "type": "Element",
+                                      "name": "p",
+                                      "attributes": [
+                                        {
+                                          "start": 495,
+                                          "end": 514,
+                                          "type": "Attribute",
+                                          "name": "class",
+                                          "value": [
+                                            {
+                                              "start": 502,
+                                              "end": 513,
+                                              "type": "Text",
+                                              "raw": "auth-switch",
+                                              "data": "auth-switch"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "type": "Text",
+                                            "raw": "New user? ",
+                                            "data": "New user? "
+                                          },
+                                          {
+                                            "start": 526,
+                                            "end": 566,
+                                            "type": "Element",
+                                            "name": "a",
+                                            "attributes": [
+                                              {
+                                                "start": 529,
+                                                "end": 547,
+                                                "type": "Attribute",
+                                                "name": "href",
+                                                "value": [
+                                                  {
+                                                    "start": 535,
+                                                    "end": 546,
+                                                    "type": "Text",
+                                                    "raw": "auth/signup",
+                                                    "data": "auth/signup"
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Create account",
+                                                  "data": "Create account"
+                                                }
+                                              ]
+                                            ]
+                                          }
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "start": 573,
+                                      "end": 644,
+                                      "type": "Element",
+                                      "name": "p",
+                                      "attributes": [
+                                        {
+                                          "start": 576,
+                                          "end": 595,
+                                          "type": "Attribute",
+                                          "name": "class",
+                                          "value": [
+                                            {
+                                              "start": 583,
+                                              "end": 594,
+                                              "type": "Text",
+                                              "raw": "auth-switch",
+                                              "data": "auth-switch"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "start": 597,
+                                            "end": 639,
+                                            "type": "Element",
+                                            "name": "a",
+                                            "attributes": [
+                                              {
+                                                "start": 600,
+                                                "end": 618,
+                                                "type": "Attribute",
+                                                "name": "href",
+                                                "value": [
+                                                  {
+                                                    "start": 606,
+                                                    "end": 617,
+                                                    "type": "Text",
+                                                    "raw": "auth/forgot",
+                                                    "data": "auth/forgot"
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Forgot Password?",
+                                                  "data": "Forgot Password?"
+                                                }
+                                              ]
+                                            ]
+                                          }
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                ]
+                              },
+                              {
+                                "start": 655,
+                                "end": 698,
+                                "type": "Element",
+                                "name": "div",
+                                "attributes": [
+                                  {
+                                    "start": 660,
+                                    "end": 677,
+                                    "type": "Attribute",
+                                    "name": "id",
+                                    "value": [
+                                      {
+                                        "start": 664,
+                                        "end": 675,
+                                        "type": "Text",
+                                        "raw": "auth-status",
+                                        "data": "auth-status"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "start": 677,
+                                    "end": 691,
+                                    "type": "Attribute",
+                                    "name": "class",
+                                    "value": [
+                                      {
+                                        "start": 684,
+                                        "end": 690,
+                                        "type": "Text",
+                                        "raw": "hidden",
+                                        "data": "hidden"
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "children": []
+                              }
+                            ]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

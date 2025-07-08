@@ -1,0 +1,119 @@
+@style
+:root {
+  --card-bg: #ffffff;
+  --card-text: #333333;
+  --card-subtext: #666666;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --card-border-radius: 12px;
+  --card-padding: 1.5rem; 
+
+  --button-primary-bg: #6a1b9a;
+  --button-primary-text: #ffffff;
+  --button-secondary-bg: transparent;
+  --button-secondary-text: #6a1b9a;
+  --button-border: 2px solid #6a1b9a; 
+
+  --font-title: 1.5rem;
+  --font-subtitle: 1.1rem;
+  --font-description: 1rem;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  max-width: 400px;
+  margin: 1rem auto;
+}
+
+.card-content {
+  padding: var(--card-padding);
+}
+
+.card-title {
+  font-size: var(--font-title);
+  color: var(--card-text);
+  margin: 0 0 0.5rem 0;
+}
+
+.card-subtitle {
+  font-size: var(--font-subtitle);
+  color: var(--card-subtext);
+  margin: 0 0 1rem 0;
+}
+
+.card-description {
+  font-size: var(--font-description);
+  color: var(--card-text);
+  margin: 0 0 1.5rem 0;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.card-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  border: none;
+}
+
+.card-button.primary {
+  background: var(--button-primary-bg);
+  color: var(--button-primary-text);
+}
+
+.card-button.secondary {
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+  border: var(--button-border);
+}
+
+.card-button.primary:hover {
+  background: #8a2be2; /* Lighter Purple on Hover */
+}
+
+.card-button.secondary:hover {
+  background: rgba(106, 27, 154, 0.1); /* Light Purple Background on Hover */
+}
+
+@media (max-width: 768px) {
+  .card {
+    max-width: 100%;
+    margin: 0.5rem;
+  }
+
+  .card-actions {
+    flex-direction: column;
+  }
+
+  .card-button {
+    width: 100%;
+  }
+}
+
+@end
+
+@html
+<div class="card">
+  <div class="card-content">
+    <h2 class="card-title"><slot name="title">Card Title</slot></h2>
+    <h3 class="card-subtitle"><slot name="subtitle">Card Subtitle</slot></h3>
+    <p class="card-description"><slot name="description">This is a description for the card. It can be longer and span multiple lines.</slot></p>
+
+    
+    <div class="card-actions">
+      <slot name="actions">
+        <button class="card-button primary">Learn More</button>
+        <button class="card-button secondary">Contact Us</button>
+      </slot>
+    </div>
+  </div>
+</div>

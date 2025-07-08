@@ -1,0 +1,139 @@
+{
+  "jsAST": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 0,
+      "body": [],
+      "sourceType": "module"
+    }
+  },
+  "customAST": {
+    "type": "HTML",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 176,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 176,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "start": 15,
+                    "end": 81,
+                    "type": "Element",
+                    "name": "head",
+                    "attributes": null,
+                    "children": [
+                      [
+                        {
+                          "start": 22,
+                          "end": 74,
+                          "type": "Element",
+                          "name": "link",
+                          "attributes": [
+                            {
+                              "start": 28,
+                              "end": 45,
+                              "type": "Attribute",
+                              "name": "rel",
+                              "value": [
+                                {
+                                  "start": 33,
+                                  "end": 43,
+                                  "type": "Text",
+                                  "raw": "stylesheet",
+                                  "data": "stylesheet"
+                                }
+                              ]
+                            },
+                            {
+                              "start": 45,
+                              "end": 71,
+                              "type": "Attribute",
+                              "name": "href",
+                              "value": [
+                                {
+                                  "start": 51,
+                                  "end": 69,
+                                  "type": "Text",
+                                  "raw": "/auth/css/auth.css",
+                                  "data": "/auth/css/auth.css"
+                                }
+                              ]
+                            }
+                          ],
+                          "children": []
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "start": 83,
+                    "end": 160,
+                    "type": "Element",
+                    "name": "footer",
+                    "attributes": null,
+                    "children": [
+                      [
+                        {
+                          "start": 92,
+                          "end": 150,
+                          "type": "Element",
+                          "name": "script",
+                          "attributes": [
+                            {
+                              "start": 100,
+                              "end": 114,
+                              "type": "Attribute",
+                              "name": "type",
+                              "value": [
+                                {
+                                  "start": 106,
+                                  "end": 112,
+                                  "type": "Text",
+                                  "raw": "module",
+                                  "data": "module"
+                                }
+                              ]
+                            },
+                            {
+                              "start": 114,
+                              "end": 139,
+                              "type": "Attribute",
+                              "name": "src",
+                              "value": [
+                                {
+                                  "start": 119,
+                                  "end": 138,
+                                  "type": "Text",
+                                  "raw": "/auth/js/confirm.js",
+                                  "data": "/auth/js/confirm.js"
+                                }
+                              ]
+                            }
+                          ],
+                          "children": [
+                            []
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

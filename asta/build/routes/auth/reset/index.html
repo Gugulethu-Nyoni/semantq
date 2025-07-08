@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Awesome Website</title>
+    <meta name="description" content="My Awesome Website" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="undefined" />
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="auth-card">
+        <h1>Reset Your Password</h1>
+        <p class="reset-instructions">Enter your new password below.</p>
+        <form id="reset-password-form" class="auth-form">
+          <div class="form-group">
+            <label for="new-password">New Password</label
+            ><input
+              type="password"
+              id="new-password"
+              name="newPassword"
+              placeholder="Enter your new password"
+              required
+              autocomplete="new-password"
+            />
+          </div>
+          <div class="form-group">
+            <label for="confirm-password">Confirm New Password</label
+            ><input
+              type="password"
+              id="confirm-password"
+              name="confirmPassword"
+              placeholder="Confirm your new password"
+              required
+              autocomplete="new-password"
+            />
+          </div>
+          <button type="submit" class="auth-button">Reset Password</button>
+          <div class="auth-footer">
+            <a href="auth/login" class="auth-switch">← Return to Login</a>
+          </div>
+        </form>
+        <div id="auth-status" class="hidden"></div>
+      </div>
+    </div>
+    <script src="./reset.js" type="module" defer></script>
+  </body>
+</html>

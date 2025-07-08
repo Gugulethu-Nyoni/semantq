@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Awesome Website</title>
+    <meta name="description" content="My Awesome Website" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="undefined" />
+    <script type="module" crossorigin src="/assets/build/routes/auth/login/index-Cvq3RoWN.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/assets/routes-BLb1p8ki.js">
+    <link rel="modulepreload" crossorigin href="/assets/config-Cv_0j0S0.js">
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="auth-card">
+        <form
+          class="auth-form"
+          id="login-form"
+          action="#"
+          method="post"
+          novalidate
+        >
+          <h2>Welcome Back</h2>
+          <div class="form-group">
+            <label for="login-email">Email</label
+            ><input name="email" type="email" id="login-email" required />
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label
+            ><input
+              name="password"
+              type="password"
+              id="login-password"
+              required
+            />
+          </div>
+          <button type="submit">Log In</button>
+          <p class="auth-switch">
+            New user? <a href="auth/signup">Create account</a>
+          </p>
+          <p class="auth-switch"><a href="auth/forgot">Forgot Password?</a></p>
+        </form>
+        <div id="auth-status" class="hidden"></div>
+      </div>
+    </div>
+  </body>
+</html>

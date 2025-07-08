@@ -1,0 +1,87 @@
+{
+  "jsAST": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 0,
+      "body": [],
+      "sourceType": "module"
+    }
+  },
+  "customAST": {
+    "type": "HTML",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 97,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 97,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "start": 15,
+                    "end": 81,
+                    "type": "Element",
+                    "name": "head",
+                    "attributes": null,
+                    "children": [
+                      [
+                        {
+                          "start": 22,
+                          "end": 74,
+                          "type": "Element",
+                          "name": "link",
+                          "attributes": [
+                            {
+                              "start": 28,
+                              "end": 45,
+                              "type": "Attribute",
+                              "name": "rel",
+                              "value": [
+                                {
+                                  "start": 33,
+                                  "end": 43,
+                                  "type": "Text",
+                                  "raw": "stylesheet",
+                                  "data": "stylesheet"
+                                }
+                              ]
+                            },
+                            {
+                              "start": 45,
+                              "end": 71,
+                              "type": "Attribute",
+                              "name": "href",
+                              "value": [
+                                {
+                                  "start": 51,
+                                  "end": 69,
+                                  "type": "Text",
+                                  "raw": "/auth/css/auth.css",
+                                  "data": "/auth/css/auth.css"
+                                }
+                              ]
+                            }
+                          ],
+                          "children": []
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

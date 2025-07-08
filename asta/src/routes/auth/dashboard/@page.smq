@@ -1,0 +1,488 @@
+@script
+import '/public/dashboard/js/dashboard.js';
+import '/public/dashboard/js/theme.js';
+import 'https://cdn.jsdelivr.net/npm/chart.js'; 
+
+
+
+@end
+
+@style
+
+@end
+
+@html
+<div class="dashboard-container">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-cube"></i>
+                <span class="logo-text">DashUI</span>
+            </div>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-angle-left"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <ul class="nav-menu">
+                <li class="nav-item active">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="nav-text">Analytics</span>
+                        <i class="fas fa-angle-down submenu-indicator"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-chart-pie"></i>
+                                <span class="nav-text">Overview</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-chart-bar"></i>
+                                <span class="nav-text">Performance</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        <span class="nav-text">Users</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span class="nav-text">Settings</span>
+                        <i class="fas fa-angle-down submenu-indicator"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-user-cog"></i>
+                                <span class="nav-text">Account</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-shield-alt"></i>
+                                <span class="nav-text">Security</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-bell"></i>
+                                <span class="nav-text">Notifications</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-calendar"></i>
+                        <span class="nav-text">Calendar</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-envelope"></i>
+                        <span class="nav-text">Messages</span>
+                        <span class="badge">5</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="nav-text">Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="avatar">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" />
+                </div>
+                <div class="user-info">
+                    <span class="user-name">Jane Doe</span>
+                    <span class="user-role">Admin</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search..." />
+                </div>
+            </div>
+            
+            <div class="top-bar-right">
+                <div class="theme-toggle" id="themeToggle">
+                    <div class="toggle-thumb"></div>
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </div>
+                
+                <div class="notifications-wrapper">
+                    <div class="notifications" id="notificationsToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </div>
+                    <div class="notifications-dropdown" id="notificationsDropdown">
+                        <div class="dropdown-header">
+                            <h4>Notifications</h4>
+                            <span class="badge">3 New</span>
+                        </div>
+                        <div class="dropdown-content">
+                            <a href="#" class="notification-item">
+                                <div class="notification-icon">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <div class="notification-text">
+                                    <span class="notification-title">New user registered</span>
+                                    <span class="notification-time">2 mins ago</span>
+                                </div>
+                            </a>
+                            <a href="#" class="notification-item">
+                                <div class="notification-icon">
+                                    <i class="fas fa-server"></i>
+                                </div>
+                                <div class="notification-text">
+                                    <span class="notification-title">Server rebooted</span>
+                                    <span class="notification-time">1 hour ago</span>
+                                </div>
+                            </a>
+                            <a href="#" class="notification-item">
+                                <div class="notification-icon">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                                <div class="notification-text">
+                                    <span class="notification-title">New order received</span>
+                                    <span class="notification-time">3 hours ago</span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="dropdown-footer">
+                            <a href="#">View all notifications</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="user-dropdown-wrapper">
+                    <div class="user-dropdown" id="userDropdownToggle">
+                        <div class="avatar">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" />
+                        </div>
+                        <i class="fas fa-angle-down"></i>
+                    </div>
+                    <div class="user-dropdown-menu" id="userDropdownMenu">
+                        <div class="dropdown-header">
+                            <div class="user-info">
+                                <div class="avatar">
+                                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" />
+                                </div>
+                                <div>
+                                    <span class="user-name">Jane Doe</span>
+                                    <span class="user-role">Admin</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown-content">
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-user"></i>
+                                <span>Profile</span>
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-cog"></i>
+                                <span>Settings</span>
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>Messages</span>
+                                <span class="badge">5</span>
+                            </a>
+                        </div>
+                        <div class="dropdown-footer">
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="content-area">
+            <div class="page-header">
+                <h1><span id="dashboard-data"></span> Dashboard Overview</h1>
+                <div class="breadcrumbs">
+                    <span>Home</span>
+                    <i class="fas fa-angle-right"></i>
+                    <span>Dashboard</span>
+                </div>
+            </div>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, rgba(255,105,180,0.2) 0%, rgba(147,112,219,0.2) 100%);">
+                        <i class="fas fa-users" style="background: linear-gradient(135deg, #ff69b4 0%, #9370db 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                    </div>
+                    <div class="metric-info">
+                        <span class="metric-label">Active Users</span>
+                        <span class="metric-value">2,453</span>
+                        <span class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i> 12.5%
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, rgba(255,105,180,0.2) 0%, rgba(147,112,219,0.2) 100%);">
+                        <i class="fas fa-server" style="background: linear-gradient(135deg, #ff69b4 0%, #9370db 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                    </div>
+                    <div class="metric-info">
+                        <span class="metric-label">Server Load</span>
+                        <span class="metric-value">68%</span>
+                        <span class="metric-change negative">
+                            <i class="fas fa-arrow-up"></i> 5.2%
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, rgba(255,105,180,0.2) 0%, rgba(147,112,219,0.2) 100%);">
+                        <i class="fas fa-exchange-alt" style="background: linear-gradient(135deg, #ff69b4 0%, #9370db 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                    </div>
+                    <div class="metric-info">
+                        <span class="metric-label">Conversion Rate</span>
+                        <span class="metric-value">3.6%</span>
+                        <span class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i> 1.8%
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, rgba(255,105,180,0.2) 0%, rgba(147,112,219,0.2) 100%);">
+                        <i class="fas fa-dollar-sign" style="background: linear-gradient(135deg, #ff69b4 0%, #9370db 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                    </div>
+                    <div class="metric-info">
+                        <span class="metric-label">Revenue</span>
+                        <span class="metric-value">$48,245</span>
+                        <span class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i> 8.4%
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>User Growth</h3>
+                        <div class="chart-actions">
+                            <button class="btn-icon">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Traffic Sources</h3>
+                        <div class="chart-actions">
+                            <button class="btn-icon">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="data-table-card">
+                <div class="table-header">
+                    <h3>Recent Transactions</h3>
+                    <div class="table-actions">
+                        <button class="btn btn-sm">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                        <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus"></i> Add New
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#2458</td>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="avatar">
+                                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" />
+                                        </div>
+                                        <span>John Smith</span>
+                                    </div>
+                                </td>
+                                <td>Jun 12, 2023</td>
+                                <td>$245.00</td>
+                                <td><span class="status-badge completed">Completed</span></td>
+                                <td>
+                                    <button class="btn-icon">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#2457</td>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="avatar">
+                                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" />
+                                        </div>
+                                        <span>Jane Doe</span>
+                                    </div>
+                                </td>
+                                <td>Jun 11, 2023</td>
+                                <td>$128.50</td>
+                                <td><span class="status-badge pending">Pending</span></td>
+                                <td>
+                                    <button class="btn-icon">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#2456</td>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="avatar">
+                                            <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="User" />
+                                        </div>
+                                        <span>Robert Johnson</span>
+                                    </div>
+                                </td>
+                                <td>Jun 10, 2023</td>
+                                <td>$89.99</td>
+                                <td><span class="status-badge completed">Completed</span></td>
+                                <td>
+                                    <button class="btn-icon">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#2455</td>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="avatar">
+                                            <img src="https://randomuser.me/api/portraits/women/63.jpg" alt="User" />
+                                        </div>
+                                        <span>Sarah Williams</span>
+                                    </div>
+                                </td>
+                                <td>Jun 9, 2023</td>
+                                <td>$356.20</td>
+                                <td><span class="status-badge failed">Failed</span></td>
+                                <td>
+                                    <button class="btn-icon">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#2454</td>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="avatar">
+                                            <img src="https://randomuser.me/api/portraits/men/81.jpg" alt="User" />
+                                        </div>
+                                        <span>Michael Brown</span>
+                                    </div>
+                                </td>
+                                <td>Jun 8, 2023</td>
+                                <td>$72.50</td>
+                                <td><span class="status-badge completed">Completed</span></td>
+                                <td>
+                                    <button class="btn-icon">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-footer">
+                    <div class="table-pagination">
+                        <span>Showing 1 to 5 of 24 entries</span>
+                        <div class="pagination-controls">
+                            <button class="btn-icon disabled">
+                                <i class="fas fa-angle-left"></i>
+                            </button>
+                            <button class="btn-icon active">1</button>
+                            <button class="btn-icon">2</button>
+                            <button class="btn-icon">3</button>
+                            <button class="btn-icon">4</button>
+                            <button class="btn-icon">5</button>
+                            <button class="btn-icon">
+                                <i class="fas fa-angle-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="main-footer">
+            <div class="footer-content">
+                <span>© 2023 DashUI. All rights reserved.</span>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Help Center</a>
+                </div>
+            </div>
+        </footer>
+    </main>
+</div>

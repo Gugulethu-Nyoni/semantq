@@ -1,0 +1,1208 @@
+{
+  "jsAST": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 37,
+      "body": [
+        {
+          "type": "ImportDeclaration",
+          "start": 1,
+          "end": 36,
+          "specifiers": [],
+          "source": {
+            "type": "Literal",
+            "start": 8,
+            "end": 35,
+            "value": "/public/auth/js/signup.js",
+            "raw": "'/public/auth/js/signup.js'"
+          }
+        }
+      ],
+      "sourceType": "module"
+    }
+  },
+  "cssAST": {
+    "type": "CSS",
+    "content": {
+      "raws": {
+        "semicolon": false,
+        "after": "\n"
+      },
+      "type": "root",
+      "nodes": [
+        {
+          "raws": {
+            "before": "\n",
+            "between": " ",
+            "semicolon": true,
+            "after": "\n"
+          },
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": {
+                "before": "\n",
+                "between": ": "
+              },
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": {
+                  "css": "\n.password-toggle {\nright: 0.5rem;\nwidth: 20px;\nheight: 20px;\ndisplay: flex;\nalign-items: center;\njustify-content: center;\n}\n\n.password-toggle svg {\nwidth: 18px;\nheight: 18px;\n}\n",
+                  "hasBOM": false,
+                  "document": "\n.password-toggle {\nright: 0.5rem;\nwidth: 20px;\nheight: 20px;\ndisplay: flex;\nalign-items: center;\njustify-content: center;\n}\n\n.password-toggle svg {\nwidth: 18px;\nheight: 18px;\n}\n",
+                  "file": "/Users/gugulethu/code/semantq/asta/style"
+                },
+                "start": {
+                  "column": 1,
+                  "line": 3,
+                  "offset": 20
+                },
+                "end": {
+                  "column": 14,
+                  "line": 3,
+                  "offset": 34
+                }
+              },
+              "prop": "right",
+              "value": "0.5rem"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 4,
+                  "offset": 35
+                },
+                "end": {
+                  "column": 12,
+                  "line": 4,
+                  "offset": 47
+                }
+              },
+              "prop": "width",
+              "value": "20px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 5,
+                  "offset": 48
+                },
+                "end": {
+                  "column": 13,
+                  "line": 5,
+                  "offset": 61
+                }
+              },
+              "prop": "height",
+              "value": "20px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 6,
+                  "offset": 62
+                },
+                "end": {
+                  "column": 14,
+                  "line": 6,
+                  "offset": 76
+                }
+              },
+              "prop": "display",
+              "value": "flex"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 7,
+                  "offset": 77
+                },
+                "end": {
+                  "column": 20,
+                  "line": 7,
+                  "offset": 97
+                }
+              },
+              "prop": "align-items",
+              "value": "center"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 8,
+                  "offset": 98
+                },
+                "end": {
+                  "column": 24,
+                  "line": 8,
+                  "offset": 122
+                }
+              },
+              "prop": "justify-content",
+              "value": "center"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 2,
+              "offset": 1
+            },
+            "end": {
+              "column": 1,
+              "line": 9,
+              "offset": 124
+            }
+          },
+          "selector": ".password-toggle"
+        },
+        {
+          "raws": {
+            "before": "\n\n",
+            "between": " ",
+            "semicolon": true,
+            "after": "\n"
+          },
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 12,
+                  "offset": 149
+                },
+                "end": {
+                  "column": 12,
+                  "line": 12,
+                  "offset": 161
+                }
+              },
+              "prop": "width",
+              "value": "18px"
+            },
+            {
+              "raws": null,
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": null,
+                "start": {
+                  "column": 1,
+                  "line": 13,
+                  "offset": 162
+                },
+                "end": {
+                  "column": 13,
+                  "line": 13,
+                  "offset": 175
+                }
+              },
+              "prop": "height",
+              "value": "18px"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 11,
+              "offset": 126
+            },
+            "end": {
+              "column": 1,
+              "line": 14,
+              "offset": 177
+            }
+          },
+          "selector": ".password-toggle svg"
+        }
+      ],
+      "source": {
+        "input": null,
+        "start": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        },
+        "end": {
+          "column": 1,
+          "line": 15,
+          "offset": 178
+        }
+      }
+    }
+  },
+  "customAST": {
+    "type": "HTML",
+    "content": [
+      {
+        "html": {
+          "start": 0,
+          "end": 1302,
+          "type": "Fragment",
+          "children": [
+            {
+              "start": 0,
+              "end": 1302,
+              "type": "Element",
+              "name": "customSyntax",
+              "attributes": null,
+              "children": [
+                [
+                  {
+                    "start": 17,
+                    "end": 1286,
+                    "type": "Element",
+                    "name": "div",
+                    "attributes": [
+                      {
+                        "start": 22,
+                        "end": 44,
+                        "type": "Attribute",
+                        "name": "class",
+                        "value": [
+                          {
+                            "start": 29,
+                            "end": 43,
+                            "type": "Text",
+                            "raw": "auth-container",
+                            "data": "auth-container"
+                          }
+                        ]
+                      }
+                    ],
+                    "children": [
+                      [
+                        {
+                          "start": 46,
+                          "end": 1279,
+                          "type": "Element",
+                          "name": "div",
+                          "attributes": [
+                            {
+                              "start": 51,
+                              "end": 68,
+                              "type": "Attribute",
+                              "name": "class",
+                              "value": [
+                                {
+                                  "start": 58,
+                                  "end": 67,
+                                  "type": "Text",
+                                  "raw": "auth-card",
+                                  "data": "auth-card"
+                                }
+                              ]
+                            }
+                          ],
+                          "children": [
+                            [
+                              {
+                                "start": 70,
+                                "end": 102,
+                                "type": "Element",
+                                "name": "div",
+                                "attributes": [
+                                  {
+                                    "start": 75,
+                                    "end": 95,
+                                    "type": "Attribute",
+                                    "name": "id",
+                                    "value": [
+                                      {
+                                        "start": 79,
+                                        "end": 94,
+                                        "type": "Text",
+                                        "raw": "signup-feedback",
+                                        "data": "signup-feedback"
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "children": [
+                                  []
+                                ]
+                              },
+                              {
+                                "start": 103,
+                                "end": 1227,
+                                "type": "Element",
+                                "name": "form",
+                                "attributes": [
+                                  {
+                                    "start": 109,
+                                    "end": 127,
+                                    "type": "Attribute",
+                                    "name": "class",
+                                    "value": [
+                                      {
+                                        "start": 116,
+                                        "end": 125,
+                                        "type": "Text",
+                                        "raw": "auth-form",
+                                        "data": "auth-form"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "start": 127,
+                                    "end": 142,
+                                    "type": "Attribute",
+                                    "name": "id",
+                                    "value": [
+                                      {
+                                        "start": 131,
+                                        "end": 141,
+                                        "type": "Text",
+                                        "raw": "signupForm",
+                                        "data": "signupForm"
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "children": [
+                                  [
+                                    {
+                                      "start": 144,
+                                      "end": 167,
+                                      "type": "Element",
+                                      "name": "h2",
+                                      "attributes": null,
+                                      "children": [
+                                        [
+                                          {
+                                            "type": "Text",
+                                            "raw": "Create Account",
+                                            "data": "Create Account"
+                                          }
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "start": 169,
+                                      "end": 298,
+                                      "type": "Element",
+                                      "name": "div",
+                                      "attributes": [
+                                        {
+                                          "start": 174,
+                                          "end": 192,
+                                          "type": "Attribute",
+                                          "name": "class",
+                                          "value": [
+                                            {
+                                              "start": 181,
+                                              "end": 191,
+                                              "type": "Text",
+                                              "raw": "form-group",
+                                              "data": "form-group"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "start": 194,
+                                            "end": 231,
+                                            "type": "Element",
+                                            "name": "label",
+                                            "attributes": [
+                                              {
+                                                "start": 201,
+                                                "end": 218,
+                                                "type": "Attribute",
+                                                "name": "for",
+                                                "value": [
+                                                  {
+                                                    "start": 206,
+                                                    "end": 217,
+                                                    "type": "Text",
+                                                    "raw": "signup-name",
+                                                    "data": "signup-name"
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Name",
+                                                  "data": "Name"
+                                                }
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "start": 232,
+                                            "end": 292,
+                                            "type": "Element",
+                                            "name": "input",
+                                            "attributes": [
+                                              {
+                                                "start": 239,
+                                                "end": 251,
+                                                "type": "Attribute",
+                                                "name": "type",
+                                                "value": [
+                                                  {
+                                                    "start": 245,
+                                                    "end": 249,
+                                                    "type": "Text",
+                                                    "raw": "text",
+                                                    "data": "text"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "start": 251,
+                                                "end": 268,
+                                                "type": "Attribute",
+                                                "name": "id",
+                                                "value": [
+                                                  {
+                                                    "start": 255,
+                                                    "end": 266,
+                                                    "type": "Text",
+                                                    "raw": "signup-name",
+                                                    "data": "signup-name"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "start": 268,
+                                                "end": 280,
+                                                "type": "Attribute",
+                                                "name": "name",
+                                                "value": [
+                                                  {
+                                                    "start": 274,
+                                                    "end": 278,
+                                                    "type": "Text",
+                                                    "raw": "name",
+                                                    "data": "name"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "start": 280,
+                                                "end": 289,
+                                                "type": "Attribute",
+                                                "name": "required",
+                                                "value": true
+                                              }
+                                            ],
+                                            "children": null
+                                          }
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "start": 300,
+                                      "end": 434,
+                                      "type": "Element",
+                                      "name": "div",
+                                      "attributes": [
+                                        {
+                                          "start": 305,
+                                          "end": 323,
+                                          "type": "Attribute",
+                                          "name": "class",
+                                          "value": [
+                                            {
+                                              "start": 312,
+                                              "end": 322,
+                                              "type": "Text",
+                                              "raw": "form-group",
+                                              "data": "form-group"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "start": 325,
+                                            "end": 364,
+                                            "type": "Element",
+                                            "name": "label",
+                                            "attributes": [
+                                              {
+                                                "start": 332,
+                                                "end": 350,
+                                                "type": "Attribute",
+                                                "name": "for",
+                                                "value": [
+                                                  {
+                                                    "start": 337,
+                                                    "end": 349,
+                                                    "type": "Text",
+                                                    "raw": "signup-email",
+                                                    "data": "signup-email"
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Email",
+                                                  "data": "Email"
+                                                }
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "start": 365,
+                                            "end": 428,
+                                            "type": "Element",
+                                            "name": "input",
+                                            "attributes": [
+                                              {
+                                                "start": 372,
+                                                "end": 385,
+                                                "type": "Attribute",
+                                                "name": "type",
+                                                "value": [
+                                                  {
+                                                    "start": 378,
+                                                    "end": 383,
+                                                    "type": "Text",
+                                                    "raw": "email",
+                                                    "data": "email"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "start": 385,
+                                                "end": 403,
+                                                "type": "Attribute",
+                                                "name": "id",
+                                                "value": [
+                                                  {
+                                                    "start": 389,
+                                                    "end": 401,
+                                                    "type": "Text",
+                                                    "raw": "signup-email",
+                                                    "data": "signup-email"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "start": 403,
+                                                "end": 416,
+                                                "type": "Attribute",
+                                                "name": "name",
+                                                "value": [
+                                                  {
+                                                    "start": 409,
+                                                    "end": 414,
+                                                    "type": "Text",
+                                                    "raw": "email",
+                                                    "data": "email"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "start": 416,
+                                                "end": 425,
+                                                "type": "Attribute",
+                                                "name": "required",
+                                                "value": true
+                                              }
+                                            ],
+                                            "children": null
+                                          }
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "start": 436,
+                                      "end": 1094,
+                                      "type": "Element",
+                                      "name": "div",
+                                      "attributes": [
+                                        {
+                                          "start": 441,
+                                          "end": 459,
+                                          "type": "Attribute",
+                                          "name": "class",
+                                          "value": [
+                                            {
+                                              "start": 448,
+                                              "end": 458,
+                                              "type": "Text",
+                                              "raw": "form-group",
+                                              "data": "form-group"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "start": 461,
+                                            "end": 506,
+                                            "type": "Element",
+                                            "name": "label",
+                                            "attributes": [
+                                              {
+                                                "start": 468,
+                                                "end": 489,
+                                                "type": "Attribute",
+                                                "name": "for",
+                                                "value": [
+                                                  {
+                                                    "start": 473,
+                                                    "end": 488,
+                                                    "type": "Text",
+                                                    "raw": "signup-password",
+                                                    "data": "signup-password"
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Password",
+                                                  "data": "Password"
+                                                }
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "start": 507,
+                                            "end": 1087,
+                                            "type": "Element",
+                                            "name": "div",
+                                            "attributes": [
+                                              {
+                                                "start": 512,
+                                                "end": 536,
+                                                "type": "Attribute",
+                                                "name": "class",
+                                                "value": [
+                                                  {
+                                                    "start": 519,
+                                                    "end": 535,
+                                                    "type": "Text",
+                                                    "raw": "password-wrapper",
+                                                    "data": "password-wrapper"
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              [
+                                                {
+                                                  "start": 538,
+                                                  "end": 610,
+                                                  "type": "Element",
+                                                  "name": "input",
+                                                  "attributes": [
+                                                    {
+                                                      "start": 545,
+                                                      "end": 561,
+                                                      "type": "Attribute",
+                                                      "name": "type",
+                                                      "value": [
+                                                        {
+                                                          "start": 551,
+                                                          "end": 559,
+                                                          "type": "Text",
+                                                          "raw": "password",
+                                                          "data": "password"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "start": 561,
+                                                      "end": 582,
+                                                      "type": "Attribute",
+                                                      "name": "id",
+                                                      "value": [
+                                                        {
+                                                          "start": 565,
+                                                          "end": 580,
+                                                          "type": "Text",
+                                                          "raw": "signup-password",
+                                                          "data": "signup-password"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "start": 582,
+                                                      "end": 598,
+                                                      "type": "Attribute",
+                                                      "name": "name",
+                                                      "value": [
+                                                        {
+                                                          "start": 588,
+                                                          "end": 596,
+                                                          "type": "Text",
+                                                          "raw": "password",
+                                                          "data": "password"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "start": 598,
+                                                      "end": 607,
+                                                      "type": "Attribute",
+                                                      "name": "required",
+                                                      "value": true
+                                                    }
+                                                  ],
+                                                  "children": null
+                                                },
+                                                {
+                                                  "start": 610,
+                                                  "end": 1080,
+                                                  "type": "Element",
+                                                  "name": "button",
+                                                  "attributes": [
+                                                    {
+                                                      "start": 618,
+                                                      "end": 632,
+                                                      "type": "Attribute",
+                                                      "name": "type",
+                                                      "value": [
+                                                        {
+                                                          "start": 624,
+                                                          "end": 630,
+                                                          "type": "Text",
+                                                          "raw": "button",
+                                                          "data": "button"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "start": 632,
+                                                      "end": 656,
+                                                      "type": "Attribute",
+                                                      "name": "class",
+                                                      "value": [
+                                                        {
+                                                          "start": 639,
+                                                          "end": 654,
+                                                          "type": "Text",
+                                                          "raw": "password-toggle",
+                                                          "data": "password-toggle"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "start": 656,
+                                                      "end": 695,
+                                                      "type": "Attribute",
+                                                      "name": "aria-label",
+                                                      "value": [
+                                                        {
+                                                          "start": 668,
+                                                          "end": 694,
+                                                          "type": "Text",
+                                                          "raw": "Toggle password visibility",
+                                                          "data": "Toggle password visibility"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ],
+                                                  "children": [
+                                                    [
+                                                      {
+                                                        "start": 697,
+                                                        "end": 1070,
+                                                        "type": "Element",
+                                                        "name": "svg",
+                                                        "attributes": [
+                                                          {
+                                                            "start": 702,
+                                                            "end": 722,
+                                                            "type": "Attribute",
+                                                            "name": "viewBox",
+                                                            "value": [
+                                                              {
+                                                                "start": 711,
+                                                                "end": 720,
+                                                                "type": "Text",
+                                                                "raw": "0 0 24 24",
+                                                                "data": "0 0 24 24"
+                                                              }
+                                                            ]
+                                                          },
+                                                          {
+                                                            "start": 722,
+                                                            "end": 734,
+                                                            "type": "Attribute",
+                                                            "name": "fill",
+                                                            "value": [
+                                                              {
+                                                                "start": 728,
+                                                                "end": 732,
+                                                                "type": "Text",
+                                                                "raw": "none",
+                                                                "data": "none"
+                                                              }
+                                                            ]
+                                                          },
+                                                          {
+                                                            "start": 734,
+                                                            "end": 755,
+                                                            "type": "Attribute",
+                                                            "name": "stroke",
+                                                            "value": [
+                                                              {
+                                                                "start": 742,
+                                                                "end": 754,
+                                                                "type": "Text",
+                                                                "raw": "currentColor",
+                                                                "data": "currentColor"
+                                                              }
+                                                            ]
+                                                          }
+                                                        ],
+                                                        "children": [
+                                                          [
+                                                            {
+                                                              "start": 757,
+                                                              "end": 867,
+                                                              "type": "Element",
+                                                              "name": "path",
+                                                              "attributes": [
+                                                                {
+                                                                  "start": 763,
+                                                                  "end": 786,
+                                                                  "type": "Attribute",
+                                                                  "name": "stroke-linecap",
+                                                                  "value": [
+                                                                    {
+                                                                      "start": 779,
+                                                                      "end": 784,
+                                                                      "type": "Text",
+                                                                      "raw": "round",
+                                                                      "data": "round"
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "start": 786,
+                                                                  "end": 810,
+                                                                  "type": "Attribute",
+                                                                  "name": "stroke-linejoin",
+                                                                  "value": [
+                                                                    {
+                                                                      "start": 803,
+                                                                      "end": 808,
+                                                                      "type": "Text",
+                                                                      "raw": "round",
+                                                                      "data": "round"
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "start": 810,
+                                                                  "end": 827,
+                                                                  "type": "Attribute",
+                                                                  "name": "stroke-width",
+                                                                  "value": [
+                                                                    {
+                                                                      "start": 824,
+                                                                      "end": 825,
+                                                                      "type": "Text",
+                                                                      "raw": "2",
+                                                                      "data": "2"
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "start": 827,
+                                                                  "end": 864,
+                                                                  "type": "Attribute",
+                                                                  "name": "d",
+                                                                  "value": [
+                                                                    {
+                                                                      "start": 830,
+                                                                      "end": 862,
+                                                                      "type": "Text",
+                                                                      "raw": "M15 12a3 3 0 11-6 0 3 3 0 016 0z",
+                                                                      "data": "M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ],
+                                                              "children": null
+                                                            },
+                                                            {
+                                                              "start": 867,
+                                                              "end": 1064,
+                                                              "type": "Element",
+                                                              "name": "path",
+                                                              "attributes": [
+                                                                {
+                                                                  "start": 873,
+                                                                  "end": 896,
+                                                                  "type": "Attribute",
+                                                                  "name": "stroke-linecap",
+                                                                  "value": [
+                                                                    {
+                                                                      "start": 889,
+                                                                      "end": 894,
+                                                                      "type": "Text",
+                                                                      "raw": "round",
+                                                                      "data": "round"
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "start": 896,
+                                                                  "end": 920,
+                                                                  "type": "Attribute",
+                                                                  "name": "stroke-linejoin",
+                                                                  "value": [
+                                                                    {
+                                                                      "start": 913,
+                                                                      "end": 918,
+                                                                      "type": "Text",
+                                                                      "raw": "round",
+                                                                      "data": "round"
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "start": 920,
+                                                                  "end": 937,
+                                                                  "type": "Attribute",
+                                                                  "name": "stroke-width",
+                                                                  "value": [
+                                                                    {
+                                                                      "start": 934,
+                                                                      "end": 935,
+                                                                      "type": "Text",
+                                                                      "raw": "2",
+                                                                      "data": "2"
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "start": 937,
+                                                                  "end": 1061,
+                                                                  "type": "Attribute",
+                                                                  "name": "d",
+                                                                  "value": [
+                                                                    {
+                                                                      "start": 940,
+                                                                      "end": 1059,
+                                                                      "type": "Text",
+                                                                      "raw": "M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.269 2.943 9.542 7-1.273 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z",
+                                                                      "data": "M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.269 2.943 9.542 7-1.273 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ],
+                                                              "children": null
+                                                            }
+                                                          ]
+                                                        ]
+                                                      }
+                                                    ]
+                                                  ]
+                                                }
+                                              ]
+                                            ]
+                                          }
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "start": 1096,
+                                      "end": 1134,
+                                      "type": "Element",
+                                      "name": "button",
+                                      "attributes": [
+                                        {
+                                          "start": 1104,
+                                          "end": 1117,
+                                          "type": "Attribute",
+                                          "name": "type",
+                                          "value": [
+                                            {
+                                              "start": 1110,
+                                              "end": 1116,
+                                              "type": "Text",
+                                              "raw": "submit",
+                                              "data": "submit"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "type": "Text",
+                                            "raw": "Sign Up",
+                                            "data": "Sign Up"
+                                          }
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "start": 1135,
+                                      "end": 1219,
+                                      "type": "Element",
+                                      "name": "p",
+                                      "attributes": [
+                                        {
+                                          "start": 1138,
+                                          "end": 1157,
+                                          "type": "Attribute",
+                                          "name": "class",
+                                          "value": [
+                                            {
+                                              "start": 1145,
+                                              "end": 1156,
+                                              "type": "Text",
+                                              "raw": "auth-switch",
+                                              "data": "auth-switch"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "children": [
+                                        [
+                                          {
+                                            "type": "Text",
+                                            "raw": "Already have an account? ",
+                                            "data": "Already have an account? "
+                                          },
+                                          {
+                                            "start": 1183,
+                                            "end": 1215,
+                                            "type": "Element",
+                                            "name": "a",
+                                            "attributes": [
+                                              {
+                                                "start": 1186,
+                                                "end": 1203,
+                                                "type": "Attribute",
+                                                "name": "href",
+                                                "value": [
+                                                  {
+                                                    "start": 1192,
+                                                    "end": 1202,
+                                                    "type": "Text",
+                                                    "raw": "auth/login",
+                                                    "data": "auth/login"
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            "children": [
+                                              [
+                                                {
+                                                  "type": "Text",
+                                                  "raw": "Sign in",
+                                                  "data": "Sign in"
+                                                }
+                                              ]
+                                            ]
+                                          }
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                ]
+                              },
+                              {
+                                "start": 1229,
+                                "end": 1272,
+                                "type": "Element",
+                                "name": "div",
+                                "attributes": [
+                                  {
+                                    "start": 1234,
+                                    "end": 1251,
+                                    "type": "Attribute",
+                                    "name": "id",
+                                    "value": [
+                                      {
+                                        "start": 1238,
+                                        "end": 1249,
+                                        "type": "Text",
+                                        "raw": "auth-status",
+                                        "data": "auth-status"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "start": 1251,
+                                    "end": 1265,
+                                    "type": "Attribute",
+                                    "name": "class",
+                                    "value": [
+                                      {
+                                        "start": 1258,
+                                        "end": 1264,
+                                        "type": "Text",
+                                        "raw": "hidden",
+                                        "data": "hidden"
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "children": null
+                              }
+                            ]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
