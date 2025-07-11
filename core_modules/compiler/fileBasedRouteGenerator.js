@@ -6,7 +6,9 @@ import * as path from 'path';
  * Scans the given basePath and outputs a fileBasedRoutes.js map file
  */
 export function generateFileBasedRoutes(basePath) {
-    const fileBasedRoutes = {};
+    const fileBasedRoutes = {
+        '/404': '404'  // Add default 404 route
+    };
 
     try {
         traverseDirectory(basePath, '', fileBasedRoutes);
@@ -21,9 +23,9 @@ export function generateFileBasedRoutes(basePath) {
  * Recursively traverses directories to build route map
  */
 function traverseDirectory(directoryPath, relativePath, fileBasedRoutes) {
-    // Add default routes once
-    if (!fileBasedRoutes['/']) fileBasedRoutes['/'] = '/';
-    if (!fileBasedRoutes['/home']) fileBasedRoutes['/home'] = '/home';
+    // Add default routes if they don't exist
+    if (!fileBasedRoutes['/']) fileBasedRoutes['/'] = '';
+    if (!fileBasedRoutes['/home']) fileBasedRoutes['/home'] = 'home';
 
     const files = fs.readdirSync(directoryPath);
     files.forEach(file => {
@@ -33,10 +35,13 @@ function traverseDirectory(directoryPath, relativePath, fileBasedRoutes) {
         if (stats.isDirectory()) {
             const newRelativePath = path.posix.join(relativePath, file);
 
-            // Always prefix with a leading slash
+            // Create route key with leading slash
             const key = path.posix.join('/', newRelativePath);
-
-            fileBasedRoutes[key] = key;
+            
+            // Create route value without leading slash
+            const value = newRelativePath;
+            
+            fileBasedRoutes[key] = value;
 
             // Recurse into subdirectory
             traverseDirectory(filePath, newRelativePath, fileBasedRoutes);
@@ -62,8 +67,3 @@ function writeRoutesToFile(basePath, fileBasedRoutes) {
 
     fs.writeFileSync(filePath, fileContent);
 }
-
-// Example usage:
-// const rootDir = process.cwd();
-// const basePath = path.join(rootDir, 'build/routes');
-// generateFileBasedRoutes(basePath);
