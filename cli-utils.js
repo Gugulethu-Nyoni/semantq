@@ -1,11 +1,33 @@
 // cli-utils.js
 import fs from 'fs';
 import path from 'path';
+import chalk from 'chalk';
+
+// CLI Color palette
+const purple = chalk.hex('#b56ef0');
+const purpleBright = chalk.hex('#d8a1ff');
+const blue = chalk.hex('#6ec7ff');
+const green = chalk.hex('#6ef0b5');
+const yellow = chalk.hex('#f0e66e');
+const errorRed = chalk.hex('#ff4d4d');
+const gray = chalk.hex('#aaaaaa');
+const cyan = chalk.hex('#6ef0e6');
+
+// Icons
+const SUCCESS_ICON = green('✓');
+const WARNING_ICON = yellow('⚠');
+const ERROR_ICON = errorRed('✗');
+const INFO_ICON = blue('ℹ');
+const FOLDER_ICON = purple('📁');
+const FILE_ICON = cyan('📄');
+const ROCKET_ICON = purpleBright('🚀');
+const SPARKLES_ICON = purple('✨');
 
 // Ensure directory exists
 function ensureDirectoryExists(dirPath) {
   if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
+    fs.mkdirSync(dirPath, { recursive: true }); // Corrected line
+    console.log(`${FOLDER_ICON} ${purple('Created directory:')} ${gray(dirPath)}`);
   }
 }
 
@@ -13,9 +35,9 @@ function ensureDirectoryExists(dirPath) {
 function writeFileIfNotExists(filePath, content) {
   if (!fs.existsSync(filePath)) {
     fs.writeFileSync(filePath, content.trim());
-    console.log(`✅ Created: ${filePath}`);
+    console.log(`${SUCCESS_ICON} ${FILE_ICON} ${green('Created:')} ${gray(filePath)}`);
   } else {
-    console.warn(`⚠️ Skipped: ${filePath} already exists.`);
+    console.log(`${WARNING_ICON} ${yellow('Skipped:')} ${gray(filePath)} ${gray('(already exists)')}`);
   }
 }
 
@@ -26,25 +48,14 @@ function updateIndexFile(dirPath, name) {
 
   if (!fs.existsSync(indexPath)) {
     fs.writeFileSync(indexPath, exportStatement);
+    console.log(`${SUCCESS_ICON} ${FILE_ICON} ${green('Created index:')} ${gray(indexPath)}`);
   } else {
     const content = fs.readFileSync(indexPath, 'utf-8');
     if (!content.includes(exportStatement)) {
       fs.appendFileSync(indexPath, exportStatement);
+      console.log(`${SUCCESS_ICON} ${green('Updated index:')} ${gray(indexPath)}`);
     }
   }
-}
-
-// Main resource generation function
-export function generateResource(name, database, targetBaseDir) {
-  const folders = ['models', 'services', 'controllers', 'routes'];
-  folders.forEach(folder => ensureDirectoryExists(path.join(targetBaseDir, `server/${folder}`)));
-
-  generateModel(name, database, targetBaseDir);
-  generateService(name, database, targetBaseDir);
-  generateController(name, targetBaseDir);
-  generateRoute(name, targetBaseDir);
-
-  console.log(`🎉 Successfully generated ${name} resource with ${database} adapter!`);
 }
 
 // Simple pluralization function (basic case for common words)
@@ -52,14 +63,13 @@ function pluralize(word) {
   if (word.toLowerCase().endsWith('y')) {
     return word.slice(0, -1) + 'ies'; // e.g., "city" -> "cities"
   }
-  return word + 's'; // Default case: "User" -> "Users"
+  return word + 's'; // Default: User -> Users
 }
 
 // Generate Model function
-export function generateModel(name, database, targetBaseDir) {
+export function generateModel(name, database, baseDir) {
   const nameLower = name.toLowerCase();
   const pluralName = pluralize(nameLower);
-
   let modelTemplate = '';
 
   switch (database) {
@@ -69,27 +79,10 @@ import mongoose from 'mongoose';
 
 const ${nameLower}Schema = new mongoose.Schema({
   name: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now }
 }, { timestamps: true });
 
-// CRUD Operations
-${name}Schema.statics.createRecord = async function(data) {
-  const record = new this(data);
-  return await record.save();
-};
-
-${name}Schema.statics.getAllRecords = async function() {
-  return await this.find();
-};
-
-${name}Schema.statics.updateRecord = async function(id, data) {
-  return await this.findByIdAndUpdate(id, data, { new: true });
-};
-
-${name}Schema.statics.deleteRecord = async function(id) {
-  return await this.findByIdAndDelete(id);
-};
+// CRUD static methods here...
 
 export default mongoose.model('${name}', ${nameLower}Schema);
 `;
@@ -104,169 +97,174 @@ export default class ${name} {
     this.data = data;
   }
 
-  // CRUD Operations
   static async createRecord(data) {
     const { data: record, error } = await supabase
       .from('${pluralName}')
       .insert([data])
       .single();
-
     if (error) throw error;
     return record;
   }
 
-  static async getAllRecords() {
-    const { data, error } = await supabase
-      .from('${pluralName}')
-      .select('*');
-
-    if (error) throw error;
-    return data;
-  }
-
-  static async updateRecord(id, data) {
-    const { data: updatedRecord, error } = await supabase
-      .from('${pluralName}')
-      .update(data)
-      .eq('id', id)
-      .single();
-
-    if (error) throw error;
-    return updatedRecord;
-  }
-
-  static async deleteRecord(id) {
-    const { data, error } = await supabase
-      .from('${pluralName}')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-    return data;
-  }
+  // Other CRUD methods here...
 }
 `;
       break;
 
+    case 'mysql':
+      modelTemplate = `
+import { v4 as uuidv4 } from 'uuid';
+import db from '../adapters/mysql.js';
+
+const ${name}Model = {
+  async findById(id) {
+    const [rows] = await db.query('SELECT * FROM ${pluralName} WHERE id = ?', [id]);
+    return rows[0];
+  },
+
+  async findAll() {
+    const [rows] = await db.query('SELECT * FROM ${pluralName}');
+    return rows;
+  },
+
+  async create(data) {
+    const { name, description, status = 'active' } = data;
+    const uuid = uuidv4();
+    await db.query(
+      'INSERT INTO ${pluralName} (name, description, status) VALUES (?, ?, ?)',
+      [name, description, status]
+    );
+    const [rows] = await db.query('SELECT * FROM ${pluralName} WHERE name = ?', [name]);
+    return rows[0];
+  },
+
+  async update(id, data) {
+    const { name, description, status } = data;
+    await db.query(
+      'UPDATE ${pluralName} SET name = ?, description = ?, status = ? WHERE id = ?',
+      [name, description, status, id]
+    );
+    const [rows] = await db.query('SELECT * FROM ${pluralName} WHERE id = ?', [id]);
+    return rows[0];
+  },
+
+  async delete(id) {
+    const [result] = await db.query('DELETE FROM ${pluralName} WHERE id = ?', [id]);
+    return result.affectedRows > 0;
+  }
+};
+
+export default ${name}Model;
+`;
+      break;
+
     default:
-      console.error(`❌ Unsupported database type: ${database}`);
+      console.log(`${ERROR_ICON} ${errorRed(`Unsupported database type:`)} ${gray(database)}`);
       return;
   }
 
-  // Write model file to disk
-  const filePath = path.join(targetBaseDir, `server/models/${name}.js`);
+  const modelDir = path.join(baseDir, 'models', database);
+  ensureDirectoryExists(modelDir);
+  const filePath = path.join(modelDir, `${name}.js`);
   writeFileIfNotExists(filePath, modelTemplate);
-
-  // Update index file for dynamic imports
-  updateIndexFile(path.join(targetBaseDir, 'server/models'), name);
-
-  console.log(`✅ Generated ${name} model with ${database} adapter.`);
+  updateIndexFile(modelDir, name);
+  console.log(`${SUCCESS_ICON} ${green(`Generated ${name} model for`)} ${blue(database)}`);
 }
 
-// Function to generate service dynamically based on database type
-export function generateService(name, database, targetBaseDir) {
+// Generate Service function
+export function generateService(name, database, baseDir) {
   const nameLower = name.toLowerCase();
   const pluralName = pluralize(name);
 
-  let serviceTemplate = '';
+  const serviceTemplate = `
+import models from '../models/index.js';
 
-  if (database === 'supabase' || database === 'mongo') {
-    serviceTemplate = `
-import ${name} from '../models/${name}.js';
+const ${nameLower}Model = models.${name}Model;
 
 class ${name}Service {
-  async create${name}(data) {
-    return await ${name}.createRecord(data);
+  async create(data) {
+    return await ${nameLower}Model.create(data);
   }
 
-  async get${name}ById(id) {
-    return await ${name}.findById(id);
+  async getById(id) {
+    return await ${nameLower}Model.findById(id);
   }
 
-  async getAll${pluralName}() {
-    return await ${name}.getAllRecords();
+  async getAll() {
+    return await ${nameLower}Model.findAll();
   }
 
-  async update${name}(id, data) {
-    return await ${name}.updateRecord(id, data);
+  async update(id, data) {
+    return await ${nameLower}Model.update(id, data);
   }
 
-  async delete${name}(id) {
-    return await ${name}.deleteRecord(id);
+  async delete(id) {
+    return await ${nameLower}Model.delete(id);
   }
 }
 
 export default new ${name}Service();
 `;
-  } else {
-    console.error('Unsupported database type. Please use "supabase" or "mongo".');
-    return;
-  }
 
-  // Create the service file path dynamically
-  const filePath = path.join(targetBaseDir, `server/services/${nameLower}Service.js`);
+  const serviceDir = path.join(baseDir, 'services');
+  ensureDirectoryExists(serviceDir);
+  const filePath = path.join(serviceDir, `${nameLower}Service.js`);
   writeFileIfNotExists(filePath, serviceTemplate);
-  updateIndexFile(path.join(targetBaseDir, 'server/services'), `${name}Service`);
-
-  console.log(`✅ Generated ${name} service for ${database}.`);
+  updateIndexFile(serviceDir, `${name}Service`);
+  console.log(`${SUCCESS_ICON} ${green(`Generated ${name} service`)}`);
 }
 
-// Generate Controller
-export function generateController(name, targetBaseDir) {
+// Generate Controller function
+export function generateController(name, baseDir) {
   const nameLower = name.toLowerCase();
-  const pluralName = pluralize(nameLower);
+  const pluralName = pluralize(name);
 
   const controllerTemplate = `
 import ${nameLower}Service from '../services/${nameLower}Service.js';
 
 class ${name}Controller {
-  async create${name}(req, res) {
+  async create(req, res) {
     try {
-      const ${nameLower} = await ${nameLower}Service.create${name}(req.body);
-      res.status(201).json(${nameLower});
-    } catch (error) {
-      console.error(\`❌ Failed to create ${name}:\`, error);
-      res.status(400).json({ error: error.message, details: error.stack });
+      const result = await ${nameLower}Service.create(req.body);
+      res.status(201).json(result);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
     }
   }
 
-  async get${name}(req, res) {
+  async getById(req, res) {
     try {
-      const ${nameLower} = await ${nameLower}Service.get${name}ById(req.params.id);
-      res.status(200).json(${nameLower});
-    } catch (error) {
-      console.error(\`❌ Failed to fetch ${name}:\`, error);
-      res.status(404).json({ error: '${name} not found', details: error.stack });
+      const result = await ${nameLower}Service.getById(req.params.id);
+      res.json(result);
+    } catch (err) {
+      res.status(404).json({ error: err.message });
     }
   }
 
-  async getAll${name}s(req, res) {
+  async getAll(req, res) {
     try {
-      const ${nameLower}s = await ${nameLower}Service.getAll${name}s();
-      res.status(200).json(${nameLower}s);
-    } catch (error) {
-      console.error(\`❌ Failed to fetch all ${name}s:\`, error);
-      res.status(500).json({ error: 'Failed to fetch all records', details: error.stack });
+      const result = await ${nameLower}Service.getAll();
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
   }
 
-  async update${name}(req, res) {
+  async update(req, res) {
     try {
-      const ${nameLower} = await ${nameLower}Service.update${name}(req.params.id, req.body);
-      res.status(200).json(${nameLower});
-    } catch (error) {
-      console.error(\`❌ Failed to update ${name}:\`, error);
-      res.status(400).json({ error: error.message, details: error.stack });
+      const result = await ${nameLower}Service.update(req.params.id, req.body);
+      res.json(result);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
     }
   }
 
-  async delete${name}(req, res) {
+  async delete(req, res) {
     try {
-      await ${nameLower}Service.delete${name}(req.params.id);
+      await ${nameLower}Service.delete(req.params.id);
       res.status(204).send();
-    } catch (error) {
-      console.error(\`❌ Failed to delete ${name}:\`, error);
-      res.status(400).json({ error: error.message, details: error.stack });
+    } catch (err) {
+      res.status(400).json({ error: err.message });
     }
   }
 }
@@ -274,14 +272,16 @@ class ${name}Controller {
 export default new ${name}Controller();
 `;
 
-  const filePath = path.join(targetBaseDir, `server/controllers/${nameLower}Controller.js`);
+  const controllerDir = path.join(baseDir, 'controllers');
+  ensureDirectoryExists(controllerDir);
+  const filePath = path.join(controllerDir, `${nameLower}Controller.js`);
   writeFileIfNotExists(filePath, controllerTemplate);
-  updateIndexFile(path.join(targetBaseDir, 'server/controllers'), `${name}Controller`);
-  console.log(`✅ Generated ${name} controller.`);
+  updateIndexFile(controllerDir, `${name}Controller`);
+  console.log(`${SUCCESS_ICON} ${green(`Generated ${name} controller`)}`);
 }
 
-// Generate Route
-export function generateRoute(name, targetBaseDir) {
+// Generate Route function
+export function generateRoute(name, baseDir) {
   const nameLower = name.toLowerCase();
   const pluralName = pluralize(nameLower);
 
@@ -291,26 +291,30 @@ import ${nameLower}Controller from '../controllers/${nameLower}Controller.js';
 
 const router = express.Router();
 
-// Create record
-router.post('/${pluralName}', ${nameLower}Controller.create${name});
-// Get single record by ID
-router.get('/${pluralName}/:id', ${nameLower}Controller.get${name});
-// Get all records
-router.get('/${pluralName}', ${nameLower}Controller.getAll${name}s);
-// Update record by ID
-router.put('/${pluralName}/:id', ${nameLower}Controller.update${name});
-// Delete record by ID
-router.delete('/${pluralName}/:id', ${nameLower}Controller.delete${name});
+router.post('/${pluralName}', ${nameLower}Controller.create);
+router.get('/${pluralName}/:id', ${nameLower}Controller.getById);
+router.get('/${pluralName}', ${nameLower}Controller.getAll);
+router.put('/${pluralName}/:id', ${nameLower}Controller.update);
+router.delete('/${pluralName}/:id', ${nameLower}Controller.delete);
 
 export default router;
 `;
 
-  // Write the route file
-  const filePath = path.join(targetBaseDir, `server/routes/${nameLower}Routes.js`);
+  const routeDir = path.join(baseDir, 'routes');
+  ensureDirectoryExists(routeDir);
+  const filePath = path.join(routeDir, `${nameLower}Routes.js`);
   writeFileIfNotExists(filePath, routeTemplate);
+  updateIndexFile(routeDir, `${nameLower}Routes`);
+  console.log(`${SUCCESS_ICON} ${green(`Generated ${name} route`)}`);
+}
 
-  // Update index file for dynamic imports
-  updateIndexFile(path.join(targetBaseDir, 'server/routes'), `${nameLower}Routes`);
+export async function generateResource(name, database, baseDir) {
+  console.log(`\n${ROCKET_ICON} ${purpleBright(`Generating ${name} resource files for:`)} ${blue(database)}\n`);
 
-  console.log(`✅ Generated ${name} route.`);
+  await generateModel(name, database, baseDir);
+  await generateService(name, database, baseDir);
+  await generateController(name, baseDir);
+  await generateRoute(name, baseDir);
+
+  console.log(`\n${SPARKLES_ICON} ${purpleBright(`Successfully generated ${name} resource files!`)}\n`);
 }

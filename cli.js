@@ -4,17 +4,17 @@ import fs from 'fs-extra'; // fs-extra is imported as fs
 import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
-//import { InferenceClient } from "@huggingface/inference";
 import dotenv from 'dotenv';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
+import ora from 'ora'; // Import ora for spinners
+import degit from 'degit'; // Import degit for cloning repos
 
 // Load environment variables from .env file
 dotenv.config();
 
-//const client = new InferenceClient(process.env.HUGGINGFACE_API_KEY);
-
 // Import utility functions (ensure these are available in ./cli-utils.js)
+// Assuming these are for resource generation, not directly used in the fullstack setup chain
 import { generateResource, generateModel, generateService, generateController, generateRoute } from './cli-utils.js';
 
 // Get the current module's filename and directory (sourceBaseDir)
@@ -60,17 +60,111 @@ const gray = chalk.hex('#aaaaaa');
 
 
 // ===============================
-//  CREATE NEW PROJECT COMMAND
+// EXTRACTED: INSTALL SERVER LOGIC
+// ===============================
+// Extracted function for installing the Semantq server
+async function installSemantqServer(targetBaseDir) {
+  const serverDir = path.join(targetBaseDir, 'semantq_server');
+  const repoURL = 'https://github.com/Gugulethu-Nyoni/semantq_server.git';
+
+  try {
+    // Check if semantq_server already exists
+    try {
+      await fs.access(serverDir);
+      console.error(errorRed(`✖ Directory 'semantq_server' already exists in this project.`));
+      console.log(chalk.yellow(`› Remove it or rename it before running this command.`));
+      return false; // Indicate that installation was skipped due to existing directory
+    } catch (err) {
+      if (err.code !== 'ENOENT') {
+        throw err; // Re-throw other errors
+      }
+      // Directory does not exist, which is what we want, so continue
+    }
+
+    const spinner = ora(blue(`Cloning Semantq server package into ${purple('semantq_server/')}`)).start();
+
+    // Clone using degit
+    const emitter = degit(repoURL, { cache: false, force: true });
+    await emitter.clone(serverDir);
+
+    spinner.succeed(blue(`✓ Semantq server installed at ${purple('semantq_server/')}`));
+
+    // Install dependencies in the new server directory
+    console.log(blue(`Installing dependencies in ${purple('semantq_server/')}`));
+    execSync('npm install --silent --no-audit --no-fund', { cwd: serverDir, stdio: 'inherit' });
+
+    console.log(blue(`✓ Server dependencies installed successfully.`));
+
+    // --- IMPORTANT ADDITION FOR PERMISSIONS ---
+    const initScriptPath = path.join(serverDir, 'bin', 'init.js');
+    console.log(blue(`Setting execute permissions for ${purple('bin/init.js')}`));
+    try {
+      execSync(`chmod +x ${initScriptPath}`, { stdio: 'pipe' });
+      console.log(blue(`✓ Permissions set successfully for bin/init.js.`));
+    } catch (permissionError) {
+      console.warn(chalk.yellow(`⚠️ Could not set execute permissions for init.js: ${permissionError.message}`));
+      console.warn(chalk.yellow(`   You might need to run 'chmod +x ${initScriptPath}' manually.`));
+    }
+    // --- END IMPORTANT ADDITION ---
+    return true; // Indicate success
+  } catch (error) {
+    console.error(errorRed(`✖ Failed to install Semantq server: ${error.message}`));
+    throw error; // Re-throw to be caught by the calling command
+  }
+}
+
+// ===============================
+// EXTRACTED: ADD AUTH UI LOGIC
+// ===============================
+// Extracted function for adding the Semantq Auth UI
+async function addSemantqAuthUI(projectRoot) {
+  const tempDir = path.join(projectRoot, '.semantq_temp_auth_ui');
+  const repoUrl = 'https://github.com/Gugulethu-Nyoni/semantq_auth_ui.git';
+
+  try {
+    console.log(blue('📥 Cloning semantq_auth_ui from GitHub...'));
+    execSync(`git clone ${repoUrl} ${tempDir}`, { stdio: 'inherit' });
+
+    // Copy public/* → projectRoot/public
+    const srcPublic = path.join(tempDir, 'public');
+    const destPublic = path.join(projectRoot, 'public');
+    await fs.copy(srcPublic, destPublic, { overwrite: true }); // Ensure overwrite is true
+    console.log(blue('✅ Copied public assets to /public'));
+
+    // Copy routes/* → projectRoot/src/routes
+    const srcRoutes = path.join(tempDir, 'routes');
+    const destRoutes = path.join(projectRoot, 'src', 'routes');
+    await fs.copy(srcRoutes, destRoutes, { overwrite: true }); // Ensure overwrite is true
+    console.log(blue('✅ Copied route files to /src/routes'));
+
+    // Clean up
+    await fs.remove(tempDir);
+    console.log(gray('🧹 Removed temporary directory'));
+
+    console.log(purpleBright('\n✨ Semantq Auth UI installed successfully!\n'));
+    return true; // Indicate success
+  } catch (err) {
+    console.error(errorRed('❌ Installation failed:'), err.message);
+    throw err; // Re-throw to be caught by the calling command
+  }
+}
+
+
+// ===============================
+// CREATE NEW PROJECT COMMAND
 // ===============================
 program
   .command('create <projectName>')
   .description('Generate the project structure')
-  .action(async (projectName) => {
+  .option('-fs, --fullstack', 'Install full stack setup (client + server + auth)')
+  .action(async (projectName, options) => {
     const targetBaseDir = resolvePath(process.cwd(), projectName); // Target directory where the project is created
     const templateDirectory = resolvePath(sourceBaseDir, 'templates');
     const configDirectory = resolvePath(sourceBaseDir, 'configs');
 
     try {
+      console.log(`${purpleBright('🚀')} ${blue('Creating Semantq project:')} ${purple(projectName)}`);
+
       // Define directories to create in the target project
       const directories = [
         'src/components/global',
@@ -90,8 +184,6 @@ program
 
       // Copy specific template files
       await copyIfExists(resolvePath(templateDirectory, 'index.html'), resolvePath(targetBaseDir, 'index.html'));
-      //await copyIfExists(resolvePath(templateDirectory, 'global.js'), resolvePath(targetBasePublic, 'global.js'));
-      //await copyIfExists(resolvePath(templateDirectory, 'global.css'), resolvePath(targetBasePublic, 'global.css'));
 
       // PLACE (Copy) the router into src/semantq/router.js
       const sourceFile = path.resolve(sourceBaseDir, 'core_modules', 'router', 'router.js');
@@ -99,20 +191,18 @@ program
       const targetFile = path.join(targetDir, 'router.js');
 
       // Ensure that the target directory exists
-      fs.ensureDirSync(targetDir);  // Creates the target directory if it doesn't exist
+      fs.ensureDirSync(targetDir); // Creates the target directory if it doesn't exist
 
       // Copy the file from source to target
       fs.copySync(sourceFile, targetFile);
 
-
-      //safeCopySync(resolvePath(sourceBaseDir, 'templates/public'), resolvePath(targetBaseDir, 'public'));
       // Copy the public directory recursively
       fs.copySync(resolvePath(sourceBaseDir, 'templates/public'), resolvePath(targetBaseDir, 'public'));
 
       // Copy the public directory recursively
       fs.copySync(resolvePath(sourceBaseDir, 'templates/components'), resolvePath(targetBaseDir, 'src/components'));
-      // Create empty routes.js in src/routes
-      await fs.writeFile(resolvePath(targetBaseDir, 'src/routes/routes.js'), 'export default [];');
+      // Create empty routes.js in src/routes (this line is redundant as it's done above)
+      // await fs.writeFile(resolvePath(targetBaseDir, 'src/routes/routes.js'), 'export default [];');
 
       // Copy config files
       ['semantq.config.js','package.json', 'tsconfig.json', 'vite.config.js'].forEach(file =>
@@ -120,20 +210,58 @@ program
       );
 
       // Install dependencies in the target project
-      console.log('Installing dependencies...');
+      console.log(`${purpleBright('📦')} ${blue('Installing project dependencies...')}`);
       // Install npm packages with suppressed warnings
       execSync('npm install --silent --no-warnings --no-audit --no-fund', { cwd: targetBaseDir, stdio: 'inherit' });
       // Install development dependencies with suppressed warnings
       execSync('npm install --save-dev --silent --no-warnings --no-audit --no-fund vite@latest vite-plugin-html@latest', { cwd: targetBaseDir, stdio: 'inherit' });
 
-console.log(`${purpleBright('✓')} ${blue('Project structure generated successfully at')} ${purple(targetBaseDir)}`);
-console.log(`${gray('Now you can run this command to go to')} ${purple(projectName)} ${gray('project directory:')} ${blue(`cd ${projectName}`)}`);    } catch (error) {
-console.error(`${errorRed('✖')} ${blue('Error generating project:')} ${errorRed(error.message)}`);
-console.error(`${purpleBright('›')} ${gray('Stack trace:')} ${gray(error.stack)}`);    }
+      // --- FULL STACK SETUP ---
+      if (options.fullstack) {
+        console.log(`${purpleBright('✨')} ${blue('Setting up full stack...')}`);
+
+        // Step 1: Install server
+        console.log(`${purpleBright('🖥️')} ${blue('Installing Semantq server...')}`);
+        // Pass targetBaseDir to the extracted function
+        const serverInstalled = await installSemantqServer(targetBaseDir);
+
+        if (serverInstalled) {
+          // Step 2: Install auth module in server
+          const serverDir = path.join(targetBaseDir, 'semantq_server');
+          console.log(`${purpleBright('🔐')} ${blue('Installing auth module in server:')} ${purple('@semantq/auth')}`);
+          execSync('npm install @semantq/auth --silent --no-warnings --no-audit --no-fund', { cwd: serverDir, stdio: 'inherit' });
+          console.log(`${purpleBright('✓')} ${blue('Auth module installed in server.')}`);
+
+          // Step 3: Install auth UI in client
+          console.log(`${purpleBright('🎨')} ${blue('Installing auth UI in client...')}`);
+          // Pass targetBaseDir (project root) to the extracted function
+          await addSemantqAuthUI(targetBaseDir);
+
+          console.log(`${purpleBright('✓')} ${blue('Full stack setup complete!')}`);
+          console.log(`
+${purpleBright('» Next steps:')}
+  ${purpleBright('›')} ${gray('Configure your auth settings in')} ${purple('semantq_server/semantq.config.js')}
+  ${purpleBright('›')} ${gray('Run database migrations:')} ${purple('cd semantq_server && semantq migrate')}
+  ${purpleBright('›')} ${gray('Start both client and server:')}
+    ${purple('npm run dev')} ${gray('(in project root for client)')}
+    ${purple('npm run dev')} ${gray('(in semantq_server for server)')}
+`);
+        } else {
+            console.warn(chalk.yellow(`⚠️ Full stack setup partially completed due to existing server directory. Please check logs above.`));
+        }
+      } else {
+        console.log(`${purpleBright('✓')} ${blue('Project structure generated successfully at')} ${purple(targetBaseDir)}`);
+        console.log(`${gray('Now you can run this command to go to')} ${purple(projectName)} ${gray('project directory:')} ${blue(`cd ${projectName}`)}`);
+      }
+    } catch (error) {
+      console.error(`${errorRed('✖')} ${blue('Error generating project:')} ${errorRed(error.message)}`);
+      console.error(`${purpleBright('›')} ${gray('Stack trace:')} ${gray(error.stack)}`);
+      process.exit(1);
+    }
   });
 
 // ===============================
-//  INSTALL:TAILWIND COMMAND
+// INSTALL:TAILWIND COMMAND
 // ===============================
 program
   .command('install:tailwind')
@@ -180,28 +308,28 @@ export default defineConfig({
       const tailwindDirectives = `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`;
 
       if (fs.existsSync(globalCSSPath)) {
-  // Read the existing content
-  const existingContent = fs.readFileSync(globalCSSPath, 'utf-8');
+        // Read the existing content
+        const existingContent = fs.readFileSync(globalCSSPath, 'utf-8');
 
-  // Write Tailwind directives at the top and append the existing content
-  fs.writeFileSync(globalCSSPath, tailwindDirectives + existingContent);
-  console.log(`${purpleBright('✓')} ${blue('Appended Tailwind directives to the top of')} ${purple('global.css')}`);
-} else {
-  // Create global.css with Tailwind directives if it doesn't exist
-  fs.writeFileSync(globalCSSPath, tailwindDirectives);
-  console.log(`${purpleBright('✓')} ${blue('Created')} ${purple('global.css')} ${blue('with Tailwind directives')}`);
-}
+        // Write Tailwind directives at the top and append the existing content
+        fs.writeFileSync(globalCSSPath, tailwindDirectives + existingContent);
+        console.log(`${purpleBright('✓')} ${blue('Appended Tailwind directives to the top of')} ${purple('global.css')}`);
+      } else {
+        // Create global.css with Tailwind directives if it doesn't exist
+        fs.writeFileSync(globalCSSPath, tailwindDirectives);
+        console.log(`${purpleBright('✓')} ${blue('Created')} ${purple('global.css')} ${blue('with Tailwind directives')}`);
+      }
 
-console.log(`${purpleBright('✨')} ${blue('Tailwind CSS installed and configured successfully!')}`);
+      console.log(`${purpleBright('✨')} ${blue('Tailwind CSS installed and configured successfully!')}`);
 
-} catch (error) {
-  console.error(`${errorRed('✖')} ${blue('Error installing Tailwind CSS:')} ${errorRed(error.message)}`);
-}
+    } catch (error) {
+      console.error(`${errorRed('✖')} ${blue('Error installing Tailwind CSS:')} ${errorRed(error.message)}`);
+    }
 
   });
 
 // ===========================================
-//  MAKE:ROUTE COMMAND - FULL RESOURCES
+// MAKE:ROUTE COMMAND - FULL RESOURCES
 // ===========================================
 program
   .command('make:route <routeName>')
@@ -212,15 +340,15 @@ program
   .option('-a, --all', 'Create all resources at once')
   .action(async (routeName, options) => {
     // Note: chalk and nanospinner are imported here, ensure they are available
-    const { default: chalk } = await import('chalk');
     const { createSpinner } = await import('nanospinner');
 
     // Color palette (already defined globally, but re-defined here for local scope consistency)
-    const purple = chalk.hex('#b56ef0');
-    const purpleBright = chalk.hex('#d8a1ff');
-    const blue = chalk.hex('#6ec7ff');
-    const errorRed = chalk.hex('#ff4d4d');
-    const gray = chalk.hex('#aaaaaa');
+    // Removed redundant chalk import as it's global now
+    // const purple = chalk.hex('#b56ef0');
+    // const purpleBright = chalk.hex('#d8a1ff');
+    // const blue = chalk.hex('#6ec7ff');
+    // const errorRed = chalk.hex('#ff4d4d');
+    // const gray = chalk.hex('#aaaaaa');
 
     try {
       const routePath = resolvePath(process.cwd(), 'src/routes', routeName);
@@ -248,7 +376,7 @@ program
       const files = {
         '@page.smq': `@script\n\n@end\n\n@style\n\n@end\n\n@html\n  ${routeName} Page\n`,
         '@layout.smq': options.layout ? `@script\n// Imports only\n@end\n\n@head\n\n@end\n\n@body\n\n@end\n\n@footer\n\n@end\n` : null,
-'config.js': options.config ? `export default {
+        'config.js': options.config ? `export default {
   meta: {
     title: '${routeName}',
     description: '',
@@ -266,7 +394,7 @@ program
   },
   middleware: []
 }` : null,
-'server.js': options.server ? `export default {\n  get() { /* ... */ }\n};` : null
+        'server.js': options.server ? `export default {\n  get() { /* ... */ }\n};` : null
       };
 
       // File creation with visual feedback
@@ -311,122 +439,44 @@ ${blue('Troubleshooting:')}
 
 
 // ===============================
-//  SEMANTQ INSTALL SERVER
+// SEMANTQ INSTALL SERVER (Standalone command)
 // ===============================
-
 program
   .command('install:server')
   .description('Install the Semantq server package into your project')
   .action(async () => {
-    const { default: chalk } = await import('chalk');
-    const { execSync } = await import('child_process');
-    const degit = (await import('degit')).default;
-    const ora = (await import('ora')).default;
-    // Import fs from promises for consistent async operations
-    const fs = await import('fs/promises'); // Use fs.promises
-
     const targetBaseDir = process.cwd();
-    const serverDir = path.join(targetBaseDir, 'semantq_server');
-    const repoURL = 'https://github.com/Gugulethu-Nyoni/semantq_server.git';
-
     try {
-      // Check if semantq_server already exists
-      // Use fs.promises.access for async check
-      try {
-        await fs.access(serverDir);
-        console.error(chalk.red(`✖ Directory 'semantq_server' already exists in this project.`));
-        console.log(chalk.yellow(`› Remove it or rename it before running this command.`));
-        process.exit(1);
-      } catch (err) {
-        // Directory does not exist, which is what we want, so continue
-        if (err.code !== 'ENOENT') {
-          throw err; // Re-throw other errors
-        }
-      }
-
-      const spinner = ora(chalk.cyan(`Cloning Semantq server package into ${chalk.magenta('semantq_server/')}`)).start();
-
-      // Clone using degit
-      const emitter = degit(repoURL, { cache: false, force: true });
-      await emitter.clone(serverDir);
-
-      spinner.succeed(chalk.green(`✓ Semantq server installed at ${chalk.magenta('semantq_server/')}`));
-
-      // Install dependencies in the new server directory
-      console.log(chalk.blue(`Installing dependencies in ${chalk.magenta('semantq_server/')}`));
-      execSync('npm install --silent --no-audit --no-fund', { cwd: serverDir, stdio: 'inherit' });
-
-      console.log(chalk.green(`✓ Server dependencies installed successfully.`));
-
-      // --- IMPORTANT ADDITION FOR PERMISSIONS ---
-      const initScriptPath = path.join(serverDir, 'bin', 'init.js');
-      console.log(chalk.blue(`Setting execute permissions for ${chalk.magenta('bin/init.js')}`));
-      try {
-        // Use 'inherit' for stdio if you want to see any chmod output (usually none)
-        // Or 'pipe' for completely silent and capture output if needed for debugging
-        execSync(`chmod +x ${initScriptPath}`, { stdio: 'pipe' });
-        console.log(chalk.green(`✓ Permissions set successfully for bin/init.js.`));
-      } catch (permissionError) {
-        console.warn(chalk.yellow(`⚠️ Could not set execute permissions for init.js: ${permissionError.message}`));
-        console.warn(chalk.yellow(`   You might need to run 'chmod +x ${initScriptPath}' manually.`));
-      }
-      // --- END IMPORTANT ADDITION ---
-
+      await installSemantqServer(targetBaseDir);
       console.log(chalk.cyan.bold(`\n› Next:`));
       console.log(chalk.gray(`  › Run ${chalk.yellow('cd semantq_server')}`));
       console.log(chalk.gray(`  › Start your server with ${chalk.yellow('npm run dev')}`));
-
     } catch (error) {
-      console.error(chalk.red(`✖ Failed to install Semantq server: ${error.message}`));
+      // Error already logged by installSemantqServer
       process.exit(1);
     }
   });
 
 
-
-
 // ===============================
-// INSTALL SEMANTQ AUTH UI 
+// INSTALL SEMANTQ AUTH UI (Standalone command)
 // ===============================
 program
   .command('add:auth-ui')
   .description('Install the Semantq Auth UI into your project')
   .action(async () => {
     const projectRoot = process.cwd();
-    const tempDir = path.join(projectRoot, '.semantq_temp_auth_ui');
-    const repoUrl = 'https://github.com/Gugulethu-Nyoni/semantq_auth_ui.git'; // replace with your actual URL
-
     try {
-      console.log(chalk.cyan('📥 Cloning semantq_auth_ui from GitHub...'));
-      execSync(`git clone ${repoUrl} ${tempDir}`, { stdio: 'inherit' });
-
-      // Copy public/* → projectRoot/public
-      const srcPublic = path.join(tempDir, 'public');
-      const destPublic = path.join(projectRoot, 'public');
-      await fs.copy(srcPublic, destPublic);
-      console.log(chalk.green('✅ Copied public assets to /public'));
-
-      // Copy routes/* → projectRoot/src/routes
-      const srcRoutes = path.join(tempDir, 'routes');
-      const destRoutes = path.join(projectRoot, 'src', 'routes');
-      await fs.copy(srcRoutes, destRoutes);
-      console.log(chalk.green('✅ Copied route files to /src/routes'));
-
-      // Clean up
-      await fs.remove(tempDir);
-      console.log(chalk.gray('🧹 Removed temporary directory'));
-
-      console.log(chalk.greenBright('\n✨ Semantq Auth UI installed successfully!\n'));
-
+      await addSemantqAuthUI(projectRoot);
     } catch (err) {
-      console.error(chalk.red('❌ Installation failed:'), err.message);
+      // Error already logged by addSemantqAuthUI
       process.exit(1);
     }
   });
 
 
 // ===============================
-//  SEMANTQ AI COMMANDS
+// SEMANTQ AI COMMANDS
 // ===============================
 
 
@@ -454,7 +504,7 @@ program
       }
 
       const outputDir = path.join("src", "routes", options.route);
-      const outputPath = path.join(outputDir, "@page.html");
+      const outputPath = path.join(outputDir, "@page.html"); // Consider changing to @page.smq if appropriate
 
       // Ensure the output directory exists
       fs.ensureDirSync(outputDir);
@@ -517,16 +567,13 @@ program
 
 
 // ===============================
-//  UPDATE COMMAND
+// UPDATE COMMAND
 // ===============================
 program
   .command('update')
   .description('Update Semantq to the latest version (backup your project first)')
   .option('--dry-run', 'Show what would be updated without making changes')
   .action(async (options) => {
-    const chalk = (await import('chalk')).default;
-    const inquirer = (await import('inquirer')).default;
-    const { execSync } = await import('child_process');
     const targetDir = process.cwd();
 
     try {
@@ -602,7 +649,7 @@ program
 
 
 // ===============================
-//  ADD MODULE COMMAND
+// ADD MODULE COMMAND
 // ===============================
 program
   .command('add <moduleName>')
@@ -628,7 +675,7 @@ program
   });
 
 // ===============================
-//  MIGRATE COMMAND
+// MIGRATE COMMAND
 // ===============================
 program
   .command('migrate')
@@ -647,7 +694,7 @@ program
   });
 
 // ===============================
-//  START SERVER COMMAND
+// START SERVER COMMAND
 // ===============================
 program
   .command('start')
