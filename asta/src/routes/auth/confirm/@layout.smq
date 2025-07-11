@@ -1,8 +1,0 @@
-@head
-<link rel="stylesheet" href="/auth/css/auth.css" />
-@end
-
-@footer
-<script type="module" src="/auth/js/confirm.js"> </script>
-@end
-
