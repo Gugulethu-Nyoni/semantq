@@ -42,7 +42,7 @@ export default {
   },
 
   database: {
-    adapter: 'supabase', // can be 'supabase', 'mysql', 'mongodb', 'sqlite'
+    adapter: 'mysql', // can be 'supabase', 'mysql', 'mongodb', 'sqlite'
     config: {
       host: process.env.DB_MYSQL_HOST || 'localhost',
       port: parseInt(process.env.DB_MYSQL_PORT || '3306', 10),

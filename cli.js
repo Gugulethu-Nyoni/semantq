@@ -338,29 +338,19 @@ program
   .option('-c, --config', 'Add config file')
   .option('-s, --server', 'Add server handlers')
   .option('-a, --all', 'Create all resources at once')
+  .option('--auth', 'Add auth import to page template') // New auth flag
   .action(async (routeName, options) => {
-    // Note: chalk and nanospinner are imported here, ensure they are available
     const { createSpinner } = await import('nanospinner');
-
-    // Color palette (already defined globally, but re-defined here for local scope consistency)
-    // Removed redundant chalk import as it's global now
-    // const purple = chalk.hex('#b56ef0');
-    // const purpleBright = chalk.hex('#d8a1ff');
-    // const blue = chalk.hex('#6ec7ff');
-    // const errorRed = chalk.hex('#ff4d4d');
-    // const gray = chalk.hex('#aaaaaa');
 
     try {
       const routePath = resolvePath(process.cwd(), 'src/routes', routeName);
 
-      // Check if route exists
       if (fs.existsSync(routePath)) {
         const spinner = createSpinner(purple(`Checking route ${routeName}...`)).start();
         spinner.error({ text: errorRed('Route already exists!') });
         return;
       }
 
-      // Create all resources if -a flag is set
       if (options.all) {
         options.layout = true;
         options.config = true;
@@ -372,9 +362,13 @@ program
       fs.mkdirSync(routePath, { recursive: true });
       dirSpinner.success({ text: purpleBright('Route directory created') });
 
-      // File templates
+      // Modified file templates with auth support
+      const basePageTemplate = options.auth 
+        ? `@script\nimport '/public/auth/js/auth.js';\n@end\n\n@style\n\n@end\n\n@html\n  ${routeName} Page\n`
+        : `@script\n\n@end\n\n@style\n\n@end\n\n@html\n  ${routeName} Page\n`;
+
       const files = {
-        '@page.smq': `@script\n\n@end\n\n@style\n\n@end\n\n@html\n  ${routeName} Page\n`,
+        '@page.smq': basePageTemplate,
         '@layout.smq': options.layout ? `@script\n// Imports only\n@end\n\n@head\n\n@end\n\n@body\n\n@end\n\n@footer\n\n@end\n` : null,
         'config.js': options.config ? `export default {
   meta: {
@@ -401,7 +395,7 @@ program
       for (const [filename, content] of Object.entries(files)) {
         if (content) {
           const spinner = createSpinner(purple(`Creating ${filename}`)).start();
-          await new Promise(resolve => setTimeout(resolve, 200)); // Visual delay
+          await new Promise(resolve => setTimeout(resolve, 200));
           fs.writeFileSync(resolvePath(routePath, filename), content.trim());
           spinner.success({
             text: `${purpleBright('✓')} ${purple(filename)} ${blue('created')}`
@@ -409,18 +403,19 @@ program
         }
       }
 
-      // Success message
+      // Enhanced success message with auth info
       console.log(`
 ${purple.bold('» Route created successfully!')}
 
 ${purpleBright.bold('Files created:')}
-${purpleBright('•')} ${purple('@page.smq')} ${gray('(base template)')}
+${purpleBright('•')} ${purple('@page.smq')} ${gray('(base template)')} ${options.auth ? gray('[with auth]') : ''}
 ${options.layout ? `${purpleBright('•')} ${purple('@layout.smq')}` : ''}
 ${options.config ? `${purpleBright('•')} ${purple('config.js')}` : ''}
 ${options.server ? `${purpleBright('•')} ${purple('server.js')}` : ''}
 
 ${blue.italic('Next steps:')}
   ${purpleBright('›')} Go to ${purple(routeName)} to edit your route files
+  ${options.auth ? `${purpleBright('›')} Configure auth in ${purple('/public/auth/js/auth.js')}\n` : ''}
   ${purpleBright('›')} Then run ${purple('npm run dev')} to test
 `);
 
@@ -435,7 +430,6 @@ ${blue('Troubleshooting:')}
       process.exit(1);
     }
   });
-
 
 
 // ===============================
