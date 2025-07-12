@@ -1,6 +1,6 @@
 # Semantq
 
-**Semantq** is an AI-first, full-stack JavaScript framework for building reactive web applications and embedded (IoT) systems, including hardware, firmware, and software. The philosophy of Semantq is Automation with Control.
+**Semantq** is an AI-first, full-stack JavaScript framework for building reactive web applications and embedded (IoT) systems, including hardware, firmware, and software. The philosophy of Semantq is Laser-Focused Automation with fine-grained Control.
 
 ## Table of Contents
 - [Features](#features)
