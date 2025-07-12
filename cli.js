@@ -129,13 +129,13 @@ async function addSemantqAuthUI(projectRoot) {
     const srcPublic = path.join(tempDir, 'public');
     const destPublic = path.join(projectRoot, 'public');
     await fs.copy(srcPublic, destPublic, { overwrite: true }); // Ensure overwrite is true
-    console.log(blue('✅ Copied public assets to /public'));
+    console.log(blue('✓ Copied public assets to /public'));
 
     // Copy routes/* → projectRoot/src/routes
     const srcRoutes = path.join(tempDir, 'routes');
     const destRoutes = path.join(projectRoot, 'src', 'routes');
     await fs.copy(srcRoutes, destRoutes, { overwrite: true }); // Ensure overwrite is true
-    console.log(blue('✅ Copied route files to /src/routes'));
+    console.log(blue('✓ Copied route files to /src/routes'));
 
     // Clean up
     await fs.remove(tempDir);
@@ -144,7 +144,7 @@ async function addSemantqAuthUI(projectRoot) {
     console.log(purpleBright('\n✨ Semantq Auth UI installed successfully!\n'));
     return true; // Indicate success
   } catch (err) {
-    console.error(errorRed('❌ Installation failed:'), err.message);
+    console.error(errorRed('✖ Installation failed:'), err.message);
     throw err; // Re-throw to be caught by the calling command
   }
 }
