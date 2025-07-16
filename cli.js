@@ -260,24 +260,25 @@ ${purpleBright('» Next steps:')}
     }
   });
 
-// ===============================
+//// ===============================
 // INSTALL:TAILWIND COMMAND
 // ===============================
 program
   .command('install:tailwind')
   .description('Install and configure Tailwind CSS for Semantq')
   .action(() => {
-    const targetBaseDir = process.cwd(); // Use the current working directory as the target
+    const targetBaseDir = process.cwd();
 
     try {
       console.log(`${purpleBright('📦')} ${blue('Installing')} ${purple('Tailwind CSS')} ${blue('and dependencies')}${gray('...')}`);
-      // Step 1: Install Tailwind CSS v3, PostCSS, and Autoprefixer
+      
+      // Step 1: Install Tailwind, PostCSS, and Autoprefixer
       execSync('npm install -D tailwindcss@3 postcss autoprefixer', { cwd: targetBaseDir, stdio: 'inherit' });
 
-      // Step 2: Initialize Tailwind CSS
+      // Step 2: Initialize Tailwind (creates tailwind.config.js and postcss.config.js)
       execSync('npx tailwindcss init -p', { cwd: targetBaseDir, stdio: 'inherit' });
 
-      // Step 3: Configure Tailwind’s Content Paths in tailwind.config.js
+      // Step 3: Write Tailwind config
       const tailwindConfigPath = resolvePath(targetBaseDir, 'tailwind.config.js');
       const tailwindConfigContent = `export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx,html,smq}"],
@@ -286,36 +287,82 @@ program
   },
   plugins: [],
 };`;
-
       fs.writeFileSync(tailwindConfigPath, tailwindConfigContent);
       console.log(`${purpleBright('✓')} ${blue('Configured content paths in')} ${purple('tailwind.config.js')}`);
-      // Step 4: Create or update vite.config.js
+
+      // Step 4: Inject postcss into existing vite.config.js
       const viteConfigPath = resolvePath(targetBaseDir, 'vite.config.js');
-      const viteConfigContent = `import { defineConfig } from 'vite';
+      if (fs.existsSync(viteConfigPath)) {
+        const viteConfigOriginal = fs.readFileSync(viteConfigPath, 'utf-8');
+
+        if (!viteConfigOriginal.includes('css:') && !viteConfigOriginal.includes('postcss')) {
+          const injectedConfig = viteConfigOriginal.replace(
+            /export default\s*{/, // naive match
+            `export default {\n  css: {\n    postcss\n  },`
+          );
+
+          fs.writeFileSync(viteConfigPath, injectedConfig);
+          console.log(`${purpleBright('✓')} ${blue('Injected PostCSS into existing')} ${purple('vite.config.js')}`);
+        } else {
+          console.log(`${yellow('⚠')} ${gray('vite.config.js already has css config — skipping injection.')}`);
+        }
+      } else {
+        // Fall back to creating vite.config.js with basic Tailwind support
+        const viteConfigContent = `import Inspect from 'vite-plugin-inspect';
+import { sync } from 'glob';
+import { resolve } from 'path';
+import fse from 'fs-extra';
 import postcss from 'postcss';
 
-export default defineConfig({
+export default {
+  plugins: [Inspect()],
   css: {
     postcss
-  }
-});`;
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        index: resolve(__dirname, 'index.html'),
+        ...Object.fromEntries(
+          sync('./build/**/*.html'.replace(/\\\\/g, '/')).map((file) => [
+            file.replace(/^\\.\\/build\\//, '').replace(/\\.html$/, ''),
+            resolve(__dirname, file),
+          ])
+        ),
+      },
+    },
+    outDir: 'dist',
+    emptyOutDir: true,
+    assetsDir: 'assets',
+  },
+  async closeBundle() {
+    const buildDir = resolve(__dirname, 'build');
+    const distDir = resolve(__dirname, 'dist');
+    await fse.copy(buildDir, distDir, {
+      overwrite: true,
+      recursive: true,
+      filter: (src) => !src.endsWith(buildDir),
+    });
+    console.log('Build files copied to dist root.');
+  },
+};`;
+        fs.writeFileSync(viteConfigPath, viteConfigContent);
+        console.log(`${purpleBright('✓')} ${blue('Created new')} ${purple('vite.config.js')} ${blue('with Tailwind and build settings')}`);
+      }
 
-      fs.writeFileSync(viteConfigPath, viteConfigContent);
-      console.log(`${purpleBright('✓')} ${blue('Updated')} ${purple('vite.config.js')}`); // or 'Created' based on actual operation
-
-      // Step 5: Append Tailwind directives to global.css
+      // Step 5: Create or update global.css
       const globalCSSPath = resolvePath(targetBaseDir, 'global.css');
       const tailwindDirectives = `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`;
 
       if (fs.existsSync(globalCSSPath)) {
-        // Read the existing content
-        const existingContent = fs.readFileSync(globalCSSPath, 'utf-8');
-
-        // Write Tailwind directives at the top and append the existing content
-        fs.writeFileSync(globalCSSPath, tailwindDirectives + existingContent);
-        console.log(`${purpleBright('✓')} ${blue('Appended Tailwind directives to the top of')} ${purple('global.css')}`);
+        const existingCSS = fs.readFileSync(globalCSSPath, 'utf-8');
+        if (!existingCSS.includes('@tailwind')) {
+          fs.writeFileSync(globalCSSPath, tailwindDirectives + existingCSS);
+          console.log(`${purpleBright('✓')} ${blue('Prepended Tailwind directives to')} ${purple('global.css')}`);
+        } else {
+          console.log(`${yellow('⚠')} ${gray('Tailwind directives already exist in global.css — skipping.')}`);
+        }
       } else {
-        // Create global.css with Tailwind directives if it doesn't exist
         fs.writeFileSync(globalCSSPath, tailwindDirectives);
         console.log(`${purpleBright('✓')} ${blue('Created')} ${purple('global.css')} ${blue('with Tailwind directives')}`);
       }
@@ -325,7 +372,6 @@ export default defineConfig({
     } catch (error) {
       console.error(`${errorRed('✖')} ${blue('Error installing Tailwind CSS:')} ${errorRed(error.message)}`);
     }
-
   });
 
 // ===========================================
