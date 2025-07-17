@@ -399,7 +399,8 @@ program
   .option('-c, --config', 'Add config file')
   .option('-s, --server', 'Add server handlers')
   .option('-a, --all', 'Create all resources at once')
-  .option('--auth', 'Add auth import to page template') // New auth flag
+  .option('--auth', 'Add auth import to page template')
+  .option('-tw, --tailwind', 'Add Tailwind CSS support')
   .action(async (routeName, options) => {
     const { createSpinner } = await import('nanospinner');
 
@@ -423,10 +424,18 @@ program
       fs.mkdirSync(routePath, { recursive: true });
       dirSpinner.success({ text: purpleBright('Route directory created') });
 
-      // Modified file templates with auth support
-      const basePageTemplate = options.auth 
-        ? `@script\nimport '/public/auth/js/auth.js';\n@end\n\n@style\n\n@end\n\n@html\n  ${routeName} Page\n`
-        : `@script\n\n@end\n\n@style\n\n@end\n\n@html\n  ${routeName} Page\n`;
+      // Base template with conditional imports
+      let basePageTemplate = `@script\n`;
+      
+      if (options.auth) {
+        basePageTemplate += `import '/public/auth/js/auth.js';\n`;
+      }
+      
+      if (options.tailwind) {
+        basePageTemplate += `import '../../../global.css';\n`;
+      }
+      
+      basePageTemplate += `@end\n\n@style\n\n@end\n\n@html\n  ${routeName} Page\n`;
 
       const files = {
         '@page.smq': basePageTemplate,
@@ -464,12 +473,14 @@ program
         }
       }
 
-      // Enhanced success message with auth info
+      // Enhanced success message with Tailwind info
       console.log(`
 ${purple.bold('» Route created successfully!')}
 
 ${purpleBright.bold('Files created:')}
-${purpleBright('•')} ${purple('@page.smq')} ${gray('(base template)')} ${options.auth ? gray('[with auth]') : ''}
+${purpleBright('•')} ${purple('@page.smq')} ${gray('(base template)')} 
+${options.auth ? `${purpleBright('  →')} ${gray('With auth support')}\n` : ''}
+${options.tailwind ? `${purpleBright('  →')} ${gray('With Tailwind CSS support')}\n` : ''}
 ${options.layout ? `${purpleBright('•')} ${purple('@layout.smq')}` : ''}
 ${options.config ? `${purpleBright('•')} ${purple('config.js')}` : ''}
 ${options.server ? `${purpleBright('•')} ${purple('server.js')}` : ''}
@@ -477,6 +488,8 @@ ${options.server ? `${purpleBright('•')} ${purple('server.js')}` : ''}
 ${blue.italic('Next steps:')}
   ${purpleBright('›')} Go to ${purple(routeName)} to edit your route files
   ${options.auth ? `${purpleBright('›')} Configure auth in ${purple('/public/auth/js/auth.js')}\n` : ''}
+  ${options.tailwind ? `${purpleBright('›')} Ensure ${purple('global.css')} contains Tailwind directives\n` : ''}
+  ${options.tailwind ? `${purpleBright('›')} ${gray('Make sure Tailwind is installed:')} ${purple('semantq install:tailwind')}\n` : ''}
   ${purpleBright('›')} Then run ${purple('npm run dev')} to test
 `);
 
@@ -487,10 +500,14 @@ ${errorRed('✖ Error:')} ${error.message}
 ${blue('Troubleshooting:')}
   ${purpleBright('›')} Check directory permissions
   ${purpleBright('›')} Verify disk space
+  ${options.tailwind ? `${purpleBright('›')} Ensure Tailwind is properly configured in your project\n` : ''}
+  ${options.tailwind ? `${purpleBright('›')} Install Tailwind with ${purple('semantq install:tailwind')}\n` : ''}
 `);
       process.exit(1);
     }
   });
+
+
 
 
 // ===============================
