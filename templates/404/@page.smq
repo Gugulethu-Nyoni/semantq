@@ -1,0 +1,16 @@
+
+    <div class="jumbotron">
+        <h1 class="title">404</h1>
+        <h2 class="subtitle">Page Not Found</h2>
+        <p class="description">
+            The page you're looking for doesn't exist in this website or web app.
+        </p>
+        
+        <a href="/" class="home-button">Return to Safety</a>
+        
+        <div class="route-help">
+            <p>To create a new route:</p>
+            <p>1. Manual: Create <code>src/routes/your-route/@page.smq</code></p>
+            <p>2. CLI: Run <code>semantq make:route your-route</code></p>
+        </div>
+    </div>

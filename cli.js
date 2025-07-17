@@ -57,7 +57,12 @@ const purpleBright = chalk.hex('#d8a1ff');
 const blue = chalk.hex('#6ec7ff');
 const errorRed = chalk.hex('#ff4d4d');
 const gray = chalk.hex('#aaaaaa');
-const yellow = chalk.keyword('yellow'); 
+const yellow = chalk.hex('#ffff00'); 
+
+
+
+
+
 
 
 // ===============================
@@ -185,7 +190,16 @@ program
 
       // Copy specific template files
       await copyIfExists(resolvePath(templateDirectory, 'index.html'), resolvePath(targetBaseDir, 'index.html'));
+      
+      // NEW: Copy global.css and global.js to project root
+      await copyIfExists(resolvePath(templateDirectory, 'global.css'), resolvePath(targetBaseDir, 'global.css'));
+      await copyIfExists(resolvePath(templateDirectory, 'global.js'), resolvePath(targetBaseDir, 'global.js'));
 
+      // NEW: Copy 404.smq page from templates/404/@page.smq to project's src/routes/404/@page.smq
+      const notFoundPageSource = resolvePath(templateDirectory, '404/@page.smq');
+      const notFoundPageTarget = resolvePath(targetBaseDir, 'src/routes/404/@page.smq');
+      await fs.ensureDir(resolvePath(targetBaseDir, 'src/routes/404')); // Ensure the 404 directory exists
+      await copyIfExists(notFoundPageSource, notFoundPageTarget);
       // PLACE (Copy) the router into src/semantq/router.js
       const sourceFile = path.resolve(sourceBaseDir, 'core_modules', 'router', 'router.js');
       const targetDir = path.resolve(targetBaseDir, 'src', 'semantq');
@@ -202,14 +216,13 @@ program
 
       // Copy the public directory recursively
       fs.copySync(resolvePath(sourceBaseDir, 'templates/components'), resolvePath(targetBaseDir, 'src/components'));
-      // Create empty routes.js in src/routes (this line is redundant as it's done above)
-      // await fs.writeFile(resolvePath(targetBaseDir, 'src/routes/routes.js'), 'export default [];');
 
       // Copy config files
       ['semantq.config.js','package.json', 'tsconfig.json', 'vite.config.js'].forEach(file =>
         safeCopySync(resolvePath(configDirectory, file), resolvePath(targetBaseDir, file))
       );
 
+      // Rest of the code remains the same...
       // Install dependencies in the target project
       console.log(`${purpleBright('📦')} ${blue('Installing project dependencies...')}`);
       // Install npm packages with suppressed warnings
@@ -260,6 +273,7 @@ ${purpleBright('» Next steps:')}
       process.exit(1);
     }
   });
+
 
 //// ===============================
 // INSTALL:TAILWIND COMMAND
