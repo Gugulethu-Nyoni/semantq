@@ -4,7 +4,7 @@ const rootDir = process.cwd();
 
 export default {
   domain: process.env.DOMAIN || 'localhost',
-  targetHost: process.env.TARGET_HOST || 'https://example.com',
+  targetHost: process.env.TARGET_HOST || 'http://localhost:3000',
   pageTitle: 'My Awesome Website',
   metaDescription: 'My Awesome Website',
   metaKeywords: 'Awesome this, awesome that',
