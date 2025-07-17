@@ -9,43 +9,43 @@
 </head>
 <body>
   <div class="jumbotron">
-    <!-- Title -->
-    <div class="title">My Semantq App</div>
-
-    <!-- Subtitle -->
-    <div class="subtitle">An AI-First JavaScript Framework For Building 4IR Systems</div>
-
-    <!-- Counter Button -->
-    <div class="counter-title">Click Me!</div>
+    <h1 class="title">Semantq</h1>
+    <p class="subtitle">AI-First JavaScript Framework for Modern Applications</p>
+    
+    <div class="counter-title">Interactive Demo</div>
     <button class="counter-button" id="counter">0</button>
-
-    <!-- Links -->
+    
     <div class="links">
-      <a href="https://semantq.com" target="_blank">
+      <a href="https://semantq.com" target="_blank" aria-label="Website">
         <i class="fas fa-globe"></i> Website
       </a>
-      <a href="https://github.com/Gugulethu-Nyoni/semantq" target="_blank">
+      <a href="https://github.com/Gugulethu-Nyoni/semantq" target="_blank" aria-label="GitHub">
         <i class="fab fa-github"></i> GitHub
+      </a>
+      <a href="/docs" aria-label="Documentation">
+        <i class="fas fa-book"></i> Docs
       </a>
     </div>
   </div>
 
-  <!-- Updated script implementation -->
   <script>
-    // Wait for DOM to be fully loaded
     document.addEventListener('DOMContentLoaded', () => {
-      // Simple Counter Logic
       let count = 0;
       const counterButton = document.getElementById('counter');
       
       counterButton.addEventListener('click', () => {
         count++;
         counterButton.textContent = count;
+        if(count % 10 === 0) {
+          counterButton.style.animation = 'none';
+          setTimeout(() => {
+            counterButton.style.animation = '';
+          }, 10);
+        }
       });
     });
   </script>
   
-  <!-- Keep your module import if still needed for other functionality -->
   <script type="module" src="./global.js"></script>
 </body>
 </html>
