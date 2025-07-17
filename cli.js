@@ -57,6 +57,7 @@ const purpleBright = chalk.hex('#d8a1ff');
 const blue = chalk.hex('#6ec7ff');
 const errorRed = chalk.hex('#ff4d4d');
 const gray = chalk.hex('#aaaaaa');
+const yellow = chalk.keyword('yellow'); 
 
 
 // ===============================

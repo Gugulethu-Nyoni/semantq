@@ -1,6 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+// Import config from 2 levels up
+import config from '../../semantq.config.js';
+
 /**
  * Generate file-based routes for your project
  * Scans the given basePath and outputs a fileBasedRoutes.js map file
@@ -23,9 +26,12 @@ export function generateFileBasedRoutes(basePath) {
  * Recursively traverses directories to build route map
  */
 function traverseDirectory(directoryPath, relativePath, fileBasedRoutes) {
-    // Add default routes if they don't exist
-    if (!fileBasedRoutes['/']) fileBasedRoutes['/'] = '';
-    if (!fileBasedRoutes['/home']) fileBasedRoutes['/home'] = 'home';
+    // Use values from config
+    const rootTargetPath = config.targetHost;
+
+    // Set both '/' and '/home' to the same targetHost value
+    fileBasedRoutes['/'] = rootTargetPath;
+    fileBasedRoutes['/home'] = rootTargetPath;
 
     const files = fs.readdirSync(directoryPath);
     files.forEach(file => {
