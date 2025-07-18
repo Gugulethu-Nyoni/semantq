@@ -1,0 +1,32 @@
+@script
+import { isAuthenticated, user, accessLevel, logout } from '/public/auth/js/auth.js';
+import '/public/dashboard/js/theme.js';
+import 'https://cdn.jsdelivr.net/npm/chart.js';
+import smQL from '@semantq/ql';
+import AppConfig from '/public/auth/js/config.js';
+const baseUrl = AppConfig.BASE_URL;
+const baseOrigin = new URL(baseUrl).origin;
+
+// CRUD Operations
+// GET 
+// const data = await new smQL(`${baseOrigin}/product/products`);
+
+// POST - CREATE 
+// const newCategory = { name: 'Mobiles' }; 
+// const response = await new smQL(`${baseOrigin}/category/categories`, 'POST', newCategory);
+
+// PUT — Update 
+// const updatedCategory = { name: 'Mobile Phones' }; 
+// const response = await new smQL(`${baseOrigin}/category/categories/${categoryId}`, 'PUT', updatedCategory);
+
+// DELETE  
+// const productId = 42; 
+// const response = await new smQL(`${baseOrigin}/product/products/${productId}`, 'DELETE', null, { log: false });
+@end
+
+@style
+
+@end
+
+@html
+  categories Page

@@ -431,6 +431,8 @@ program
   .option('-s, --server', 'Add server handlers')
   .option('-a, --all', 'Create all resources at once')
   .option('--auth', 'Add auth import to page template')
+  .option('--crud', 'Add CRUD operations')
+  .option('--ac', 'Shortcut for both --auth and --crud')
   .option('-tw, --tailwind', 'Add Tailwind CSS support')
   .action(async (routeName, options) => {
     const { createSpinner } = await import('nanospinner');
@@ -442,6 +444,12 @@ program
         const spinner = createSpinner(purple(`Checking route ${routeName}...`)).start();
         spinner.error({ text: errorRed('Route already exists!') });
         return;
+      }
+
+      // Handle shortcut options
+      if (options.ac) {
+        options.auth = true;
+        options.crud = true;
       }
 
       if (options.all) {
@@ -459,18 +467,57 @@ program
       let basePageTemplate = `@script\n`;
       
       if (options.auth) {
-        basePageTemplate += `import { isAuthenticated, user, accessLevel, logout } from '/public/auth/js/auth.js';\n import '/public/dashboard/js/dashboard.js';\n`;
+        basePageTemplate += `import { isAuthenticated, user, accessLevel, logout } from '/public/auth/js/auth.js';\n`;
       }
       
+      if (options.crud) {
+        if (options.auth) {
+          basePageTemplate += `import '/public/dashboard/js/theme.js';\n`;
+        }
+        basePageTemplate += `import 'https://cdn.jsdelivr.net/npm/chart.js';\n`;
+        basePageTemplate += `import smQL from '@semantq/ql';\n`;
+        basePageTemplate += `import AppConfig from '/public/auth/js/config.js';\n`;
+        basePageTemplate += `const baseUrl = AppConfig.BASE_URL;\n`;
+        basePageTemplate += `const baseOrigin = new URL(baseUrl).origin;\n\n`;
+        
+        basePageTemplate += `// CRUD Operations\n`;
+        basePageTemplate += `// GET \n`;
+        basePageTemplate += `// const data = await new smQL(\`\${baseOrigin}/product/products\`);\n\n`;
+        
+        basePageTemplate += `// POST - CREATE \n`;
+        basePageTemplate += `// const newCategory = { name: 'Mobiles' }; \n`;
+        basePageTemplate += `// const response = await new smQL(\`\${baseOrigin}/category/categories\`, 'POST', newCategory);\n\n`;
+        
+        basePageTemplate += `// PUT — Update \n`;
+        basePageTemplate += `// const updatedCategory = { name: 'Mobile Phones' }; \n`;
+        basePageTemplate += `// const response = await new smQL(\`\${baseOrigin}/category/categories/\${categoryId}\`, 'PUT', updatedCategory);\n\n`;
+        
+        basePageTemplate += `// DELETE  \n`;
+        basePageTemplate += `// const productId = 42; \n`;
+        basePageTemplate += `// const response = await new smQL(\`\${baseOrigin}/product/products/\${productId}\`, 'DELETE', null, { log: false });\n`;
+      } else if (options.auth) {
+        basePageTemplate += `import '/public/dashboard/js/dashboard.js';\n`;
+      }      
       if (options.tailwind) {
         basePageTemplate += `import '../../../global.css';\n`;
       }
       
       basePageTemplate += `@end\n\n@style\n\n@end\n\n@html\n  ${routeName} Page\n`;
 
+      // Layout content - different for CRUD vs regular auth
+      const layoutContent = options.crud ? 
+        `@head\n` +
+        `<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />\n` +
+        `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />\n` +
+        (options.auth ? `<link href="/dashboard/css/dashboard.css" rel="stylesheet" />\n` : '') +
+        `@end\n` +
+        `@body\n\n@end\n` +
+        `@footer\n\n@end\n` :
+        `@script\n// Imports only\n@end\n\n@head\n\n@end\n\n@body\n\n@end\n\n@footer\n\n@end\n`;
+
       const files = {
         '@page.smq': basePageTemplate,
-        '@layout.smq': options.layout ? `@script\n// Imports only\n@end\n\n@head\n\n@end\n\n@body\n\n@end\n\n@footer\n\n@end\n` : null,
+        '@layout.smq': options.layout ? layoutContent : null,
         'config.js': options.config ? `export default {
   meta: {
     title: '${routeName}',
@@ -487,9 +534,11 @@ program
     type: 'fade',
     duration: 300
   },
-  middleware: []
+  middleware: []${options.auth ? `,\n  auth: true` : ''}
 }` : null,
-        'server.js': options.server ? `export default {\n  get() { /* ... */ }\n};` : null
+        'server.js': options.server ? `export default {\n  get() { /* ... */ }` + 
+          (options.crud ? `,\n  post() { /* ... */ },\n  put() { /* ... */ },\n  delete() { /* ... */ }` : '') + 
+          `\n};` : null
       };
 
       // File creation with visual feedback
@@ -504,13 +553,14 @@ program
         }
       }
 
-      // Enhanced success message with Tailwind info
+      // Enhanced success message
       console.log(`
 ${purple.bold('» Route created successfully!')}
 
 ${purpleBright.bold('Files created:')}
 ${purpleBright('•')} ${purple('@page.smq')} ${gray('(base template)')} 
 ${options.auth ? `${purpleBright('  →')} ${gray('With auth support')}\n` : ''}
+${options.crud ? `${purpleBright('  →')} ${gray('With CRUD operations')}\n` : ''}
 ${options.tailwind ? `${purpleBright('  →')} ${gray('With Tailwind CSS support')}\n` : ''}
 ${options.layout ? `${purpleBright('•')} ${purple('@layout.smq')}` : ''}
 ${options.config ? `${purpleBright('•')} ${purple('config.js')}` : ''}
@@ -519,6 +569,8 @@ ${options.server ? `${purpleBright('•')} ${purple('server.js')}` : ''}
 ${blue.italic('Next steps:')}
   ${purpleBright('›')} Go to ${purple(routeName)} to edit your route files
   ${options.auth ? `${purpleBright('›')} Configure auth in ${purple('/public/auth/js/auth.js')}\n` : ''}
+  ${options.crud ? `${purpleBright('›')} Implement CRUD functions in ${purple('@page.smq')}\n` : ''}
+  ${options.crud && !options.auth ? `${purpleBright('›')} ${gray('Add appropriate security to your public CRUD endpoints')}\n` : ''}
   ${options.tailwind ? `${purpleBright('›')} Ensure ${purple('global.css')} contains Tailwind directives\n` : ''}
   ${options.tailwind ? `${purpleBright('›')} ${gray('Make sure Tailwind is installed:')} ${purple('semantq install:tailwind')}\n` : ''}
   ${purpleBright('›')} Then run ${purple('npm run dev')} to test
@@ -537,8 +589,6 @@ ${blue('Troubleshooting:')}
       process.exit(1);
     }
   });
-
-
 
 
 // ===============================
