@@ -328,7 +328,15 @@ class ${name}Controller {
 
   async update${name}(req, res) {
     try {
-      const result = await ${nameLower}Service.update(req.params.id, req.body);
+      // Parse ID from string to integer
+      const ${nameLower}Id = parseInt(req.params.id, 10);
+
+      // Validate parsed ID
+      if (isNaN(${nameLower}Id)) {
+        return res.status(400).json({ error: 'Invalid ${name} ID provided. Must be a number.' });
+      }
+
+      const result = await ${nameLower}Service.update(${nameLower}Id, req.body);
       res.json(result);
     } catch (err) {
       res.status(400).json({ error: err.message });
@@ -337,10 +345,22 @@ class ${name}Controller {
 
   async delete${name}(req, res) {
     try {
-      await ${nameLower}Service.delete(req.params.id);
+      // Parse ID from string to integer
+      const ${nameLower}Id = parseInt(req.params.id, 10);
+
+      // Validate parsed ID
+      if (isNaN(${nameLower}Id)) {
+        return res.status(400).json({ error: 'Invalid ${name} ID provided. Must be a number.' });
+      }
+
+      await ${nameLower}Service.delete(${nameLower}Id);
       res.status(204).send();
     } catch (err) {
-      res.status(400).json({ error: err.message });
+      if (err.message.includes("Record to delete does not exist")) {
+        res.status(404).json({ error: "${name} not found." });
+      } else {
+        res.status(400).json({ error: err.message });
+      }
     }
   }
 }
@@ -355,6 +375,9 @@ export default new ${name}Controller();
   console.log(`${SUCCESS_ICON} ${green(`Generated ${name} controller`)}`);
   return true;
 }
+
+
+
 
 // Generate Route function
 export function generateRoute(name, baseDir) {
