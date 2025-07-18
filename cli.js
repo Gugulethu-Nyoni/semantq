@@ -4,6 +4,7 @@ import fs from 'fs-extra'; // fs-extra is imported as fs
 import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
+import { pathToFileURL } from 'url'; 
 import dotenv from 'dotenv';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
@@ -275,6 +276,7 @@ ${purpleBright('» Next steps:')}
   });
 
 
+
 //// ===============================
 // INSTALL:TAILWIND COMMAND
 // ===============================
@@ -428,7 +430,8 @@ program
       let basePageTemplate = `@script\n`;
       
       if (options.auth) {
-        basePageTemplate += `import '/public/auth/js/auth.js';\n`;
+        basePageTemplate += `import '/public/auth/js/auth.js';\n import '/public/dashboard/js/dashboard.js';\n
+`;
       }
       
       if (options.tailwind) {
@@ -636,6 +639,78 @@ program
     }
   });
 
+
+
+
+
+// ===============================
+// MAKE:RESOURCE COMMAND (MCSR - Model, Controller, Service, Route)
+// ===============================
+
+// function to read the config
+// Use dynamic import to support JS config files
+async function readServerConfig(projectRoot) {
+  const configPath = path.join(projectRoot, 'semantq_server', 'semantq.config.js');
+  try {
+    // Dynamically import the config file
+    const config = await import(pathToFileURL(configPath).href);
+    // Return the default export, or the entire module if no default
+    return config.default || config;
+  } catch (error) {
+    console.log(chalk.yellow(`⚠ Could not read semantq.config.js: ${error.message}`));
+    // Return a default configuration if the file cannot be read or imported
+    return { database: { adapter: 'mysql' } };
+  }
+}
+
+
+program
+  .command('make:resource <resourceName>')
+  .description('Generate full backend resource (Model, Controller, Service, Route)')
+  .action(async (resourceName) => {
+    const targetBaseDir = process.cwd();
+    const serverDir = path.join(targetBaseDir, 'semantq_server');
+    const configPath = path.join(serverDir, 'semantq.config.js');
+
+    try {
+      // Verify server directory exists
+      if (!fs.existsSync(serverDir)) {
+        console.error(errorRed('✖ semantq_server directory not found.'));
+        console.log(chalk.yellow('› Run this command from your project root with semantq_server installed.'));
+        console.log(chalk.yellow('› To install the server, run: semantq install:server'));
+        return;
+      }
+
+      // Load the configuration
+      const serverConfig = await readServerConfig(targetBaseDir);
+      
+      // Get the database adapter - this is the key fix
+      const databaseAdapter = serverConfig.database?.adapter || 'mysql';
+
+      console.log(`${purpleBright('🚀')} ${blue('Generating')} ${purple(resourceName)} ${blue('resource for')} ${purple(databaseAdapter)}`);
+
+      // Generate all resource files
+      await generateResource(resourceName, serverDir, databaseAdapter);
+
+      console.log(`${purpleBright('✨')} ${blue('Resource generation complete!')}`);
+      console.log(`
+${purpleBright('» Next steps:')}
+  ${databaseAdapter === 'mongo' ?
+    `${purpleBright('›')} ${gray('Your MongoDB model is ready to use')}` :
+    `${purpleBright('›')} ${gray('Add the model to your schema.prisma')}
+     ${purpleBright('›')} ${gray('Run:')} ${purple(`npx prisma migrate dev --name add_${resourceName.toLowerCase()}_model`)}`
+  }
+  ${purpleBright('›')} ${gray('Add the route to your main router if needed')}
+  ${purpleBright('›')} ${gray('Restart your server to apply changes')}
+`);
+    } catch (error) {
+      console.error(`${errorRed('✖')} ${blue('Error generating resource:')} ${errorRed(error.message)}`);
+      if (error.stack) {
+        console.error(`${purpleBright('›')} ${gray('Stack trace:')} ${gray(error.stack)}`);
+      }
+      process.exit(1);
+    }
+  });
 
 
 // ===============================
