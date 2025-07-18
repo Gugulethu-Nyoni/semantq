@@ -430,8 +430,7 @@ program
       let basePageTemplate = `@script\n`;
       
       if (options.auth) {
-        basePageTemplate += `import '/public/auth/js/auth.js';\n import '/public/dashboard/js/dashboard.js';\n
-`;
+        basePageTemplate += `import { isAuthenticated, user, accessLevel, logout } from '/public/auth/js/auth.js';\n import '/public/dashboard/js/dashboard.js';\n`;
       }
       
       if (options.tailwind) {
