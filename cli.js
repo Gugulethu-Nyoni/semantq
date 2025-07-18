@@ -277,6 +277,35 @@ ${purpleBright('» Next steps:')}
 
 
 
+
+// ===============================
+//  ADD MODULE COMMAND
+// ===============================
+program
+  .command('add <moduleName>')
+  .description('Add a Semantq module (e.g., @semantq/auth) to your project')
+  .action((moduleName) => { // No async needed if only execSync
+    console.log(`${purpleBright('📦')} ${blue('Adding module:')} ${purple(moduleName)}${gray('...')}`);
+    try {
+      // Ensure it's a scoped @semantq module if that's the convention
+      const fullModuleName = moduleName.startsWith('@semantq/') ? moduleName : `@semantq/${moduleName}`;
+      const projectRoot = process.cwd(); // Ensure we're installing in the current project root
+
+      // This command will run npm install in the current directory (project root)
+      execSync(`npm install ${fullModuleName}`, { cwd: projectRoot, stdio: 'inherit' });
+
+      console.log(`${purpleBright('✓')} ${blue('Module')} ${purple(fullModuleName)} ${blue('added successfully!')}`);
+      console.log(`${gray('›')} ${blue('Remember to run')} ${purple('semantq migrate')} ${blue('to apply any new database migrations for the module.')}`);
+
+    } catch (error) {
+      console.error(`${errorRed('✖')} ${blue('Failed to add module')} ${errorRed(moduleName)}: ${errorRed(error.message)}`);
+      // execSync will throw an error if the command fails, so we catch it
+      process.exit(1);
+    }
+  });
+
+
+
 //// ===============================
 // INSTALL:TAILWIND COMMAND
 // ===============================
