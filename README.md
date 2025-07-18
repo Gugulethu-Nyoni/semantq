@@ -69,6 +69,5 @@ Your app will be available at `http://localhost:5173` (or the default port).
 
 ### Application Architecture
 - [Semantq CLI](docs/SemantqCli.md) - Command line interface
-- [Semantq Full Stack Architecture](docs/SemantqQL.md) - Full Server set up with a robust plug and play database driven authentication. 
-```
+- [Semantq Full Stack Architecture](docs/SemantqQL.md) - Full Server set up with a robust plug and play database driven authentication.
 
