@@ -98,12 +98,38 @@ function cleanJSAST(node) {
     node.properties = [];
   }
 
-  // --- NEW FIX START ---
   // Handle ImportDeclaration with null specifiers
   if (node.type === 'ImportDeclaration' && node.specifiers === null) {
     node.specifiers = [];
   }
-  // --- NEW FIX END ---
+  
+  // Handle ArrayExpression with null elements
+  if (node.type === 'ArrayExpression' && node.elements === null) {
+    node.elements = [];
+  }
+
+  // Handle Literal nodes with null values
+  if (node.type === 'Literal') {
+    if (node.value === null && !node.raw) {
+      node.raw = 'null';
+    }
+    // Ensure regex literals have pattern and flags
+    if (node.regex && !node.regex.pattern) {
+      node.regex.pattern = '';
+    }
+    if (node.regex && !node.regex.flags) {
+      node.regex.flags = '';
+    }
+  }
+
+  // Handle TemplateElement nodes
+  if (node.type === 'TemplateElement') {
+    if (!node.value) {
+      node.value = { raw: '', cooked: '' };
+    } else if (!node.value.raw) {
+      node.value.raw = '';
+    }
+  }
 
   // Recursively clean child nodes
   for (const key in node) {
@@ -120,8 +146,6 @@ function cleanJSAST(node) {
 
   return node;
 }
-
-
 jsAST = cleanJSAST(jsAST);
 
 //console.log("Cleaned",JSON.stringify(jsAST, null, 2));
