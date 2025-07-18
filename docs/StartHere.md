@@ -56,6 +56,7 @@ If you want to build full stack app please follow this guide: - [Semantq Full St
 
 ## Documentation
 
+
 ### Core Features
 - [Semantq AI CLI Guide](docs/SemantqAI.md) - Generate compliant code using AI
 - [Semantq Config Guide](docs/SemantqConfig.md) - Manage app configuration
@@ -74,3 +75,8 @@ If you want to build full stack app please follow this guide: - [Semantq Full St
 - [Semantq CLI](docs/SemantqCli.md) - Command line interface
 - [Semantq Full Stack Architecture](docs/SemantqQL.md) - Full Server set up with a robust plug and play database driven authentication.
 
+## **License**
+
+Semantq is open-source software licensed under the **MIT License**.
+
+## Semantq Main Documentation: [Semantq](https://github.com/Gugulethu-Nyoni/semantq).

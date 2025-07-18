@@ -2,6 +2,10 @@
 
 **Semantq** is an AI-first, full-stack JavaScript framework for building reactive web applications and embedded (IoT) systems, including hardware, firmware, and software. The philosophy of Semantq is Laser-Focused Automation with fine-grained Control.
 
+### Start Here
+- [Quick Start](docs/StartHere.md) - quick guide for building Semantq front end and full stack apps.
+
+
 ## Table of Contents
 - [Features](#features)
 - [Installation](#installation)
