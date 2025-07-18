@@ -51,6 +51,9 @@ npm run dev
 ```
 Your app will be available at `http://localhost:5173` (or the default port).
 
+If you want to build full stack app please follow this guide: - [Semantq Full Stack Architecture](docs/SemantqQL.md) - Full Server set up with a robust plug and play database driven authentication.
+
+
 ## Documentation
 
 ### Core Features
@@ -69,6 +72,5 @@ Your app will be available at `http://localhost:5173` (or the default port).
 
 ### Application Architecture
 - [Semantq CLI](docs/SemantqCli.md) - Command line interface
-- [MSCR Architecture](docs/mscr.md) - Model-Service-Controller-Routes pattern
-```
+- [Semantq Full Stack Architecture](docs/SemantqQL.md) - Full Server set up with a robust plug and play database driven authentication.
 
