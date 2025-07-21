@@ -11,7 +11,8 @@ This guide provides a quick and comprehensive walkthrough to set up a full-stack
 * [Step 2: Configuration](#step-2-configuration)
 * [Step 3: Database Initialization](#step-3-database-initialization)
 * [Step 4: Creating a CRUD Model and Testing Auth](#step-4-creating-a-crud-model-and-testing-auth)
-* [Step 5: Building the CRUD Page](#step-5-building-the-crud-page)
+* [Step 5: Generating CRUD Resources](#step-5-generating-crud-resources)
+* [Step 6: Building the CRUD Page](#step-6-building-the-crud-page)
 * [Common Issues](#common-issues)
 
 
@@ -103,6 +104,56 @@ npx prisma migrate dev --name my_fullstack_migrations // or whatever name you pr
 
 The migrations will create the default auth tables and also create the table for the Product model you just added.
 
+Here’s a refined and professional version of your README section for clarity and ease of understanding:
+
+
+### Step 5: Generating CRUD Resources
+
+From the root of your project, run the following command in your terminal:
+
+```bash
+semantq make:resource Product
+```
+
+This will automatically generate all the essential files required for a complete CRUD workflow, including:
+
+* **Model**
+* **Controller**
+* **Service**
+* **Routes**
+
+These files will be created inside your `semantq_server` directory in the models, controllers, services and routes directories.
+
+> 💡 There is no need to manually add routes to your `server.js`. SemantqQL automatically loads and registers them on server boot.
+
+
+#### Accessing Your API Routes
+
+The route structure follows this pattern:
+
+```
+/<modelName>/<resourceName>
+```
+
+#### Examples:
+
+* For a model named `Product`, your base route will be:
+
+  ```
+  http://localhost:3001/product/products
+  ```
+
+* If your model name is in CamelCase (e.g., `ProductCategory`), the route becomes:
+
+  ```
+  http://localhost:3001/productCategory/productCategories
+  ```
+
+**Note** You can always check the semantq_server/routes/modelRoutes.js file if you are not sure of your routes. 
+
+Make sure to replace `localhost:3001` with your configured server port if different.
+
+
 #### Test the Authentication Flow
 
 Before you can test the flow there are a few important checks:
@@ -167,7 +218,7 @@ node node_modules/@semantq/auth/test-email.js
 This will output logs indicating success or failure.
 
 
-### Step 5: Building the CRUD Page
+### Step 6: Building the CRUD Page
 
 Now you'll create an authenticated page with all the necessary components for your CRUD operations.
 
