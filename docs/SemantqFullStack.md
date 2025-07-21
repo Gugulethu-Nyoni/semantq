@@ -233,18 +233,75 @@ const form = new Formique(formSchema, formSettings, formParams);
 
 // CAPTURE AND SUBMIT FORM DATA  WITH smQL and smQL Form 
 
-let formData = null;
-const formId = 'addProduct';
-const formHandler = new Form(formId);
+// Minimal code for POST data via smQL API
 
-formHandler.form.addEventListener('form:captured', async (e) => {
-  formData = e.detail;
+ new Form('addProduct', {
+  onCaptured: async (data) => {
+    await new smQL('http://localhost:3001/product/products', 'POST', data, {
+      formId: 'addProduct',
+    });
+  },
+});
 
-  const res = await new smQL('http://localhost:3001/product/products', 'POST', formData, {
-    formId: formId,
-  });
+```
+
+#### smQL Syntax Recap (Full Config) for your convinience
+
+```js
+new Form('orderForm', 'submit', {
+  debug: true,
+  onCaptured: async (data) => {
+    await new smQL('/orders', 'POST', data, {
+      formId: 'orderForm',
+      log: true,
+      headers: {
+        Authorization: 'Bearer token123',
+      },
+      successMessage: 'Order submitted successfully!',
+      errorMessage: 'Failed to submit order. Please try again.',
+    });
+  },
 });
 ```
+
+```js
+new Form('orderForm', 'submit', {
+  // Optional: logs captured data to console for debugging
+  debug: true,
+  // Required: callback function called with form data object on submit
+  onCaptured: async (data) => {
+    await new smQL('/orders', 'POST', data, {
+      // Optional: ID of the form for auto UI feedback messages
+      formId: 'orderForm',
+
+      // Optional: whether to log request and response to console (default true)
+      log: true,
+
+      // Optional: additional headers for the HTTP request
+      headers: {
+        Authorization: 'Bearer token123',
+      },
+
+      // Optional: custom success message shown in the form UI on success
+      successMessage: 'Order submitted successfully!',
+
+      // Optional: custom error message shown in the form UI on failure
+      errorMessage: 'Failed to submit order. Please try again.',
+    });
+  },
+});
+```
+
+#### Available Parameters
+
+| Parameter    | Type       | Default    | Description                                        |
+| ------------ | ---------- | ---------- | -------------------------------------------------- |
+| `formId`     | `string`   | —          | ID of the HTML form element                        |
+| `eventType`  | `string`   | `'submit'` | Event to listen for (e.g. `'submit'`, `'change'`)  |
+| `debug`      | `boolean`  | `false`    | Logs captured form data to the console             |
+| `onCaptured` | `function` | —          | Callback function executed with captured form data |
+
+
 
 #### b. Display All Products
 
@@ -253,9 +310,9 @@ Use `smQL` to fetch your product data and then render it using **AnyGrid**.
 ```javascript
 let productData;
 
-const response = new smQL('http://localhost:3001/product/products');
+const response = await new smQL('http://localhost:3001/product/products');
 
-// OR const response = new smQL('http://localhost:3001/product/products', 'GET', { log: true });
+// OR const response = await new smQL('http://localhost:3001/product/products', 'GET', { log: true });
 
 productData = response.data;
 
