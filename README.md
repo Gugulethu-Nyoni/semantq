@@ -72,6 +72,7 @@ Your app will be available at `http://localhost:5173` (or the default port).
 - [Layout System](docs/SemantqLayouts.md) - Application layout management
 
 ### Application Architecture
+- [Semantq Full Stack Quick Start](docs/SemantqFullStack.md) - Guide for Building CRUD projects with Semantq.
 - [Semantq CLI](docs/SemantqCli.md) - Command line interface
 - [Semantq Full Stack Architecture](docs/SemantqQL.md) - Full Server set up with a robust plug and play database driven authentication.
 

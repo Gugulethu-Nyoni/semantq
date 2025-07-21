@@ -432,7 +432,7 @@ program
   .option('-a, --all', 'Create all resources at once')
   .option('--auth', 'Add auth import to page template')
   .option('--crud', 'Add CRUD operations')
-  .option('--ac', 'Shortcut for both --auth and --crud')
+  .option('-ac', 'Shortcut for both --auth and --crud')
   .option('-tw, --tailwind', 'Add Tailwind CSS support')
   .action(async (routeName, options) => {
     const { createSpinner } = await import('nanospinner');
@@ -475,7 +475,9 @@ program
           basePageTemplate += `import '/public/dashboard/js/theme.js';\n`;
         }
         basePageTemplate += `import 'https://cdn.jsdelivr.net/npm/chart.js';\n`;
-        basePageTemplate += `import smQL from '@semantq/ql';\n`;
+        basePageTemplate += `import smQL, { Form } from '@semantq/ql';\n`;
+        basePageTemplate += `import Formique from '@formique/semantq';\n`;
+        basePageTemplate += `import AnyGrid from 'anygridjs';\n`;
         basePageTemplate += `import AppConfig from '/public/auth/js/config.js';\n`;
         basePageTemplate += `const baseUrl = AppConfig.BASE_URL;\n`;
         basePageTemplate += `const baseOrigin = new URL(baseUrl).origin;\n\n`;
@@ -506,15 +508,22 @@ program
 
       // Layout content - different for CRUD vs regular auth
       const layoutContent = options.crud ? 
-        `@head\n` +
-        `<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />\n` +
-        `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />\n` +
-        (options.auth ? `<link href="/dashboard/css/dashboard.css" rel="stylesheet" />\n` : '') +
-        `@end\n` +
-        `@body\n\n@end\n` +
-        `@footer\n\n@end\n` :
-        `@script\n// Imports only\n@end\n\n@head\n\n@end\n\n@body\n\n@end\n\n@footer\n\n@end\n`;
-
+          `@head\n` +
+          `<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />\n` +
+          `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />\n` +
+          `<link rel="stylesheet" href="https://unpkg.com/formique-css@1.0.11/formique-css.css" />\n` +
+          `<link rel="stylesheet" href="https://unpkg.com/anygridcss@1.0.2/anyGrid.css" anygrid-style />\n` +
+          (options.auth ? `<link href="/dashboard/css/dashboard.css" rel="stylesheet" />\n` : '') +
+          `@end\n` +
+          `@body\n\n@end\n` +
+          `@footer\n\n@end\n` :
+          `@head\n` +
+          `<link rel="stylesheet" href="https://unpkg.com/formique-css@1.0.11/formique-css.css" />\n` +
+          `<link rel="stylesheet" href="https://unpkg.com/anygridcss@1.0.2/anyGrid.css" anygrid-style />\n` +
+          `@end\n\n` +
+          `@script\n// Imports only\n@end\n\n` +
+          `@body\n\n@end\n\n` +
+          `@footer\n\n@end\n`;
       const files = {
         '@page.smq': basePageTemplate,
         '@layout.smq': options.layout ? layoutContent : null,
