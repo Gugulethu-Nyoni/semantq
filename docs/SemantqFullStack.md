@@ -46,6 +46,7 @@ This command will install the following components in your new `mycrudapp` direc
   * **semantq server**: Your back-end server.
   * **@semantq/auth**: The authentication backend.
   * **semantq auth ui**: The front-end authentication files, including routes for sign-up, login, and dashboard.
+  * **@semantq/state**: Semantq state management library for handling auth state in this case.
   * **AnyGrid**: A library for data visualization and grids.
   * **@formique/semantq**: A code, low-code, no-code JS schema-driven form library.
 
