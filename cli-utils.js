@@ -55,11 +55,36 @@ function pluralize(word) {
   return word + 's';
 }
 
+/**
+ * Converts a string to camelCase.
+ * Handles single words and multi-word PascalCase.
+ * e.g., "ProductCategory" -> "productCategory"
+ * e.g., "Product" -> "product"
+ * e.g., "driverLocation" -> "driverLocation" (no change)
+ */
+function toCamelCase(name) {
+  return name.charAt(0).toLowerCase() + name.slice(1);
+}
+
+/**
+ * Converts a string to PascalCase (first letter capitalized of each word, no hyphens).
+ * This function will primarily capitalize the first letter if the input is already camelCase
+ * or a single word.
+ * e.g., "productCategory" -> "ProductCategory"
+ * e.g., "product" -> "Product"
+ */
+function toPascalCase(name) {
+  // Ensure the name is treated as a single string for PascalCase conversion
+  // This helps if the input name is already "DriverLocation" or "productCategory"
+  return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
 // --- Resource Generation Functions ---
 
 // Generate Model function
 export function generateModel(name, database, baseDir) {
-  const nameLower = name.toLowerCase();
+  const namePascal = toPascalCase(name); // Use PascalCase for model file, class, and Mongoose model name
+  const nameCamel = toCamelCase(name); // Use camelCase for Prisma model name in queries (e.g., prisma.driverLocation)
   let modelTemplate = '';
 
   switch (database) {
@@ -67,12 +92,12 @@ export function generateModel(name, database, baseDir) {
       modelTemplate = `
 import mongoose from 'mongoose';
 
-const ${nameLower}Schema = new mongoose.Schema({
+const ${nameCamel}Schema = new mongoose.Schema({
   name: { type: String, required: true },
   createdAt: { type: Date, default: Date.now }
 }, { timestamps: true });
 
-export default mongoose.model('${name}', ${nameLower}Schema);
+export default mongoose.model('${namePascal}', ${nameCamel}Schema);
 `;
       break;
 
@@ -81,7 +106,7 @@ export default mongoose.model('${name}', ${nameLower}Schema);
       modelTemplate = `
 // Add to your schema.prisma:
 /*
-model ${name} {
+model ${namePascal} {
   id        String   @id @default(uuid())
   name      String
   createdAt DateTime @default(now())
@@ -94,69 +119,69 @@ model ${name} {
 // Import the function that returns the Prisma client promise
 import getPrismaClient from '../../lib/prisma.js';
 
-export default class ${name}Model {
+export default class ${namePascal}Model {
   /**
-   * Creates a new ${nameLower} in the database.
-   * @param {object} data - The data for the new ${nameLower}.
-   * @returns {Promise<object>} The created ${nameLower} object.
+   * Creates a new ${nameCamel} in the database.
+   * @param {object} data - The data for the new ${nameCamel}.
+   * @returns {Promise<object>} The created ${nameCamel} object.
    */
   static async create(data) {
     const prisma = await getPrismaClient(); // Get the initialized Prisma client
-    return prisma.${nameLower}.create({ data });
+    return prisma.${nameCamel}.create({ data });
   }
 
   /**
-   * Finds a ${nameLower} by its unique ID.
-   * @param {string} id - The ID of the ${nameLower} to find.
-   * @returns {Promise<object|null>} The found ${nameLower} object, or null if not found.
+   * Finds a ${nameCamel} by its unique ID.
+   * @param {string} id - The ID of the ${nameCamel} to find.
+   * @returns {Promise<object|null>} The found ${nameCamel} object, or null if not found.
    */
   static async findById(id) {
     const prisma = await getPrismaClient(); // Get the initialized Prisma client
-    return prisma.${nameLower}.findUnique({ where: { id } });
+    return prisma.${nameCamel}.findUnique({ where: { id } });
   }
 
   /**
-   * Retrieves all ${nameLower}s from the database.
-   * @returns {Promise<Array<object>>} An array of all ${nameLower} objects.
+   * Retrieves all ${nameCamel}s from the database.
+   * @returns {Promise<Array<object>>} An array of all ${nameCamel} objects.
    */
   static async findAll() {
     const prisma = await getPrismaClient(); // Get the initialized Prisma client
-    return prisma.${nameLower}.findMany();
+    return prisma.${nameCamel}.findMany();
   }
 
   /**
-   * Updates an existing ${nameLower} by its ID.
-   * @param {string} id - The ID of the ${nameLower} to update.
-   * @param {object} data - The data to update the ${nameLower} with.
-   * @returns {Promise<object>} The updated ${nameLower} object.
+   * Updates an existing ${nameCamel} by its ID.
+   * @param {string} id - The ID of the ${nameCamel} to update.
+   * @param {object} data - The data to update the ${nameCamel} with.
+   * @returns {Promise<object>} The updated ${nameCamel} object.
    */
   static async update(id, data) {
     const prisma = await getPrismaClient(); // Get the initialized Prisma client
-    return prisma.${nameLower}.update({
+    return prisma.${nameCamel}.update({
       where: { id },
       data,
     });
   }
 
   /**
-   * Deletes a ${nameLower} by its ID.
-   * @param {string} id - The ID of the ${nameLower} to delete.
-   * @returns {Promise<object>} The deleted ${nameLower} object.
+   * Deletes a ${nameCamel} by its ID.
+   * @param {string} id - The ID of the ${nameCamel} to delete.
+   * @returns {Promise<object>} The deleted ${nameCamel} object.
    */
   static async delete(id) {
     const prisma = await getPrismaClient(); // Get the initialized Prisma client
-    return prisma.${nameLower}.delete({ where: { id } });
+    return prisma.${nameCamel}.delete({ where: { id } });
   }
 
   /**
-   * Finds ${nameLower}s with pagination.
+   * Finds ${nameCamel}s with pagination.
    * @param {number} [skip=0] - The number of records to skip.
    * @param {number} [take=10] - The number of records to take.
-   * @returns {Promise<Array<object>>} An array of ${nameLower} objects for the given pagination.
+   * @returns {Promise<Array<object>>} An array of ${nameCamel} objects for the given pagination.
    */
   static async findWithPagination(skip = 0, take = 10) {
     const prisma = await getPrismaClient(); // Get the initialized Prisma client
-    return prisma.${nameLower}.findMany({
+    return prisma.${nameCamel}.findMany({
       skip,
       take,
       orderBy: { createdAt: 'desc' }, // Assuming 'createdAt' field exists for ordering
@@ -170,7 +195,7 @@ export default class ${name}Model {
       modelTemplate = `
 // Add to your schema.prisma:
 /*
-model ${name} {
+model ${namePascal} {
   id        Int      @id @default(autoincrement())
   name      String
   createdAt DateTime @default(now())
@@ -181,58 +206,58 @@ model ${name} {
 // Import the function that returns the Prisma client promise
 import getPrismaClient from '../../lib/prisma.js';
 
-export default class ${name}Model {
+export default class ${namePascal}Model {
   /**
-   * Creates a new ${nameLower} in the database.
-   * @param {object} data - The data for the new ${nameLower}.
-   * @returns {Promise<object>} The created ${nameLower} object.
+   * Creates a new ${nameCamel} in the database.
+   * @param {object} data - The data for the new ${nameCamel}.
+   * @returns {Promise<object>} The created ${nameCamel} object.
    */
   static async create(data) {
     const prisma = await getPrismaClient(); // Get the initialized Prisma client
-    return prisma.${nameLower}.create({ data });
+    return prisma.${nameCamel}.create({ data });
   }
 
   /**
-   * Finds a ${nameLower} by its unique ID.
-   * @param {string} id - The ID of the ${nameLower} to find.
-   * @returns {Promise<object|null>} The found ${nameLower} object, or null if not found.
+   * Finds a ${nameCamel} by its unique ID.
+   * @param {string} id - The ID of the ${nameCamel} to find.
+   * @returns {Promise<object|null>} The found ${nameCamel} object, or null if not found.
    */
   static async findById(id) {
     const prisma = await getPrismaClient(); // Get the initialized Prisma client
-    return prisma.${nameLower}.findUnique({ where: { id } });
+    return prisma.${nameCamel}.findUnique({ where: { id } });
   }
 
   /**
-   * Retrieves all ${nameLower}s from the database.
-   * @returns {Promise<Array<object>>} An array of all ${nameLower} objects.
+   * Retrieves all ${nameCamel}s from the database.
+   * @returns {Promise<Array<object>>} An array of all ${nameCamel} objects.
    */
   static async findAll() {
     const prisma = await getPrismaClient(); // Get the initialized Prisma client
-    return prisma.${nameLower}.findMany();
+    return prisma.${nameCamel}.findMany();
   }
 
   /**
-   * Updates an existing ${nameLower} by its ID.
-   * @param {string} id - The ID of the ${nameLower} to update.
-   * @param {object} data - The data to update the ${nameLower} with.
-   * @returns {Promise<object>} The updated ${nameLower} object.
+   * Updates an existing ${nameCamel} by its ID.
+   * @param {string} id - The ID of the ${nameCamel} to update.
+   * @param {object} data - The data to update the ${nameCamel} with.
+   * @returns {Promise<object>} The updated ${nameCamel} object.
    */
   static async update(id, data) {
     const prisma = await getPrismaClient(); // Get the initialized Prisma client
-    return prisma.${nameLower}.update({
+    return prisma.${nameCamel}.update({
       where: { id },
       data,
     });
   }
 
   /**
-   * Deletes a ${nameLower} by its ID.
-   * @param {string} id - The ID of the ${nameLower} to delete.
-   * @returns {Promise<object>} The deleted ${nameLower} object.
+   * Deletes a ${nameCamel} by its ID.
+   * @param {string} id - The ID of the ${nameCamel} to delete.
+   * @returns {Promise<object>} The deleted ${nameCamel} object.
    */
   static async delete(id) {
     const prisma = await getPrismaClient(); // Get the initialized Prisma client
-    return prisma.${nameLower}.delete({ where: { id } });
+    return prisma.${nameCamel}.delete({ where: { id } });
   }
 }
 `;
@@ -245,119 +270,121 @@ export default class ${name}Model {
 
   const modelDir = path.join(baseDir, 'models', database);
   ensureDirectoryExists(modelDir);
-  const filePath = path.join(modelDir, `${name}.js`);
+  const filePath = path.join(modelDir, `${namePascal}.js`); // File name in PascalCase
   writeFileIfNotExists(filePath, modelTemplate);
-  console.log(`${SUCCESS_ICON} ${green(`Generated ${name} model for`)} ${blue(database)}`);
+  console.log(`${SUCCESS_ICON} ${green(`Generated ${namePascal} model for`)} ${blue(database)}`);
   return true;
 }
 
 // Generate Service function
 export function generateService(name, database, baseDir) {
-  const nameLower = name.toLowerCase();
+  const namePascal = toPascalCase(name); // For class name and model import
+  const nameCamel = toCamelCase(name); // For service instance variable name and file name
 
   const serviceTemplate = `
-import ${name}Model from '../models/${database}/${name}.js';
+import ${namePascal}Model from '../models/${database}/${namePascal}.js';
 
-class ${name}Service {
+class ${namePascal}Service {
   async create(data) {
-    return await ${name}Model.create(data);
+    return await ${namePascal}Model.create(data);
   }
 
   async getById(id) {
-    return await ${name}Model.findById(id);
+    return await ${namePascal}Model.findById(id);
   }
 
   async getAll() {
-    return await ${name}Model.findAll();
+    return await ${namePascal}Model.findAll();
   }
 
   async update(id, data) {
-    return await ${name}Model.update(id, data);
+    return await ${namePascal}Model.update(id, data);
   }
 
   async delete(id) {
-    return await ${name}Model.delete(id);
+    return await ${namePascal}Model.delete(id);
   }
 }
 
-export default new ${name}Service();
+export default new ${namePascal}Service();
 `;
 
   const serviceDir = path.join(baseDir, 'services');
   ensureDirectoryExists(serviceDir);
-  const filePath = path.join(serviceDir, `${nameLower}Service.js`);
+  const filePath = path.join(serviceDir, `${nameCamel}Service.js`); // File name in camelCase
   writeFileIfNotExists(filePath, serviceTemplate);
-  console.log(`${SUCCESS_ICON} ${green(`Generated ${name} service`)}`);
+  console.log(`${SUCCESS_ICON} ${green(`Generated ${namePascal} service`)}`);
   return true;
 }
 
 // Generate Controller function
 export function generateController(name, baseDir) {
-  const nameLower = name.toLowerCase();
+  const namePascal = toPascalCase(name); // For class name and method names
+  const nameCamel = toCamelCase(name); // For service import name, service variable, and file name
 
   const controllerTemplate = `
-import ${nameLower}Service from '../services/${nameLower}Service.js';
+import ${nameCamel}Service from '../services/${nameCamel}Service.js';
 
-class ${name}Controller {
-  async create${name}(req, res) {
+class ${namePascal}Controller {
+  async create${namePascal}(req, res) {
     try {
-      const result = await ${nameLower}Service.create(req.body);
+      const result = await ${nameCamel}Service.create(req.body);
       res.status(201).json(result);
     } catch (err) {
       res.status(400).json({ error: err.message });
     }
   }
 
-  async get${name}ById(req, res) {
+  async get${namePascal}ById(req, res) {
     try {
-      const result = await ${nameLower}Service.getById(req.params.id);
+      const result = await ${nameCamel}Service.getById(req.params.id);
       res.json(result);
     } catch (err) {
       res.status(404).json({ error: err.message });
     }
   }
 
-  async getAll${name}s(req, res) {
+  async getAll${namePascal}s(req, res) {
     try {
-      const result = await ${nameLower}Service.getAll();
+      const result = await ${nameCamel}Service.getAll();
       res.json(result);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
   }
 
-  async update${name}(req, res) {
+  async update${namePascal}(req, res) {
     try {
-      // Parse ID from string to integer
-      const ${nameLower}Id = parseInt(req.params.id, 10);
+      // Parse ID from string to integer (for sqlite/mysql; mongo uses string IDs)
+      const resourceId = parseInt(req.params.id, 10);
 
       // Validate parsed ID
-      if (isNaN(${nameLower}Id)) {
-        return res.status(400).json({ error: 'Invalid ${name} ID provided. Must be a number.' });
+      if (isNaN(resourceId)) {
+        return res.status(400).json({ error: 'Invalid ${namePascal} ID provided. Must be a number.' });
       }
 
-      const result = await ${nameLower}Service.update(${nameLower}Id, req.body);
+      const result = await ${nameCamel}Service.update(resourceId, req.body);
       res.json(result);
     } catch (err) {
       res.status(400).json({ error: err.message });
     }
   }
 
-  async delete${name}(req, res) {
+  async delete${namePascal}(req, res) {
     try {
-      // Parse ID from string to integer
-      const ${nameLower}Id = parseInt(req.params.id, 10);
+      // Parse ID from string to integer (for sqlite/mysql; mongo uses string IDs)
+      const resourceId = parseInt(req.params.id, 10);
 
       // Validate parsed ID
-      if (isNaN(${nameLower}Id)) {
-        return res.status(400).json({ error: 'Invalid ${name} ID provided. Must be a number.' });
+      if (isNaN(resourceId)) {
+        return res.status(400).json({ error: 'Invalid ${namePascal} ID provided. Must be a number.' });
       }
 
-      await ${nameLower}Service.delete(${nameLower}Id);
+      await ${nameCamel}Service.delete(resourceId);
       res.status(204).send();
     } catch (err) {
       if (err.message.includes("Record to delete does not exist")) {
-        res.status(404).json({ error: "${name} not found." });
+        res.status(404).json({ error: "${namePascal} not found." });
       } else {
         res.status(400).json({ error: err.message });
       }
@@ -365,53 +392,51 @@ class ${name}Controller {
   }
 }
 
-export default new ${name}Controller();
+export default new ${namePascal}Controller();
 `;
 
   const controllerDir = path.join(baseDir, 'controllers');
   ensureDirectoryExists(controllerDir);
-  const filePath = path.join(controllerDir, `${nameLower}Controller.js`);
+  const filePath = path.join(controllerDir, `${nameCamel}Controller.js`); // File name in camelCase
   writeFileIfNotExists(filePath, controllerTemplate);
-  console.log(`${SUCCESS_ICON} ${green(`Generated ${name} controller`)}`);
+  console.log(`${SUCCESS_ICON} ${green(`Generated ${namePascal} controller`)}`);
   return true;
 }
 
-
-
-
 // Generate Route function
 export function generateRoute(name, baseDir) {
-  const nameLower = name.toLowerCase();
-  const pluralName = pluralize(nameLower);
-  const controllerName = `${nameLower}Controller`;
+  const namePascal = toPascalCase(name); // For comments and controller method calls
+  const nameCamel = toCamelCase(name); // For controller import name, route path, and file name
+  const pluralNameCamel = pluralize(nameCamel); // Pluralize the camelCase name for routes (e.g., driverLocations)
 
   const routeTemplate = `
 import express from 'express';
-import ${controllerName} from '../controllers/${controllerName}.js';
+import ${nameCamel}Controller from '../controllers/${nameCamel}Controller.js';
 
 const router = express.Router();
 
-// 🟢 Public ${name} Routes
-router.get('/${pluralName}', ${controllerName}.getAll${name}s);
-router.get('/${pluralName}/:id', ${controllerName}.get${name}ById);
-router.post('/${pluralName}', ${controllerName}.create${name});
-router.put('/${pluralName}/:id', ${controllerName}.update${name});
-router.delete('/${pluralName}/:id', ${controllerName}.delete${name});
+// 🟢 Public ${namePascal} Routes
+router.get('/${pluralNameCamel}', ${nameCamel}Controller.getAll${namePascal}s);
+router.get('/${pluralNameCamel}/:id', ${nameCamel}Controller.get${namePascal}ById);
+router.post('/${pluralNameCamel}', ${nameCamel}Controller.create${namePascal});
+router.put('/${pluralNameCamel}/:id', ${nameCamel}Controller.update${namePascal});
+router.delete('/${pluralNameCamel}/:id', ${nameCamel}Controller.delete${namePascal});
 
 export default router;
 `;
 
   const routeDir = path.join(baseDir, 'routes');
   ensureDirectoryExists(routeDir);
-  const filePath = path.join(routeDir, `${nameLower}Routes.js`);
+  const filePath = path.join(routeDir, `${nameCamel}Routes.js`); // File name in camelCase, e.g., driverLocationRoutes.js
   writeFileIfNotExists(filePath, routeTemplate);
-  console.log(`${SUCCESS_ICON} ${green(`Generated ${name} resources`)}`);
+  console.log(`${SUCCESS_ICON} ${green(`Generated ${namePascal} resources`)}`);
   return true;
 }
 
 // Main generateResource function
 export async function generateResource(name, baseDir, database) {
-  console.log(`\n${ROCKET_ICON} ${purpleBright(`Generating ${name} resource files for:`)} ${blue(database)}\n`);
+  const namePascal = toPascalCase(name); // Ensure consistent PascalCase for display
+  console.log(`\n${ROCKET_ICON} ${purpleBright(`Generating ${namePascal} resource files for:`)} ${blue(database)}\n`);
 
   if (!(await generateModel(name, database, baseDir))) {
     console.error(`${ERROR_ICON} ${errorRed('Resource generation aborted due to unsupported database type.')}`);
@@ -422,16 +447,16 @@ export async function generateResource(name, baseDir, database) {
   await generateController(name, baseDir);
   await generateRoute(name, baseDir);
 
-  console.log(`\n${SPARKLES_ICON} ${purpleBright(`Successfully generated ${name} resource files!`)}\n`);
+  console.log(`\n${SPARKLES_ICON} ${purpleBright(`Successfully generated ${namePascal} resource files!`)}\n`);
 }
 
 async function readServerConfig(projectRoot) {
   const configPath = path.join(projectRoot, 'semantq_server', 'semantq.config.js');
   try {
-    const fileUrl = typeof pathToFileURL !== 'undefined' 
+    const fileUrl = typeof pathToFileURL !== 'undefined'
       ? pathToFileURL(configPath).href
       : 'file://' + configPath.replace(/\\/g, '/');
-    
+
     const config = await import(fileUrl);
     return config.default || config;
   } catch (error) {
@@ -460,7 +485,9 @@ program
       const serverConfig = await readServerConfig(targetBaseDir);
       const databaseAdapter = serverConfig.database?.adapter || 'mysql';
 
-      console.log(`${purpleBright('🚀')} ${blue('Generating')} ${purple(resourceName)} ${blue('resource for')} ${purple(databaseAdapter)}`);
+      // Ensure the display name is PascalCase
+      const displayResourceName = toPascalCase(resourceName);
+      console.log(`${purpleBright('🚀')} ${blue('Generating')} ${purple(displayResourceName)} ${blue('resource for')} ${purple(databaseAdapter)}`);
 
       await generateResource(resourceName, serverDir, databaseAdapter);
 
@@ -470,7 +497,7 @@ ${purpleBright('» Next steps:')}
   ${databaseAdapter === 'mongo' ?
     `${purpleBright('›')} ${gray('Your MongoDB model is ready to use')}` :
     `${purpleBright('›')} ${gray('Add the model to your schema.prisma')}
-      ${purpleBright('›')} ${gray('Run:')} ${purple(`npx prisma migrate dev --name add_${resourceName.toLowerCase()}_model`)}`
+      ${purpleBright('›')} ${gray('Run:')} ${purple(`npx prisma migrate dev --name add_${toCamelCase(resourceName)}_model`)}`
   }
   ${purpleBright('›')} ${gray('Add the route to your main router if needed')}
   ${purpleBright('›')} ${gray('Restart your server to apply changes')}
