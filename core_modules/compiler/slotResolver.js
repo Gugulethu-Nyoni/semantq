@@ -456,100 +456,82 @@ processNamedSlots(newNodes, childAST) {
 
 
   resolveDefaultSlots(filePath) {
-    const parentComponentFileName = path.basename(filePath);
-    const parentComponentKey = this.isPage
-      ? "customAST"
-      : parentComponentFileName.replace(".merged.ast", "").toLowerCase();
+  const parentComponentFileName = path.basename(filePath);
+  const parentComponentKey = this.isPage
+    ? "customAST"
+    : parentComponentFileName.replace(".merged.ast", "").toLowerCase();
 
-    const parentComponentAST = this.ast[parentComponentKey];
-    const walk = new Walker();
+  const parentComponentAST = this.ast[parentComponentKey];
+  const walk = new Walker();
 
-    for (const key of Object.keys(this.componentsRegistry).reverse()) {
-      const childComponentKey = key.toLowerCase();
-      const childComponentAstBlock = this.ast[childComponentKey];
+  for (const key of Object.keys(this.componentsRegistry).reverse()) {
+    const childComponentKey = key.toLowerCase();
+    const childComponentAstBlock = this.ast[childComponentKey];
 
+    let nodeType = "Element";
+    let nodeName = key; // e.g. Card
+    let matchLogic = walk.createMatchLogic(nodeType, nodeName);
+    let returnType = { path: "name" };
 
+    const getTargetNode = walk.deepWalker(
+      parentComponentAST,
+      nodeType,
+      matchLogic,
+      returnType
+    );
 
+    if (getTargetNode.length === 0) continue;
+    // Wrap slot resolution inside forEach on all instances
+    getTargetNode.forEach(({ node: targetNode }) => {
+    const localChildAst = JSON.parse(JSON.stringify(childComponentAstBlock)); // deep clone
 
-      //const nodeType = "Element";
-            //console.log(typeof walk.createMatchLogic(nodeType, key));
-
-      let nodeType = "Element";
-      let nodeName = key; // e.g. Card
-      let matchLogic = walk.createMatchLogic(nodeType, nodeName);
-      let returnType = { path: "name" };
-      // Call deepWalker with the correct arguments
-      const getTargetNode = walk.deepWalker(
-        parentComponentAST, 
-        nodeType,  
-        matchLogic,         
-        returnType         
-      );
-
-      //console.log(getTargetNode);
-
-      if (getTargetNode.length === 0) continue; // skip this one
-      const targetNode = getTargetNode[0].node;
       const targetNodeChildren = walk.findChildren(targetNode);
-       nodeType = "Element";
-       nodeName = "slot"; 
-       matchLogic = walk.createMatchLogic(nodeType, nodeName);
-       returnType = { path: "name" };
 
-      // Call deepWalker with the correct arguments
+      nodeType = "Element";
+      nodeName = "slot";
+      matchLogic = walk.createMatchLogic(nodeType, nodeName);
+      returnType = { path: "name" };
+
       const getSlotNode = walk.deepWalker(
         childComponentAstBlock,
-        nodeType,              
-        matchLogic,            
-        returnType             
+        nodeType,
+        matchLogic,
+        returnType
       );
-
-      //console.log("HERE",getSlotNode);
-      //return;
 
       let contentToSet = '';
 
       if (getSlotNode.length !== 0) {
-
         const slotNode = getSlotNode[0].node;
         const slotFallBackChildren = walk.findChildren(slotNode);
         contentToSet = targetNodeChildren?.[0]?.length > 0
           ? targetNodeChildren[0][0]
           : slotFallBackChildren?.[0]?.[0];
 
-        
-
-        const slotNodeLocations = new GetNodePositions(childComponentAstBlock, slotNode).init();
+        const slotNodeLocations = new GetNodePositions(localChildAst, slotNode).init();
         const parentNode = slotNodeLocations[0]?.parentNode;
         const targetNodeIndex = slotNodeLocations[0]?.nodeIndex;
 
         if (parentNode?.children?.[0]?.[targetNodeIndex]) {
           parentNode.children[0][targetNodeIndex] = contentToSet;
-        }  
-
-
+        }
       }
-      
 
       const parentNodeLocations = new GetNodePositions(parentComponentAST, targetNode).init();
       const actualParentNode = parentNodeLocations[0]?.parentNode;
       const actualTargetNodeIndex = parentNodeLocations[0]?.nodeIndex;
 
       if (actualParentNode?.children?.[0]?.[actualTargetNodeIndex]) {
-        //console.log("Ngena???");
-        actualParentNode.children[0][actualTargetNodeIndex] = childComponentAstBlock;
-        //console.log(JSON.stringify(actualParentNode,null,2));
+        actualParentNode.children[0][actualTargetNodeIndex] = localChildAst;
       }
+    });
 
-
-      delete this.ast[childComponentKey];
-
-            //console.log("HERE JS",JSON.stringify(this.ast['jsAST'],null,2));
-
-    }
-
-    //this.writeResolvedAstFile();
+    delete this.ast[childComponentKey];
   }
+
+  //this.writeResolvedAstFile();
+}
+
 
   writeResolvedAstFile(parentComponentKey) {
     if (!this.ast || !this.filePath) throw new Error("AST data or filePath is missing");

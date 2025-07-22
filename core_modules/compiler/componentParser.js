@@ -3,6 +3,7 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import * as cheerio from 'cheerio';
 import { parse } from 'acorn';
+//import { parse } from 'esprima';
 import postcss from 'postcss';
 import escodegen from 'escodegen';
 import parser from './semantq_parser.js'; 
@@ -55,8 +56,11 @@ async function parseComponent(filePath) {
       customCode = code.substring(startIndex, endIndex + endMarker.length).trim();
     }
 
-    let jsAST = parse(jsCode, { ecmaVersion: 2023, sourceType: "module" });
+    let jsAST = parse(jsCode, { ecmaVersion: 2024, sourceType: "module" });
     //let jsAST = esprima.parseScript(code);
+
+    //console.log("JS Code",jsCode);
+    //let jsAST = parse(jsCode, { comment: true, loc: true });
     let cssAST = postcss.parse(cssCode, { from: 'style' });
     let customAST = parser.parse(customCode);
 
@@ -68,6 +72,16 @@ async function parseComponent(filePath) {
 
 function cleanJSAST(node) {
   if (!node || typeof node !== 'object') return node;
+
+  // Fix Property nodes in ObjectPattern with shorthand=true and null value
+  if (
+    node.type === 'Property' &&
+    node.shorthand === true &&
+    node.value === null &&
+    node.key && node.key.type === 'Identifier'
+  ) {
+    node.value = { ...node.key }; // Mirror the key in value
+  }
 
   // Handle CallExpression argument null issue
   if (node.type === 'CallExpression' && node.arguments === null) {
@@ -146,6 +160,10 @@ function cleanJSAST(node) {
 
   return node;
 }
+
+
+
+
 jsAST = cleanJSAST(jsAST);
 
 //console.log("Cleaned",JSON.stringify(jsAST, null, 2));
