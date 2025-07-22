@@ -36,7 +36,8 @@
 npm install semantq
 ```
 
-### Install Globally (for use anywhere on your system)
+### Install Globally (for use anywhere on your system) - this is the recommended approach
+
 ```bash
 npm install -g semantq
 ```
