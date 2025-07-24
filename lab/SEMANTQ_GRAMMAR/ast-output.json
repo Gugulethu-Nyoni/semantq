@@ -1,0 +1,199 @@
+{
+  "html": {
+    "start": {
+      "offset": 0,
+      "line": 1,
+      "column": 1
+    },
+    "end": {
+      "offset": 63,
+      "line": 5,
+      "column": 1
+    },
+    "type": "Fragment",
+    "children": [
+      {
+        "type": "IfStatement",
+        "start": {
+          "offset": 0,
+          "line": 1,
+          "column": 1
+        },
+        "end": {
+          "offset": 63,
+          "line": 5,
+          "column": 1
+        },
+        "test": {
+          "type": "MemberExpression",
+          "start": {
+            "offset": 5,
+            "line": 2,
+            "column": 5
+          },
+          "end": {
+            "offset": 18,
+            "line": 2,
+            "column": 18
+          },
+          "object": {
+            "type": "Identifier",
+            "start": {
+              "offset": 5,
+              "line": 2,
+              "column": 5
+            },
+            "end": {
+              "offset": 9,
+              "line": 2,
+              "column": 9
+            },
+            "name": "user"
+          },
+          "property": {
+            "type": "Identifier",
+            "start": {
+              "offset": 10,
+              "line": 2,
+              "column": 10
+            },
+            "end": {
+              "offset": 18,
+              "line": 2,
+              "column": 18
+            },
+            "name": "loggedIn"
+          }
+        },
+        "consequent": {
+          "type": "BlockStatement",
+          "start": {
+            "offset": 0,
+            "line": 1,
+            "column": 1
+          },
+          "end": {
+            "offset": 63,
+            "line": 5,
+            "column": 1
+          },
+          "body": [
+            {
+              "start": 22,
+              "end": 25,
+              "name": "p",
+              "attributes": null
+            },
+            {
+              "start": 22,
+              "end": 56,
+              "type": "Element",
+              "name": "p",
+              "attributes": [],
+              "children": [
+                {
+                  "type": "MixedContent",
+                  "start": {
+                    "offset": 25,
+                    "line": 3,
+                    "column": 6
+                  },
+                  "end": {
+                    "offset": 51,
+                    "line": 3,
+                    "column": 32
+                  },
+                  "children": [
+                    {
+                      "type": "TextNode",
+                      "value": "Welcome back,",
+                      "start": {
+                        "offset": 25,
+                        "line": 3,
+                        "column": 6
+                      },
+                      "end": {
+                        "offset": 39,
+                        "line": 3,
+                        "column": 20
+                      }
+                    },
+                    {
+                      "type": "MustacheTag",
+                      "expression": {
+                        "type": "MemberExpression",
+                        "start": {
+                          "offset": 40,
+                          "line": 3,
+                          "column": 21
+                        },
+                        "end": {
+                          "offset": 49,
+                          "line": 3,
+                          "column": 30
+                        },
+                        "object": {
+                          "type": "Identifier",
+                          "start": {
+                            "offset": 40,
+                            "line": 3,
+                            "column": 21
+                          },
+                          "end": {
+                            "offset": 44,
+                            "line": 3,
+                            "column": 25
+                          },
+                          "name": "user"
+                        },
+                        "property": {
+                          "type": "Identifier",
+                          "start": {
+                            "offset": 45,
+                            "line": 3,
+                            "column": 26
+                          },
+                          "end": {
+                            "offset": 49,
+                            "line": 3,
+                            "column": 30
+                          },
+                          "name": "name"
+                        }
+                      },
+                      "start": {
+                        "offset": 39,
+                        "line": 3,
+                        "column": 20
+                      },
+                      "end": {
+                        "offset": 50,
+                        "line": 3,
+                        "column": 31
+                      }
+                    },
+                    {
+                      "type": "TextNode",
+                      "value": "!",
+                      "start": {
+                        "offset": 50,
+                        "line": 3,
+                        "column": 31
+                      },
+                      "end": {
+                        "offset": 51,
+                        "line": 3,
+                        "column": 32
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "alternate": null
+      }
+    ]
+  }
+}

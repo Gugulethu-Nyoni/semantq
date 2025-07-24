@@ -159,7 +159,7 @@ More blocks to be added.
 
 ### Semantq Syntax Philosophy:
 
-Consistency, intuition, flexibility, elegance and efficiency. 
+Consistency, elegance and efficiency. 
 
 ---
 
