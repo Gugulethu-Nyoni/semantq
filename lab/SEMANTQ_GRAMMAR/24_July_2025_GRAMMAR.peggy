@@ -103,11 +103,10 @@ function createMemberExpression(object, property) {
 
 
 function createElement(start, end, name, attributes, children) {
-  // Flatten and process children
-  const processedChildren = Array.isArray(children) 
-    ? children.flat().filter(x => x) 
-    : children ? [children] : [];
-    
+  const processedChildren = Array.isArray(children)
+    ? children.flat().filter(x => x !== null && x !== undefined)
+    : (children ? [children].filter(x => x !== null && x !== undefined) : []);
+
   return {
     start,
     end,
@@ -128,19 +127,24 @@ function createSelfClosingElement(start, end, name, attributes) {
   };
 }
 
-function createMixedContentNode(parts, start, end) {
-  // Filter out empty text nodes
-  const validParts = parts.filter(part => 
-    part && (part.type !== 'TextNode' || part.value.trim())
-  );
-  
-  if (validParts.length === 1) return validParts[0]; 
- 
-  
+function createMixedContentNode(parts) { // Removed start, end params as they can be derived
+  // Filter out null/undefined parts, but NOT whitespace-only Text nodes
+  const validParts = parts.filter(part => part !== null && part !== undefined);
+
+  // If there's only one valid part and it's not already a Fragment,
+  // return it directly to avoid unnecessary Fragment nesting.
+  if (validParts.length === 1 && validParts[0].type !== 'Fragment') {
+    return validParts[0];
+  }
+
+  // Calculate start and end from the first and last valid parts
+  const start = validParts.length > 0 ? validParts[0].start : undefined;
+  const end = validParts.length > 0 ? validParts[validParts.length - 1].end : undefined;
+
   return {
-    type: 'MixedContent',
-    start: location().start,
-    end: location().end,
+    type: 'Fragment', // Changed from 'MixedContent' to 'Fragment'
+    start: start,
+    end: end,
     children: validParts
   };
 }
@@ -380,23 +384,25 @@ CodeContent
     
     
 
-HTML 
+HTML
   = fragment:Fragment {
+    const children = (fragment.type === "Fragment") ? fragment.children : [fragment];
+    const start = fragment.start !== undefined ? fragment.start : (children.length > 0 ? children[0].start : undefined);
+    const end = fragment.end !== undefined ? fragment.end : (children.length > 0 ? children[children.length - 1].end : undefined);
+
     return {
       html: {
-        start: fragment.start,
-        end: fragment.end,
+        start: start,
+        end: end,
         type: "Fragment",
-        children: [fragment]
+        children: children
       }
     };
   }
 
 Fragment
   = fragments:(MustacheTag / LogicBlock / OpenCloseTags / SelfClosingTags / TextNode / CommentBlock)+ {
-      return fragments.length === 1 
-        ? fragments[0] 
-        : createMixedContentNode(fragments);
+      return createMixedContentNode(fragments);
     }
 
 /*
@@ -407,14 +413,13 @@ OpenCloseTags
 */
 
 OpenCloseTags
-  = _ codeTag:CodeHtmlTag { return codeTag; } // Match code tags first
+  = _ codeTag:CodeHtmlTag { return codeTag; }
   / _ openTag:OpenTag _
-    (closeTag:CloseTag { // Handle empty elements
-      return createElement(openTag.start, closeTag.end, openTag.name, openTag.attributes, []);
+    innerContent:InnerContent? // Make innerContent optional and directly use its result
+    _ closeTag:CloseTag _ {
+      const children = innerContent ? (innerContent.type === 'Fragment' ? innerContent.children : [innerContent]) : [];
+      return createElement(openTag.start, closeTag.end, openTag.name, openTag.attributes, children);
     }
-    / inner:InnerContent _ closeTag:CloseTag _ { // Normal case for other tags
-      return createElement(openTag.start, closeTag.end, openTag.name, openTag.attributes, [inner]);
-    })
     
 
 SelfClosingTags
@@ -819,18 +824,25 @@ Params
 
   
 InnerContent
-  = parts:(HtmlTagWithExpressions / LogicBlock / TextWithExpressions / CommentBlock)* {
-      const flattened = parts.flat().filter(x => x);
-      return flattened.length === 0
-        ? { type: 'EmptyContent' } // Explicit empty node
-        : flattened.length === 1 
-          ? flattened[0] 
-          : {
-              type: 'Fragment',
-              children: flattened,
-              start: flattened[0]?.start || location().start,
-              end: flattened[flattened.length-1]?.end || location().end
-            };
+  = parts:(HtmlTagWithExpressions / LogicBlock / TextWithExpressions / CommentBlock / TextNode)* { // Added TextNode directly
+      const flattened = parts.flat().filter(x => x !== null && x !== undefined);
+
+      if (flattened.length === 1 && flattened[0].type !== 'Fragment') {
+        return flattened[0];
+      }
+      if (flattened.length === 0) {
+          return null; // Or { type: 'EmptyContent' } if you want an explicit node
+      }
+
+      const start = flattened[0]?.start !== undefined ? flattened[0].start : location().start.offset;
+      const end = flattened[flattened.length - 1]?.end !== undefined ? flattened[flattened.length - 1].end : location().end.offset;
+
+      return {
+        type: 'Fragment',
+        children: flattened,
+        start: start,
+        end: end
+      };
     }
 
 /* END ATTRIBUTE BLOCK */
