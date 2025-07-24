@@ -2,8 +2,16 @@ import parser from './latestParser.mjs';
 import fs from 'fs';
 
 const customSyntax = `
-@if(user.loggedIn)
-  <p>Welcome back, {user.name}!</p>
+@if(items.length > 0)
+  @each(items as item)
+    @if(item.active)
+      <li>{item.name}</li>
+    @else
+      <li>Item is inactive</li>
+    @endif
+  @endeach
+@else
+  <p>No items available</p>
 @endif
 `;
 
