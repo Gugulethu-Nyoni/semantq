@@ -93,7 +93,7 @@ class SlotResolver {
 
 
 
-
+// 
 
 
 // Function to resolve named slots in component AST
@@ -125,6 +125,24 @@ resolveNamedSlots(filePath) {
       continue;
     }
 
+/* STOP THE FLOW IF THE SLOT IS NOT NAME */
+
+// check if the imported (child) slot is named - skip if not
+    const isNamed = walk.deepWalker(
+      childComponentAstBlock,
+      "Element",
+      walk.createMatchLogic("Element", "slot"),
+      { path: "attributes" }
+    );
+
+   // console.log("isNamed",isNamed[0].value);
+
+if (isNamed[0].value === null || isNamed[0].value.length === 0 ) continue;
+
+/* END OF NAMED SLOT CHECK */
+
+
+
     // Find all instances of this component in parent
     const parentInstances = walk.deepWalker(
       parentComponentAST,
@@ -133,7 +151,7 @@ resolveNamedSlots(filePath) {
       { path: "name" }
     );
 
-    console.log("Here",parentInstances);
+    //console.log("Here",parentInstances);
 
     // Process each component instance
     parentInstances.forEach((instance) => {
@@ -546,7 +564,7 @@ resolveDefaultSlots(filePath) {
         );
 
         if (componentUsageNodesInParent.length === 0) {
-            console.log(`No instances of <${key}> found in ${parentComponentFileName}. Skipping slot resolution for this component.`);
+            //console.log(`No instances of <${key}> found in ${parentComponentFileName}. Skipping slot resolution for this component.`);
             continue; // No component usage found, move to the next component type
         }
 
@@ -597,7 +615,7 @@ resolveDefaultSlots(filePath) {
             let resolvedSlotContent;
             if (parentProvidedSlotContent && parentProvidedSlotContent.length > 0) {
                 resolvedSlotContent = parentProvidedSlotContent; // Use content from parent
-                console.log("WHY",resolvedSlotContent);
+                //console.log("WHY",resolvedSlotContent);
 
             } else if (slotFallBackChildren && slotFallBackChildren.length > 0) {
                 resolvedSlotContent = slotFallBackChildren; // Use fallback content
@@ -605,7 +623,7 @@ resolveDefaultSlots(filePath) {
                 resolvedSlotContent = []; // Slot resolves to empty if no content or fallback
             }
 
-            console.log("WHY 2",resolvedSlotContent);
+            //console.log("WHY 2",resolvedSlotContent);
 
 
             // Only attempt to replace the slot if a slotNode was actually found
