@@ -597,8 +597,7 @@ Identifier
 */
 
 ExtendedIdentifier
-  = $([a-zA-Z_$][a-zA-Z_0-9\-]*) // Include dash '-' in the character set
-
+  = $([a-zA-Z_$][a-zA-Z_0-9\-\:]*) // Include dash '-' and colon ':' 
 
 AttributeValue
 = IIFE / ArrowFunctionCall / MustacheAttributeValueWithParams / MustacheAttributeValue / RegularAttributeValue / RegularFunctionalCall

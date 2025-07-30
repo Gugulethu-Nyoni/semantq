@@ -1,0 +1,1023 @@
+{
+  "jsAST": {
+    "type": "JavaScript",
+    "content": {
+      "type": "Program",
+      "start": 0,
+      "end": 561,
+      "body": [
+        {
+          "type": "VariableDeclaration",
+          "start": 46,
+          "end": 70,
+          "declarations": [
+            {
+              "type": "VariableDeclarator",
+              "start": 52,
+              "end": 69,
+              "id": {
+                "type": "Identifier",
+                "start": 52,
+                "end": 57,
+                "name": "tempC"
+              },
+              "init": {
+                "type": "CallExpression",
+                "start": 60,
+                "end": 69,
+                "callee": {
+                  "type": "Identifier",
+                  "start": 60,
+                  "end": 66,
+                  "name": "$state"
+                },
+                "arguments": [
+                  {
+                    "type": "Literal",
+                    "start": 67,
+                    "end": 68,
+                    "value": 0,
+                    "raw": "0"
+                  }
+                ],
+                "optional": false
+              }
+            }
+          ],
+          "kind": "const"
+        },
+        {
+          "type": "VariableDeclaration",
+          "start": 111,
+          "end": 194,
+          "declarations": [
+            {
+              "type": "VariableDeclarator",
+              "start": 117,
+              "end": 193,
+              "id": {
+                "type": "Identifier",
+                "start": 117,
+                "end": 125,
+                "name": "displayC"
+              },
+              "init": {
+                "type": "CallExpression",
+                "start": 128,
+                "end": 193,
+                "callee": {
+                  "type": "Identifier",
+                  "start": 128,
+                  "end": 136,
+                  "name": "$derived"
+                },
+                "arguments": [
+                  {
+                    "type": "ArrowFunctionExpression",
+                    "start": 137,
+                    "end": 191,
+                    "id": null,
+                    "expression": true,
+                    "generator": false,
+                    "async": false,
+                    "params": [],
+                    "body": {
+                      "type": "ConditionalExpression",
+                      "start": 143,
+                      "end": 191,
+                      "test": {
+                        "type": "CallExpression",
+                        "start": 143,
+                        "end": 161,
+                        "callee": {
+                          "type": "Identifier",
+                          "start": 143,
+                          "end": 148,
+                          "name": "isNaN"
+                        },
+                        "arguments": [
+                          {
+                            "type": "MemberExpression",
+                            "start": 149,
+                            "end": 160,
+                            "object": {
+                              "type": "Identifier",
+                              "start": 149,
+                              "end": 154,
+                              "name": "tempC"
+                            },
+                            "property": {
+                              "type": "Identifier",
+                              "start": 155,
+                              "end": 160,
+                              "name": "value"
+                            },
+                            "computed": false,
+                            "optional": false
+                          }
+                        ],
+                        "optional": false
+                      },
+                      "consequent": {
+                        "type": "Literal",
+                        "start": 164,
+                        "end": 166,
+                        "value": "",
+                        "raw": "''"
+                      },
+                      "alternate": {
+                        "type": "CallExpression",
+                        "start": 169,
+                        "end": 191,
+                        "callee": {
+                          "type": "MemberExpression",
+                          "start": 169,
+                          "end": 188,
+                          "object": {
+                            "type": "MemberExpression",
+                            "start": 169,
+                            "end": 180,
+                            "object": {
+                              "type": "Identifier",
+                              "start": 169,
+                              "end": 174,
+                              "name": "tempC"
+                            },
+                            "property": {
+                              "type": "Identifier",
+                              "start": 175,
+                              "end": 180,
+                              "name": "value"
+                            },
+                            "computed": false,
+                            "optional": false
+                          },
+                          "property": {
+                            "type": "Identifier",
+                            "start": 181,
+                            "end": 188,
+                            "name": "toFixed"
+                          },
+                          "computed": false,
+                          "optional": false
+                        },
+                        "arguments": [
+                          {
+                            "type": "Literal",
+                            "start": 189,
+                            "end": 190,
+                            "value": 2,
+                            "raw": "2"
+                          }
+                        ],
+                        "optional": false
+                      }
+                    }
+                  }
+                ],
+                "optional": false
+              }
+            }
+          ],
+          "kind": "const"
+        },
+        {
+          "type": "VariableDeclaration",
+          "start": 196,
+          "end": 292,
+          "declarations": [
+            {
+              "type": "VariableDeclarator",
+              "start": 202,
+              "end": 291,
+              "id": {
+                "type": "Identifier",
+                "start": 202,
+                "end": 210,
+                "name": "displayF"
+              },
+              "init": {
+                "type": "CallExpression",
+                "start": 213,
+                "end": 291,
+                "callee": {
+                  "type": "Identifier",
+                  "start": 213,
+                  "end": 221,
+                  "name": "$derived"
+                },
+                "arguments": [
+                  {
+                    "type": "ArrowFunctionExpression",
+                    "start": 222,
+                    "end": 289,
+                    "id": null,
+                    "expression": true,
+                    "generator": false,
+                    "async": false,
+                    "params": [],
+                    "body": {
+                      "type": "ConditionalExpression",
+                      "start": 228,
+                      "end": 289,
+                      "test": {
+                        "type": "CallExpression",
+                        "start": 228,
+                        "end": 246,
+                        "callee": {
+                          "type": "Identifier",
+                          "start": 228,
+                          "end": 233,
+                          "name": "isNaN"
+                        },
+                        "arguments": [
+                          {
+                            "type": "MemberExpression",
+                            "start": 234,
+                            "end": 245,
+                            "object": {
+                              "type": "Identifier",
+                              "start": 234,
+                              "end": 239,
+                              "name": "tempC"
+                            },
+                            "property": {
+                              "type": "Identifier",
+                              "start": 240,
+                              "end": 245,
+                              "name": "value"
+                            },
+                            "computed": false,
+                            "optional": false
+                          }
+                        ],
+                        "optional": false
+                      },
+                      "consequent": {
+                        "type": "Literal",
+                        "start": 249,
+                        "end": 251,
+                        "value": "",
+                        "raw": "''"
+                      },
+                      "alternate": {
+                        "type": "CallExpression",
+                        "start": 254,
+                        "end": 289,
+                        "callee": {
+                          "type": "MemberExpression",
+                          "start": 254,
+                          "end": 286,
+                          "object": {
+                            "type": "BinaryExpression",
+                            "start": 255,
+                            "end": 277,
+                            "left": {
+                              "type": "BinaryExpression",
+                              "start": 255,
+                              "end": 272,
+                              "left": {
+                                "type": "BinaryExpression",
+                                "start": 255,
+                                "end": 270,
+                                "left": {
+                                  "type": "MemberExpression",
+                                  "start": 255,
+                                  "end": 266,
+                                  "object": {
+                                    "type": "Identifier",
+                                    "start": 255,
+                                    "end": 260,
+                                    "name": "tempC"
+                                  },
+                                  "property": {
+                                    "type": "Identifier",
+                                    "start": 261,
+                                    "end": 266,
+                                    "name": "value"
+                                  },
+                                  "computed": false,
+                                  "optional": false
+                                },
+                                "operator": "*",
+                                "right": {
+                                  "type": "Literal",
+                                  "start": 269,
+                                  "end": 270,
+                                  "value": 9,
+                                  "raw": "9"
+                                }
+                              },
+                              "operator": "/",
+                              "right": {
+                                "type": "Literal",
+                                "start": 271,
+                                "end": 272,
+                                "value": 5,
+                                "raw": "5"
+                              }
+                            },
+                            "operator": "+",
+                            "right": {
+                              "type": "Literal",
+                              "start": 275,
+                              "end": 277,
+                              "value": 32,
+                              "raw": "32"
+                            }
+                          },
+                          "property": {
+                            "type": "Identifier",
+                            "start": 279,
+                            "end": 286,
+                            "name": "toFixed"
+                          },
+                          "computed": false,
+                          "optional": false
+                        },
+                        "arguments": [
+                          {
+                            "type": "Literal",
+                            "start": 287,
+                            "end": 288,
+                            "value": 2,
+                            "raw": "2"
+                          }
+                        ],
+                        "optional": false
+                      }
+                    }
+                  }
+                ],
+                "optional": false
+              }
+            }
+          ],
+          "kind": "const"
+        },
+        {
+          "type": "FunctionDeclaration",
+          "start": 312,
+          "end": 426,
+          "id": {
+            "type": "Identifier",
+            "start": 321,
+            "end": 334,
+            "name": "updateCelsius"
+          },
+          "expression": false,
+          "generator": false,
+          "async": false,
+          "params": [
+            {
+              "type": "Identifier",
+              "start": 335,
+              "end": 336,
+              "name": "e"
+            }
+          ],
+          "body": {
+            "type": "BlockStatement",
+            "start": 338,
+            "end": 426,
+            "body": [
+              {
+                "type": "VariableDeclaration",
+                "start": 340,
+                "end": 381,
+                "declarations": [
+                  {
+                    "type": "VariableDeclarator",
+                    "start": 346,
+                    "end": 380,
+                    "id": {
+                      "type": "Identifier",
+                      "start": 346,
+                      "end": 351,
+                      "name": "value"
+                    },
+                    "init": {
+                      "type": "CallExpression",
+                      "start": 354,
+                      "end": 380,
+                      "callee": {
+                        "type": "Identifier",
+                        "start": 354,
+                        "end": 364,
+                        "name": "parseFloat"
+                      },
+                      "arguments": [
+                        {
+                          "type": "MemberExpression",
+                          "start": 365,
+                          "end": 379,
+                          "object": {
+                            "type": "MemberExpression",
+                            "start": 365,
+                            "end": 373,
+                            "object": {
+                              "type": "Identifier",
+                              "start": 365,
+                              "end": 366,
+                              "name": "e"
+                            },
+                            "property": {
+                              "type": "Identifier",
+                              "start": 367,
+                              "end": 373,
+                              "name": "target"
+                            },
+                            "computed": false,
+                            "optional": false
+                          },
+                          "property": {
+                            "type": "Identifier",
+                            "start": 374,
+                            "end": 379,
+                            "name": "value"
+                          },
+                          "computed": false,
+                          "optional": false
+                        }
+                      ],
+                      "optional": false
+                    }
+                  }
+                ],
+                "kind": "const"
+              },
+              {
+                "type": "ExpressionStatement",
+                "start": 382,
+                "end": 424,
+                "expression": {
+                  "type": "AssignmentExpression",
+                  "start": 382,
+                  "end": 423,
+                  "operator": "=",
+                  "left": {
+                    "type": "MemberExpression",
+                    "start": 382,
+                    "end": 393,
+                    "object": {
+                      "type": "Identifier",
+                      "start": 382,
+                      "end": 387,
+                      "name": "tempC"
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "start": 388,
+                      "end": 393,
+                      "name": "value"
+                    },
+                    "computed": false,
+                    "optional": false
+                  },
+                  "right": {
+                    "type": "ConditionalExpression",
+                    "start": 396,
+                    "end": 423,
+                    "test": {
+                      "type": "CallExpression",
+                      "start": 396,
+                      "end": 408,
+                      "callee": {
+                        "type": "Identifier",
+                        "start": 396,
+                        "end": 401,
+                        "name": "isNaN"
+                      },
+                      "arguments": [
+                        {
+                          "type": "Identifier",
+                          "start": 402,
+                          "end": 407,
+                          "name": "value"
+                        }
+                      ],
+                      "optional": false
+                    },
+                    "consequent": {
+                      "type": "Literal",
+                      "start": 411,
+                      "end": 415,
+                      "value": null,
+                      "raw": "null"
+                    },
+                    "alternate": {
+                      "type": "Identifier",
+                      "start": 418,
+                      "end": 423,
+                      "name": "value"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "FunctionDeclaration",
+          "start": 428,
+          "end": 558,
+          "id": {
+            "type": "Identifier",
+            "start": 437,
+            "end": 453,
+            "name": "updateFahrenheit"
+          },
+          "expression": false,
+          "generator": false,
+          "async": false,
+          "params": [
+            {
+              "type": "Identifier",
+              "start": 454,
+              "end": 455,
+              "name": "e"
+            }
+          ],
+          "body": {
+            "type": "BlockStatement",
+            "start": 457,
+            "end": 558,
+            "body": [
+              {
+                "type": "VariableDeclaration",
+                "start": 459,
+                "end": 500,
+                "declarations": [
+                  {
+                    "type": "VariableDeclarator",
+                    "start": 465,
+                    "end": 499,
+                    "id": {
+                      "type": "Identifier",
+                      "start": 465,
+                      "end": 470,
+                      "name": "value"
+                    },
+                    "init": {
+                      "type": "CallExpression",
+                      "start": 473,
+                      "end": 499,
+                      "callee": {
+                        "type": "Identifier",
+                        "start": 473,
+                        "end": 483,
+                        "name": "parseFloat"
+                      },
+                      "arguments": [
+                        {
+                          "type": "MemberExpression",
+                          "start": 484,
+                          "end": 498,
+                          "object": {
+                            "type": "MemberExpression",
+                            "start": 484,
+                            "end": 492,
+                            "object": {
+                              "type": "Identifier",
+                              "start": 484,
+                              "end": 485,
+                              "name": "e"
+                            },
+                            "property": {
+                              "type": "Identifier",
+                              "start": 486,
+                              "end": 492,
+                              "name": "target"
+                            },
+                            "computed": false,
+                            "optional": false
+                          },
+                          "property": {
+                            "type": "Identifier",
+                            "start": 493,
+                            "end": 498,
+                            "name": "value"
+                          },
+                          "computed": false,
+                          "optional": false
+                        }
+                      ],
+                      "optional": false
+                    }
+                  }
+                ],
+                "kind": "const"
+              },
+              {
+                "type": "ExpressionStatement",
+                "start": 501,
+                "end": 556,
+                "expression": {
+                  "type": "AssignmentExpression",
+                  "start": 501,
+                  "end": 555,
+                  "operator": "=",
+                  "left": {
+                    "type": "MemberExpression",
+                    "start": 501,
+                    "end": 512,
+                    "object": {
+                      "type": "Identifier",
+                      "start": 501,
+                      "end": 506,
+                      "name": "tempC"
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "start": 507,
+                      "end": 512,
+                      "name": "value"
+                    },
+                    "computed": false,
+                    "optional": false
+                  },
+                  "right": {
+                    "type": "ConditionalExpression",
+                    "start": 515,
+                    "end": 555,
+                    "test": {
+                      "type": "CallExpression",
+                      "start": 515,
+                      "end": 527,
+                      "callee": {
+                        "type": "Identifier",
+                        "start": 515,
+                        "end": 520,
+                        "name": "isNaN"
+                      },
+                      "arguments": [
+                        {
+                          "type": "Identifier",
+                          "start": 521,
+                          "end": 526,
+                          "name": "value"
+                        }
+                      ],
+                      "optional": false
+                    },
+                    "consequent": {
+                      "type": "Literal",
+                      "start": 530,
+                      "end": 534,
+                      "value": null,
+                      "raw": "null"
+                    },
+                    "alternate": {
+                      "type": "BinaryExpression",
+                      "start": 537,
+                      "end": 555,
+                      "left": {
+                        "type": "BinaryExpression",
+                        "start": 537,
+                        "end": 553,
+                        "left": {
+                          "type": "BinaryExpression",
+                          "start": 538,
+                          "end": 548,
+                          "left": {
+                            "type": "Identifier",
+                            "start": 538,
+                            "end": 543,
+                            "name": "value"
+                          },
+                          "operator": "-",
+                          "right": {
+                            "type": "Literal",
+                            "start": 546,
+                            "end": 548,
+                            "value": 32,
+                            "raw": "32"
+                          }
+                        },
+                        "operator": "*",
+                        "right": {
+                          "type": "Literal",
+                          "start": 552,
+                          "end": 553,
+                          "value": 5,
+                          "raw": "5"
+                        }
+                      },
+                      "operator": "/",
+                      "right": {
+                        "type": "Literal",
+                        "start": 554,
+                        "end": 555,
+                        "value": 9,
+                        "raw": "9"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "sourceType": "module"
+    }
+  },
+  "cssAST": {
+    "type": "CSS",
+    "content": {
+      "raws": {
+        "semicolon": false,
+        "after": "\n"
+      },
+      "type": "root",
+      "nodes": [
+        {
+          "raws": {
+            "before": "\n",
+            "between": " ",
+            "semicolon": false,
+            "after": ""
+          },
+          "type": "rule",
+          "nodes": [
+            {
+              "raws": {
+                "before": " ",
+                "between": ": "
+              },
+              "type": "decl",
+              "parent": null,
+              "source": {
+                "input": {
+                  "css": "\nh1 { color: green}\n",
+                  "hasBOM": false,
+                  "document": "\nh1 { color: green}\n",
+                  "file": "/Users/gugulethu/code/semantq_sites/gram/style"
+                },
+                "start": {
+                  "column": 6,
+                  "line": 2,
+                  "offset": 6
+                },
+                "end": {
+                  "column": 17,
+                  "line": 2,
+                  "offset": 18
+                }
+              },
+              "prop": "color",
+              "value": "green"
+            }
+          ],
+          "parent": null,
+          "source": {
+            "input": null,
+            "start": {
+              "column": 1,
+              "line": 2,
+              "offset": 1
+            },
+            "end": {
+              "column": 18,
+              "line": 2,
+              "offset": 19
+            }
+          },
+          "selector": "h1"
+        }
+      ],
+      "source": {
+        "input": null,
+        "start": {
+          "column": 1,
+          "line": 1,
+          "offset": 0
+        },
+        "end": {
+          "column": 1,
+          "line": 3,
+          "offset": 20
+        }
+      }
+    }
+  },
+  "customAST": {
+    "type": "HTML",
+    "content": {
+      "html": {
+        "start": 0,
+        "end": 207,
+        "type": "Fragment",
+        "children": [
+          {
+            "start": 0,
+            "end": 207,
+            "type": "Element",
+            "name": "customSyntax",
+            "attributes": [],
+            "children": [
+              {
+                "start": 16,
+                "end": 101,
+                "type": "Element",
+                "name": "div",
+                "attributes": null,
+                "children": [
+                  {
+                    "type": "Element",
+                    "start": 22,
+                    "end": 86,
+                    "name": "input",
+                    "attributes": [
+                      {
+                        "start": 29,
+                        "end": 43,
+                        "type": "KeyValueAttribute",
+                        "name": "type",
+                        "value": [
+                          {
+                            "start": 35,
+                            "end": 41,
+                            "type": "Text",
+                            "raw": "number",
+                            "data": "number"
+                          }
+                        ]
+                      },
+                      {
+                        "start": 43,
+                        "end": 60,
+                        "type": "KeyValueAttribute",
+                        "name": "value",
+                        "value": [
+                          {
+                            "start": 50,
+                            "end": 58,
+                            "type": "MustacheAttribute",
+                            "name": {
+                              "type": "Identifier",
+                              "start": {
+                                "offset": 50,
+                                "line": 4,
+                                "column": 29
+                              },
+                              "end": {
+                                "offset": 58,
+                                "line": 4,
+                                "column": 37
+                              },
+                              "name": "displayC"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "start": 60,
+                        "end": 81,
+                        "type": "EventHandler",
+                        "name": "input",
+                        "modifiers": null,
+                        "value": {
+                          "start": 68,
+                          "end": 81,
+                          "type": "MustacheAttribute",
+                          "name": {
+                            "type": "Identifier",
+                            "start": {
+                              "offset": 68,
+                              "line": 4,
+                              "column": 47
+                            },
+                            "end": {
+                              "offset": 81,
+                              "line": 4,
+                              "column": 60
+                            },
+                            "name": "updateCelsius"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "TextNode",
+                    "value": "Celsius",
+                    "start": {
+                      "offset": 86,
+                      "line": 4,
+                      "column": 65
+                    },
+                    "end": {
+                      "offset": 94,
+                      "line": 5,
+                      "column": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "start": 101,
+                "end": 192,
+                "type": "Element",
+                "name": "div",
+                "attributes": null,
+                "children": [
+                  {
+                    "type": "Element",
+                    "start": 107,
+                    "end": 174,
+                    "name": "input",
+                    "attributes": [
+                      {
+                        "start": 114,
+                        "end": 128,
+                        "type": "KeyValueAttribute",
+                        "name": "type",
+                        "value": [
+                          {
+                            "start": 120,
+                            "end": 126,
+                            "type": "Text",
+                            "raw": "number",
+                            "data": "number"
+                          }
+                        ]
+                      },
+                      {
+                        "start": 128,
+                        "end": 145,
+                        "type": "KeyValueAttribute",
+                        "name": "value",
+                        "value": [
+                          {
+                            "start": 135,
+                            "end": 143,
+                            "type": "MustacheAttribute",
+                            "name": {
+                              "type": "Identifier",
+                              "start": {
+                                "offset": 135,
+                                "line": 7,
+                                "column": 29
+                              },
+                              "end": {
+                                "offset": 143,
+                                "line": 7,
+                                "column": 37
+                              },
+                              "name": "displayF"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "start": 145,
+                        "end": 169,
+                        "type": "EventHandler",
+                        "name": "input",
+                        "modifiers": null,
+                        "value": {
+                          "start": 153,
+                          "end": 169,
+                          "type": "MustacheAttribute",
+                          "name": {
+                            "type": "Identifier",
+                            "start": {
+                              "offset": 153,
+                              "line": 7,
+                              "column": 47
+                            },
+                            "end": {
+                              "offset": 169,
+                              "line": 7,
+                              "column": 63
+                            },
+                            "name": "updateFahrenheit"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "TextNode",
+                    "value": "Fahrenheit",
+                    "start": {
+                      "offset": 174,
+                      "line": 7,
+                      "column": 68
+                    },
+                    "end": {
+                      "offset": 185,
+                      "line": 8,
+                      "column": 1
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

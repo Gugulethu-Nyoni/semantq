@@ -363,14 +363,31 @@ function peg$parse(input, options) {
     return [head, ...tail.map(t => t[1])];
   }
   function peg$f14(attributeName, attributeValue) {
-    return {
-      start: location().start.offset,
-      end: location().end.offset,
-      type: "Attribute",
-      type: "KeyValueAttribute",
-      name: attributeName,
-      value: [attributeValue]
-    }; 
+    // Check the 'type' property of the 'attributeName' AST node that was parsed
+    if (attributeName.type === "EventHandler") {
+        // If the name (e.g., @click) was identified as an EventHandler by SemantqAttributeName,
+        // then the entire attribute should be an EventHandler.
+        return {
+            // Use the start/end from the name and value nodes for more accurate positioning
+            start: attributeName.start,
+            end: attributeValue.end, // Assuming attributeValue has a reliable 'end'
+            type: "EventHandler",     // <--- THIS IS THE CRITICAL CHANGE: Set top-level type
+            name: attributeName.name, // This will be the clean event name (e.g., 'click')
+            modifiers: attributeName.modifiers,
+            value: attributeValue     // This will be the AST for the JS expression (e.g., {type: "MustacheAttribute", ...})
+        };
+    } else {
+        // If it's not an EventHandler (i.e., it's a regular attribute like id="foo")
+        // then keep it as a KeyValueAttribute.
+        return {
+            start: location().start.offset, // Use location for the whole attribute rule
+            end: location().end.offset,
+            // Removed the duplicate 'type: "Attribute"' - keeping the intended one.
+            type: "KeyValueAttribute", // The type for standard key-value attributes
+            name: attributeName,       // The full AST node for the attribute name (e.g., {type: "Identifier", name: "id"})
+            value: [attributeValue]    // Keep value as an array if your handler expects it
+        };
+    }
   }
   function peg$f15(name) {
     return {
@@ -396,14 +413,12 @@ function peg$parse(input, options) {
     return {
       start: location().start.offset,
       end: location().end.offset,
-      type: "EventHandler",
-      name: name,
-      modifiers: [],
-      expression: {
-        type: "CallExpression",
-        start: location().start.offset,
-        end: location().end.offset
-      }
+      type: "EventHandler", // Keep this - it correctly identifies the attribute type
+      name: name,            // Keep this - it's the actual event name (e.g., 'click')
+      modifiers: []
+      // REMOVE THE 'expression' PROPERTY HERE.
+      // The actual JS expression for the handler will be attached by the rule
+      // that combines the attribute name and its value (e.g., in a rule like KeyValueAttribute)
     };
   }
   function peg$f18(value) {
@@ -2820,7 +2835,7 @@ function peg$parse(input, options) {
   }
 
   function peg$parseIfStatement() {
-    let s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12;
+    let s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15;
 
     s0 = peg$currPos;
     s1 = peg$parse_();
@@ -2832,64 +2847,67 @@ function peg$parse(input, options) {
       if (peg$silentFails === 0) { peg$fail(peg$e30); }
     }
     if (s2 !== peg$FAILED) {
+      s3 = peg$parse_();
       if (input.charCodeAt(peg$currPos) === 40) {
-        s3 = peg$c13;
+        s4 = peg$c13;
         peg$currPos++;
       } else {
-        s3 = peg$FAILED;
+        s4 = peg$FAILED;
         if (peg$silentFails === 0) { peg$fail(peg$e23); }
       }
-      if (s3 !== peg$FAILED) {
-        s4 = peg$parseCondition();
-        if (s4 !== peg$FAILED) {
+      if (s4 !== peg$FAILED) {
+        s5 = peg$parse_();
+        s6 = peg$parseCondition();
+        if (s6 !== peg$FAILED) {
+          s7 = peg$parse_();
           if (input.charCodeAt(peg$currPos) === 41) {
-            s5 = peg$c14;
+            s8 = peg$c14;
             peg$currPos++;
           } else {
-            s5 = peg$FAILED;
+            s8 = peg$FAILED;
             if (peg$silentFails === 0) { peg$fail(peg$e24); }
           }
-          if (s5 !== peg$FAILED) {
-            s6 = peg$parse_();
-            s7 = peg$parseContentBody();
-            if (s7 !== peg$FAILED) {
-              s8 = peg$currPos;
-              s9 = peg$parse_();
+          if (s8 !== peg$FAILED) {
+            s9 = peg$parse_();
+            s10 = peg$parseContentBody();
+            if (s10 !== peg$FAILED) {
+              s11 = peg$currPos;
+              s12 = peg$parse_();
               if (input.substr(peg$currPos, 5) === peg$c20) {
-                s10 = peg$c20;
+                s13 = peg$c20;
                 peg$currPos += 5;
               } else {
-                s10 = peg$FAILED;
+                s13 = peg$FAILED;
                 if (peg$silentFails === 0) { peg$fail(peg$e31); }
               }
-              if (s10 !== peg$FAILED) {
-                s11 = peg$parse_();
-                s12 = peg$parseContentBody();
-                if (s12 !== peg$FAILED) {
-                  s9 = [s9, s10, s11, s12];
-                  s8 = s9;
+              if (s13 !== peg$FAILED) {
+                s14 = peg$parse_();
+                s15 = peg$parseContentBody();
+                if (s15 !== peg$FAILED) {
+                  s12 = [s12, s13, s14, s15];
+                  s11 = s12;
                 } else {
-                  peg$currPos = s8;
-                  s8 = peg$FAILED;
+                  peg$currPos = s11;
+                  s11 = peg$FAILED;
                 }
               } else {
-                peg$currPos = s8;
-                s8 = peg$FAILED;
+                peg$currPos = s11;
+                s11 = peg$FAILED;
               }
-              if (s8 === peg$FAILED) {
-                s8 = null;
+              if (s11 === peg$FAILED) {
+                s11 = null;
               }
               if (input.substr(peg$currPos, 6) === peg$c21) {
-                s9 = peg$c21;
+                s12 = peg$c21;
                 peg$currPos += 6;
               } else {
-                s9 = peg$FAILED;
+                s12 = peg$FAILED;
                 if (peg$silentFails === 0) { peg$fail(peg$e32); }
               }
-              if (s9 !== peg$FAILED) {
-                s10 = peg$parse_();
+              if (s12 !== peg$FAILED) {
+                s13 = peg$parse_();
                 peg$savedPos = s0;
-                s0 = peg$f34(s2, s4, s7, s8);
+                s0 = peg$f34(s2, s6, s10, s11);
               } else {
                 peg$currPos = s0;
                 s0 = peg$FAILED;

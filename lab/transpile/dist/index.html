@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semantq Transpiled Component</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        #app-root {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba/rgba(0,0,0,0.1); /* Typo here - fix from prev response */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>My Semantq Application</h1>
+    <p>This is a generic container for any transpiled Semantq component.</p>
+
+    <div id="app-root"></div>
+
+    <script type="module">
+        // Import your transpiled component module.
+        // Ensure the path is correct relative to this index.html file.
+        // The 'renderComponent' function encapsulates all the DOM creation and reactivity.
+        import renderComponent from './unified.js';
+
+        // Get the target DOM element where the component should be inserted.
+        const appRoot = document.getElementById('app-root');
+
+        // Call the renderComponent function to get the component's root DOM fragment
+        // and its destroy method (for cleanup if the component is removed).
+        const component = renderComponent();
+
+        // Append the component's root DOM fragment to the app-root div.
+        appRoot.appendChild(component.root);
+
+        // Optional: Log the component instance for debugging purposes in the browser console.
+        // This will show any properties you've explicitly exposed from renderComponent,
+        // such as its `root` DOM node or the `destroy` function.
+        console.log("Semantq Component mounted:", component);
+
+        // Optional: Add cleanup logic if the component might be dynamically removed or the page navigates.
+        // This ensures effects and event listeners are properly un-registered.
+        window.addEventListener('beforeunload', () => {
+            if (component && typeof component.destroy === 'function') {
+                component.destroy();
+                console.log("Semantq Component destroyed during page unload.");
+            }
+        });
+    </script>
+</body>
+</html>

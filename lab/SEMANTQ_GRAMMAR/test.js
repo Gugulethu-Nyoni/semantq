@@ -28,3 +28,8 @@ fs.writeFile('ast-output.json', astString, (err) => {
 });
 
 console.log(astString);
+
+
+
+
+
