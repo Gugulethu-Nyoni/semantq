@@ -1,119 +1,176 @@
-// src/code-generators/html-attribute-handlers.js
+import { $effect, $derived } from '../../dist/state/index.js';
+import { text, attr } from '../runtime/dom-helpers.js';
 
+/**
+ * Handlers for converting HTML Attribute AST nodes into code strings.
+ * Each handler function receives:
+ * - attrNode: The current AST attribute node being processed.
+ * - elVar: The JavaScript variable name for the DOM element this attribute belongs to (e.g., 'el_0').
+ * - context: An object containing current compilation context (e.g., reactiveScope, getIdentifierValue, cleanupQueue, getUniqueVar).
+ * - generateExpression: A function to recursively generate code for nested JavaScript expressions.
+ * - imports: A Set to collect necessary imports for the generated code.
+ * - originalHtmlNode: The original HTML element AST node (e.g., for <input> to infer 'type' for bind:value).
+ */
 export const htmlAttributeHandlers = {
-    MustacheAttribute: (attr, elVar, context, generateExpression, imports) => {
-        if (attr.value && attr.value.length > 0) {
-            imports.add('state');
-            imports.add('$derived');
-            // Assuming attr.value[0] is the AST node for the expression (e.g., an Identifier node)
-            const expressionNode = attr.value[0];
-            const expressionJs = generateExpression(expressionNode, context);
+    EventHandler: (attrNode, elVar, context, generateExpression, imports, originalHtmlNode) => {
+        imports.add('$effect'); // Effects might be used for reactivity within handlers, or for cleanup
 
-            return `  ${context.cleanupQueue}.push(state.attr(${elVar}, '${attr.name}', $derived(() => ${expressionJs})));\n`;
-        }
-        return '';
+        const eventName = attrNode.name.slice(2).toLowerCase(); // e.g., 'onclick' -> 'click'
+        const handlerBody = generateExpression(attrNode.value, { ...context, isAssignmentTarget: false }); // Event handler value is an expression
+
+        // Add event listener and a cleanup function
+        let code = `  const ${context.getUniqueVar('eventHandler')} = ${handlerBody};\n`;
+        code += `  ${elVar}.addEventListener('${eventName}', ${context.getUniqueVar('eventHandler')});\n`;
+        code += `  ${context.cleanupQueue}.push(() => ${elVar}.removeEventListener('${eventName}', ${context.getUniqueVar('eventHandler')}));\n`;
+        return code;
     },
-    EventHandler: (attr, elVar, context, generateExpression, imports) => {
-        const eventName = attr.name;
-        const handlerExpressionNode = attr.value && attr.value.name ? attr.value.name : null;
 
-        if (!eventName) {
-            console.warn(`[CodeGenerator] EventHandler: 'name' property is missing for node:`, attr);
-            return '';
-        }
-
-        if (!handlerExpressionNode) {
-            console.warn(`[CodeGenerator] EventHandler for '${eventName}': 'value' property or its 'name' (expression) is missing for node:`, attr);
-            return '';
-        }
-
-        const handlerJsCode = generateExpression(handlerExpressionNode, context);
-
-        if (!handlerJsCode) {
-            console.warn(`[CodeGenerator] EventHandler for '${eventName}': Failed to generate JavaScript code for handler expression. Node:`, attr);
-            return '';
-        }
-
+    TwoWayBindingAttribute: (attrNode, elVar, context, generateExpression, imports, originalHtmlNode) => {
+        // Example: <input bind:value={myState}>
+        // attrNode.name: 'value' (the bound DOM property, e.g., 'value', 'checked')
+        // attrNode.expression: The AST for 'myState' (the reactive variable)
         imports.add('$effect');
+        imports.add('$state'); // Ensure $state is imported for setting values
 
-        return `  ${context.cleanupQueue}.push($effect(() => {
-            ${elVar}.addEventListener('${eventName}', ${handlerJsCode});
-            return () => ${elVar}.removeEventListener('${eventName}', ${handlerJsCode}); // Cleanup
-        }));\n`;
-    },
+        const propName = attrNode.name; // e.g., 'value', 'checked'
+        const expressionNode = attrNode.expression; // e.g., Identifier 'myState'
 
-    BooleanIdentifierAttribute: (attr, elVar, context, generateExpression, imports) => {
-        imports.add('state');
-        imports.add('$derived');
-        // attr.name is expected to be the string name (e.g., 'disabled')
-        const expressionJs = generateExpression({ type: 'Identifier', name: attr.name }, context);
-        return `  ${context.cleanupQueue}.push(state.attr(${elVar}, '${attr.name}', $derived(() => ${expressionJs})));\n`;
-    },
-    KeyValueAttribute: (attr, elVar, context, generateExpression, imports) => {
-        // Determine the attribute name correctly: if attr.name is an object, use attr.name.name, else use attr.name
-        const attributeName = typeof attr.name === 'object' ? attr.name.name : attr.name;
+        // Generate JS for the expression that holds the reactive state.
+        // It's crucial that this resolves to the reactive *object* (e.g., `myState`), not `myState.value`.
+        // We pass `isAssignmentTarget: true` because this is the target of an assignment (e.g., `myState.value = ...`).
+        const reactiveVarJs = generateExpression(expressionNode, { ...context, isAssignmentTarget: true });
 
-        if (attr.value && Array.isArray(attr.value) && attr.value[0]?.type === 'Text') {
-            const staticValue = attr.value[0].data || attr.value[0].raw;
-            return `  ${elVar}.setAttribute('${attributeName}', ${JSON.stringify(staticValue)});\n`;
-        } else if (attr.value === true) {
-            return `  ${elVar}.setAttribute('${attributeName}', '');\n`;
-        }
-        // If it's still unhandled here, and it has mustache attributes within its value (e.g., class="foo {{bar}}")
-        if (attr.value && Array.isArray(attr.value)) {
-            const dynamicParts = attr.value.map(valNode => {
-                if (valNode.type === 'MustacheAttribute' && valNode.name) {
-                    imports.add('$derived');
-                    imports.add('state');
-                    // FIX: Assuming valNode.name is already the AST node for the identifier.
-                    // If valNode.name is a string like 'myVar', you need:
-                    // return `\${${generateExpression({ type: 'Identifier', name: valNode.name }, context)}}`;
-                    // But based on the `[object Object]` error, it's more likely `valNode.name` IS the AST node.
-                    return `\${${generateExpression(valNode.name, context)}}`;
-                } else if (valNode.type === 'Text') {
-                    return valNode.data;
+        let code = '';
+
+        // 1. Set initial DOM value and update DOM when state changes
+        code += `  ${context.cleanupQueue}.push($effect(() => { ${elVar}.${propName} = ${reactiveVarJs}.value; }));\n`;
+
+        // 2. Update state when DOM changes (input, change events)
+        let eventType = 'input'; // Default event type for inputs
+
+        // Try to infer the correct event type based on the original HTML element node
+        if (originalHtmlNode) {
+            if (originalHtmlNode.name === 'select') {
+                eventType = 'change';
+            } else if (originalHtmlNode.name === 'input' && attrNode.name === 'checked') {
+                // For checkboxes and radios, use 'change' event
+                const typeAttr = originalHtmlNode.attributes.find(a => a.name === 'type');
+                if (typeAttr && typeAttr.value && (typeAttr.value.raw === 'checkbox' || typeAttr.value.raw === 'radio')) {
+                    eventType = 'change';
                 }
-                return `/*UNHANDLED_ATTR_VAL_NODE_TYPE_${valNode.type}* /`;
-            }).join('');
-
-            if (dynamicParts.includes('${')) {
-                imports.add('$effect');
-                return `  ${context.cleanupQueue}.push($effect(() => {
-    ${elVar}.setAttribute('${attributeName}', \`${dynamicParts}\`);
-  }));\n`;
-            } else if (dynamicParts) {
-                return `  ${elVar}.setAttribute('${attributeName}', \`${dynamicParts}\`);\n`;
             }
-        }
-
-        console.warn(`[CodeGenerator] Complex KeyValueAttribute not handled by specific handlers:`, attr);
-        return '';
-    },
-
-    LiteralAttribute: (attr, elVar, context, generateExpression, imports) => {
-        // attr.name is expected to be the string (e.g., 'type', 'class')
-        // attr.value is expected to be the string value (e.g., 'number', 'my-class')
-        return `${elVar}.setAttribute('${attr.name}', \`${attr.value}\`);\n`;
-    },
-
-    // For dynamic attributes like value={displayC}
-    MustacheTag: (attr, elVar, context, generateExpression, imports) => {
-        imports.add('$effect'); // Ensure $effect is imported
-
-        // This call to generateExpression will use generateExpressionAsJS from CodeGenerator.js,
-        // which now correctly returns 'displayC.value' for 'displayC' (after the reactiveScope fix).
-        const expressionCode = generateExpression(attr.expression, context);
-
-        // Special handling for 'value' attribute on input elements (preferred way)
-        if (attr.name === 'value') {
-            // DIRECT PROPERTY ASSIGNMENT: No template literal needed for a property.
-            return `${context.cleanupQueue}.push($effect(() => { ${elVar}.value = ${expressionCode}; }));\n`;
         } else {
-            // For other dynamic attributes, use setAttribute, usually with a template literal
-            // to allow for string coercion/interpolation if the expression isn't already a string.
-            return `${context.cleanupQueue}.push($effect(() => { ${elVar}.setAttribute('${attr.name}', \`${expressionCode}\`); }));\n`;
+            // This warning means `originalHtmlNode` wasn't passed, which it *should* be
+            // from the `Element` handler in `html-node-handlers.js`.
+            console.warn(`[TwoWayBindingAttribute] Missing originalHtmlNode for bind:${propName}. Cannot infer specific event type.`);
+        }
+
+        const handlerFnVar = context.getUniqueVar('bindHandler');
+        code += `  const ${handlerFnVar} = (e) => { ${reactiveVarJs}.value = e.target.${propName}; };\n`;
+        code += `  ${elVar}.addEventListener('${eventType}', ${handlerFnVar});\n`;
+        code += `  ${context.cleanupQueue}.push(() => ${elVar}.removeEventListener('${eventType}', ${handlerFnVar}));\n`;
+
+        return code;
+    },
+
+    MustacheAttribute: (attrNode, elVar, context, generateExpression, imports, originalHtmlNode) => {
+        // This handles attributes like `class={myClass}` or `id={someId}` where the *entire* value
+        // is a single JavaScript expression.
+        imports.add('$effect');
+        imports.add('$derived');
+        imports.add('attr'); // Helper for reactive attribute updates
+
+        const expressionJs = generateExpression(attrNode.expression, context);
+        const attributeName = attrNode.name;
+
+        // Use the 'attr' helper to set dynamic attributes reactively
+        return `  ${context.cleanupQueue}.push(attr(${elVar}, '${attributeName}', $derived(() => ${expressionJs})));\n`;
+    },
+
+    // *** THIS IS THE HANDLER FOR KeyValueAttribute ***
+    KeyValueAttribute: (attrNode, elVar, context, generateExpression, imports, originalHtmlNode) => {
+        let code = '';
+        const attributeName = attrNode.name;
+
+        // The 'value' of a KeyValueAttribute is an array of parts.
+        // These parts can be Text nodes or MustacheAttribute nodes.
+        const parts = attrNode.value;
+
+        if (!Array.isArray(parts)) {
+            // This case should ideally not happen if the parser is consistent.
+            console.warn(`[KeyValueAttribute] Expected attrNode.value to be an array for attribute "${attributeName}", got non-array:`, parts);
+            // Fallback: Treat as a static string.
+            return `  ${elVar}.setAttribute('${attributeName}', ${JSON.stringify(String(parts))});\n`;
+        }
+
+        // Determine if the attribute value contains any dynamic parts (MustacheAttribute)
+        const hasDynamicPart = parts.some(part => part && part.type === 'MustacheAttribute');
+
+        if (!hasDynamicPart) {
+            // If only static Text nodes, combine them and set attribute once
+            const staticValue = parts.map(part => {
+                if (part && part.type === 'Text') {
+                    return part.data || part.raw || '';
+                }
+                console.warn(`[KeyValueAttribute] Unexpected non-Text part in static attribute "${attributeName}":`, part);
+                return String(part); // Attempt to stringify for robustness
+            }).join('');
+            code += `  ${elVar}.setAttribute('${attributeName}', ${JSON.stringify(staticValue)});\n`;
+        } else {
+            // If dynamic parts are present, build a derived expression for the full string
+            // e.g., `class="my-class {someVar} other"` => `'my-class ' + (someVar) + ' other'`
+            imports.add('$effect');
+            imports.add('$derived');
+            imports.add('attr'); // Need the 'attr' helper for dynamic updates
+
+            const derivedParts = parts.map(part => {
+                if (part && part.type === 'Text') {
+                    return JSON.stringify(part.data || part.raw || '');
+                } else if (part && part.type === 'MustacheAttribute') {
+                    // Generate JS for the expression within the MustacheAttribute.
+                    // `generateExpression` is responsible for handling the AST structure of `part.expression`.
+                    return `(${generateExpression(part.expression, context)})`; // Wrap in parens for safety
+                } else {
+                    console.warn(`[KeyValueAttribute] Unhandled dynamic part type in attribute "${attributeName}": ${part && part.type}`, part);
+                    return `''`; // Fallback for unhandled part types
+                }
+            }).filter(Boolean).join(' + '); // Filter out empty strings from join to avoid "a + + b"
+
+            // Wrap the whole thing in a derived signal and use the 'attr' helper
+            code += `  ${context.cleanupQueue}.push(attr(${elVar}, '${attributeName}', $derived(() => ${derivedParts})));\n`;
+        }
+        return code;
+    },
+
+    // Handles attributes like `<input disabled>` or `<input id="foo">`
+    // where the value is either implicitly true (boolean) or a simple literal.
+    LiteralAttribute: (attrNode, elVar, context, generateExpression, imports, originalHtmlNode) => {
+        const attributeName = attrNode.name;
+        if (typeof attrNode.value === 'boolean' && attrNode.value === true) {
+            // For boolean attributes like `disabled`
+            return `  ${elVar}.setAttribute('${attributeName}', '');\n`;
+        } else {
+            // For simple static string literal values
+            return `  ${elVar}.setAttribute('${attributeName}', ${JSON.stringify(String(attrNode.value))});\n`;
         }
     },
 
-    
+    // If your parser has a distinct type for Boolean attributes like `required`
+    BooleanAttribute: (attrNode, elVar, context, generateExpression, imports, originalHtmlNode) => {
+        return `  ${elVar}.setAttribute('${attrNode.name}', '');\n`;
+    },
+
+    // Generic fallback for any other attribute types. Should ideally be hit rarely.
+    Attribute: (attrNode, elVar, context, generateExpression, imports, originalHtmlNode) => {
+        console.warn(`[htmlAttributeHandlers.Attribute] Generic attribute handler invoked for ${attrNode.name}. Consider more specific handler.`, attrNode);
+        if (attrNode.value === true) {
+            return `  ${elVar}.setAttribute('${attrNode.name}', '');\n`;
+        } else if (attrNode.value && attrNode.value.type === 'Text') {
+            return `  ${elVar}.setAttribute('${attrNode.name}', ${JSON.stringify(attrNode.value.data || attrNode.value.raw)});\n`;
+        } else if (attrNode.value) {
+            // Last resort: stringify whatever the value is
+            return `  ${elVar}.setAttribute('${attrNode.name}', ${JSON.stringify(String(attrNode.value))});\n`;
+        }
+        return '';
+    }
 };

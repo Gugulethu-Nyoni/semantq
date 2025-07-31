@@ -101,6 +101,17 @@ function createMemberExpression(object, property) {
   });
 }
 
+function createUpdateExpression(operator, argument, prefix) {
+  return {
+    type: "UpdateExpression",
+    operator,
+    argument,
+    prefix,
+    start: argument.start || location().start,
+    end: location().end
+  };
+}
+
 
 function createElement(start, end, name, attributes, children) {
   const processedChildren = Array.isArray(children)
@@ -359,7 +370,7 @@ TextNode
 
 
 CommentBlock 
-  = "<!--" content:$((!"-->" .)*) "-->"
+  = "<!--" content:$((!"-->" .)*) "-->" _
     {
       return {
         type: 'CommentBlock',
@@ -513,10 +524,13 @@ AttributeTypes
 =  ExpressionAttribute / BasicHtmlAttribute 
 
 ExpressionAttribute
-= ArrowFunctionCall 
+  = ArrowFunction
+  / UpdateExpression
+
+
 
 BasicHtmlAttribute
-= KeyValueAttribute / BooleanAttribute / BooleanIdentifierAttribute
+= TwoWayBindingAttribute / KeyValueAttribute / BooleanAttribute / BooleanIdentifierAttribute
 
 KeyValueAttribute
   = _ attributeName:AttributeName _ "=" _ attributeValue:AttributeValue _ {
@@ -546,6 +560,25 @@ KeyValueAttribute
           };
       }
     }
+    
+    
+    
+  TwoWayBindingAttribute "two-way binding attribute"
+  = "bind:" propertyName:ExtendedIdentifier _ "=" _ value:AttributeValue {
+      // propertyName: e.g., "value" (string)
+      // value: The AST node for the expression, often a MustacheAttributeValue
+      if (value.type !== "MustacheAttribute") {
+          error("Two-way binding ('bind:') attributes must have a mustache expression value (e.g., {variable}).");
+      }
+      return {
+        start: location().start.offset,
+        end: location().end.offset,
+        type: "TwoWayBindingAttribute", // CRITICAL: The type your handler expects
+        name: propertyName,             // The string "value" (or "checked", etc.)
+        expression: value.expression    // The AST for `count` (or whatever JS expression)
+      };
+    }
+    
     
 BooleanAttribute
 = _ name:Identifier _ {
@@ -615,15 +648,17 @@ RegularAttributeValue
     
     
 MustacheAttributeValue
-= "{" value:MustacheAttributeValueIdentifier   "}" {
+= "{" _ expr:MustacheExpression _ "}" { // Changed 'value:MustacheAttributeValueIdentifier' to 'expr:MustacheExpression'
       return {
-        start: location().start.offset + 1,  // Adjust to start after the opening quote
-        end: location().end.offset - 1,      // Adjust to end before the closing quote
+        start: location().start.offset, // Start from the '{'
+        end: location().end.offset,     // End at the '}'
         type: "MustacheAttribute",
-        name: value
+        expression: expr // Store the parsed expression AST here
       };
     }
-  
+
+
+
  MustacheAttributeValueIdentifier
  = ChainedIdentifier / Identifier
   
@@ -781,8 +816,10 @@ ArrowParams
     }
 
 ArrowFunctionBody
-  = CallExpression
+  = PostfixUnaryExpression
+  / CallExpression
   / Identifier
+  / UpdateExpression
   / BlockStatement
 
 
@@ -838,14 +875,14 @@ Params
 
   
 InnerContent
-  = parts:(HtmlTagWithExpressions / LogicBlock / TextWithExpressions / CommentBlock / TextNode)* { // Added TextNode directly
+  = parts:(HtmlTagWithExpressions / LogicBlock / TextWithExpressions / CommentBlock / TextNode)* {
       const flattened = parts.flat().filter(x => x !== null && x !== undefined);
 
       if (flattened.length === 1 && flattened[0].type !== 'Fragment') {
         return flattened[0];
       }
       if (flattened.length === 0) {
-          return null; // Or { type: 'EmptyContent' } if you want an explicit node
+          return null;
       }
 
       const start = flattened[0]?.start !== undefined ? flattened[0].start : location().start.offset;
@@ -913,32 +950,38 @@ ContentBody
     }
 
 ContentLine
-  =  content:(
+  = content:(
       IfStatement
       / EachStatement
       / HtmlTagWithExpressions
-      / Interpolations
-      / ConsequentContent
+      / Interpolations // This is MustacheTag for HTML interpolation
+      / ConsequentContentBlock // Use ConsequentContentBlock for general nested content
       / TextNode
+      / CommentBlock
     ) _ {
       return content;
     }
 
 HtmlTagWithExpressions
-  = OpenCloseTags / SelfClosingTags / TextWithExpressions / CommentBlock 
+  = OpenCloseTags
+  / SelfClosingTags
+  / TextWithExpressions // TextWithExpressions handles mixed text and expressions
+  / CommentBlock
+
 
 TextWithExpressions
-  = parts:(TextPart / MustacheTag / ConsequentContent / CommentBlock  (_ ConsequentContent)*)+ {
-      const validParts = parts.flatMap(part => 
+  = parts:(TextPart / MustacheTag / ConsequentExpression / CommentBlock / ConsequentContentBlock)+ { // Changed to ConsequentContentBlock
+      const validParts = parts.flatMap(part =>
         Array.isArray(part) ? part : [part]
-      ).filter(part => 
-        part && (part.type !== 'TextNode' || part.value.trim())
+      ).filter(part =>
+        part && (part.type !== 'TextNode' || part.value.trim().length > 0)
       );
-      
+
       if (validParts.length === 1) return validParts[0];
       return createMixedContentNode(validParts);
     }
-    
+
+
 TextPart
   = _ text:$([^@{}\n<]+) _ {
       return text.trim() ? {
@@ -953,16 +996,293 @@ TextPart
 
 
 Interpolations
-= Expression / MustacheTag 
+= Expression / MustacheTag
 
 MustacheTag
-  = _ "{" _ expr:ChainedIdentifier _ "}" _ {
+  = _ "{" _ expr:MustacheExpression _ "}" _ {
       return {
         type: 'MustacheTag',
         expression: expr,
         start: location().start,
         end: location().end
       };
+    }
+
+// Ensure MustacheExpression points to FullJSExpression for its parsing logic.
+MustacheExpression
+  = FullJSExpression; // All mustache expressions are now handled by the comprehensive FullJSExpression
+
+  
+
+TemplateLiteral
+  = "`" parts:TemplatePart* "`" {
+      return {
+        type: 'TemplateLiteral',
+        parts: parts,
+        start: location().start,
+        end: location().end
+      };
+    }
+
+TemplatePart
+  = "${" expr:MustacheExpression "}" {
+      return {
+        type: 'TemplateExpression',
+        expression: expr
+      };
+    }
+  / $[^`$]+ {
+      return {
+        type: 'TemplateText',
+        value: text()
+      };
+    }
+
+// Reuse all your existing expression rules
+TernaryExpression
+  = test:LogicalORExpression _ "?" _ consequent:MustacheExpression _ ":" _ alternate:MustacheExpression {
+      return createConditionalExpression(test, consequent, alternate);
+    }
+
+LogicalORExpression
+  = left:LogicalNullishExpression _ "||" _ right:LogicalORExpression { return createBinaryExpression(left, "||", right); }
+  / LogicalNullishExpression
+
+LogicalNullishExpression
+  = left:LogicalANDExpression _ "??" _ right:LogicalNullishExpression { return createBinaryExpression(left, "??", right); }
+  / LogicalANDExpression
+  
+
+LogicalANDExpression
+  = left:BitwiseExpression _ "&&" _ right:LogicalANDExpression { return createBinaryExpression(left, "&&", right); }
+  / BitwiseExpression
+
+BitwiseExpression
+  = left:EqualityExpression _ op:(">>>" / "&" / "|" / "^" / "<<" / ">>") _ right:BitwiseExpression {
+      return createBinaryExpression(left, op, right);
+    }
+  / EqualityExpression
+
+EqualityExpression
+  = left:RelationalExpression _ op:("===" / "!==" / "!=" / "==") _ right:EqualityExpression { return createBinaryExpression(left, op, right); }
+  / RelationalExpression
+
+RelationalExpression
+  = left:AdditiveExpression _ op:("<=" / ">=" / "<" / ">") _ right:RelationalExpression { return createBinaryExpression(left, op, right); }
+  / AdditiveExpression
+
+AdditiveExpression
+  = left:MultiplicativeExpression _ op:("+" / "-") _ right:AdditiveExpression { return createBinaryExpression(left, op, right); }
+  / MultiplicativeExpression
+
+MultiplicativeExpression
+  = left:LeftHandSideExpression _ op:("*" / "/" / "%") _ right:MultiplicativeExpression {
+      return createBinaryExpression(left, op, right);
+    }
+  / LeftHandSideExpression
+
+
+LeftHandSideExpression
+  = CallExpression
+  / MemberExpression
+  / PostfixUnaryExpression
+  / PrimaryExpression
+
+
+
+PostfixUnaryExpression
+  = argument:Identifier _ operator:("++" / "--") {
+      return {
+        type: "PostfixUnaryExpression",
+        argument,
+        operator,
+        prefix: false,
+        loc: location(),
+        start: argument.start,
+        end: location().end
+      };
+    }
+
+
+
+PrimaryAtom
+  = Identifier
+  / NumericLiteral
+  / StringLiteral
+  / Literal
+  / ArrayLiteral
+  / ObjectLiteral
+  / "(" _ MustacheExpression _ ")" { return expr; }
+
+
+PrimaryExpression
+  = ArrayLiteral
+  / ObjectLiteral
+  / "(" _ expr:FullJSExpression _ ")" { return expr; } // Parenthesized expressions contain a full expression
+  / NumericLiteral
+  / StringLiteral
+  / Literal
+  / Identifier // A simple identifier is a primary expression
+  ;
+
+
+
+UpdateExpression
+  = argument:Identifier _ op:("++" / "--") {
+      return createUpdateExpression(op, argument, false);
+    }
+
+
+
+CallExpression
+  = callee:MemberExpression _ "(" args:ArgumentList? ")" {
+      return createCallExpression(callee, args || []);
+    }
+
+MemberExpression
+  = head:PrimaryAtom tail:(
+      "[" _ expr:MustacheExpression _ "]"  // Array access
+      / "." _ prop:Identifier              // Property access
+      / "?." _ prop:Identifier             // Optional chaining
+    )* {
+      return tail.reduce((acc, part) => {
+        if (part[1] === '[') {
+          // Array access
+          return {
+            type: 'MemberExpression',
+            object: acc,
+            property: part[2],
+            computed: true,
+            optional: false
+          };
+        } else if (part[1] === '?.') {
+          // Optional chaining
+          return {
+            type: 'MemberExpression',
+            object: acc,
+            property: part[2],
+            computed: false,
+            optional: true
+          };
+        } else {
+          // Regular property access
+          return {
+            type: 'MemberExpression',
+            object: acc,
+            property: part[2],
+            computed: false,
+            optional: false
+          };
+        }
+      }, head);
+    }
+
+UnaryExpression
+  = op:("!" / "+" / "-" / "~" / "typeof" / "void" / "delete" / "++" / "--") _ argument:AtomicExpression {
+      return createUnaryExpression(op, argument);
+    }
+
+AtomicExpression
+  = Identifier
+  / Literal
+  / "(" _ FullJSExpression _ ")" // Use FullJSExpression here for consistent parsing of parenthesized expressions
+  ;
+
+
+ArgumentList
+  = head:MustacheExpression tail:(_ "," _ MustacheExpression)* {
+      return [head, ...tail.map(t => t[3])];
+    }
+
+// Literals (keep your existing definitions)
+NumericLiteral
+  = value:$[0-9]+ {
+      return createNode('Literal', location().start, location().end, {
+        value: parseInt(value, 10),
+        raw: value
+      });
+    }
+
+ArrayLiteral
+  = "[" _ elements:(MustacheExpression (_ "," _ MustacheExpression)*)? _ "]" {
+      const items = elements
+        ? [elements[0], ...elements[1].map(e => e[3])]
+        : [];
+      return {
+        type: "ArrayExpression",
+        elements: items,
+        start: location().start,
+        end: location().end
+      };
+    }
+
+
+
+ObjectLiteral
+  = "{" _ pairs:(ObjectPair (_ "," _ ObjectPair)*)? _ "}" {
+      const properties = pairs
+        ? [pairs[0], ...pairs[1].map(p => p[3])]
+        : [];
+      return {
+        type: "ObjectExpression",
+        properties,
+        start: location().start,
+        end: location().end
+      };
+    }
+
+ObjectPair
+  = key:Identifier _ ":" _ value:MustacheExpression {
+      return {
+        type: "Property",
+        key,
+        value
+      };
+    }
+
+
+
+
+StringLiteral
+  = "'" chars:$[^']* "'" 
+  / '"' chars:$[^"]* '"' {
+      return createNode('Literal', location().start, location().end, {
+        value: chars,
+        raw: text()
+      });
+    }
+
+Literal
+  = "true" { 
+      return createNode('Literal', location().start, location().end, {
+        value: true,
+        raw: "true"
+      });
+    }
+  / "false" {
+      return createNode('Literal', location().start, location().end, {
+        value: false,
+        raw: "false"
+      });
+    }
+  / "null" {
+      return createNode('Literal', location().start, location().end, {
+        value: null,
+        raw: "null"
+      });
+    }
+  / "undefined" {
+      return createNode('Literal', location().start, location().end, {
+        value: undefined,
+        raw: "undefined"
+      });
+    }
+
+Identifier
+  = name:$([a-zA-Z_][a-zA-Z0-9_]*) {
+      return createNode('Identifier', location().start, location().end, { 
+        name: name 
+      });
     }
 
 ChainedIdentifier
@@ -980,30 +1300,14 @@ ChainedIdentifier
 Condition
   = head:LogicalORExpression { return head; }
 
-LogicalORExpression
-  = left:ParenthesizedLogicalAND _ "||" _ right:ParenthesizedLogicalOR { return createBinaryExpression(left, "||", right); }
-  / LogicalANDExpression
 
 
-// Then update LogicalANDExpression to chain to BitwiseExpression:
-LogicalANDExpression
-  = left:ParenthesizedBitwise _ "&&" _ right:ParenthesizedLogicalAND { 
-      return createBinaryExpression(left, "&&", right);
-    }
-  / BitwiseExpression
 
-BitwiseANDExpression
-  = left:ParenthesizedEquality _ "&" _ right:BitwiseANDExpression { 
-      return createBinaryExpression(left, "&", right); 
-    }
-  / EqualityExpression
+
+
   
   
-  BitwiseExpression
-  = left:EqualityExpression _ op:(">>>" / "&" / "|" / "^" / "<<" / ">>") _ right:BitwiseExpression {
-      return createBinaryExpression(left, op, right);
-    }
-  / EqualityExpression
+  
   
   // Add parenthesized version
 ParenthesizedBitwise
@@ -1011,10 +1315,7 @@ ParenthesizedBitwise
   / "(" _ expr:BitwiseExpression _ ")" { return expr; }
 
 // Keep all your existing Parenthesized rules but add:
-ParenthesizedBitwiseAND
-  = BitwiseANDExpression
-  / "(" _ expr:BitwiseANDExpression _ ")" { return expr; }
-  
+
 ParenthesizedLogicalOR
   = LogicalORExpression
   / "(" _ expr:LogicalORExpression _ ")" { return expr; }
@@ -1027,111 +1328,50 @@ ParenthesizedEquality
   = EqualityExpression
   / "(" _ expr:EqualityExpression _ ")" { return expr; }
 
-EqualityExpression
-  = left:RelationalExpression _ op:("===" /  "!==" / "!=" / "==") _ right:EqualityExpression { return createBinaryExpression(left, op, right); }
-  / RelationalExpression
 
-RelationalExpression
-  = left:AdditiveExpression _ op:("<=" / ">=" / "<" / ">") _ right:RelationalExpression { return createBinaryExpression(left, op, right); }
-  / AdditiveExpression
-
-AdditiveExpression
-  = left:MultiplicativeExpression _ op:("+" / "-") _ right:AdditiveExpression { return createBinaryExpression(left, op, right); }
-  / MultiplicativeExpression
-
-MultiplicativeExpression 
-  = left:PrimaryExpression _ op:("*" / "/" / "%") _ right:MultiplicativeExpression { return createBinaryExpression(left, op, right); }
-  / PrimaryExpression
-
-PrimaryExpression
-  = 
-  CallExpression
-  / ChainedIdentifier
-  / UnaryExpression
-  / "(" _ expr:Condition _ ")" { return expr; }
-  / NumericLiteral
-  / StringLiteral
-  / Literal
-  / Identifier 
  
 
-CallExpression
-  = callee:Identifier _ "(" args:ArgumentList? _ ")" _ {
-      return createCallExpression(callee, args);
-    }
 
-UnaryExpression
-  = "!" (_ / __) argument:PrimaryExpression { 
-      return createNode('UnaryExpression', location().start, location().end, {
-        operator: "!",
-        argument: argument,
-        prefix: true
-      });
-    }
-    
-    
-  ArgumentList
-  = head:Condition tail:(_ "," _ Condition)* { 
-      return [head, ...tail.map(t => t[3])];
-    }
-  / _ { return []; }  // Empty args
-  
-  
 
-Identifier
-  = name:$([a-zA-Z_][a-zA-Z0-9_]*) {
-      return createNode('Identifier', location().start, location().end, { 
-        name: name 
-      });
-    }
 
-NumericLiteral
-  = value:$[0-9]+ {
-      return createNode('Literal', location().start, location().end, {
-        value: parseInt(value, 10),
-        raw: value
-      });
-    }
 
-Literal
-  = "true" { 
-      return createNode('Literal', location().start, location().end, {
-        value: true,
-        raw: "true"
-      });
-    }
-  / "false" {
-      return createNode('Literal', location().start, location().end, {
-        value: false,
-        raw: "false"
-      });
-    }
-
-StringLiteral
-  = "'" chars:$[^']* "'" 
-  / '"' chars:$[^"]* '"' {
-      return createNode('Literal', location().start, location().end, {
-        value: chars,
-        raw: text()
-      });
-    }
   /* START CONSEQUENT */
   
   
 
-ConsequentContent 
-  = "{" _ expr:(TernaryExpression / ArrowFunction / EachStatement) _ "}" { 
-      return createConsequentExpression(expr);
+// NEW RULE: ConsequentContentBlock
+// This rule allows content that is explicitly within a block like an @if or @each.
+// It can contain HTML elements, expressions, and text.
+
+
+ConsequentContentBlock
+  = parts:(MustacheTag / LogicBlock / OpenCloseTags / SelfClosingTags / TextNode / CommentBlock)+ {
+      return createMixedContentNode(parts);
     }
+
+ConsequentContent
+  = ConsequentExpression // Only allows a direct expression now
+  / MustacheTag // If a mustache tag is treated as a consequent
+  / TextNode // Plain text that might be a consequent
+  / CommentBlock // Comments are okay
+  / ConsequentContentBlock // Allows a block of mixed content, but only if explicitly a "block"
+  ;
+
   
-    
-    
-  ConsequentExpression
-  = 
-  ArrowFunction
+ConsequentExpression
+= ArrowFunction
   / TernaryExpression
-  / ExistingExpression 
-  
+  / PostfixUnaryExpression // Added to handle count++
+  / UnaryExpression // Handles -count, !isAdmin, etc.
+  / CallExpression // Handles function()
+  / MemberExpression // Handles obj.prop
+  / Identifier // Handles single identifiers like 'counter'
+  / Literal // Handles 'true', '123', '"hello"'
+  / ArrayLiteral
+  / ObjectLiteral
+  / ExistingExpression // Keep for other complex expressions
+
+
 
 // Reuse all existing expression rules through this proxy rule
 ExistingExpression
@@ -1140,19 +1380,14 @@ ExistingExpression
 
 // Only need to add these new rules:
 // Then update your grammar:
-TernaryExpression
-  = test:ExistingExpression _ "?" _ consequent:ConsequentExpression _ ":" _ alternate:ConsequentExpression {
-      // Ensure we have valid locations
-      if (!test.start || !alternate.end) {
-        error('Invalid positions in ternary expression');
-      }
-      return createConditionalExpression(test, consequent, alternate);
-    }
+
     
 ArrowFunction
-  = params:ArrowParameters _ "=>" _ body:ArrowBody {
+  = params:ArrowParameters _ "=>" _ body:(ArrowFunctionBody / UnaryExpression / UpdateExpression) {
       return createArrowFunction(params, body);
     }
+
+
 
 ArrowParameters
   = "(" _ ")" { return []; }  // Explicit empty params
@@ -1165,14 +1400,31 @@ ParameterList
     }
 
 ArrowBody
-  = "{" _ body:ConsequentExpression _ "}" {
-      if (!body) error('Empty arrow function body');
-      return body;
-    }
-  / body:(ValidExpression / StringLiteral) {  // Add StringLiteral directly
-      if (!body) error('Invalid arrow function body');
-      return body;
-    }
+  = BlockStatement
+  / FullJSExpression // NEW: A more comprehensive rule for single JS expressions
+  / StringLiteral;
+
+
+
+// Define FullJSExpression to encompass all possible expression types
+FullJSExpression
+  = TernaryExpression         // Highest-level conditional
+  / LogicalORExpression       // Logical OR (lowest binary precedence)
+  / LogicalNullishExpression
+  / LogicalANDExpression
+  / BitwiseExpression
+  / EqualityExpression
+  / RelationalExpression
+  / AdditiveExpression
+  / MultiplicativeExpression
+  / UnaryExpression           // IMPORTANT: Unary (like '!') must be tried before anything that might consume its argument as a primary.
+  / PostfixUnaryExpression    // IMPORTANT: Postfix (like '++') must be tried before just a plain identifier.
+  / CallExpression            // Function calls
+  / MemberExpression          // Property access (dot or bracket)
+  / PrimaryExpression         // The base atoms (literals, identifiers, parenthesized expressions)
+  ;
+
+
 
 ValidExpression
   = ExistingExpression  // Reuse your existing expression rules
@@ -1207,17 +1459,20 @@ EachSource
     }
 
 
-/*
-JSExpression
-  = identifier:Identifier
-  / identifier:Identifier _ "." property:Identifier { // to capture property access like item.id
-      return { type: 'PropertyAccess', base: identifier, property };
-  }
-*/
+
 
 JSExpression
   = ChainedIdentifier
   / Identifier
+  / PostfixUnaryExpression // Allow post-fix for bind:value and similar
+  / CallExpression
+  / Literal
+  / NumericLiteral
+  / StringLiteral
+  / UnaryExpression
+  / TernaryExpression
+  / LogicalORExpression // Include all logical/binary expressions
+
     
 /* END EACH BLOCK */
 

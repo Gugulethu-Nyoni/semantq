@@ -1,4 +1,4 @@
-// src/code-generators/html-node-handlers.js
+import { htmlAttributeHandlers } from './html-attribute-handlers.js'; // <-- THIS IMPORT IS CRUCIAL
 
 export const htmlNodeHandlers = {
     IfStatement: (node, context, generateChildrenCode, generateExpression, imports) => {
@@ -97,32 +97,68 @@ export const htmlNodeHandlers = {
         return code;
     },
 
-    Element: (node, context, generateChildrenCode, generateExpression, imports, attributeHandlers) => {
+    Element: (node, context, generateChildrenCode, generateExpression, imports) => {
         const elVar = context.getUniqueVar(node.name);
         let code = `  const ${elVar} = document.createElement('${node.name}');\n`;
 
-        node.attributes && node.attributes.forEach(attr => {
-            const handler = attributeHandlers[attr.type];
-            if (handler) {
-                // IMPORTANT FIX: Reordered arguments to match the expected signature
-                // of attribute handlers in html-attribute-handlers.js:
-                // (attr, elVar, context, generateExpression, imports)
-                code += handler(
-                    attr,               // 1st argument: the attribute AST node
-                    elVar,              // 2nd argument: the element's variable name (e.g., 'input_2')
-                    context,            // 3rd argument: the context object (contains reactiveScope)
-                    generateExpression, // 4th argument: the JS expression generator
-                    imports             // 5th argument: the imports set
+        const attributes = node.attributes || []; // Ensure attributes is always an array
+
+        attributes.forEach(attr => {
+            let handlerFn = null;
+
+            // Use direct lookup for handler functions from htmlAttributeHandlers
+            // The order matters: more specific handlers first.
+            if (attr.type === 'EventHandler' && htmlAttributeHandlers.EventHandler) {
+                handlerFn = htmlAttributeHandlers.EventHandler;
+            } else if (attr.smqtype === 'TwoWayBindingAttribute' && htmlAttributeHandlers.TwoWayBindingAttribute) {
+                handlerFn = htmlAttributeHandlers.TwoWayBindingAttribute;
+            } else if (attr.type === 'MustacheAttribute' && htmlAttributeHandlers.MustacheAttribute) {
+                handlerFn = htmlAttributeHandlers.MustacheAttribute;
+            } else if (attr.type === 'KeyValueAttribute' && htmlAttributeHandlers.KeyValueAttribute) {
+                handlerFn = htmlAttributeHandlers.KeyValueAttribute;
+            }
+            // `BooleanAttribute` usually maps to a generic `Attribute` handler or specific logic
+            else if ((attr.type === 'BooleanAttribute' || attr.smqtype === 'BooleanAttribute') && htmlAttributeHandlers.Attribute) {
+                handlerFn = htmlAttributeHandlers.Attribute; // Assuming generic Attribute handler manages boolean attributes
+            } else if (attr.type === 'LiteralAttribute' && htmlAttributeHandlers.LiteralAttribute) {
+                handlerFn = htmlAttributeHandlers.LiteralAttribute;
+            }
+            // Add other attribute types if your parser generates them (e.g., SpreadAttribute)
+
+            if (handlerFn) {
+                code += handlerFn(
+                    attr,
+                    elVar,
+                    context,
+                    generateExpression,
+                    imports
                 );
             } else {
-                console.warn(`[CodeGenerator] No handler for attribute type: ${attr.type}. Attribute:`, attr);
+                console.warn(`[htmlNodeHandlers] No handler for attribute type: ${attr.type}. Attribute:`, attr);
                 // Fallback logic for unhandled attribute types
                 const attributeName = typeof attr.name === 'object' ? attr.name.name : attr.name;
-                if (attr.value === true) {
+                if (attr.value === true) { // For boolean attributes written as `disabled`
                     code += `  ${elVar}.setAttribute('${attributeName}', '');\n`;
-                } else if (attr.type === 'KeyValueAttribute' && attr.value && Array.isArray(attr.value) && attr.value[0]?.type === 'Text') {
-                    const staticValue = attr.value[0].data || attr.value[0].raw;
+                } else if (attr.value && (attr.value.type === 'Text' || typeof attr.value === 'string')) {
+                    // Handle simple static text values
+                    const staticValue = attr.value.type === 'Text' ? (attr.value.data || attr.value.raw) : String(attr.value);
                     code += `  ${elVar}.setAttribute('${attributeName}', ${JSON.stringify(staticValue)});\n`;
+                } else if (Array.isArray(attr.value) && attr.value.every(v => v.type === 'Text' || typeof v === 'string')) {
+                    // Handle array of text nodes as a static value
+                    const staticValue = attr.value.map(v => v.data || v.raw || String(v)).join('');
+                    code += `  ${elVar}.setAttribute('${attributeName}', ${JSON.stringify(staticValue)});\n`;
+                }
+                // If it's a MustacheAttribute that somehow didn't get picked up by its own handler,
+                // and it contains an expression, we might try a dynamic fallback if not already handled by KeyValueAttribute.
+                // This specific fallback should ideally not be hit if the primary handlers are correct.
+                else if (attr.type === 'MustacheAttribute' && attr.expression) {
+                    // This scenario should be rare if MustacheAttribute handler is working, but as a last resort:
+                    console.warn(`[htmlNodeHandlers] Falling back for MustacheAttribute within Element loop: ${attributeName}`);
+                    imports.add('$effect');
+                    imports.add('$derived');
+                    imports.add('state'); // Assuming state.attr is available
+                    const dynamicValueJs = generateExpression(attr.expression, context);
+                    code += `  ${context.cleanupQueue}.push(state.attr(${elVar}, '${attributeName}', $derived(() => ${dynamicValueJs})));\n`;
                 }
             }
         });
@@ -132,7 +168,6 @@ export const htmlNodeHandlers = {
         code += `  ${context.currentParentVar}.appendChild(${elVar});\n`;
         return code;
     },
-
     TextNode: (node, context) => {
         const textVar = context.getUniqueVar('text');
         let code = `  const ${textVar} = document.createTextNode(${JSON.stringify(node.value)});\n`;

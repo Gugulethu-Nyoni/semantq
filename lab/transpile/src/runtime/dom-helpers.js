@@ -1,4 +1,6 @@
-// src/runtime/dom-helpers.js
+// Import $effect and $derived if these helpers are reactive
+// The path needs to be correct relative to dom-helpers.js
+import { $effect, $derived } from '../../dist/state/index.js'; // Assuming '../state/index.js' is the correct path for your state management
 
 /**
  * Inserts a new DOM node after a reference node.
@@ -102,6 +104,45 @@ export function reconcileChildren(startAnchor, newItems, oldMap, createChildFn, 
     // It avoids removing all children of parentNode first.
     insertAfter(fragment, startAnchor);
 
-
     return newMap; // Return the updated map for the next reconciliation cycle
+}
+
+/**
+ * Reactively sets an attribute on a DOM element.
+ * This function should be called inside an $effect or similar reactive context
+ * that handles its own cleanup, or the returned cleanup function should be stored.
+ * @param {Element} element - The DOM element.
+ * @param {string} name - The name of the attribute.
+ * @param {import('../state/index.js').DerivedSignal<any>} valueSignal - A derived signal holding the attribute's value.
+ * @returns {Function} A cleanup function to stop the effect.
+ */
+export function attr(element, name, valueSignal) {
+    const stopEffect = $effect(() => {
+        const value = valueSignal.value; // Access the current value of the signal
+        if (value === null || value === undefined || value === false) {
+            element.removeAttribute(name);
+        } else if (value === true) {
+            // For boolean attributes (e.g., <input disabled={true}>)
+            element.setAttribute(name, '');
+        } else {
+            element.setAttribute(name, String(value));
+        }
+    });
+    return stopEffect; // Return the cleanup function
+}
+
+/**
+ * Reactively sets the text content of a Text node.
+ * This function should be called inside an $effect or similar reactive context
+ * that handles its own cleanup, or the returned cleanup function should be stored.
+ * @param {Text} textNode - The Text DOM node.
+ * @param {import('../state/index.js').DerivedSignal<any>} valueSignal - A derived signal holding the text's value.
+ * @returns {Function} A cleanup function to stop the effect.
+ */
+export function text(textNode, valueSignal) {
+    const stopEffect = $effect(() => {
+        // Ensure that null/undefined values result in an empty string, not "null" or "undefined"
+        textNode.textContent = String(valueSignal.value ?? '');
+    });
+    return stopEffect;
 }
