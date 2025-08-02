@@ -100,11 +100,10 @@ This document outlines the various attribute formats supported within Semantq Cu
 * Values may contain code, structured data, or regex
 
 
-
 ### Summary Table
 
 | Format                   | Example                   | Description                    |
-|  | - |  |
+| ------------------------ | ------------------------- | ------------------------------ |
 | `key="value"`            | `id="myId"`               | Most common format             |
 | `key='value'`            | `name='user'`             | Also valid                     |
 | `key=value`              | `width=100`               | Valid if value is safe         |
@@ -116,6 +115,8 @@ This document outlines the various attribute formats supported within Semantq Cu
 | Namespaced attributes    | `xlink:href="..."`        | Used in SVG/XML                |
 | Multiple values          | `class="a b c"`           | List of space-separated values |
 | Empty / present-only     | `<option selected>`       | Presence implies true          |
+
+
 
 
 ###  Special Semantq Custom Attributes
