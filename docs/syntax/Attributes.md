@@ -186,20 +186,70 @@ Of course. I'll update the README section to be more comprehensive, incorporatin
 
 ### Special Semantq Custom Attributes Table
 
+Perfect. Here's the **restructured guide** broken into the two requested sections:
 
-| Attribute Type | Custom Syntax Example | Node Name | Description |
-| :--- | :--- | :--- | :--- |
-| **Event Handler** | `<button @click={handler}>` | `EventHandler` | Handles DOM events with the **`@`** prefix. The associated function or expression is invoked when the event occurs. |
-| **Two-Way Binding** | `<input bind:value={variable}>` | `TwoWayBindingAttribute` | Creates **two-way data binding** with the **`bind:`** prefix, linking an element's property to a reactive state variable. |
-| **Dynamic Attribute** | `<input value={variable}>` | `MustacheAttribute` | A **one-way dynamic attribute** where the value is set by a reactive JavaScript expression inside **`{}`** curly braces. |
-| **Boolean Identifier** | `<button {disabled}>` | `MustacheAttribute` | A special case for dynamic boolean attributes, where the attribute is present or absent based on the truthiness of a reactive variable. |
-| **Key-Value** | `<input type="number">` | `KeyValueAttribute` | Standard static HTML attributes with a key-value pair. |
-| **Boolean** | `<input type="checkbox" checked>` | `BooleanAttribute` | A standalone boolean attribute that doesn't have a value. |
 
-***
+## Special Semantq Attributes
 
-### Additional Notes
+Semantq extends standard HTML with attribute-level reactivity. These custom attributes enable dynamic, interactive behavior while keeping your markup declarative.
 
-* **Self-Closing Tags**: All attributes can be used on self-closing tags, such as `<input type="text" @click={handler} />`.
-* **Dynamic Expressions**: The curly braces can contain complex JavaScript expressions, not just single variables. For example, `class={isActive ? 'active' : 'inactive'}` or `value={counter + 1}` are both valid.
-* **Modifiers**: Event handlers can include modifiers for advanced behavior, such as `@click.prevent` to prevent the default browser action.
+### Overview Table: Special Attribute Types
+
+| Attribute Type     | Example                      | Node Name                | Description                                             |
+| ------------------ | ---------------------------- | ------------------------ | ------------------------------------------------------- |
+| Event Handler      | `<button @click={handler}>`  | `EventHandler`           | Binds DOM events using the `@` prefix.                  |
+| Two-Way Binding    | `<input bind:value={state}>` | `TwoWayBindingAttribute` | Links DOM property to reactive state (syncs both ways). |
+| Mustache Attribute | `<input value={state}>`      | `MustacheAttribute`      | One-way binding from reactive state to DOM attribute.   |
+| Boolean (Dynamic)  | `<button {disabled}>`        | `MustacheAttribute`      | Conditionally renders attribute based on truthiness.    |
+| Static Key-Value   | `<input type="text">`        | `KeyValueAttribute`      | Standard HTML key-value pairs (non-reactive).           |
+| Static Boolean     | `<input disabled>`           | `BooleanAttribute`       | HTML boolean attributes with no explicit value.         |
+
+
+### Event Handlers – `@event={handler}`
+
+Attach JavaScript functions to native DOM events.
+
+```html
+<button @click={increment}>Click Me</button>
+```
+
+* Supports events like `click`, `input`, `change`, `keydown`, etc.
+* The handler receives the raw DOM `Event` object.
+
+
+
+### Two-Way Binding – `bind:property={state}`
+
+Binds an element’s property to a reactive variable for both reading and updating.
+
+```html
+<input type="number" bind:value={count} />
+```
+
+* Keeps `count.value` and the input field synchronized.
+* Ideal for forms, toggles, inputs, and sliders.
+
+
+### Dynamic Attributes – `{}` (Mustache)
+
+One-way dynamic updates using a JavaScript expression inside an attribute.
+
+```html
+<input value={count} />
+<img src={imageUrl} />
+```
+
+* Updates the DOM attribute whenever the underlying expression changes.
+
+### Dynamic Boolean Attributes – `{}` on its own
+
+The presence of the attribute depends on the truthiness of a reactive variable.
+
+```html
+<button {disabled}>Submit</button>
+```
+
+* If `disabled.value === true`, the attribute is added.
+* If false, it is removed.
+
+
