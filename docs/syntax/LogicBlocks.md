@@ -80,7 +80,7 @@ const items = $state([
 ```
 
 ```html
-<h1> Nested If and each Blocks</h1>
+<h1> Nested If and Each Blocks</h1>
 
 @if(items.length > 0)
   @each(items as item)
