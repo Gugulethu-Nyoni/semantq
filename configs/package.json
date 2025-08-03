@@ -52,7 +52,7 @@
     "http-server": "^14.1.1",
     "inquirer": "^12.7.0",
     "ora": "^8.2.0",
-    "@semantq/state": "^1.0.5"
+    "@semantq/state": "^1.0.6"
 
   }
 }
