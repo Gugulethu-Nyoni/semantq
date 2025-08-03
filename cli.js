@@ -71,14 +71,14 @@ const yellow = chalk.hex('#ffff00');
 // ===============================
 // Extracted function for installing the Semantq server
 async function installSemantqServer(targetBaseDir) {
-  const serverDir = path.join(targetBaseDir, 'semantq_server');
-  const repoURL = 'https://github.com/Gugulethu-Nyoni/semantq_server.git';
+  const serverDir = path.join(targetBaseDir, 'semantqQL');
+  const repoURL = 'https://github.com/Gugulethu-Nyoni/semantqQL.git';
 
   try {
-    // Check if semantq_server already exists
+    // Check if semantqQL already exists
     try {
       await fs.access(serverDir);
-      console.error(errorRed(`✖ Directory 'semantq_server' already exists in this project.`));
+      console.error(errorRed(`✖ Directory 'semantqQL' already exists in this project.`));
       console.log(chalk.yellow(`› Remove it or rename it before running this command.`));
       return false; // Indicate that installation was skipped due to existing directory
     } catch (err) {
@@ -88,16 +88,16 @@ async function installSemantqServer(targetBaseDir) {
       // Directory does not exist, which is what we want, so continue
     }
 
-    const spinner = ora(blue(`Cloning Semantq server package into ${purple('semantq_server/')}`)).start();
+    const spinner = ora(blue(`Cloning Semantq server package into ${purple('semantqQL/')}`)).start();
 
     // Clone using degit
     const emitter = degit(repoURL, { cache: false, force: true });
     await emitter.clone(serverDir);
 
-    spinner.succeed(blue(`✓ Semantq server installed at ${purple('semantq_server/')}`));
+    spinner.succeed(blue(`✓ Semantq server installed at ${purple('semantqQL/')}`));
 
     // Install dependencies in the new server directory
-    console.log(blue(`Installing dependencies in ${purple('semantq_server/')}`));
+    console.log(blue(`Installing dependencies in ${purple('semantqQL/')}`));
     execSync('npm install --silent --no-audit --no-fund', { cwd: serverDir, stdio: 'inherit' });
 
     console.log(blue(`✓ Server dependencies installed successfully.`));
@@ -242,7 +242,7 @@ program
 
         if (serverInstalled) {
           // Step 2: Install auth module in server
-          const serverDir = path.join(targetBaseDir, 'semantq_server');
+          const serverDir = path.join(targetBaseDir, 'semantqQL');
           console.log(`${purpleBright('🔐')} ${blue('Installing auth module in server:')} ${purple('@semantq/auth')}`);
           execSync('npm install @semantq/auth --silent --no-warnings --no-audit --no-fund', { cwd: serverDir, stdio: 'inherit' });
           console.log(`${purpleBright('✓')} ${blue('Auth module installed in server.')}`);
@@ -255,11 +255,11 @@ program
           console.log(`${purpleBright('✓')} ${blue('Full stack setup complete!')}`);
           console.log(`
 ${purpleBright('» Next steps:')}
-  ${purpleBright('›')} ${gray('Configure your auth settings in')} ${purple('semantq_server/semantq.config.js')}
-  ${purpleBright('›')} ${gray('Run database migrations:')} ${purple('cd semantq_server && semantq migrate')}
+  ${purpleBright('›')} ${gray('Configure your auth settings in')} ${purple('semantqQL/semantq.config.js')}
+  ${purpleBright('›')} ${gray('Run database migrations:')} ${purple('cd semantqQL && semantq migrate')}
   ${purpleBright('›')} ${gray('Start both client and server:')}
     ${purple('npm run dev')} ${gray('(in project root for client)')}
-    ${purple('npm run dev')} ${gray('(in semantq_server for server)')}
+    ${purple('npm run dev')} ${gray('(in semantqQL for server)')}
 `);
         } else {
             console.warn(chalk.yellow(`⚠️ Full stack setup partially completed due to existing server directory. Please check logs above.`));
@@ -611,7 +611,7 @@ program
     try {
       await installSemantqServer(targetBaseDir);
       console.log(chalk.cyan.bold(`\n› Next:`));
-      console.log(chalk.gray(`  › Run ${chalk.yellow('cd semantq_server')}`));
+      console.log(chalk.gray(`  › Run ${chalk.yellow('cd semantqQL')}`));
       console.log(chalk.gray(`  › Start your server with ${chalk.yellow('npm run dev')}`));
     } catch (error) {
       // Error already logged by installSemantqServer
@@ -737,7 +737,7 @@ program
 // function to read the config
 // Use dynamic import to support JS config files
 async function readServerConfig(projectRoot) {
-  const configPath = path.join(projectRoot, 'semantq_server', 'semantq.config.js');
+  const configPath = path.join(projectRoot, 'semantqQL', 'semantq.config.js');
   try {
     // Dynamically import the config file
     const config = await import(pathToFileURL(configPath).href);
@@ -756,14 +756,14 @@ program
   .description('Generate full backend resource (Model, Controller, Service, Route)')
   .action(async (resourceName) => {
     const targetBaseDir = process.cwd();
-    const serverDir = path.join(targetBaseDir, 'semantq_server');
+    const serverDir = path.join(targetBaseDir, 'semantqQL');
     const configPath = path.join(serverDir, 'semantq.config.js');
 
     try {
       // Verify server directory exists
       if (!fs.existsSync(serverDir)) {
-        console.error(errorRed('✖ semantq_server directory not found.'));
-        console.log(chalk.yellow('› Run this command from your project root with semantq_server installed.'));
+        console.error(errorRed('✖ semantqQL directory not found.'));
+        console.log(chalk.yellow('› Run this command from your project root with semantqQL installed.'));
         console.log(chalk.yellow('› To install the server, run: semantq install:server'));
         return;
       }
