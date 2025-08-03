@@ -1,6 +1,6 @@
 {
   "name": "semantq",
-  "version": "1.2.14",
+  "version": "1.2.15",
   "type": "module",
   "description": "Semantq is a fullstack JavaScript framework for writing intuitive reactive web apps as well IoT firmware and applications.",
   "main": "index.js",
