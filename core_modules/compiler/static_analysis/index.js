@@ -1,0 +1,330 @@
+"use strict";
+
+import { writeFile, mkdir } from 'node:fs/promises';
+import { join, basename } from 'node:path';
+import escodegen from 'escodegen';
+import { parse } from 'acorn';
+import customHtmlParser from '../customHtmlParser.js';
+import fs from 'fs-extra';
+import path from 'path';
+import prettier from 'prettier';
+import Anatomique from './anatomique.js';
+import { readFile as fsReadFile } from 'node:fs/promises';
+
+/**
+ * Main transformation pipeline - processes ASTs and generates final output files.
+ * This is the orchestrator that now explicitly separates JS bundle generation from HTML file creation.
+ * @param {Object} jsAST - JavaScript AST (Program node from Acorn).
+ * @param {string} cssCode - CSS content.
+ * @param {Object} customSyntaxAST - Custom HTML AST (from .smq file).
+ * @param {string} filePath - Original source file path (e.g., /path/to/routes/node/@page.smq.ast).
+ */
+export default async function transformASTs(jsAST, cssCode, customSyntaxAST, filePath) {
+    try {
+
+
+        const fileName = path.basename(path.dirname(filePath));
+        const appRootId = 'app';
+
+        //console.log("Initial Structure", customSyntaxAST);
+
+        // --- PHASE 1: CORE CUSTOM SYNTAX TRANSPILATION ---
+        // Anatomique transpiles custom HTML (customSyntaxAST) into reactive JS code.
+        const transpiler = new Anatomique({ content: jsAST }, cssCode, customSyntaxAST, filePath);
+        const { transpiledJSCode } = await transpiler.output();
+
+        //console.log("Critical",transpiledJSCode);
+
+
+        //return;
+
+        // --- PHASE 2: LAYOUT PROCESSING (if a layout exists for this route) ---
+        const layoutHTML = await processLayoutFile(filePath);
+        const hasLayout = Boolean(layoutHTML);
+        let layoutJS = '';
+        if (hasLayout) {
+            layoutJS = generateLayoutJS(layoutHTML);
+        }
+
+        // --- PHASE 3: FINAL JAVASCRIPT BUNDLE ASSEMBLY ---
+        // Combine original JS, transpiled custom syntax JS, and layout JS into a single JS file.
+        const finalJsCode = await generateFinalJsBundle(
+            jsAST,
+            transpiledJSCode,
+            hasLayout,
+            layoutJS
+        );
+
+        // --- FINAL PHASE: WRITE OUTPUT FILES ---
+        // Write the complete JS, CSS, and HTML files to their respective locations.
+        // The HTML file is now generated in this step.
+        await writeOutputFiles(filePath, finalJsCode, cssCode, fileName, appRootId);
+
+    } catch (error) {
+        console.error('❌ Transformation pipeline failed:', error);
+        throw error;
+    }
+}
+
+// -----------------------------------------------------------------------------
+// HELPER FUNCTIONS
+// -----------------------------------------------------------------------------
+
+/**
+ * Generates base imports for the application.
+ * @returns {string} - Common import statements.
+ */
+function generateBaseImports() {
+  return `
+import Router from '/core_modules/router/router.js';
+
+\n
+import {
+  $state,
+  $derived,
+  $effect,
+  bind,
+  bindText,
+  bindAttr,
+  bindClass,
+  $props,
+} from "@semantq/state";
+`;
+}
+
+
+
+
+/**
+ * Processes layout file if available and extracts its HTML content.
+ * @param {string} filePath - The original file path to deduce layout path.
+ * @returns {Object|null} - Object containing head, main, footer HTML strings, or null if no layout.
+ */
+async function processLayoutFile(filePath) {
+    const targetDir = path.dirname(filePath);
+    const layoutResolvedPath = path.join(targetDir, '@layout.resolved.ast');
+    const layoutSmqPath = path.join(targetDir, '@layout.smq.ast');
+
+    const layoutFilePath = fs.existsSync(layoutResolvedPath)
+        ? layoutResolvedPath
+        : fs.existsSync(layoutSmqPath) ? layoutSmqPath : null;
+
+    if (!layoutFilePath) return null;
+
+    try {
+        const layoutContent = await fsReadFile(layoutFilePath, 'utf-8');
+        const layoutAST = JSON.parse(layoutContent);
+        return extractLayoutContent(layoutAST);
+    } catch (error) {
+        console.error('Error processing layout file:', error);
+        return null;
+    }
+}
+
+/**
+ * Extracts specific HTML blocks (head, main, footer) from a layout AST.
+ * Uses customHtmlParser to convert AST nodes back to HTML strings.
+ * @param {Object} layoutAST - The AST of the layout file.
+ * @returns {Object} - HTML content strings for head, main, and footer.
+ */
+function extractLayoutContent(layoutAST) {
+    const blocks = { head: null, main: null, footer: null };
+    const traverse = (node) => {
+        if (Array.isArray(node)) return node.forEach(traverse);
+        if (node?.type === 'Element') {
+            if (node.name === 'head') blocks.head = node;
+            else if (node.name === 'main') blocks.main = node;
+            else if (node.name === 'footer') blocks.footer = node;
+        }
+        if (node?.children) node.children.forEach(traverse);
+    };
+    if (layoutAST.customAST) {
+        const rootNode = layoutAST.customAST.content[0]?.html?.children[0]?.children[0];
+        if (rootNode) traverse(rootNode);
+    }
+    return {
+        head: blocks.head ? customHtmlParser(blocks.head) : '',
+        main: blocks.main ? customHtmlParser(blocks.main) : '',
+        footer: blocks.footer ? customHtmlParser(blocks.footer) : ''
+    };
+}
+
+/**
+ * Generates JavaScript code for incorporating the layout HTML.
+ * @param {Object} layoutHTML - Object containing head, main, footer HTML strings.
+ * @returns {string} - JavaScript code for rendering the layout.
+ */
+function generateLayoutJS(layoutHTML) {
+    return `
+function layoutInit() {
+    const layoutBlocks = {
+        head: \`${layoutHTML.head}\`,
+        body: \`${layoutHTML.main}\`,
+        footer: \`${layoutHTML.footer}\`
+    };
+    function updateHead(html) {
+        const head = document.head;
+        const template = document.createElement('template');
+        template.innerHTML = html;
+        const preserved = [...head.querySelectorAll("script, link[rel='modulepreload']")]
+            .filter(el => (el.tagName === "SCRIPT" && el.type === "module") ||
+                          (el.tagName === "LINK" && el.rel === "modulepreload"))
+            .map(el => el.outerHTML);
+        head.innerHTML = '';
+        head.appendChild(template.content.cloneNode(true));
+        preserved.forEach(html => {
+            const temp = document.createElement("template");
+            temp.innerHTML = html;
+            head.appendChild(temp.content.firstChild);
+        });
+    }
+    function updateBody(html) {
+        document.body.innerHTML = '';
+        const template = document.createElement('template');
+        template.innerHTML = html;
+        document.body.appendChild(template.content.cloneNode(true));
+    }
+    function appendFooter(html) {
+        const template = document.createElement('template');
+        template.innerHTML = html;
+        document.body.appendChild(template.content.cloneNode(true));
+    }
+    if (layoutBlocks.head) updateHead(layoutBlocks.head);
+    if (layoutBlocks.body) updateBody(layoutBlocks.body);
+    if (layoutBlocks.footer) appendFooter(layoutBlocks.footer);
+}
+layoutInit();`;
+}
+
+/**
+ * Generates the complete JavaScript bundle by combining all code parts.
+ * @param {Object} originalJsAST - The initial JavaScript AST.
+ * @param {string} transpiledJSCode - JS code transpiled from custom HTML.
+ * @param {boolean} hasLayout - Whether a layout is present.
+ * @param {string} layoutJS - JavaScript code for layout initialization.
+ * @returns {Promise<string>} - The complete JS bundle string.
+ */
+async function generateFinalJsBundle(originalJsAST, transpiledJSCode, hasLayout, layoutJS) {
+    // 1. Hoist imports from the original JS AST
+    const { importsAST, jsCodeAST } = hoistImports(originalJsAST);
+
+    let allImports = generateBaseImports();
+    if (importsAST.length > 0) {
+        allImports += escodegen.generate({
+            type: "Program",
+            body: importsAST,
+            sourceType: "module"
+        });
+    }
+
+    // 2. Generate the main page JS code from the original AST
+
+
+        //console.log("transpiledJSCode",transpiledJSCode);
+
+    // 3. Assemble the complete JS bundle string.
+    const finalJsBundle = await formatCode(`
+${allImports}
+${hasLayout ? `
+// Layout initialization script
+${layoutJS}
+` : ''}
+
+// Transpiled custom HTML syntax (includes renderComponent)
+${transpiledJSCode}
+
+`, 'babel');
+
+    return finalJsBundle;
+}
+
+/**
+ * Separates import declarations from other JavaScript code.
+ * @param {Object} ast - The AST to process.
+ * @returns {{importsAST: Array, jsCodeAST: Array}} - Arrays of import nodes and other JS code nodes.
+ */
+function hoistImports(ast) {
+    const importsAST = [];
+    const jsCodeAST = [];
+    if (ast && Array.isArray(ast.body)) {
+        ast.body.forEach(node => {
+            node.type === "ImportDeclaration"
+                ? importsAST.push(node)
+                : jsCodeAST.push(node);
+        });
+    }
+    return { importsAST, jsCodeAST };
+}
+
+/**
+ * Formats code using Prettier.
+ * @param {string} code - The code string to format.
+ * @param {'babel'|'html'|'css'} parser - The parser to use for Prettier.
+ * @returns {Promise<string>} - The formatted code string.
+ */
+async function formatCode(code, parser) {
+    try {
+        return await prettier.format(code, { parser });
+    } catch (err) {
+        console.error(`Error formatting ${parser} code:`, err);
+        return code;
+    }
+}
+
+/**
+ * Writes the final generated JavaScript, CSS, and HTML files to disk.
+ * The HTML file is now generated directly within this function.
+ * @param {string} originalFilePath - The original source file path.
+ * @param {string} jsCode - The complete JavaScript bundle.
+ * @param {string} cssCode - The complete CSS content.
+ * @param {string} fileName - The base name for the output JS and CSS files.
+ * @param {string} appRootId - The ID of the root HTML element.
+ */
+async function writeOutputFiles(originalFilePath, jsCode, cssCode, fileName, appRootId) {
+    const outputDir = path.dirname(originalFilePath);
+    const jsPath = path.join(outputDir, `${fileName}.js`);
+    const cssPath = path.join(outputDir, `${fileName}.css`);
+    const htmlPath = path.join(outputDir, 'index.html');
+
+    // Ensure output directory exists
+    await mkdir(outputDir, { recursive: true });
+
+    // Generate the minimal HTML shell.
+    const config = await import('../../../semantq.config.js');
+    const { brand, pageTitle, metaDescription } = config.default;
+
+    const htmlContent = await formatCode(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${pageTitle}</title>
+    <meta name="description" content="${metaDescription}">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="${brand}">
+    ${cssCode ? `<link rel="stylesheet" href="./${fileName}.css">` : ''}
+</head>
+<body>
+    <div id="${appRootId}"></div>
+    <script type="module">
+        import { renderComponent } from './${fileName}.js';
+        document.addEventListener("DOMContentLoaded", () => {
+            const appRoot = document.getElementById('${appRootId}');
+            if (appRoot) {
+                const cleanup = renderComponent(appRoot);
+            } else {
+                console.error('App root element not found: #${appRootId}');
+            }
+        });
+    </script>
+</body>
+</html>`, 'html');
+
+    await Promise.all([
+        fs.writeFile(jsPath, jsCode),
+        cssCode && fs.writeFile(cssPath, cssCode),
+        fs.writeFile(htmlPath, htmlContent)
+    ]);
+    //console.log(`✨ Generated files for ${fileName}: ${jsPath}, ${htmlPath}${cssCode ? `, ${cssPath}` : ''}`);
+}
