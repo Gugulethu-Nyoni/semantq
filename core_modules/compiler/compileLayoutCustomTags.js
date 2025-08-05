@@ -1,205 +1,209 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { fileURLToPath } from 'url';
+// fileURLToPath is not used in the provided code blocks, so it's removed for cleanup.
 
+/**
+ * Recursively reads a directory, finds all '@layout.smq' files,
+ * and triggers their compilation.
+ * @param {string} directory The path to the directory to scan.
+ */
+async function readSMQFiles(directory) {
+    //console.log(`[DEBUG] Starting directory scan: ${directory}`);
+    try {
+        const files = await fs.promises.readdir(directory);
 
-function readSMQFiles(directory) {
-  fs.readdir(directory, (err, files) => {
-    if (err) {
-      // console.error('Error reading directory:', err);
-      return;
+        for (const file of files) {
+            const filePath = path.join(directory, file);
+            const stats = await fs.promises.stat(filePath);
+
+            if (stats.isDirectory()) {
+                // Recursively call on subdirectory
+                await readSMQFiles(filePath);
+            } else if (file === '@layout.smq') {
+                // Only process files named @layout.smq
+                //console.log(`[DEBUG] Found @layout.smq file: ${filePath}`);
+                await readAndCompileSMQFile(filePath);
+            }
+        }
+    } catch (err) {
+        console.error(`[ERROR] Failed to read directory ${directory}:`, err);
     }
-
-    files.forEach((file) => {
-      const filePath = path.join(directory, file);
-      fs.stat(filePath, (err, stats) => {
-        if (err) {
-          console.error('Error stat-ing file:', err);
-          return;
-        }
-
-        if (stats.isDirectory()) {
-          readSMQFiles(filePath); // Recursively call on subdirectory
-        } else if (file === '@layout.smq') {
-          // Only pick up files named @layout.smq
-          // console.log(`Found @layout.smq file: ${filePath}`);
-          readAndCompileSMQFile(filePath);
-        }
-      });
-    });
-  });
 }
 
+// --- Horizontal Line ---
 
-
-async function readAndCompileSMQFile(filePath) {
-  try {
-    const data = await fs.promises.readFile(filePath, 'utf8');
-    const buildPath = filePath.replace('src', 'build');
-    // Ensure the directory is created before writing the file
-    await fs.promises.mkdir(path.dirname(buildPath), { recursive: true });
-    let compiledContent = compileSMQContent(data, buildPath);
-
-    /* EXPERIMENT */
-    /*
-    let scriptContent = '';
-    let htmlContent = '';
-    let i = 0;
-    let tagStack = [];
-
-    // Extract script content including opening and closing tags
-    while (i < compiledContent.length) {
-      if (compiledContent.slice(i, i + 8) === '<script>') {
-        tagStack.push('<script type="module">');
-        scriptContent += '<script type="module">';
-        i += 8;
-        while (i < compiledContent.length && compiledContent.slice(i, i + 9) !== '</script>') {
-          scriptContent += compiledContent[i];
-          i++;
-        }
-        scriptContent += '</script>';
-        i += 9;
-      } else if (compiledContent.slice(i, i + 7) === '@head') {
-        // Extract @head content and wrap it with <header>
-        htmlContent += '<header>';
-        i += 6;
-        while (i < compiledContent.length && compiledContent.slice(i, i + 6) !== '@end') {
-          htmlContent += compiledContent[i];
-          i++;
-        }
-        htmlContent += '</header>';
-      } else if (compiledContent.slice(i, i + 6) === '@body') {
-        // Extract @body content and wrap it with <main>
-        htmlContent += '<main>';
-        i += 5;
-        while (i < compiledContent.length && compiledContent.slice(i, i + 5) !== '@end') {
-          htmlContent += compiledContent[i];
-          i++;
-        }
-        htmlContent += '</main>';
-      } else if (compiledContent.slice(i, i + 7) === '@footer') {
-        // Extract @foot content and wrap it with <footer>
-        htmlContent += '<footer>';
-        i += 6;
-        while (i < compiledContent.length && compiledContent.slice(i, i + 5) !== '@end') {
-          htmlContent += compiledContent[i];
-          i++;
-        }
-        htmlContent += '</footer>';
-      } else {
-        i++;
-      }
-    }
-
-    // Combine the content
-    compiledContent = scriptContent + '\n\n' + htmlContent;
-
-    */
-
-    // Write compiled content to a new .html file
-    const outputFilePath = path.join(path.dirname(buildPath), `${path.basename(buildPath, '.smq')}.smq.html`);
-    await fs.promises.writeFile(outputFilePath, compiledContent, 'utf8');
-    //console.log(`File ${outputFilePath} compiled successfully.`);
-  } catch (err) {
-    console.error(`Error processing file ${filePath}:`, err);
-  }
-}
-
-
-
-
-
+/**
+ * Compiles SMQ content by parsing custom @tags and assembling them into a standard HTML structure.
+ * This parser processes the content line by line.
+ * @param {string} content The raw content from the .smq file.
+ * @param {string} filePath The original file path (used for comprehensive error reporting).
+ * @returns {string} The compiled HTML content.
+ * @throws {Error} If an invalid tag case is detected, an @end tag is misplaced, or a block is unclosed.
+ */
 function compileSMQContent(content, filePath) {
-  const jsRegex = /^\s*(?:var|let|const|function|class|if|for|while|switch|case|try|catch|finally|return|import|export)\s*\(?/im;
-  const cssRegex = /^\s*[a-zA-Z-]+\s*[:{};]/im;
+    //console.log(`DEBUG Starting SMQ content transformation (line-by-line parser).");
 
-  let compiledContent = '';
-  let i = 0;
-  const tagStack = [];
+    let compiledHtmlContent = '';
+    const tagStack = []; // Keeps track of currently open custom tags
 
-  // Define custom tag mappings
-  const tagMappings = {
-    '@script': '<script>',
-    '@head': '<head>',
-    '@body': '<main>',
-    '@footer': '<footer>',
-    '@end': '</>',
-  };
+    // Define custom tag mappings to standard HTML tags
+    const tagMappings = {
+        '@script': '<script type="module">', // Ensures modern module scripts
+        '@head': '<head>',
+        '@body': '<body>', // Standard HTML body tag
+        '@footer': '<footer>',
+    };
 
-  const validTags = ['@script', '@head', '@body', '@footer', '@end'];
+    // List of valid custom tags for case validation and parsing logic
+    const validTags = ['@script', '@head', '@body', '@footer', '@end'];
 
-  while (i < content.length) {
-    const lineStart = i;
-    while (i < content.length && content[i] !== '\n') {
-      i++;
+    const lines = content.split('\n'); // Split content into individual lines for processing
+
+    for (const line of lines) {
+        const trimmedLine = line.trim();
+
+        // Preserve empty lines to maintain formatting in the output
+        if (trimmedLine === '') {
+            compiledHtmlContent += '\n';
+            continue;
+        }
+
+        // Validate that custom tags are always in lowercase
+        if (validTags.includes(trimmedLine.toLowerCase()) && trimmedLine !== trimmedLine.toLowerCase()) {
+            throw new Error(
+                `\x1b[31mInvalid tag case detected in file ${filePath}: "${trimmedLine}". ` +
+                `Custom tags must be in lowercase (e.g., '@head' instead of '@Head').\x1b[0m`
+            );
+        }
+
+        // Process custom tag declarations and their corresponding content
+        if (trimmedLine === '@script') {
+            tagStack.push('script');
+            compiledHtmlContent += tagMappings['@script'] + '\n';
+        } else if (trimmedLine === '@head') {
+            tagStack.push('head');
+            compiledHtmlContent += tagMappings['@head'] + '\n';
+        } else if (trimmedLine === '@body') {
+            tagStack.push('body');
+            compiledHtmlContent += tagMappings['@body'] + '\n';
+        } else if (trimmedLine === '@footer') {
+            tagStack.push('footer');
+            compiledHtmlContent += tagMappings['@footer'] + '\n';
+        } else if (trimmedLine === '@end') {
+            // Handle closing custom tags
+            if (tagStack.length === 0) {
+                throw new Error(
+                    `\x1b[31mMisplaced "@end" tag in file ${filePath}. ` +
+                    `Found "@end" without a corresponding open custom tag.\x1b[0m`
+                );
+            }
+            const topTag = tagStack.pop(); // Get the most recently opened tag
+
+            // Append the correct HTML closing tag
+            if (topTag === 'script') {
+                compiledHtmlContent += '</script>\n';
+            } else if (topTag === 'head') {
+                compiledHtmlContent += '</head>\n';
+            } else if (topTag === 'body') {
+                compiledHtmlContent += '</body>\n';
+            } else if (topTag === 'footer') {
+                compiledHtmlContent += '</footer>\n';
+            } else {
+                // This case should ideally not be reached if only valid tags are pushed onto the stack
+                throw new Error(
+                    `\x1b[31mInternal error: Unexpected tag "${topTag}" found on stack for @end in file ${filePath}.\x1b[0m`
+                );
+            }
+        } else {
+            // If it's not a custom tag, it's considered regular HTML content
+            compiledHtmlContent += line + '\n'; // Use original line to preserve indentation
+        }
     }
 
-    const line = content.slice(lineStart, i).trim();
-
-    // Log the current line and tag stack for debugging
-    //console.log(`Processing line: "${line}"`);
-    //console.log(`Current tag stack:`, tagStack);
-
-    // Validate lowercase tags
-    if (validTags.includes(line.toLowerCase()) && line !== line.toLowerCase()) {
-      throw new Error(`\x1b[31mInvalid tag case detected in file ${filePath}: "${line}". Tags must be in lowercase.\x1b[0m`);
+    // After processing all lines, check for any unclosed custom tags
+    if (tagStack.length > 0) {
+        const unclosedTag = tagStack[tagStack.length - 1];
+        throw new Error(
+            `\x1b[31mMissing "@end" tag for the "${unclosedTag}" block in file ${filePath}. ` +
+            `All custom blocks must be properly closed.\x1b[0m`
+        );
     }
 
-    // Handle custom tag declarations
-    if (line === '@script') {
-      tagStack.push('script');
-      compiledContent += tagMappings['@script'] + '\n';
-    } else if (line === '@head') {
-      tagStack.push('head');
-      compiledContent += tagMappings['@head'] + '\n';
-    } else if (line === '@body') {
-      tagStack.push('body');
-      compiledContent += tagMappings['@body'] + '\n';
-    } else if (line === '@footer') {
-      tagStack.push('footer');
-      compiledContent += tagMappings['@footer'] + '\n';
-    } else if (line === '@end') {
-      if (tagStack.length === 0) {
-        throw new Error(`Invalid "@end" tag found outside of any open block in file ${filePath}`);
-      }
-      const topTag = tagStack.pop();
-      if (topTag === 'script') {
-        compiledContent += '</script>\n';
-      } else if (topTag === 'head') {
-        compiledContent += '</head>\n';
-      } else if (topTag === 'body') {
-        compiledContent += '</main>\n';
-      } else if (topTag === 'footer') {
-        compiledContent += '</footer>\n';
-      } else {
-        compiledContent += `</${topTag}>\n`;
-      }
-    } else {
-      // Regular HTML or custom content (that doesn't require transformation)
-      compiledContent += line + '\n';
-    }
-
-    i++;
-  }
-
-  // Ensure all opened blocks are properly closed
-  if (tagStack.length > 0) {
-    const topTag = tagStack[0];
-    throw new Error(`Missing "@end" tag for a "${topTag}" block in file ${filePath}`);
-  }
-   //console.log(compiledContent);
-  //compiledContent =`<customSyntax> ${compiledContent} </customSyntax>`;
-  return compiledContent;
+    //console.log(`DEBUG SMQ content transformation completed.");
+    return compiledHtmlContent; 
 }
 
+// --- Horizontal Line ---
 
+/**
+ * Reads an SMQ file, compiles its content using `compileSMQContent`,
+ * and writes the resulting HTML to a new .smq.html file in the 'build' directory.
+ * @param {string} filePath The path to the source SMQ file (e.g., 'src/routes/node/@layout.smq').
+ */
+async function readAndCompileSMQFile(filePath) {
+    try {
+        //console.log(`[DEBUG] Attempting to read file: ${filePath}`);
 
+        // Read the source file content
+        const data = await fs.promises.readFile(filePath, 'utf8');
+        //console.log(`[DEBUG] Read file content. Length: ${data.length} characters.`);
 
-// Main function
+        // Construct the output file path in the 'build' directory
+        const buildPath = filePath.replace('src', 'build');
+        const outputFilePath = path.join(path.dirname(buildPath), `${path.basename(buildPath, '.smq')}.smq.html`);
+        
+        //console.log(`[DEBUG] Output HTML file will be written to: ${outputFilePath}`);
+
+        // Ensure the target directory exists before attempting to write the file
+        const dirname = path.dirname(outputFilePath);
+        await fs.promises.mkdir(dirname, { recursive: true });
+        //console.log(`[DEBUG] Target directory verified: ${dirname}`);
+        
+        // Verify directory was created
+        const dirExists = await fs.promises.access(dirname).then(() => true).catch(() => false);
+        //console.log(`[DEBUG] Directory exists after creation attempt: ${dirExists}`);
+
+        // Compile the content
+
+        let compiledContent = compileSMQContent(data, filePath);
+
+        // Write the file
+
+        //console.log(compiledContent);
+        await fs.promises.writeFile(outputFilePath, compiledContent, 'utf8');
+        
+        // Verify file was written
+        const fileExists = await fs.promises.access(outputFilePath).then(() => true).catch(() => false);
+        //console.log(`[DEBUG] File exists after write attempt: ${fileExists}`);
+        if (fileExists) {
+            const stats = await fs.promises.stat(outputFilePath);
+        
+        /*
+        console.log(`[DEBUG] File stats: ${JSON.stringify({
+                size: stats.size,
+                mode: stats.mode.toString(8),
+                uid: stats.uid,
+                gid: stats.gid
+            })}`);
+            */
+        }
+        
+        //console.log(`[SUCCESS] File compiled and written successfully: ${outputFilePath}`);
+
+    } catch (err) {
+        console.error(`[ERROR] Failed to process file ${filePath}:`, err);
+        // More detailed error handling...
+    }
+}
+
+// --- Horizontal Line ---
+
+/**
+ * Main function to initiate the compilation of SMQ files.
+ * This function should be called with the source directory containing your .smq files.
+ * @param {string} sourceDir The root directory to start compiling SMQ files from.
+ */
 export function compileSMQFiles(sourceDir) {
-   // const directory = '../../src/routes'; // src directory
+    //console.log(`[INFO] Starting SMQ file compilation process from source directory: ${sourceDir}`);
     readSMQFiles(sourceDir);
 }
-
-// Compile .smq files
-//compileSMQFiles(sourceDir);
