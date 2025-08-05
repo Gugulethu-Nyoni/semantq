@@ -102,24 +102,23 @@ const routes = { ...cleanedFileBasedRoutes, ...declaredRoutesFormatted };
     if (Array.isArray(structure)) {
       // Handle flat menu structure
       return `<ul class="${ulClass}">${structure.map(route => {
-        const href = routes[route] || '#';
+        const href = route.startsWith('http') ? route : route; // Keep external URLs as-is
         const linkText = getLinkText(route);
-        return `<li class="${liClass}"><a href="${href}">${linkText}</a></li>`;
+        return `<li class="${liClass}"><a href="${route}">${linkText}</a></li>`;
       }).join('')}</ul>`;
     } else {
       // Handle hierarchical menu structure
       return `<ul class="${ulClass} ${parentMenuDisplay === 'inline' ? 'inline-parent' : 'stacked-parent'}">${Object.keys(structure).map(key => {
         const fullRoute = parentRoute ? `${parentRoute}/${key}` : key;
-        const href = routes[fullRoute] || '#';
+        const href = routes[fullRoute] || fullRoute; // Use the route path as href
         const linkText = getLinkText(fullRoute);
         const children = structure[key];
         const hasChildren = Object.keys(children).length > 0;
 
-        return `<li class="${liClass} ${hasChildren ? 'has-dropdown' : ''}"><a href="${href}">${linkText}</a>${hasChildren ? generateHTML(children, fullRoute) : ''}</li>`;
+        return `<li class="${liClass} ${hasChildren ? 'has-dropdown' : ''}"><a href="/${fullRoute}">${linkText}</a>${hasChildren ? generateHTML(children, fullRoute) : ''}</li>`;
       }).join('')}</ul>`;
     }
   };
-
   // Function to get the link text for a route
   const getLinkText = (route) => {
     // 1. Check if custom link text is defined
