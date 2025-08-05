@@ -49,8 +49,9 @@ function transformReactiveIdentifiersInExpression(node, isReactiveVariableFn) {
 
 
 export default class Anatomique {
-    constructor(jsAST, cssAST, customAST, filePath) {
+    constructor(jsAST, cssAST, customAST, filePath, mainPageOriginalJS = null) {
         this.filePath = filePath;
+        //this.mainPageOriginalJS = mainPageOriginalJS;
         this.fileName = basename(filePath, '.ast');
         this.appRootId = 'app';
         this.jsAST = jsAST;
@@ -65,14 +66,23 @@ export default class Anatomique {
 
         this.reactiveVariables = new Set();
         this.staticVariables = new Set();
+        this.onMountCallbacks = [];
+        this.mainPageOriginalJS = '';
+        this.derivedDeclarations = [];
+
+
+
+
 
         this.globalDerivedCache = new Map(); // Map: expressionString -> varName
         this.globalDerivedDeclarations = []; // Array of actual 'const varName = $derived(...);' strings
 
         this.localDerivedDeclarations = null; // A temporary array for block-local deriveds
 
-        this.analyzeJsAST(); // Populate `this.reactiveVariables` and `this.staticVariables`
 
+        //this.analyzeJsAST(); // Populate `this.reactiveVariables` and `this.staticVariables`
+        this.analyzeAndFilterJsAST();
+        
         this.nodeToTranspilerMap = {
             Element: this.Element.bind(this),
             KeyValueAttribute: this.Attribute.bind(this),
@@ -89,7 +99,7 @@ export default class Anatomique {
 
         };
 
-        this.transpiledJSContent.push(`const appRoot = document.getElementById('${this.appRootId}');\n`);
+        //this.transpiledJSContent.push(`const appRoot = document.getElementById('${this.appRootId}');\n`);
 
         this.traverse();
 
@@ -98,50 +108,165 @@ export default class Anatomique {
 
     // --- Utility Methods ---
 
-    analyzeJsAST() {
-        // Add a debug log here
-        //console.log("DEBUG: analyzeJsAST - jsAST content received:", this.jsAST?.content ? 'Exists' : 'Undefined/Null');
-        if (!this.jsAST || !this.jsAST.content) {
-           // console.warn("DEBUG: analyzeJsAST - jsAST or its content is undefined/null. Skipping analysis.");
-            return;
-        }
-
-        // Use estraverse to walk the AST more thoroughly
-        estraverse.traverse(this.jsAST.content, {
-            enter: (node, parent) => {
+   analyzeNode(astNode) {
+        if (!astNode) return;
+        estraverse.traverse(astNode, {
+            enter: (node) => {
                 if (node.type === 'VariableDeclarator') {
-                    const varName = node.id.name; // Assuming simple identifiers for now
-
-                    if (node.init && node.init.type === 'CallExpression') {
-                        const callee = node.init.callee;
-                        // Check if it's a call to a reactivity primitive ($state, $derived, or $props)
-                        if (callee.type === 'Identifier' &&
-                            (callee.name === '$state' || callee.name === '$derived' || callee.name === '$props')) {
+                    const varName = node.id.name;
+                    if (node.init?.type === 'CallExpression') {
+                        const calleeName = node.init.callee?.name;
+                        if (calleeName === '$state' || calleeName === '$derived' || calleeName === '$props') {
                             this.reactiveVariables.add(varName);
-                            this.staticVariables.delete(varName); // Ensure it's not also marked static
+                            this.staticVariables.delete(varName);
                         } else {
-                            // It's a function call, but not a reactivity primitive (e.g., `let x = someFunc();`)
-                            if (!this.reactiveVariables.has(varName)) { // Only add if not already marked reactive
+                            if (!this.reactiveVariables.has(varName)) {
                                 this.staticVariables.add(varName);
                             }
                         }
                     } else if (node.id.type === 'Identifier') {
-                        // Plain variable declaration (e.g., `let x = 10;`, `const y = 'hello';`, `let z;`)
-                        // Add to static variables if not already identified as reactive
                         if (!this.reactiveVariables.has(varName)) {
                             this.staticVariables.add(varName);
                         }
                     }
                 }
-                // Future consideration: Handle function parameters, loop variables, etc., if they could affect reactivity.
-                // For now, this covers top-level `let` and `const`.
+            }
+        });
+    }
+
+
+    analyzeAndFilterJsAST() {
+    if (!this.jsAST || !this.jsAST.content) {
+        return;
+    }
+
+    const filteredBody = [];
+    estraverse.traverse(this.jsAST.content, {
+        enter: (node, parent) => {
+            // Analyze all top-level variable declarations, even inside onMount for now
+            if (node.type === 'VariableDeclarator') {
+                const varName = node.id.name;
+                if (node.init?.type === 'CallExpression') {
+                    const calleeName = node.init.callee?.name;
+                    if (calleeName === '$state' || calleeName === '$derived' || calleeName === '$props') {
+                        this.reactiveVariables.add(varName);
+                        this.staticVariables.delete(varName);
+                    } else {
+                        if (!this.reactiveVariables.has(varName)) {
+                            this.staticVariables.add(varName);
+                        }
+                    }
+                } else if (node.id.type === 'Identifier') {
+                    if (!this.reactiveVariables.has(varName)) {
+                        this.staticVariables.add(varName);
+                    }
+                }
+            }
+
+            // Identify and extract $onMount calls
+            if (node.type === 'ExpressionStatement' && node.expression?.type === 'CallExpression' && node.expression.callee?.name === '$onMount') {
+                const onMountFunction = node.expression.arguments[0];
+                if (onMountFunction && (onMountFunction.type === 'ArrowFunctionExpression' || onMountFunction.type === 'FunctionExpression')) {
+                    const functionBody = onMountFunction.body;
+
+                    if (functionBody.type === 'BlockStatement') {
+                        this.onMountCallbacks.push(...functionBody.body);
+                    } else {
+                        this.onMountCallbacks.push(functionBody);
+                    }
+                }
+                return estraverse.VisitorOption.Skip; // Skip this node for the main body
+            }
+        },
+        leave: (node, parent) => {
+            // This is the updated condition to also exclude ImportDeclarations
+            if (parent?.type === 'Program' && node.type !== 'ImportDeclaration' && !(node.type === 'ExpressionStatement' && node.expression?.type === 'CallExpression' && node.expression.callee?.name === '$onMount')) {
+                filteredBody.push(node);
+            }
+        }
+    });
+
+    // Store the filtered AST and generate the clean JS string
+    this.jsAST.content.body = filteredBody;
+    this.mainPageOriginalJS = escodegen.generate(this.jsAST.content);
+}
+
+
+    analyzeJsAST() {
+        if (!this.jsAST || !this.jsAST.content) {
+            return;
+        }
+
+        const filteredBody = [];
+        estraverse.traverse(this.jsAST.content, {
+            enter: (node, parent) => {
+                // If it's a top-level VariableDeclaration, analyze it immediately
+                if (parent?.type === 'Program' && node.type === 'VariableDeclaration') {
+                    this.analyzeNode(node);
+                    filteredBody.push(node);
+                    return estraverse.VisitorOption.Skip; // Skip traversal of its children
+                }
+
+                // Logic to identify and extract $onMount calls
+                if (node.type === 'ExpressionStatement' && node.expression?.type === 'CallExpression' && node.expression.callee?.name === '$onMount') {
+                    const onMountFunction = node.expression.arguments[0];
+                    if (onMountFunction && (onMountFunction.type === 'ArrowFunctionExpression' || onMountFunction.type === 'FunctionExpression')) {
+                        const functionBody = onMountFunction.body;
+
+                        // NEW: Analyze the variables inside the onMount block
+                        this.analyzeNode(functionBody);
+
+                        // Store the function body as a single BlockStatement node
+                        if (functionBody.type === 'BlockStatement') {
+                            this.onMountCallbacks.push(...functionBody.body);
+                        } else {
+                            this.onMountCallbacks.push(functionBody);
+                        }
+                    }
+                    // Skip this node so it doesn't get added to the filteredBody
+                    return estraverse.VisitorOption.Skip;
+                }
             },
+            leave: (node, parent) => {
+                // Only push nodes to filteredBody if they are top-level and haven't been skipped
+                if (parent?.type === 'Program' && !node.onMountHandled) {
+                    filteredBody.push(node);
+                }
+            }
         });
 
-        // Optional: Log for debugging
-        //console.log("Reactive variables detected:", Array.from(this.reactiveVariables));
-        //console.log("Static variables detected:", Array.from(this.staticVariables));
+        this.jsAST.content.body = filteredBody;
+        console.log("REACTIVE VARS", this.reactiveVariables);
+        console.log("STATIC VARS", this.staticVariables);
+        console.log("onMountCallbacks", JSON.stringify(this.onMountCallbacks,null,2));
     }
+
+
+     // NEW: Method to generate the filtered JS string
+    generateMainPageOriginalJS() {
+        if (!this.jsAST || !this.jsAST.content) {
+            this.mainPageOriginalJS = '';
+            return;
+        }
+
+        // Create a deep clone to avoid modifying the original AST
+        const clonedAST = deepCloneAstNode(this.jsAST.content);
+
+        // Filter out the onMount calls from the AST
+        const nonOnMountAST = estraverse.replace(clonedAST, {
+            enter(node) {
+                if (node.type === 'ExpressionStatement' && node.expression?.type === 'CallExpression' && node.expression.callee?.name === '$onMount') {
+                    // Remove the node by returning null
+                    return this.remove();
+                }
+            }
+        });
+
+        // Generate the code string from the filtered AST
+        this.mainPageOriginalJS = escodegen.generate(nonOnMountAST);
+    }
+
+
 
     isReactiveVariable(varName) {
         return this.reactiveVariables.has(varName);
@@ -662,106 +787,92 @@ export default class Anatomique {
         };
     }
 
+    
 
     // --- Output Generation ---
-    async output() {
-        try {
-            await mkdir(this.distDir, { recursive: true });
 
-            const strippedFileName = this.filePath.replace('.ast', '');
-            const finalFileName = basename(strippedFileName);
-            const jsFilePath = join(this.distDir, `${finalFileName}.js`);
-            // FIX START
-            const htmlFilePath = join(this.distDir, 'index.html'); // Moved this line up
-            // FIX END
+async output() {
+    try {
+        const mainComponentJS = this.transpiledJSContent.join('\n');
+        const mainComponentCleanups = this.componentCleanups.join('\n');
+        const generatedDerivedDeclarations = this.globalDerivedDeclarations.join('\n');
+        
+        // Process onMount callbacks
+        const onMountEffects = this.onMountCallbacks.map((callback) => {
+            const code = escodegen.generate(callback);
+            return `
+                $effect(() => {
+                    let cleanupFn;
+                    const mount = () => {
+                        try {
+                            ${code}
+                            
+                            // Auto-detect cleanup
+                            if (typeof ${callback.id} === 'object' && ${callback.id} !== null) {
+                                if (typeof ${callback.id}.destroy === 'function') {
+                                    cleanupFn = () => ${callback.id}.destroy();
+                                } else if (typeof ${callback.id}.dispose === 'function') {
+                                    cleanupFn = () => ${callback.id}.dispose();
+                                }
+                            }
+                        } catch (e) {
+                            console.error('Mount error:', e);
+                        }
+                    };
+                    
+                    // Double RAF for reliable mounting
+                    let rafId;
+                    const scheduleMount = () => {
+                        cancelAnimationFrame(rafId);
+                        rafId = requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                mount();
+                            });
+                        });
+                    };
+                    
+                    scheduleMount();
+                    
+                    return () => {
+                        cancelAnimationFrame(rafId);
+                        if (cleanupFn) cleanupFn();
+                    };
+                });
+            `;
+        }).join('\n');
 
-            // Add debug log for jsAST.content before escodegen.generate
-            //console.log("DEBUG: output - jsAST.content type before escodegen:", this.jsAST?.content?.type);
-            if (!this.jsAST || !this.jsAST.content) {
-                console.error("ERROR: output - this.jsAST or this.jsAST.content is undefined or null. Cannot generate originalJsCode.");
-                // Ensure output always returns an object, even on error, to prevent subsequent destructuring errors
-                return { transpiledJSCode: '// Error: JS AST content missing.' };
-            }
+        const finalJsCode = `
+${this.mainPageOriginalJS}
 
-            const originalJsCode = escodegen.generate(this.jsAST.content);
-
-            // Capture all top-level transpiled JS content and cleanups
-            const mainComponentJS = this.transpiledJSContent.join('\n');
-            const mainComponentCleanups = this.componentCleanups.join('\n');
-
-            const finalJsCode = `
-
-// Original script content (includes $state, $derived, $props declarations)
-${originalJsCode}
-
-// Global Derived Declarations created by the transpiler
-${this.globalDerivedDeclarations.join('\n')}
+${generatedDerivedDeclarations}
 
 export function renderComponent(targetElement) {
-    const fragment = document.createDocumentFragment();
+    const appRoot = targetElement || document.getElementById("app");
+    
+    if (!appRoot) {
+        console.error("App root element not found");
+        return () => {};
+    }
 
-    // Transpiled DOM creation and reactive effects
     ${mainComponentJS}
+    
+    ${onMountEffects}
 
-    // Append the fragment to the target element
-    targetElement.appendChild(fragment);
-
-    // Lifecycle management: return a cleanup function
     return () => {
-        // Run all component-level cleanups
         ${mainComponentCleanups}
-        // Remove all direct children added by this component
-        while (targetElement.firstChild) {
-            targetElement.removeChild(targetElement.firstChild);
+        while (appRoot.firstChild) {
+            appRoot.removeChild(appRoot.firstChild);
         }
     };
 }
 `.trim();
 
-            //await writeFile(jsFilePath, finalJsCode, 'utf8');
-
-            return { transpiledJSCode: finalJsCode }
-
-            /*
-                        const htmlContent = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Semantq Output</title>
-            </head>
-            <body>
-                <div id="${this.appRootId}"></div>
-                <script type="module">
-                    import { renderComponent } from './${finalFileName}.js';
-
-                    const appRoot = document.getElementById('${this.appRootId}');
-                    const cleanup = renderComponent(appRoot);
-
-                    // Optional: If you had a way to unmount or re-render, you'd call cleanup()
-                    // For a single-page app, this might not be strictly necessary unless
-                    // you're dynamically loading/unloading components.
-                    // Example: setTimeout(cleanup, 5000); // Unmount after 5 seconds
-                </script>
-            </body>
-            </html>
-            `.trim();
-
-            await writeFile(htmlFilePath, htmlContent, 'utf8'); // This line now has htmlFilePath defined
-            */
-
-            console.log('\x1b[32mCustom syntax has been transpiled into efficient JS\x1b[0m');
-        } catch (err) {
-            console.error('\x1b[31mFailed to return transpiled output:\x1b[0m', err);
-            // Crucial: Re-throw the error if it's genuinely a failure to allow higher-level error handling
-            // Or, return a specific error object if that's the expected contract.
-            // For now, returning an empty object to prevent the destructuring error downstream.
-            return {}; // Or { transpiledJSCode: '', error: err }
-        }
+        return { transpiledJSCode: finalJsCode };
+    } catch (err) {
+        console.error('Failed to generate output:', err);
+        return {};
     }
-
-
+}
 /*
     generateStateImports() {
         return `import { $state, $derived, $effect, bind, bindText, bindAttr, bindClass, $props } from '@semantq/ql';\n\n`; // Added $props

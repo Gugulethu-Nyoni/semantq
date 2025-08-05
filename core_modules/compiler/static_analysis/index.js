@@ -26,12 +26,30 @@ export default async function transformASTs(jsAST, cssCode, customSyntaxAST, fil
         const fileName = path.basename(path.dirname(filePath));
         const appRootId = 'app';
 
-        //console.log("Initial Structure", customSyntaxAST);
+        // 1. First extract imports BEFORE any processing
+        const { importsAST } = hoistImports(jsAST); 
+
+        //console.log("Initial jsAST", jsAST);
+
+        const clonedJSAST = structuredClone(jsAST);
+        //clonedJSAST.body = clonedJSAST.body.filter(node => node.type !== 'ImportDeclaration');
+        const mainPageOriginalJS = clonedJSAST.body?.length
+          ? escodegen.generate(clonedJSAST)
+          : '';
+
+    //console.log("Original JS", mainPageOriginalJS);
+
+
+//console.log("JS Generated", mainPageOriginalJS);
+//console.log("JS AST structure", jsAST);
+
+
 
         // --- PHASE 1: CORE CUSTOM SYNTAX TRANSPILATION ---
         // Anatomique transpiles custom HTML (customSyntaxAST) into reactive JS code.
-        const transpiler = new Anatomique({ content: jsAST }, cssCode, customSyntaxAST, filePath);
+        const transpiler = new Anatomique({ content: jsAST }, cssCode, customSyntaxAST, filePath, mainPageOriginalJS);
         const { transpiledJSCode } = await transpiler.output();
+
 
         //console.log("Critical",transpiledJSCode);
 
@@ -49,10 +67,12 @@ export default async function transformASTs(jsAST, cssCode, customSyntaxAST, fil
         // --- PHASE 3: FINAL JAVASCRIPT BUNDLE ASSEMBLY ---
         // Combine original JS, transpiled custom syntax JS, and layout JS into a single JS file.
         const finalJsCode = await generateFinalJsBundle(
+            importsAST,
             jsAST,
             transpiledJSCode,
             hasLayout,
-            layoutJS
+            layoutJS,
+            
         );
 
         // --- FINAL PHASE: WRITE OUTPUT FILES ---
@@ -83,6 +103,7 @@ import {
   $state,
   $derived,
   $effect,
+  $getValue,
   bind,
   bindText,
   bindAttr,
@@ -114,6 +135,7 @@ async function processLayoutFile(filePath) {
     try {
         const layoutContent = await fsReadFile(layoutFilePath, 'utf-8');
         const layoutAST = JSON.parse(layoutContent);
+        //console.log("LAYOUT AST",JSON.stringify(layoutAST));
         return extractLayoutContent(layoutAST);
     } catch (error) {
         console.error('Error processing layout file:', error);
@@ -138,10 +160,14 @@ function extractLayoutContent(layoutAST) {
         }
         if (node?.children) node.children.forEach(traverse);
     };
-    if (layoutAST.customAST) {
-        const rootNode = layoutAST.customAST.content[0]?.html?.children[0]?.children[0];
-        if (rootNode) traverse(rootNode);
+
+    if (layoutAST?.customAST?.content?.html?.children) {
+        // Correct path to the children of the customSyntax element
+        const rootNodes = layoutAST.customAST.content.html.children[0].children; 
+        if (rootNodes) traverse(rootNodes);
     }
+    
+    //console.log("THE HEAD", customHtmlParser(blocks.head));
     return {
         head: blocks.head ? customHtmlParser(blocks.head) : '',
         main: blocks.main ? customHtmlParser(blocks.main) : '',
@@ -204,9 +230,26 @@ layoutInit();`;
  * @param {string} layoutJS - JavaScript code for layout initialization.
  * @returns {Promise<string>} - The complete JS bundle string.
  */
-async function generateFinalJsBundle(originalJsAST, transpiledJSCode, hasLayout, layoutJS) {
-    // 1. Hoist imports from the original JS AST
-    const { importsAST, jsCodeAST } = hoistImports(originalJsAST);
+// In transformASTs.js
+
+// ... other helper functions ...
+
+/**
+ * Generates the complete JavaScript bundle.
+ * @param {Object} originalJsAST - The initial JavaScript AST.
+ * @param {string} transpiledJSCode - The full component JS string from Anatomique.
+ * @param {boolean} hasLayout - Whether a layout is present.
+ * @param {string} layoutJS - JavaScript code for layout initialization.
+ * @returns {Promise<string>} - The complete JS bundle string.
+ */
+
+async function generateFinalJsBundle(importsAST, originalJsAST, transpiledJSCode, hasLayout, layoutJS) {
+    // Hoist imports from the original JS AST
+
+    //console.log("originalJsAST",originalJsAST);
+    //const { importsAST } = hoistImports(originalJsAST);
+
+
 
     let allImports = generateBaseImports();
     if (importsAST.length > 0) {
@@ -217,26 +260,28 @@ async function generateFinalJsBundle(originalJsAST, transpiledJSCode, hasLayout,
         });
     }
 
-    // 2. Generate the main page JS code from the original AST
+        console.log("allImports",allImports);
 
 
-        //console.log("transpiledJSCode",transpiledJSCode);
+    // also get imports from originalJsAST if any and add them to allImports
 
-    // 3. Assemble the complete JS bundle string.
+    //console.log("JS AST",JSON.stringify(originalJsAST,null,2))
+
+
     const finalJsBundle = await formatCode(`
-${allImports}
-${hasLayout ? `
-// Layout initialization script
-${layoutJS}
-` : ''}
+    ${allImports}
+    ${hasLayout ? `
+    // Layout initialization script
+    ${layoutJS}
+    ` : ''}
 
-// Transpiled custom HTML syntax (includes renderComponent)
-${transpiledJSCode}
-
-`, 'babel');
+    // Transpiled code from Anatomique, including renderComponent and all page logic
+    ${transpiledJSCode}
+    `, 'babel');
 
     return finalJsBundle;
 }
+
 
 /**
  * Separates import declarations from other JavaScript code.
@@ -244,6 +289,8 @@ ${transpiledJSCode}
  * @returns {{importsAST: Array, jsCodeAST: Array}} - Arrays of import nodes and other JS code nodes.
  */
 function hoistImports(ast) {
+
+    console.log("hoistImports",ast);
     const importsAST = [];
     const jsCodeAST = [];
     if (ast && Array.isArray(ast.body)) {
@@ -310,12 +357,9 @@ async function writeOutputFiles(originalFilePath, jsCode, cssCode, fileName, app
     <script type="module">
         import { renderComponent } from './${fileName}.js';
         document.addEventListener("DOMContentLoaded", () => {
-            const appRoot = document.getElementById('${appRootId}');
-            if (appRoot) {
-                const cleanup = renderComponent(appRoot);
-            } else {
-                console.error('App root element not found: #${appRootId}');
-            }
+            
+            renderComponent();
+            
         });
     </script>
 </body>
