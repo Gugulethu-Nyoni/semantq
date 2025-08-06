@@ -260,7 +260,7 @@ async function generateFinalJsBundle(importsAST, originalJsAST, transpiledJSCode
         });
     }
 
-        console.log("allImports",allImports);
+        //console.log("allImports",allImports);
 
 
     // also get imports from originalJsAST if any and add them to allImports
@@ -290,7 +290,7 @@ async function generateFinalJsBundle(importsAST, originalJsAST, transpiledJSCode
  */
 function hoistImports(ast) {
 
-    console.log("hoistImports",ast);
+    //console.log("hoistImports",ast);
     const importsAST = [];
     const jsCodeAST = [];
     if (ast && Array.isArray(ast.body)) {
