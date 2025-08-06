@@ -128,6 +128,9 @@ async function transformTextNodes(destDir) {
 }
 
 
+
+/*
+
 // Resolve imports
 async function layoutImportsResolution(destDir) {
   try {
@@ -148,6 +151,8 @@ async function layoutSlotsResolution(destDir) {
   }
 }
 
+
+*/
 
 
 
@@ -170,6 +175,8 @@ async function importsResolution(destDir) {
 
 // Resolve slots
 async function slotsResolution(destDir) {
+
+  //console.error("INSIDE");
   try {
     const slotResolver = await import('./slotResolver.js');
     await slotResolver.processMergedFiles(destDir);
@@ -243,7 +250,7 @@ async function semantqNavGenerator() {
     const generateNavigation = navModule.default;
 
     // Call the function
-    await generateNavigation();
+    //await generateNavigation();
   } catch (err) {
     console.error('Error during navigation generation:', err);
   }
@@ -294,7 +301,6 @@ async function main(sourceDir, destDir, destDirBase) {
 
 
 
-
     // Step 6: Transform text nodes
     await transformTextNodes(destDir);
     await transformTextNodes(componentsDest);
@@ -302,15 +308,17 @@ async function main(sourceDir, destDir, destDirBase) {
 
 
     // Step 7: Resolve imports and slots @components
-   await importsResolution(componentsDest);
-   await slotsResolution(componentsDest);
+   //await importsResolution(componentsDest);
+   //await slotsResolution(componentsDest);
 
 
-  /* RESOLVE LAYOUT FIELS HERE */
+  /* RESOLVE LAYOUT FILES HERE */
+
 
     // Step 8: Resolve imports and slots @layouts
-    await layoutImportsResolution(destDir);
-    await layoutSlotsResolution(destDir);
+   
+   // await layoutImportsResolution(destDir);
+   // await layoutSlotsResolution(destDir);
 
     /* END OF DEALING WITH LAYOUTS */
 
@@ -322,8 +330,8 @@ async function main(sourceDir, destDir, destDirBase) {
 
 
     // Step 10: Transform components
-    await transformer(destDir);
-    await transformer(componentsDest);
+  await transformer(destDir);
+  await transformer(componentsDest);
 
      if (config.sitemap) {
        await sitemapGenerator();
@@ -338,3 +346,4 @@ async function main(sourceDir, destDir, destDirBase) {
 
 // Execute the main function
 main(sourceDir, destDir, destDirBase);
+
