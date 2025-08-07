@@ -72,6 +72,8 @@ export default async function transformASTs(jsAST, cssCode, customSyntaxAST, fil
             transpiledJSCode,
             hasLayout,
             layoutJS,
+            cssCode,
+            fileName
             
         );
 
@@ -189,20 +191,16 @@ function layoutInit() {
         footer: \`${layoutHTML.footer}\`
     };
     function updateHead(html) {
+        // Use a temporary template to parse the incoming HTML string.
+        const tempContainer = document.createElement('div');
+        tempContainer.innerHTML = html;
+
+        // Iterate over all children of the parsed HTML.
+        // Append them directly to the head, preserving existing elements.
         const head = document.head;
-        const template = document.createElement('template');
-        template.innerHTML = html;
-        const preserved = [...head.querySelectorAll("script, link[rel='modulepreload']")]
-            .filter(el => (el.tagName === "SCRIPT" && el.type === "module") ||
-                          (el.tagName === "LINK" && el.rel === "modulepreload"))
-            .map(el => el.outerHTML);
-        head.innerHTML = '';
-        head.appendChild(template.content.cloneNode(true));
-        preserved.forEach(html => {
-            const temp = document.createElement("template");
-            temp.innerHTML = html;
-            head.appendChild(temp.content.firstChild);
-        });
+        while (tempContainer.firstChild) {
+            head.appendChild(tempContainer.firstChild);
+        }
     }
     function updateBody(html) {
         document.body.innerHTML = '';
@@ -243,22 +241,40 @@ layoutInit();`;
  * @returns {Promise<string>} - The complete JS bundle string.
  */
 
-async function generateFinalJsBundle(importsAST, originalJsAST, transpiledJSCode, hasLayout, layoutJS) {
+async function generateFinalJsBundle(importsAST, originalJsAST, transpiledJSCode, hasLayout, layoutJS, cssCode, fileName) {
     // Hoist imports from the original JS AST
 
     //console.log("originalJsAST",originalJsAST);
     //const { importsAST } = hoistImports(originalJsAST);
 
+    ///console.log("cssCode",cssCode);
+
 
 
     let allImports = generateBaseImports();
-    if (importsAST.length > 0) {
-        allImports += escodegen.generate({
-            type: "Program",
-            body: importsAST,
-            sourceType: "module"
-        });
-    }
+
+    if (cssCode !=='') {
+
+        const cssImportNode = {
+          type: 'ImportDeclaration',
+          specifiers: [],
+          source: {
+            type: 'Literal',
+            value: `./${fileName}.css`,
+            raw: `'./${fileName}.css'`
+          }
+        };
+
+        // Add the new AST node to the existing imports array
+        importsAST.unshift(cssImportNode); // Use unshift to add it to the beginning of the array
+   } 
+        if (importsAST.length > 0) {
+            allImports += escodegen.generate({
+                type: "Program",
+                body: importsAST,
+                sourceType: "module"
+            });
+        }
 
         //console.log("allImports",allImports);
 
@@ -340,6 +356,7 @@ async function writeOutputFiles(originalFilePath, jsCode, cssCode, fileName, app
     const config = await import('../../../semantq.config.js');
     const { brand, pageTitle, metaDescription } = config.default;
 
+// removed: ${cssCode ? `<link rel="stylesheet" href="./${fileName}.css">` : ''}
     const htmlContent = await formatCode(`
 <!DOCTYPE html>
 <html lang="en">
@@ -350,7 +367,6 @@ async function writeOutputFiles(originalFilePath, jsCode, cssCode, fileName, app
     <meta name="description" content="${metaDescription}">
     <meta name="robots" content="index, follow">
     <meta name="author" content="${brand}">
-    ${cssCode ? `<link rel="stylesheet" href="./${fileName}.css">` : ''}
 </head>
 <body>
     <div id="${appRootId}"></div>
