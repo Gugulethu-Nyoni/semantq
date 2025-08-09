@@ -6,7 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node ./semantqQL/server.js",
-    "server-init": "./semantqQL/bin/init.js",
+    "server-init": "node ./semantqQL/bin/init.js",
     "compile": "node core_modules/compiler/compiler.js",
     "dev": "npm run compile && vite",
     "dev-s": "npm run compile && concurrently \"npm run app-server\" \"vite\"",
