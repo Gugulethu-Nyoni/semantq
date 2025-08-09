@@ -12,8 +12,7 @@
     "dev-s": "npm run compile && concurrently \"npm run app-server\" \"vite\"",
     "app-server": "node ./semantq_server/server.js",
     "build": "npm run compile && vite build",
-    "postbuild": "node core_modules/post-build.js",
-    "migrate": "node ./semantq_server/bin/migrate.js"
+    "postbuild": "node core_modules/post-build.js"
   },
   "keywords": [],
   "author": "",
