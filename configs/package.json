@@ -5,12 +5,12 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "start": "node ./semantq_server/server.js",
-    "server-init": "./semantq_server/bin/init.js",
+    "start": "node ./semantqQL/server.js",
+    "server-init": "./semantqQL/bin/init.js",
     "compile": "node core_modules/compiler/compiler.js",
     "dev": "npm run compile && vite",
     "dev-s": "npm run compile && concurrently \"npm run app-server\" \"vite\"",
-    "app-server": "node ./semantq_server/server.js",
+    "app-server": "node ./semantqQL/server.js",
     "build": "npm run compile && vite build",
     "postbuild": "node core_modules/post-build.js"
   },
