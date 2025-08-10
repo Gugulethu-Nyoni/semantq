@@ -57,7 +57,7 @@ This command will install the following components in your new `mycrudapp` direc
 From your project root, open a terminal and run the following commands:
 
 ```bash
-cd semantq_server
+cd semantqQL
 npm run init
 ```
 This command will create the semantq.config.js in your server directory.  
@@ -67,7 +67,7 @@ This command will create the semantq.config.js in your server directory.
 
 Navigate into your new project's server directory and ensure the configuration file is set up correctly.
 
-Open the file at `projectroot/semantq_server/semantq.config.js` and update the following settings:
+Open the file at `projectroot/semantqQL/semantq.config.js` and update the following settings:
 
   * **Database Credentials**: Add your database connection details.
   * **Resend API Key & Approved Domain**: Enter your Resend API key and the domain approved for sending emails.
@@ -79,7 +79,7 @@ Open the file at `projectroot/semantq_server/semantq.config.js` and update the f
 
 First, add a simple data model for your CRUD operations to the Prisma schema file.
 
-Open `projectroot/semantq_server/prisma/schema.prisma` and add the following `Product` model:
+Open `projectroot/semantqQL/prisma/schema.prisma` and add the following `Product` model:
 
 ```prisma
 model Product {
@@ -96,7 +96,7 @@ model Product {
 Next, run the database migrations.  
 
 
-From your `semantq_server` directory, run this command:
+From your `semantqQL` directory, run this command:
 
 ```bash
 npx prisma migrate dev --name my_fullstack_migrations // or whatever name you prefer
@@ -122,7 +122,7 @@ This will automatically generate all the essential files required for a complete
 * **Service**
 * **Routes**
 
-These files will be created inside your `semantq_server` directory in the models, controllers, services and routes directories.
+These files will be created inside your `semantqQL` directory in the models, controllers, services and routes directories.
 
 > 💡 There is no need to manually add routes to your `server.js`. SemantqQL automatically loads and registers them on server boot.
 
@@ -149,7 +149,7 @@ The route structure follows this pattern:
   http://localhost:3001/productCategory/productCategories
   ```
 
-**Note** You can always check the semantq_server/routes/modelRoutes.js file if you are not sure of your routes. 
+**Note** You can always check the semantqQL/routes/modelRoutes.js file if you are not sure of your routes. 
 
 Make sure to replace `localhost:3001` with your configured server port if different.
 
@@ -183,7 +183,7 @@ npx serve dist
 
 In another terminal tab also get your server running with these commands:
 ```bash
-cd semantq_server
+cd semantqQL
 npn run start
 ```
 
@@ -197,7 +197,7 @@ Open the address provided by the `serve` command in your browser. You will see t
 
 #### Common Issues
 
-If emails are not being sent, verify that your Resend configurations in `semantq_server/semantq.config.js` are correct.
+If emails are not being sent, verify that your Resend configurations in `semantqQL/semantq.config.js` are correct.
 The settings should look like this:
 
 ```javascript
@@ -209,7 +209,7 @@ email: {
 },
 ```
 
-You can also test your email configurations by running this command from your `semantq_server` directory (remember to edit the file first to include your actual email address):
+You can also test your email configurations by running this command from your `semantqQL` directory (remember to edit the file first to include your actual email address):
 
 ```bash
 node node_modules/@semantq/auth/test-email.js
