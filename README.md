@@ -1,5 +1,16 @@
 # Semantq
 
+[![NPM](https://img.shields.io/npm/v/anygridjs.svg)](https://www.npmjs.com/package/semantq)
+[![NPM Downloads](https://img.shields.io/npm/dt/anygridjs.svg)](https://www.npmjs.com/package/semantq)
+[![GitHub Stars](https://img.shields.io/github/stars/Gugulethu-Nyoni/semantq.svg)](https://github.com/Gugulethu-Nyoni/semantq/stargazers)
+[![GitHub Issues](https://img.shields.io/github/issues/Gugulethu-Nyoni/semantq.svg)](https://github.com/Gugulethu-Nyoni/semantq/issues)
+<a href="https://github.com/Gugulethu-Nyoni/semantq/blob/main/LICENSE">
+  <img alt="semantq uses the MIT license" src="https://img.shields.io/github/license/Gugulethu-Nyoni/semantq" style="max-width: 100%;">
+</a>
+
+[![GitHub Workflow](https://img.shields.io/github/workflow/status/Gugulethu-Nyoni/semantq/CI/main.svg)](https://github.com/Gugulethu-Nyoni/semantq/actions)
+
+
 **Semantq** is an AI-first, full-stack JavaScript framework for building reactive web applications and embedded (IoT) systems, including hardware, firmware, and software. The philosophy of Semantq is Laser-Focused Automation with fine-grained Control.
 
 ### Start Here
