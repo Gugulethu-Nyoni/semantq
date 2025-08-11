@@ -5,372 +5,481 @@ import config from '../../semantq.config.js';
 const fileBasedRoutes = await import(config.routes.fileBasedRoutes).then(module => module.default || module);
 const declaredRoutes = await import(config.routes.declaredRoutes).then(module => module.default || module);
 
-export default function generateMenu(declaredRoutes, fileBasedRoutes, menuConfig) {
-  if (!declaredRoutes || !fileBasedRoutes || !menuConfig) return '';
 
-  const { containerClass, ulClass, liClass, excludeRoutes = [], hierarchical, parentMenuDisplay, customLinkTexts = {} } = menuConfig;
+// generateMenu.js
+function generateMenu(routes = {}, config = {}) {
+  if (!config || config.enable === false) return '';
 
-  if (!Array.isArray(declaredRoutes)) {
-    throw new TypeError('declaredRoutes must be an array');
+  // --- helpers ---
+  const capWords = (s = '') =>
+    s
+      .replace(/[-_]/g, ' ')
+      .split(' ')
+      .filter(Boolean)
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+
+  const isExcluded = path =>
+    (config.excludeRoutes || []).some(ex => {
+      if (ex === '/') return path === '/';
+      return path === ex || path.startsWith(ex + '/');
+    });
+
+  // clone so we don't mutate caller's object
+  const normalizedRoutes = { ...routes };
+
+  // merge includeRoutes (always add/override; includeRoutes take precedence)
+  if (config.includeRoutes) {
+    for (const [k, v] of Object.entries(config.includeRoutes)) {
+      normalizedRoutes[k] = v;
+    }
   }
 
-  const declaredRoutesFormatted = declaredRoutes.reduce((acc, route) => {
-    acc[route.path] = route.filePath;
-    return acc;
-  }, {});
-
-  const cleanedFileBasedRoutes = { ...fileBasedRoutes };
-  declaredRoutes.forEach(route => {
-    const matchingKey = Object.keys(cleanedFileBasedRoutes).find(
-      key => cleanedFileBasedRoutes[key] === route.filePath
-    );
-    if (matchingKey) delete cleanedFileBasedRoutes[matchingKey];
+  // decide which paths to include:
+  const includedPaths = Object.keys(normalizedRoutes).filter(path => {
+    if (config.includeRoutes && Object.prototype.hasOwnProperty.call(config.includeRoutes, path)) return true;
+    return !isExcluded(path);
   });
 
-  const allRoutes = { ...cleanedFileBasedRoutes, ...declaredRoutesFormatted };
-  const routeKeys = Object.keys(allRoutes).filter(route => !excludeRoutes.includes(route));
+  // priorityRoutes used globally for ordering within lists
+  const priorityRoutes = Array.isArray(config.priorityRoutes) ? config.priorityRoutes : [];
 
-  const sortedRoutes = [...routeKeys].sort((a, b) => {
-    if (a === '/') return -1;
-    if (b === '/') return 1;
-
-    const partsA = a.split('/').filter(p => p !== '');
-    const partsB = b.split('/').filter(p => p !== '');
-
-    const depthA = partsA.length;
-    const depthB = partsB.length;
-
-    if (depthA !== depthB) return depthA - depthB;
+  // Sort includedPaths so higher-level building is stable (priority first, then alpha)
+  includedPaths.sort((a, b) => {
+    const ai = priorityRoutes.indexOf(a);
+    const bi = priorityRoutes.indexOf(b);
+    if (ai !== -1 && bi === -1) return -1;
+    if (bi !== -1 && ai === -1) return 1;
+    if (ai !== -1 && bi !== -1) return ai - bi;
     return a.localeCompare(b);
   });
 
-  const createMenuStructure = (routes) => {
-    const menu = {};
-    routes.forEach(route => {
-      if (route === '/') {
-        menu['/'] = { children: {}, route: '/', isHome: true };
-        return;
-      }
-      const parts = route.split('/').filter(p => p !== '');
-      let currentLevel = menu;
-      let currentPath = '';
-
-      parts.forEach((part, index) => {
-        currentPath = `${currentPath}/${part}`;
-        
-        if (!currentLevel[part]) {
-          currentLevel[part] = {
-            children: {},
-            route: currentPath,
-            isLeaf: index === parts.length - 1
-          };
-        }
-        
-        if (index < parts.length - 1) {
-          currentLevel = currentLevel[part].children;
-        }
-      });
-    });
-    return menu;
-  };
-
-  const menuStructure = hierarchical ? createMenuStructure(sortedRoutes) : sortedRoutes;
-
-  const getLinkText = (route) => {
-    if (route === '/') return 'Home';
-    if (customLinkTexts[route]) return customLinkTexts[route];
-
-    const parts = route.split('/').filter(p => p !== '');
-    const lastPart = parts.pop();
-    if (!lastPart) return '';
-
-    return lastPart
-      .replace(/-/g, ' ')
-      .replace(/\b\w/g, char => char.toUpperCase());
-  };
-
-  const generateHTML = (structure, parentRoute = '', isTopLevel = true) => {
-    if (Array.isArray(structure)) {
-      const listClass = `${ulClass} ${isTopLevel ? (parentMenuDisplay === 'inline' ? 'inline-parent' : 'stacked-parent') : ''}`;
-
-      const homeItem = structure.find(r => r === '/');
-      const otherItems = structure.filter(r => r !== '/');
-      const sortedItems = homeItem ? [homeItem, ...otherItems] : otherItems;
-
-      return `<ul class="${listClass}">${sortedItems.map(route => {
-        const linkText = getLinkText(route);
-        return `<li class="${liClass}"><a href="${route}">${linkText}</a></li>`;
-      }).join('')}</ul>`;
-    } else {
-      const listClass = `${ulClass} ${isTopLevel ? (parentMenuDisplay === 'inline' ? 'inline-parent' : 'stacked-parent') : ''}`;
-
-      let itemsHTML = '';
-      const sortedKeys = Object.keys(structure).sort((a, b) => {
-        if (a === '/') return -1;
-        if (b === '/') return 1;
-        return a.localeCompare(b);
-      });
-
-      itemsHTML = sortedKeys.map(key => {
-        const value = structure[key];
-        const fullRoute = value.route;
-        const linkText = getLinkText(key === '/' ? '/' : fullRoute);
-        const hasChildren = Object.keys(value.children).length > 0;
-
-        const linkHref = key === '/' ? '/' : fullRoute;
-
-        return `
-          <li class="${liClass} ${hasChildren ? 'has-dropdown' : ''}">
-            <a href="${linkHref}">${linkText}</a>
-            ${hasChildren ? generateHTML(value.children, fullRoute, false) : ''}
-          </li>
-        `;
-      }).join('');
-
-      return `<ul class="${listClass}">${itemsHTML}</ul>`;
+  // --- build tree structure keyed by last-segment ---
+  // special-case the root path '/' into a distinct key '__root'
+  const tree = {};
+  includedPaths.forEach(path => {
+    if (path === '/') {
+      // root node stored at __root so it doesn't collide with real segments
+      tree['__root'] = { __path: '/', __href: normalizedRoutes['/'] || '/' };
+      return;
     }
-  };
+    const parts = path.split('/').filter(Boolean);
+    let current = tree;
+    parts.forEach((part, idx) => {
+      const nodePath = '/' + parts.slice(0, idx + 1).join('/');
+      if (!current[part]) {
+        const href = Object.prototype.hasOwnProperty.call(normalizedRoutes, nodePath)
+          ? normalizedRoutes[nodePath]
+          : nodePath;
+        current[part] = { __path: nodePath, __href: href };
+      }
+      current = current[part];
+    });
+  });
 
-  const menuHTML = generateHTML(menuStructure);
+  // sortedKeys respects priorityRoutes by comparing each node's __path
+  const sortedKeys = obj => Object.keys(obj)
+    .filter(k => !k.startsWith('__'))
+    .sort((a, b) => {
+      const pa = obj[a] && obj[a].__path ? obj[a].__path : '';
+      const pb = obj[b] && obj[b].__path ? obj[b].__path : '';
+      const ai = priorityRoutes.indexOf(pa);
+      const bi = priorityRoutes.indexOf(pb);
+      if (ai !== -1 && bi === -1) return -1;
+      if (bi !== -1 && ai === -1) return 1;
+      if (ai !== -1 && bi !== -1) return ai - bi;
+      return a.localeCompare(b);
+    });
 
-  return `
-    <div class="${containerClass}">
-      <label for="semantq-menu-toggle" class="semantq-burger-icon">
-        <span></span>
-        <span></span>
-        <span></span>
-      </label>
-      <input type="checkbox" id="semantq-menu-toggle" class="semantq-menu-toggle" />
-      ${menuHTML}
-    </div>
-  `;
+  // ensure __root is returned first if present and prioritized
+  function sortedKeysWithRoot(obj) {
+    const keys = [];
+    if (obj['__root']) {
+      // treat root as a logical item: we want it first if included in priorityRoutes or generally first
+      const rootPath = obj['__root'].__path; // '/'
+      const rootPriorityIndex = priorityRoutes.indexOf(rootPath);
+      // if root explicitly prioritized and at position 0 we still want it first; else still include it before others
+      keys.push('__root');
+    }
+    return keys.concat(sortedKeys(obj));
+  }
+
+  // flatten tree (pre-order), using sortedKeys so priority is kept
+  function flattenTree(obj, out = []) {
+    const keys = sortedKeysWithRoot(obj);
+    for (const key of keys) {
+      const node = obj[key];
+      // skip if malformed
+      if (!node || !node.__href) continue;
+      // key for display: use special name for root
+      const displayKey = key === '__root' ? 'home' : key;
+      out.push({ key: displayKey, href: node.__href, path: node.__path });
+      // descend (use child keys)
+      const childKeys = sortedKeys(node);
+      if (childKeys.length) {
+        const childObj = {};
+        for (const ck of childKeys) childObj[ck] = node[ck];
+        flattenTree(childObj, out);
+      }
+    }
+    return out;
+  }
+
+  // recursive renderer for hierarchical menus
+  function buildNestedList(obj, depth = 0) {
+    const ulClass = `${config.ulClass || 'nav-list'} ${config.parentMenuDisplay || 'stacked'}${depth > 0 ? ' submenu' : ''}`;
+    let html = `<ul class="${ulClass}">`;
+    const keys = sortedKeysWithRoot(obj);
+    for (const key of keys) {
+      const node = obj[key];
+      if (!node) continue;
+      const isRoot = key === '__root';
+      const nodeKeyForText = isRoot ? 'home' : key;
+      const text = (config.customLinkTexts && config.customLinkTexts[nodeKeyForText]) ? config.customLinkTexts[nodeKeyForText] : capWords(nodeKeyForText);
+      const childKeys = sortedKeys(node);
+      const hasChildren = childKeys.length > 0;
+      const liClasses = [config.liClass || 'nav-item'];
+      if (hasChildren) liClasses.push('has-children');
+
+      html += `<li class="${liClasses.join(' ')}">`;
+      html += `<a href="${node.__href}">${text}</a>`;
+
+      if (hasChildren) {
+        html += buildNestedList(node, depth + 1);
+      }
+      html += `</li>`;
+    }
+    html += `</ul>`;
+    return html;
+  }
+
+  // --- final assembly ---
+  let content = '';
+  if (config.hierarchical) {
+    content = buildNestedList(tree, 0);
+  } else {
+    const flat = flattenTree(tree, []);
+    // If priorityRoutes includes the root '/', we already ensured root is first in flattenTree order
+    const ulClass = `${config.ulClass || 'nav-list'} ${config.parentMenuDisplay || 'stacked'}`;
+    content = `<ul class="${ulClass}">`;
+    for (const item of flat) {
+      // item.key is 'home' for root; respects customLinkTexts
+      const text = (config.customLinkTexts && config.customLinkTexts[item.key]) ? config.customLinkTexts[item.key] : capWords(item.key);
+      content += `<li class="${config.liClass || 'nav-item'}"><a href="${item.href}">${text}</a></li>`;
+    }
+    content += `</ul>`;
+  }
+
+  return `<nav class="${config.containerClass || 'nav-container'}">${content}</nav>`;
 }
+
+
+
+
+const menuHTML = generateMenu(fileBasedRoutes, config.semantqNav);
+console.log(menuHTML);
+
+
 
 const semantqNavCss = `
-<style>
-/* Base Reset - Scoped to our component only */
-.semantq-nav-container,
-.semantq-nav-container * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@style
+/* semantq-nav.css - responsive navigation with infinite dropdowns */
 
-/* Container Styles */
+/* Base Styles */
 .semantq-nav-container {
-  font-family: 'Arial', sans-serif;
-  background: #f8f9fa;
-  padding: 10px;
+  width: 100%;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   position: relative;
 }
 
-/* List Base Styles */
 .semantq-nav-list {
   list-style: none;
-  display: flex;
   margin: 0;
   padding: 0;
 }
 
-/* Menu Item Styles */
 .semantq-nav-item {
   position: relative;
 }
 
 .semantq-nav-item a {
-  text-decoration: none;
-  color: #333;
-  padding: 10px 15px;
   display: block;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  border-radius: 4px;
+  padding: 10px 14px;
+  color: #222;
+  text-decoration: none;
+  transition: background 0.2s ease;
 }
 
 .semantq-nav-item a:hover {
-  background: #e9ecef;
-  color: #007bff;
+  background: #f2f2f2;
 }
 
-/* Dropdown Indicators */
-.semantq-nav-item.has-dropdown > a::after {
-  content: '▸';
-  margin-left: 8px;
-  font-size: 14px;
-  transition: transform 0.2s ease;
-  display: inline-block;
+/* Stacked (Vertical) */
+.semantq-nav-list.stacked {
+  display: block;
 }
 
-.semantq-nav-item.has-dropdown:hover > a::after {
-  transform: rotate(90deg);
+.semantq-nav-list.stacked > .semantq-nav-item {
+  border-bottom: 1px solid #e6e6e6;
 }
 
-/* INLINE MODE (Horizontal) */
-.semantq-nav-list.inline-parent {
-  flex-direction: row;
-  gap: 15px;
+/* Inline (Horizontal) */
+.semantq-nav-list.inline {
+  display: flex;
+  gap: 4px;
+  align-items: center;
 }
 
-.semantq-nav-list.inline-parent .semantq-nav-item.has-dropdown > ul {
+.semantq-nav-list.inline > .semantq-nav-item {
+  border-right: 1px solid #eee;
+}
+
+.semantq-nav-list.inline > .semantq-nav-item:last-child {
+  border-right: none;
+}
+
+/* Submenu Base (Hidden by default) */
+.semantq-nav-list .submenu {
   display: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Stacked Submenu Style */
+.semantq-nav-list.stacked .submenu {
+  padding-left: 12px;
+}
+
+.semantq-nav-list.stacked .semantq-nav-item:hover > .submenu,
+.semantq-nav-list.stacked .semantq-nav-item:focus-within > .submenu {
+  display: block;
+}
+
+/* Inline Submenu Style - Dropdown */
+.semantq-nav-list.inline .submenu {
   position: absolute;
   top: 100%;
   left: 0;
-  background: #fff;
-  border: 1px solid #ddd;
   min-width: 200px;
-  z-index: 1000;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  opacity: 0;
-  transform: translateY(-10px);
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  z-index: 999;
 }
 
-.semantq-nav-list.inline-parent .semantq-nav-item.has-dropdown:hover > ul {
+.semantq-nav-list.inline .semantq-nav-item:hover > .submenu,
+.semantq-nav-list.inline .semantq-nav-item:focus-within > .submenu {
   display: block;
-  opacity: 1;
-  transform: translateY(0);
 }
 
-.semantq-nav-list.inline-parent .semantq-nav-item.has-dropdown > ul .semantq-nav-item.has-dropdown > ul {
+/* Nested Submenus to the Right */
+.semantq-nav-list.inline .submenu .submenu {
   top: 0;
   left: 100%;
-  margin-left: 1px;
 }
 
-/* STACKED MODE (Vertical) */
-.semantq-nav-list.stacked-parent {
-  flex-direction: column;
-  gap: 5px;
-}
-
-.semantq-nav-list.stacked-parent .semantq-nav-item.has-dropdown > ul {
-  max-height: 0;
-  overflow: hidden;
+/* Style for Items with Children */
+.has-children > a {
   position: relative;
+  padding-right: 28px; /* Room for arrow */
+}
+
+/* Arrow Indicator (CSS-only) */
+.has-children > a::after {
+  content: '▾';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8em;
+  transition: transform 0.15s ease;
+  pointer-events: none;
+}
+
+/* When Submenu is Open */
+.has-children.open > a::after {
+  transform: translateY(-50%) rotate(-180deg);
+}
+
+/* Burger Menu Styles */
+.burger {
+  display: none;
   border: none;
-  margin-left: 15px;
-  padding-top: 5px;
-  box-shadow: none;
-  transition: max-height 0.3s ease-in-out;
-  opacity: 1;
-  transform: none;
+  background: transparent;
+  padding: 12px 8px;
+  cursor: pointer;
+  margin-left: auto;
 }
 
-.semantq-nav-list.stacked-parent .semantq-nav-item.has-dropdown:hover > ul {
-  max-height: 500px;
+.burger .bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #111;
+  margin: 4px 0;
+  transition: all 0.3s ease;
 }
 
-/* MOBILE STYLES */
+/* Mobile Styles */
 @media (max-width: 768px) {
-  .semantq-nav-list {
-    flex-direction: column !important;
-    display: none !important;
-    gap: 5px;
-    width: 100%;
-    background: #f8f9fa;
-    border-top: 1px solid #ddd;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 999;
-  }
-
-  .semantq-menu-toggle:checked ~ .semantq-nav-list {
-    display: flex !important;
-  }
-
-  .semantq-nav-item.has-dropdown > ul {
-    position: static !important;
-    margin-left: 20px;
-    border-left: 2px solid #ddd !important;
-    max-height: 0;
-    overflow: hidden;
-    background: #e9ecef;
-    transition: max-height 0.3s ease-in-out;
-  }
-  
-  .semantq-nav-item.has-dropdown:hover > ul {
-    max-height: 500px !important;
-  }
-
-  /* Burger Icon */
-  .semantq-burger-icon {
+  /* Navigation Container */
+  .semantq-nav-container {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    width: 30px;
-    height: 24px;
-    cursor: pointer;
-    padding: 5px 0;
-    z-index: 1001;
   }
-
-  .semantq-burger-icon span {
-    width: 100%;
-    height: 3px;
-    background: #333;
-    transition: all 0.3s ease;
-    transform-origin: center;
-  }
-
-  .semantq-menu-toggle {
-    position: absolute;
-    opacity: 0;
-    height: 0;
-    width: 0;
-  }
-
-  .semantq-menu-toggle:checked + .semantq-burger-icon span:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-  }
-
-  .semantq-menu-toggle:checked + .semantq-burger-icon span:nth-child(2) {
-    opacity: 0;
-  }
-
-  .semantq-menu-toggle:checked + .semantq-burger-icon span:nth-child(3) {
-    transform: rotate(-45deg) translate(5px, -5px);
-  }
-}
-
-/* Desktop-specific styles */
-@media (min-width: 769px) {
-  .semantq-burger-icon,
-  .semantq-menu-toggle {
+  
+  /* Hide lists by default in mobile */
+  .semantq-nav-list.inline, 
+  .semantq-nav-list.stacked {
     display: none;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+  }
+
+  /* Show when mobile-open */
+  .semantq-nav-container.mobile-open .semantq-nav-list.inline,
+  .semantq-nav-container.mobile-open .semantq-nav-list.stacked {
+    display: flex;
+  }
+
+  /* Show burger */
+  .burger { 
+    display: block; 
+  }
+
+  /* Burger active state */
+  .burger.active .bar:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+  .burger.active .bar:nth-child(2) {
+    opacity: 0;
+  }
+  .burger.active .bar:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  /* Make dropdowns behave like stacked */
+  .semantq-nav-list.inline .submenu,
+  .semantq-nav-list.stacked .submenu {
+    position: static;
+    box-shadow: none;
+    padding-left: 20px;
+  }
+
+  /* Reset inline styles for mobile */
+  .semantq-nav-list.inline > .semantq-nav-item {
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  /* Ensure anchors are full-width */
+  .semantq-nav-item a { 
+    padding: 14px 16px; 
   }
   
-  .semantq-nav-list {
-    display: flex !important;
+  /* Smooth transitions */
+  .semantq-nav-list.inline, 
+  .semantq-nav-list.stacked {
+    transition: max-height 0.3s ease, opacity 0.2s ease;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
   }
   
-  .semantq-nav-list.inline-parent {
-    flex-direction: row !important;
-  }
-  
-  .semantq-nav-list.stacked-parent {
-    flex-direction: column !important;
+  .semantq-nav-container.mobile-open .semantq-nav-list.inline,
+  .semantq-nav-container.mobile-open .semantq-nav-list.stacked {
+    max-height: 1000px;
+    opacity: 1;
   }
 }
-</style>
+@end
 `;
 
-const menuConfig = {
-  ...config.semantqNav,
-  containerClass: 'semantq-nav-container',
-  ulClass: 'semantq-nav-list',
-  liClass: 'semantq-nav-item',
-  customLinkTexts: {
-    '/': 'Home',
-    ...config.semantqNav.customLinkTexts
-  }
-};
+const menuJS = `
+@script
+// Mobile burger menu toggle
+// Initialize the navigation system
+function initResponsiveNavigation() {
+  // Create and setup burger menu
+  function initBurgerMenu() {
+    const container = document.querySelector('.semantq-nav-container');
+    if (!container) return;
 
-const menuHTML = generateMenu(declaredRoutes, fileBasedRoutes, menuConfig);
+    const burger = document.createElement('button');
+    burger.className = 'burger';
+    burger.innerHTML = \`
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    \`;
+    
+    burger.addEventListener('click', () => {
+      container.classList.toggle('mobile-open');
+      burger.classList.toggle('active');
+    });
+
+    container.insertBefore(burger, container.firstChild);
+  }
+
+  // Initialize dropdown functionality
+  function initDropdowns() {
+    const container = document.querySelector('.semantq-nav-container');
+    if (!container) return;
+
+    const dropdownParents = container.querySelectorAll('.has-children');
+    
+    dropdownParents.forEach(parent => {
+      const link = parent.querySelector('a');
+      if (link) {
+        link.addEventListener('click', function(e) {
+          // On mobile, prevent default for parents with submenus
+          if (window.innerWidth <= 768 && parent.querySelector('.submenu')) {
+            e.preventDefault();
+            parent.classList.toggle('open');
+          }
+        });
+      }
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!container.contains(e.target)) {
+        dropdownParents.forEach(parent => {
+          parent.classList.remove('open');
+        });
+      }
+    });
+  }
+
+  // Handle window resize
+  function handleResize() {
+    if (window.innerWidth > 768) {
+      const container = document.querySelector('.semantq-nav-container');
+      if (container) {
+        container.classList.remove('mobile-open');
+        const burger = container.querySelector('.burger');
+        if (burger) burger.classList.remove('active');
+      }
+    }
+  }
+
+  // Initialize everything
+  initBurgerMenu();
+  initDropdowns();
+  window.addEventListener('resize', handleResize);
+}
+
+// Initialize when DOM is loaded
+$onMount(() => {
+  initResponsiveNavigation();
+});
+
+@end
+`;
+
 
 const semantqNavComponent = `
+${menuJS}
 ${semantqNavCss}
 @html
 ${menuHTML}
@@ -378,3 +487,5 @@ ${menuHTML}
 
 const outputPath = path.join(config.globalComponents['$global'], 'SemantqNav.smq');
 fs.writeFileSync(outputPath, semantqNavComponent, 'utf-8');
+
+
