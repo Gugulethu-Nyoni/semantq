@@ -182,13 +182,23 @@ console.log(menuHTML);
 
 
 const semantqNavCss = `
-@style
+  @style
 /* semantq-nav.css - responsive navigation with infinite dropdowns */
+:root {
+  /* Navigation-specific variables with global.css fallbacks */
+  --nav-font-family: var(--font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif);
+  --nav-color-text: var(--color-secondary, #e558a4);
+  --nav-color-bg: var(--color-light, #ffffff);
+  --nav-color-hover: var(--color-light-semi, #f2f2f2);
+  --nav-color-border: var(--color-light-semi, #e6e6e6);
+  --nav-shadow: var(--shadow-primary, 0 6px 18px rgba(0,0,0,0.08));
+  --nav-transition: var(--transition-base, all 0.3s ease);
+  --nav-radius: var(--radius-medium, 12px);
+}
 
-/* Base Styles */
 .semantq-nav-container {
   width: 100%;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family: var(--nav-font-family);
   position: relative;
 }
 
@@ -205,13 +215,13 @@ const semantqNavCss = `
 .semantq-nav-item a {
   display: block;
   padding: 10px 14px;
-  color: #222;
+  color: var(--nav-color-text);
   text-decoration: none;
-  transition: background 0.2s ease;
+  transition: var(--nav-transition);
 }
 
 .semantq-nav-item a:hover {
-  background: #f2f2f2;
+  background: var(--nav-color-hover);
 }
 
 /* Stacked (Vertical) */
@@ -220,7 +230,7 @@ const semantqNavCss = `
 }
 
 .semantq-nav-list.stacked > .semantq-nav-item {
-  border-bottom: 1px solid #e6e6e6;
+  border-bottom: 1px solid var(--nav-color-border);
 }
 
 /* Inline (Horizontal) */
@@ -231,59 +241,58 @@ const semantqNavCss = `
 }
 
 .semantq-nav-list.inline > .semantq-nav-item {
-  border-right: 1px solid #eee;
+  border-right: 1px solid var(--nav-color-border);
 }
 
 .semantq-nav-list.inline > .semantq-nav-item:last-child {
   border-right: none;
 }
 
-/* Submenu Base (Hidden by default) */
+/* Submenu Base */
 .semantq-nav-list .submenu {
   display: none;
   margin: 0;
   padding: 0;
 }
 
-/* Stacked Submenu Style */
+/* Stacked Submenu */
 .semantq-nav-list.stacked .submenu {
   padding-left: 12px;
 }
 
-.semantq-nav-list.stacked .semantq-nav-item:hover > .submenu,
-.semantq-nav-list.stacked .semantq-nav-item:focus-within > .submenu {
-  display: block;
-}
-
-/* Inline Submenu Style - Dropdown */
+/* Inline Submenu - Dropdown */
 .semantq-nav-list.inline .submenu {
   position: absolute;
   top: 100%;
   left: 0;
   min-width: 200px;
-  background: #fff;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  background: var(--nav-color-bg);
+  box-shadow: var(--nav-shadow);
   z-index: 999;
+  border-radius: var(--nav-radius);
 }
 
+/* Active States (unchanged structure) */
+.semantq-nav-list.stacked .semantq-nav-item:hover > .submenu,
+.semantq-nav-list.stacked .semantq-nav-item:focus-within > .submenu,
 .semantq-nav-list.inline .semantq-nav-item:hover > .submenu,
 .semantq-nav-list.inline .semantq-nav-item:focus-within > .submenu {
   display: block;
 }
 
-/* Nested Submenus to the Right */
+/* Nested Submenus */
 .semantq-nav-list.inline .submenu .submenu {
   top: 0;
   left: 100%;
 }
 
-/* Style for Items with Children */
+/* Items with Children */
 .has-children > a {
   position: relative;
-  padding-right: 28px; /* Room for arrow */
+  padding-right: 28px;
 }
 
-/* Arrow Indicator (CSS-only) */
+/* Arrow Indicator */
 .has-children > a::after {
   content: '▾';
   position: absolute;
@@ -291,16 +300,15 @@ const semantqNavCss = `
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.8em;
-  transition: transform 0.15s ease;
+  transition: var(--nav-transition);
   pointer-events: none;
 }
 
-/* When Submenu is Open */
 .has-children.open > a::after {
   transform: translateY(-50%) rotate(-180deg);
 }
 
-/* Burger Menu Styles */
+/* Burger Menu */
 .burger {
   display: none;
   border: none;
@@ -314,20 +322,18 @@ const semantqNavCss = `
   display: block;
   width: 22px;
   height: 2px;
-  background: #111;
+  background: var(--nav-color-text);
   margin: 4px 0;
-  transition: all 0.3s ease;
+  transition: var(--nav-transition);
 }
 
-/* Mobile Styles */
+/* Mobile Styles (fully preserved) */
 @media (max-width: 768px) {
-  /* Navigation Container */
   .semantq-nav-container {
     display: flex;
     flex-direction: column;
   }
   
-  /* Hide lists by default in mobile */
   .semantq-nav-list.inline, 
   .semantq-nav-list.stacked {
     display: none;
@@ -336,18 +342,15 @@ const semantqNavCss = `
     width: 100%;
   }
 
-  /* Show when mobile-open */
   .semantq-nav-container.mobile-open .semantq-nav-list.inline,
   .semantq-nav-container.mobile-open .semantq-nav-list.stacked {
     display: flex;
   }
 
-  /* Show burger */
   .burger { 
     display: block; 
   }
 
-  /* Burger active state */
   .burger.active .bar:nth-child(1) {
     transform: translateY(6px) rotate(45deg);
   }
@@ -358,7 +361,6 @@ const semantqNavCss = `
     transform: translateY(-6px) rotate(-45deg);
   }
 
-  /* Make dropdowns behave like stacked */
   .semantq-nav-list.inline .submenu,
   .semantq-nav-list.stacked .submenu {
     position: static;
@@ -366,18 +368,15 @@ const semantqNavCss = `
     padding-left: 20px;
   }
 
-  /* Reset inline styles for mobile */
   .semantq-nav-list.inline > .semantq-nav-item {
     border-right: none;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--nav-color-border);
   }
 
-  /* Ensure anchors are full-width */
   .semantq-nav-item a { 
     padding: 14px 16px; 
   }
   
-  /* Smooth transitions */
   .semantq-nav-list.inline, 
   .semantq-nav-list.stacked {
     transition: max-height 0.3s ease, opacity 0.2s ease;
@@ -392,7 +391,7 @@ const semantqNavCss = `
     opacity: 1;
   }
 }
-@end
+  @end
 `;
 
 const menuJS = `
