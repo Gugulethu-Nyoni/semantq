@@ -47,7 +47,7 @@ function traverseDirectory(directoryPath, relativePath, fileBasedRoutes) {
             // Create route value without leading slash
             const value = newRelativePath;
             
-            fileBasedRoutes[key] = value;
+            fileBasedRoutes[key] = key; //value;
 
             // Recurse into subdirectory
             traverseDirectory(filePath, newRelativePath, fileBasedRoutes);
