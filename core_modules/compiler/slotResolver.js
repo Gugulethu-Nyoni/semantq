@@ -44,7 +44,7 @@ class SlotResolver {
     this.finalAst='';
     
     this.buildComponentRegistry();
-    this.resolvedAst = this.resolveNamedSlots(this.filePath);
+    //this.resolvedAst = this.resolveNamedSlots(this.filePath);
     this.finalResolvedAst = this.resolveDefaultSlots(this.filePath);
 
     //
@@ -371,148 +371,60 @@ processNamedSlots(newNodes, childAST) {
 
 
 
-/*
 
-    // Step 1: Find the target node in the parent AST (the component instance)
-    const targetNode = walk.deepWalker(
-      parentComponentAST,
-      walk.createMatchLogic("Element", key),
-      "Element"
-    )[0]?.node;
-
-    if (!targetNode) continue; // Skip if the component instance is not found
-
-    // Step 2: Find all named slots in the child component
-    const slotNodes = walk.deepWalker(
-      childComponentAstBlock,
-      walk.createMatchLogic("Element", "slot"),
-      "Element"
-    );
-
-    // Process each named slot in the child component
-    for (const slotNode of slotNodes) {
-      const slotName = slotNode.node.attributes?.find(attr => attr.name === "name")?.value;
-
-      if (!slotName) continue; // Skip if the slot doesn't have a name (default slot)
-
-      // Step 3: Find all parent elements with a matching slot attribute
-      const parentSlotElements = walk.deepWalker(
-        targetNode,
-        walk.createMatchLogic("Element", null, { slot: slotName }),
-        "Element"
-      );
-
-      // Step 3a: Get fallback content from the child slot
-      const slotFallBackChildren = walk.findChildren(slotNode.node);
-
-      // Resolve the content for the named slot
-      const contentToSet = parentSlotElements.length > 0
-        ? parentSlotElements.map(element => element.node) // Use all matching parent elements
-        : slotFallBackChildren?.[0]; // Use fallback content if no parent content is found
-
-      // Step 3c: Replace the child slot with the resolved content
-      const slotNodeLocations = new GetNodePositions(childComponentAstBlock, slotNode.node).init();
-      const parentNode = slotNodeLocations[0]?.parentNode;
-      const targetNodeIndex = slotNodeLocations[0]?.nodeIndex;
-
-      if (parentNode?.children?.[0]?.[targetNodeIndex]) {
-        parentNode.children[0][targetNodeIndex] = contentToSet;
-      }
-
-      // Step 3b: Remove the `slot` attribute from the parent elements
-      parentSlotElements.forEach(element => {
-        if (element.node && typeof element.node === "object" && !Array.isArray(element.node)) {
-          if (!element.node.attributes) {
-            element.node.attributes = [];
-          }
-          element.node.attributes = element.node.attributes.filter(attr => attr.name !== "slot");
-        } else {
-          //console.warn("Unexpected node type:", element.node);
-        }
-      });
-    }
-
-    // Step 3d: Replace the component instance in the parent AST with the resolved child AST
-    const parentNodeLocations = new GetNodePositions(parentComponentAST, targetNode).init();
-    const actualParentNode = parentNodeLocations[0]?.parentNode;
-    const actualTargetNodeIndex = parentNodeLocations[0]?.nodeIndex;
-
-    if (actualParentNode?.children?.[0]?.[actualTargetNodeIndex]) {
-      actualParentNode.children[0][actualTargetNodeIndex] = childComponentAstBlock;
-    }
-
-    // Clean up the resolved child component from the AST registry
-    delete this.ast[childComponentKey];
-  }
-
-  // Final cleanup and file writing
-  this.removeComponentImports();
-  this.writeResolvedAstFile();
-}
-
-*/
-
-
-
-
-  resolveDefaultSlots(filePath) {
+ resolveDefaultSlots(filePath) {
   const parentComponentFileName = path.basename(filePath);
   const parentComponentKey = this.isPage
-    ? "customAST"
-    : parentComponentFileName.replace(".merged.ast", "").toLowerCase();
+    ? 'customAST'
+    : parentComponentFileName.replace('.merged.ast', '').toLowerCase();
 
   const parentComponentAST = this.ast[parentComponentKey];
   const walk = new Walker();
-
 
   for (const key of Object.keys(this.componentsRegistry).reverse()) {
     const childComponentKey = key.toLowerCase();
     const childComponentAstBlock = this.ast[childComponentKey];
 
-
-
-    let nodeType = "Element";
-    let nodeName = key; // e.g. Card
+    let nodeType = 'Element';
+    let nodeName = key;
     let matchLogic = walk.createMatchLogic(nodeType, nodeName);
-    let returnType = { path: "name" };
+    let returnType = {
+      path: 'name'
+    };
 
     const getTargetNode = walk.deepWalker(
       parentComponentAST,
       nodeType,
       matchLogic,
-      returnType
+      returnType,
     );
 
 
-
-
     if (getTargetNode.length === 0) continue;
+
     // Wrap slot resolution inside forEach on all instances
-    getTargetNode.forEach(({ node: targetNode }) => {
-    const localChildAst = JSON.parse(JSON.stringify(childComponentAstBlock)); // deep clone
-
+    getTargetNode.forEach(({
+      node: targetNode
+    }) => {
+      const localChildAst = JSON.parse(JSON.stringify(childComponentAstBlock)); // deep clone
       const targetNodeChildren = walk.findChildren(targetNode);
-      //console.log("targetNode",targetNode);
-      //console.log("targetNodeChildren",targetNodeChildren);
 
-
-      nodeType = "Element";
-      nodeName = "slot";
+      nodeType = 'Element';
+      nodeName = 'slot';
       matchLogic = walk.createMatchLogic(nodeType, nodeName);
-      returnType = { path: "name" };
+      returnType = {
+        path: 'name'
+      };
 
       const getSlotNode = walk.deepWalker(
         childComponentAstBlock,
         nodeType,
         matchLogic,
-        returnType
+        returnType,
       );
 
 
-
       //console.log("getSlotNode",getSlotNode);
-
-
 
 
       let contentToSet = '';
@@ -522,63 +434,47 @@ processNamedSlots(newNodes, childAST) {
         const slotNode = getSlotNode[0].node;
         const slotFallBackChildren = walk.findChildren(slotNode);
 
-          //console.log("slotFallBackChildren",slotFallBackChildren);
-
-        contentToSet = targetNodeChildren?.length > 0
-    ? targetNodeChildren[0]
-    : slotFallBackChildren[0];
-
-    //console.log("slotNode",slotNode);
-
-          //console.log("contentToSet",contentToSet);
-
+        contentToSet = targetNodeChildren ?.length > 0 ?
+          targetNodeChildren[0] :
+          slotFallBackChildren[0];
 
         const slotNodeLocations = new GetNodePositions(localChildAst, slotNode).init();
-        
-        //console.log("slotNodeLocations",slotNodeLocations);
+        parentNode = slotNodeLocations[0] ?.parentNode;
+        const targetNodeIndex = slotNodeLocations[0] ?.nodeIndex;
 
-        parentNode = slotNodeLocations[0]?.parentNode;
-
-          //console.log("parentNode",JSON.stringify(parentNode,null,2));
-
-        const targetNodeIndex = slotNodeLocations[0]?.nodeIndex;
-
-          //console.log("targetNodeIndex",targetNodeIndex);
-
-
-       if (parentNode?.children?.[targetNodeIndex]) {
-            parentNode.children[targetNodeIndex] = contentToSet;
+        if (parentNode ?.children ?.[targetNodeIndex]) {
+          parentNode.children[targetNodeIndex] = contentToSet;
         }
-
-        //console.log("at this point parentNode must be updated",JSON.stringify(parentNode,null,2));
       }
-
 
       let contentToSetInParent = localChildAst.content.html.children[0].children[0];
 
-
       if (getSlotNode.length === 0) {
-        // the whole child component is the contentToSet 
+        //console.log("status",);
+        // the whole child component is the contentToSet
         contentToSetInParent = localChildAst.content.html.children[0].children[0];
-        //console.log("contentToSetInParent",contentToSetInParent);
       }
+
+      //console.log("contentToSetInParent",contentToSetInParent);
 
       const parentNodeLocations = new GetNodePositions(parentComponentAST, targetNode).init();
+      //console.log("targetNode",targetNode);
+      //console.log("parentComponentAST",JSON.stringify(parentComponentAST));
       //console.log("parentNodeLocations",parentNodeLocations);
-      const actualParentNode = parentNodeLocations[0]?.parentNode;
-      //console.log("actualParentNode",actualParentNode);
 
-      const actualTargetNodeIndex = parentNodeLocations[0]?.nodeIndex;
-
-      //console.log("actualTargetNodeIndex",actualTargetNodeIndex);
-
-      //console.log("localChildAst",JSON.stringify(localChildAst,null,2));
+      const actualParentNode = parentNodeLocations[0] ?.parentNode;
+      const actualTargetNodeIndex = parentNodeLocations[0] ?.nodeIndex;
 
 
-      if (actualParentNode?.children?.[actualTargetNodeIndex]) {
-    actualParentNode.children[actualTargetNodeIndex] = contentToSetInParent;
+
+
+
+
+
+
+      if (actualParentNode ?.children ?.[actualTargetNodeIndex]) {
+        actualParentNode.children[actualTargetNodeIndex] = contentToSetInParent;
       }
-
     });
 
     delete this.ast[childComponentKey];
@@ -586,6 +482,9 @@ processNamedSlots(newNodes, childAST) {
 
   //this.writeResolvedAstFile();
 }
+
+
+
 
 
   writeResolvedAstFile(parentComponentKey) {
@@ -599,30 +498,6 @@ processNamedSlots(newNodes, childAST) {
     fs.writeFileSync(resolvedFilePath, JSON.stringify(this.ast, null, 2), "utf8");
   }
 
-/*
-  removeComponentImports() {
-    for (const componentName in this.componentsRegistry) {
-      walk(this.ast["jsAST"], {
-        enter: (node, parent) => {
-          if (node.type === "ImportDeclaration") {
-            node.specifiers.forEach((specifier) => {
-              if (
-                specifier.type === "ImportDefaultSpecifier" &&
-                specifier.local.name === componentName
-              ) {
-                if (parent && Array.isArray(parent.body)) {
-                  parent.body = parent.body.filter((n) => n !== node);
-                }
-                return false;
-              }
-            });
-          }
-        },
-      });
-    }
-  }
-
-*/
 
 removeComponentImports() {
     for (const componentName in this.componentsRegistry) {
