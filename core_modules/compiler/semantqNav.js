@@ -177,7 +177,7 @@ function generateMenu(routes = {}, config = {}) {
 
 
 const menuHTML = generateMenu(fileBasedRoutes, config.semantqNav);
-console.log(menuHTML);
+//console.log(menuHTML);
 
 
 
