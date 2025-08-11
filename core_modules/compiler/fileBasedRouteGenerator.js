@@ -10,7 +10,8 @@ import config from '../../semantq.config.js';
  */
 export function generateFileBasedRoutes(basePath) {
     const fileBasedRoutes = {
-        '/404': '404'  // Add default 404 route
+        '/404': '/404',  // Add default 404 route
+        '/sitemap': '/sitemap',
     };
 
     try {
