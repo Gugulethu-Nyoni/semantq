@@ -427,12 +427,11 @@ program
   .command('make:route <routeName>')
   .description('Create a new route with stylish feedback')
   .option('-l, --layout', 'Add layout file')
-  .option('-c, --config', 'Add config file')
+  .option('-c, --crud', 'Add CRUD operations')
+  .option('-a, --auth', 'Add auth import to page template')
   .option('-s, --server', 'Add server handlers')
-  .option('-a, --all', 'Create all resources at once')
-  .option('--auth', 'Add auth import to page template')
-  .option('--crud', 'Add CRUD operations')
-  .option('-ac', 'Shortcut for both --auth and --crud')
+  .option('-A, --all', 'Create all resources at once')
+  .option('--ac', 'Shortcut for both --auth and --crud')
   .option('-tw, --tailwind', 'Add Tailwind CSS support')
   .action(async (routeName, options) => {
     const { createSpinner } = await import('nanospinner');
@@ -494,36 +493,38 @@ program
         basePageTemplate += `// const updatedCategory = { name: 'Mobile Phones' }; \n`;
         basePageTemplate += `// const response = await new smQL(\`\${baseOrigin}/category/categories/\${categoryId}\`, 'PUT', updatedCategory);\n\n`;
         
-        basePageTemplate += `// DELETE  \n`;
+        basePageTemplate += `// DELETE \n`;
         basePageTemplate += `// const productId = 42; \n`;
         basePageTemplate += `// const response = await new smQL(\`\${baseOrigin}/product/products/\${productId}\`, 'DELETE', null, { log: false });\n`;
       } else if (options.auth) {
         basePageTemplate += `import '/public/dashboard/js/dashboard.js';\n`;
-      }      
+      }
+      
       if (options.tailwind) {
         basePageTemplate += `import '../../../global.css';\n`;
       }
       
-      basePageTemplate += `@end\n\n@style\n\n@end\n\n@html\n  ${routeName} Page\n`;
+      basePageTemplate += `@end\n\n@style\n\n@end\n\n@html\n ${routeName} Page\n`;
 
-      // Layout content - different for CRUD vs regular auth
+      // Layout content
       const layoutContent = options.crud ? 
-          `@head\n` +
-          `<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />\n` +
-          `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />\n` +
-          `<link rel="stylesheet" href="https://unpkg.com/formique-css@1.0.11/formique-css.css" />\n` +
-          `<link rel="stylesheet" href="https://unpkg.com/anygridcss@1.0.2/anyGrid.css" anygrid-style />\n` +
-          (options.auth ? `<link href="/dashboard/css/dashboard.css" rel="stylesheet" />\n` : '') +
-          `@end\n` +
-          `@body\n\n@end\n` +
-          `@footer\n\n@end\n` :
-          `@head\n` +
-          `<link rel="stylesheet" href="https://unpkg.com/formique-css@1.0.11/formique-css.css" />\n` +
-          `<link rel="stylesheet" href="https://unpkg.com/anygridcss@1.0.2/anyGrid.css" anygrid-style />\n` +
-          `@end\n\n` +
-          `@script\n// Imports only\n@end\n\n` +
-          `@body\n\n@end\n\n` +
-          `@footer\n\n@end\n`;
+        `@head\n` +
+        `<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />\n` +
+        `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />\n` +
+        `<link rel="stylesheet" href="https://unpkg.com/formique-css@1.0.13/formique-css.css" />\n` +
+        `<link rel="stylesheet" href="https://unpkg.com/anygridcss@1.0.2/anyGrid.css" />\n` +
+        (options.auth ? `<link href="/dashboard/css/dashboard.css" rel="stylesheet" />\n` : '') +
+        `@end\n` +
+        `@body\n\n@end\n` +
+        `@footer\n\n@end\n` :
+        `@head\n` +
+        `<link rel="stylesheet" href="https://unpkg.com/formique-css@1.0.11/formique-css.css" />\n` +
+        `<link rel="stylesheet" href="https://unpkg.com/anygridcss@1.0.2/anyGrid.css" anygrid-style />\n` +
+        `@end\n\n` +
+        `@script\n// Imports only\n@end\n\n` +
+        `@body\n\n@end\n\n` +
+        `@footer\n\n@end\n`;
+
       const files = {
         '@page.smq': basePageTemplate,
         '@layout.smq': options.layout ? layoutContent : null,
@@ -599,7 +600,6 @@ ${blue('Troubleshooting:')}
     }
   });
 
-
 // ===============================
 // SEMANTQ INSTALL SERVER (Standalone command)
 // ===============================
@@ -614,11 +614,9 @@ program
       console.log(chalk.gray(`  › Run ${chalk.yellow('cd semantqQL')}`));
       console.log(chalk.gray(`  › Start your server with ${chalk.yellow('npm run dev')}`));
     } catch (error) {
-      // Error already logged by installSemantqServer
       process.exit(1);
     }
   });
-
 
 // ===============================
 // INSTALL SEMANTQ AUTH UI (Standalone command)
@@ -631,7 +629,6 @@ program
     try {
       await addSemantqAuthUI(projectRoot);
     } catch (err) {
-      // Error already logged by addSemantqAuthUI
       process.exit(1);
     }
   });
@@ -807,16 +804,38 @@ program
   .command('update')
   .description('Update Semantq to the latest version (backup your project first)')
   .option('--dry-run', 'Show what would be updated without making changes')
+  .option('--force', 'Force update even if versions match')
+  .option('--restore', 'Restore missing directories (docs/examples)')
   .action(async (options) => {
     const targetDir = process.cwd();
+    const GITHUB_REPO = 'https://github.com/Gugulethu-Nyoni/semantq';
+    const GITHUB_RAW = 'https://raw.githubusercontent.com/Gugulethu-Nyoni/semantq/main';
 
     try {
-      // Get versions
-      const latestVersion = execSync('npm view semantq version', { encoding: 'utf-8' }).trim();
-      const currentVersion = JSON.parse(fs.readFileSync('package.json', 'utf-8')).version;
+      // Get latest version from GitHub
+      const latestVersion = await fetch(`${GITHUB_RAW}/package.json`)
+        .then(res => res.json())
+        .then(pkg => pkg.version)
+        .catch(() => {
+          throw new Error('Could not fetch latest version from GitHub');
+        });
 
-      if (latestVersion === currentVersion) {
-        console.log(chalk.green('✓ Already on latest version (v' + currentVersion + ')'));
+      // Get current version
+      let currentVersion;
+      try {
+        currentVersion = JSON.parse(fs.readFileSync('package.json', 'utf-8')).dependencies?.semantq?.replace(/^[\^~]/, '');
+        if (!currentVersion) {
+          currentVersion = JSON.parse(fs.readFileSync('package.json', 'utf-8')).version;
+        }
+      } catch (err) {
+        throw new Error('Could not determine current version from package.json');
+      }
+
+      console.log(chalk.blue(`Current version: v${currentVersion}`));
+      console.log(chalk.blue(`Latest version:  v${latestVersion}`));
+
+      if (latestVersion === currentVersion && !options.force) {
+        console.log(chalk.green('✓ Already on latest version'));
         return;
       }
 
@@ -836,36 +855,101 @@ program
       // Dry run mode
       if (options.dryRun) {
         console.log(chalk.blue('[Dry Run] Would update:'));
-        console.log('• core_modules/');
-        console.log('• docs/');
-        console.log('• • examples/');
-        console.log(chalk.gray('(Add --force to actually apply changes)'));
+        console.log('• core_modules/ (always updated)');
+        
+        // Check which optional directories exist
+        const optionalDirs = ['docs', 'examples'];
+        optionalDirs.forEach(dir => {
+          const exists = fs.existsSync(path.join(targetDir, dir));
+          console.log(`${exists ? '•' : '○'} ${dir}/ ${exists ? '(will update)' : '(would restore)'}`);
+        });
+        
+        console.log(chalk.gray('(Remove --dry-run to actually apply changes)'));
         return;
       }
 
       // Perform update
-      console.log(chalk.blue('Updating Semantq...'));
+      console.log(chalk.blue('\nUpdating Semantq...'));
 
       // 1. Install latest version
+      console.log(chalk.blue('Installing latest npm package...'));
       execSync('npm install semantq@latest', { stdio: 'inherit' });
 
-      // 2. Update core directories (force overwrite)
-      const dirsToUpdate = ['core_modules', 'docs', 'examples'];
-      dirsToUpdate.forEach(dir => {
-        const source = path.join('node_modules', 'semantq', dir);
-        const dest = path.join(targetDir, dir);
-
-        fs.rmSync(dest, { recursive: true, force: true });
-        fs.copySync(source, dest);
-        console.log(chalk.green(`✓ Updated ${dir}/`));
-      });
+      // 2. Download and update core directories from GitHub
+      console.log(chalk.blue('\nUpdating core files from GitHub...'));
+      
+      const requiredDirs = ['core_modules'];
+      const optionalDirs = ['docs', 'examples'];
+      const tempDir = path.join(os.tmpdir(), 'semantq_update');
+      
+      // Create temp directory
+      fs.mkdirSync(tempDir, { recursive: true });
+      
+      // Clone repo (only once)
+      if (!fs.existsSync(path.join(tempDir, 'semantq'))) {
+        execSync(`git clone --depth 1 --filter=blob:none --sparse ${GITHUB_REPO} ${path.join(tempDir, 'semantq')}`, 
+          { stdio: 'pipe' });
+      }
+      
+      // Update required directories (always)
+      for (const dir of requiredDirs) {
+        try {
+          const destPath = path.join(targetDir, dir);
+          
+          console.log(chalk.blue(`- Updating required ${dir}/...`));
+          
+          execSync(`cd ${path.join(tempDir, 'semantq')} && git sparse-checkout set ${dir}`, { stdio: 'pipe' });
+          
+          // Remove existing directory
+          fs.rmSync(destPath, { recursive: true, force: true });
+          
+          // Copy new files
+          fs.copySync(path.join(tempDir, 'semantq', dir), destPath);
+          
+          console.log(chalk.green(`  ✓ Updated ${dir}/`));
+        } catch (err) {
+          console.log(chalk.red(`  ✖ Failed to update ${dir}/: ${err.message}`));
+          throw err; // Fail completely if required directory can't be updated
+        }
+      }
+      
+      // Update optional directories (only if they exist or --restore is set)
+      for (const dir of optionalDirs) {
+        const destPath = path.join(targetDir, dir);
+        const dirExists = fs.existsSync(destPath);
+        
+        if (dirExists || options.restore) {
+          try {
+            console.log(chalk.blue(`- ${dirExists ? 'Updating' : 'Restoring'} ${dir}/...`));
+            
+            execSync(`cd ${path.join(tempDir, 'semantq')} && git sparse-checkout set ${dir}`, { stdio: 'pipe' });
+            
+            // Remove existing directory if it exists
+            if (dirExists) {
+              fs.rmSync(destPath, { recursive: true, force: true });
+            }
+            
+            // Copy new files
+            fs.copySync(path.join(tempDir, 'semantq', dir), destPath);
+            
+            console.log(chalk.green(`  ✓ ${dirExists ? 'Updated' : 'Restored'} ${dir}/`));
+          } catch (err) {
+            console.log(chalk.yellow(`  ⚠️ Could not ${dirExists ? 'update' : 'restore'} ${dir}/: ${err.message}`));
+          }
+        } else {
+          console.log(chalk.gray(`- Skipping ${dir}/ (not present in project)`));
+        }
+      }
+      
+      // Clean up temp directory
+      fs.rmSync(tempDir, { recursive: true, force: true });
 
       // 3. Preserve config (show diff if modified)
       const userConfigPath = path.join(targetDir, 'semantq.config.js');
       const defaultConfigPath = path.join('node_modules', 'semantq', 'semantq.config.default.js');
 
       if (fs.existsSync(userConfigPath)) {
-        console.log(chalk.yellow('⚠️ semantq.config.js was preserved (may need manual updates)'));
+        console.log(chalk.yellow('\n⚠️ semantq.config.js was preserved (may need manual updates)'));
         if (fs.existsSync(defaultConfigPath)) {
           console.log(chalk.gray('Compare with default config:'));
           console.log(chalk.gray(`  ${defaultConfigPath}`));
@@ -876,12 +960,10 @@ program
       console.log(chalk.blue('Restart your dev server to apply changes.'));
 
     } catch (error) {
-      console.error(chalk.red('✖ Update failed:'), error.message);
+      console.error(chalk.red('\n✖ Update failed:'), error.message);
       process.exit(1);
     }
   });
-
-
 // ===============================
 // ADD MODULE COMMAND
 // ===============================
