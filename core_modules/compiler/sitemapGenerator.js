@@ -3,46 +3,88 @@ import path from 'path';
 import config from '../../semantq.config.js';
 
 const generateSitemap = async () => {
-  // Check if sitemap generation is enabled
   if (!config.sitemap) {
     console.log('Sitemap generation is disabled.');
     return;
   }
 
   try {
-    // Dynamically import the fileBasedRoutes module
+    // Dynamically import routes
     const fileBasedRoutesModule = await import(config.routes.fileBasedRoutes);
-    //console.log('Imported fileBasedRoutes module:', fileBasedRoutesModule);
-
-    // Access the default export
     const fileBasedRoutes = fileBasedRoutesModule.default;
-    //console.log('fileBasedRoutes:', JSON.stringify(fileBasedRoutes, null, 2));
 
-    // Check if fileBasedRoutes is defined
     if (!fileBasedRoutes || typeof fileBasedRoutes !== 'object') {
       throw new Error('fileBasedRoutes is not a valid object.');
     }
 
-    // Get the target host from the config
     const targetHost = config.targetHost;
+    const targetHostUrl = new URL(targetHost);
+    const targetHostOrigin = targetHostUrl.origin;
 
-    // Generate XML Sitemap
+    // Get navigation config with defaults
+    const {
+      excludeRoutes = [],
+      includeRoutes = {},
+      customLinkTexts = {},
+      priorityRoutes = []
+    } = config.semantqNav || {};
+
+    // Merge all routes, giving priority to explicitly included routes
+    const allRoutes = { ...fileBasedRoutes, ...includeRoutes };
+
+    // Track processed URLs to prevent duplicates
+    const processedUrls = new Set();
+
+    // --- XML Sitemap Generation ---
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
     xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
 
-    for (const [key, route] of Object.entries(fileBasedRoutes)) {
+    // Process all routes for XML sitemap
+    for (const [key, route] of Object.entries(allRoutes)) {
       if (typeof route !== 'string') {
         console.warn(`Skipping invalid route for key "${key}":`, route);
         continue;
       }
 
-      const normalizedRoute = route.replace(/^\//, ''); // Remove leading slash
-      const url = `${targetHost}/${normalizedRoute}`; // Construct the full URL
+      // Skip excluded routes
+      if (excludeRoutes.includes(key) || excludeRoutes.includes(route)) {
+        continue;
+      }
+
+      // Handle URL construction
+      let url;
+      try {
+        // For external URLs, skip if not matching our target host
+        if (route.startsWith('http')) {
+          const routeUrl = new URL(route);
+          if (routeUrl.origin !== targetHostOrigin) {
+            continue;
+          }
+          url = routeUrl.href;
+        } else {
+          // For internal routes
+          url = new URL(
+            route === '/' ? '' : route.replace(/^\/+/, '/'), 
+            targetHostOrigin
+          ).href;
+        }
+      } catch (e) {
+        console.warn(`Invalid URL for route "${key}":`, route);
+        continue;
+      }
+
+      // Skip if we've already processed this URL
+      if (processedUrls.has(url)) continue;
+      processedUrls.add(url);
+
+      // Determine priority (higher for priority routes)
+      const priority = priorityRoutes.includes(key) ? '1.0' : '0.8';
+
       xml += `  <url>\n`;
       xml += `    <loc>${url}</loc>\n`;
       xml += `    <lastmod>${new Date().toISOString()}</lastmod>\n`;
       xml += `    <changefreq>weekly</changefreq>\n`;
-      xml += `    <priority>0.8</priority>\n`;
+      xml += `    <priority>${priority}</priority>\n`;
       xml += `  </url>\n`;
     }
 
@@ -57,9 +99,9 @@ const generateSitemap = async () => {
     }
 
     fs.writeFileSync(xmlSitemapPath, xml, 'utf8');
-    //console.log(`XML sitemap generated successfully at ${xmlSitemapPath}`);
+    //console.log(`XML sitemap generated at ${xmlSitemapPath}`);
 
-    // Generate HTML Sitemap
+    // --- HTML Sitemap Generation ---
     let html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -67,12 +109,13 @@ const generateSitemap = async () => {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HTML Sitemap - ${config.pageTitle}</title>
   <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
-    h1 { color: #333; }
+    body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; max-width: 800px; margin: 0 auto; }
+    h1 { color: #333; border-bottom: 1px solid #eee; padding-bottom: 10px; }
     ul { list-style-type: none; padding: 0; }
-    li { margin: 10px 0; }
-    a { color: #007BFF; text-decoration: none; }
+    li { margin: 10px 0; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
+    a { color: #007BFF; text-decoration: none; font-size: 1.1em; }
     a:hover { text-decoration: underline; }
+    .priority { background-color: #f0f8ff; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; color: #0066cc; }
   </style>
 </head>
 <body>
@@ -80,13 +123,58 @@ const generateSitemap = async () => {
   <ul>
 `;
 
-    for (const [key, route] of Object.entries(fileBasedRoutes)) {
-      const normalizedRoute = route.replace(/^\//, '');
-      const url = `${targetHost}/${normalizedRoute}`;
-      html += `    <li><a href="${url}">${key}</a></li>\n`;
+    // Reset processed URLs for HTML sitemap
+    processedUrls.clear();
+
+    // Sort routes with priority routes first
+    const sortedRoutes = Object.entries(allRoutes).sort(([keyA], [keyB]) => {
+      const isPriorityA = priorityRoutes.includes(keyA);
+      const isPriorityB = priorityRoutes.includes(keyB);
+      return isPriorityB - isPriorityA;
+    });
+
+    for (const [key, route] of sortedRoutes) {
+      if (typeof route !== 'string') continue;
+
+      // Skip excluded routes
+      if (excludeRoutes.includes(key) || excludeRoutes.includes(route)) {
+        continue;
+      }
+
+      // Handle URL construction
+      let url, displayPath;
+      try {
+        // Skip external URLs
+        if (route.startsWith('http')) {
+          const routeUrl = new URL(route);
+          if (routeUrl.origin !== targetHostOrigin) continue;
+          url = routeUrl.pathname || '/';
+          displayPath = routeUrl.pathname || '/';
+        } else {
+          url = route === '/' ? '/' : `/${route.replace(/^\/+/, '')}`;
+          displayPath = url;
+        }
+      } catch (e) {
+        continue;
+      }
+
+      // Skip duplicates
+      if (processedUrls.has(url)) continue;
+      processedUrls.add(url);
+
+      // Get display text
+      const displayText = customLinkTexts[key] || 
+                         (key === '/' ? 'Home' : 
+                         key.startsWith('/') ? key.slice(1) : key);
+
+      // Add priority badge if applicable
+      const priorityBadge = priorityRoutes.includes(key) 
+        ? ' <span class="priority">Priority</span>' 
+        : '';
+
+      html += `    <li><a href="${url}">${displayText}</a>${priorityBadge}</li>\n`;
     }
 
-    // Add the script tag before the closing </body> tag
     html += `  </ul>
   <script src="./sitemap.js" type="module"></script>
 </body>
@@ -101,13 +189,20 @@ const generateSitemap = async () => {
     }
 
     fs.writeFileSync(htmlSitemapPath, html, 'utf8');
-    //console.log(`HTML sitemap generated successfully at ${htmlSitemapPath}`);
+    //console.log(`HTML sitemap generated at ${htmlSitemapPath}`);
 
     // Generate sitemap.js
     const sitemapJsContent = `import Router from "/build/semantq/router.js";
 
 async function pageJS() {
-  console.log(Router);
+  // Highlight current page in sitemap
+  const currentPath = window.location.pathname;
+  document.querySelectorAll('a[href]').forEach(link => {
+    if (link.getAttribute('href') === currentPath) {
+      link.style.fontWeight = 'bold';
+      link.style.color = '#004080';
+    }
+  });
 }
 
 async function main() {
@@ -119,9 +214,6 @@ async function main() {
         resolve();
       }
     });
-
-    console.log("DOM is ready");
-
     await pageJS();
   } catch (error) {
     console.error("Error in main function:", error);
@@ -133,9 +225,11 @@ main();
 
     const sitemapJsPath = path.join(sitemapDir, 'sitemap.js');
     fs.writeFileSync(sitemapJsPath, sitemapJsContent, 'utf8');
-    //console.log(`sitemap.js generated successfully at ${sitemapJsPath}`);
+    //console.log(`sitemap.js generated at ${sitemapJsPath}`);
+
   } catch (err) {
     console.error('Error generating sitemaps:', err);
+    process.exit(1);
   }
 };
 
