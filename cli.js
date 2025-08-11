@@ -10,6 +10,10 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import ora from 'ora'; // Import ora for spinners
 import degit from 'degit'; // Import degit for cloning repos
+import archiver from 'archiver';
+import { format } from 'date-fns';
+import fetch from 'node-fetch';
+import os from 'os'; // <--- Add this line
 
 // Load environment variables from .env file
 dotenv.config();
@@ -808,38 +812,73 @@ program
   .option('--restore', 'Restore missing directories (docs/examples)')
   .action(async (options) => {
     const targetDir = process.cwd();
-    const GITHUB_REPO = 'https://github.com/Gugulethu-Nyoni/semantq';
+    // Using degit-friendly repo string
+    const GITHUB_REPO = 'Gugulethu-Nyoni/semantq';
     const GITHUB_RAW = 'https://raw.githubusercontent.com/Gugulethu-Nyoni/semantq/main';
 
+    const spinner = ora('Starting Semantq update...').start();
+
+    // Function to create zip backup
+    const createBackup = async (dirPath) => {
+      const timestamp = format(new Date(), 'yyyyMMdd_HHmmss');
+      const dirName = path.basename(dirPath);
+      const backupName = `${dirName}_${timestamp}_backup.zip`;
+      const backupPath = path.join(targetDir, backupName);
+
+      const output = fs.createWriteStream(backupPath);
+      const archive = archiver('zip', { zlib: { level: 9 } });
+
+      return new Promise((resolve, reject) => {
+        output.on('close', () => {
+          spinner.succeed(`Created backup: ${backupName} (${archive.pointer()} bytes)`);
+          resolve(backupPath);
+        });
+
+        archive.on('warning', (err) => {
+          if (err.code === 'ENOENT') {
+            spinner.warn(`Backup warning: ${err.message}`);
+          } else {
+            reject(err);
+          }
+        });
+
+        archive.on('error', (err) => reject(err));
+        archive.pipe(output);
+        archive.directory(dirPath, false);
+        archive.finalize();
+      });
+    };
+
     try {
-      // Get latest version from GitHub
+      // 1. Get latest version from GitHub
+      spinner.text = 'Fetching latest version from GitHub...';
       const latestVersion = await fetch(`${GITHUB_RAW}/package.json`)
         .then(res => res.json())
         .then(pkg => pkg.version)
         .catch(() => {
-          throw new Error('Could not fetch latest version from GitHub');
+          throw new Error('Could not fetch latest version from GitHub.');
         });
+      spinner.succeed('Fetched latest version.');
 
-      // Get current version
+      // 2. Get current version
       let currentVersion;
       try {
-        currentVersion = JSON.parse(fs.readFileSync('package.json', 'utf-8')).dependencies?.semantq?.replace(/^[\^~]/, '');
-        if (!currentVersion) {
-          currentVersion = JSON.parse(fs.readFileSync('package.json', 'utf-8')).version;
-        }
+        const pkg = JSON.parse(fs.readFileSync(path.join(targetDir, 'package.json'), 'utf-8'));
+        currentVersion = pkg.dependencies?.semantq?.replace(/^[\^~]/, '') || pkg.version;
       } catch (err) {
-        throw new Error('Could not determine current version from package.json');
+        throw new Error('Could not determine current version from package.json.');
       }
-
+      
       console.log(chalk.blue(`Current version: v${currentVersion}`));
       console.log(chalk.blue(`Latest version:  v${latestVersion}`));
 
       if (latestVersion === currentVersion && !options.force) {
-        console.log(chalk.green('✓ Already on latest version'));
+        spinner.info(chalk.green('Already on latest version. Update not required.'));
         return;
       }
 
-      // Confirmation prompt
+      // 3. Confirmation prompt
+      spinner.stop();
       const { proceed } = await inquirer.prompt([{
         type: 'confirm',
         name: 'proceed',
@@ -851,13 +890,14 @@ program
         console.log(chalk.yellow('Update cancelled.'));
         return;
       }
+      spinner.start();
 
-      // Dry run mode
+      // 4. Dry run mode
       if (options.dryRun) {
-        console.log(chalk.blue('[Dry Run] Would update:'));
+        spinner.stop();
+        console.log(chalk.blue('\n[Dry Run] Would update:'));
         console.log('• core_modules/ (always updated)');
         
-        // Check which optional directories exist
         const optionalDirs = ['docs', 'examples'];
         optionalDirs.forEach(dir => {
           const exists = fs.existsSync(path.join(targetDir, dir));
@@ -868,102 +908,83 @@ program
         return;
       }
 
-      // Perform update
-      console.log(chalk.blue('\nUpdating Semantq...'));
+      // 5. Perform update
+      spinner.text = 'Starting update process...';
+      const coreModulesPath = path.join(targetDir, 'core_modules');
 
-      // 1. Install latest version
-      console.log(chalk.blue('Installing latest npm package...'));
-      execSync('npm install semantq@latest', { stdio: 'inherit' });
+      // Backup core_modules if it exists
+      if (fs.existsSync(coreModulesPath)) {
+        spinner.text = 'Creating backup of core_modules...';
+        await createBackup(coreModulesPath);
+      }
 
-      // 2. Download and update core directories from GitHub
-      console.log(chalk.blue('\nUpdating core files from GitHub...'));
-      
+      // Install latest npm package
+      spinner.text = 'Installing latest npm package...';
+      execSync('npm install semantq@latest', { stdio: 'ignore' });
+      spinner.succeed('NPM package updated successfully.');
+
+      // Download and update core directories from GitHub using degit
+      spinner.text = 'Downloading core files from GitHub...';
       const requiredDirs = ['core_modules'];
       const optionalDirs = ['docs', 'examples'];
+      const allDirs = [...requiredDirs, ...optionalDirs];
+      
       const tempDir = path.join(os.tmpdir(), 'semantq_update');
       
-      // Create temp directory
-      fs.mkdirSync(tempDir, { recursive: true });
-      
-      // Clone repo (only once)
-      if (!fs.existsSync(path.join(tempDir, 'semantq'))) {
-        execSync(`git clone --depth 1 --filter=blob:none --sparse ${GITHUB_REPO} ${path.join(tempDir, 'semantq')}`, 
-          { stdio: 'pipe' });
-      }
-      
-      // Update required directories (always)
-      for (const dir of requiredDirs) {
-        try {
-          const destPath = path.join(targetDir, dir);
-          
-          console.log(chalk.blue(`- Updating required ${dir}/...`));
-          
-          execSync(`cd ${path.join(tempDir, 'semantq')} && git sparse-checkout set ${dir}`, { stdio: 'pipe' });
-          
-          // Remove existing directory
-          fs.rmSync(destPath, { recursive: true, force: true });
-          
-          // Copy new files
-          fs.copySync(path.join(tempDir, 'semantq', dir), destPath);
-          
-          console.log(chalk.green(`  ✓ Updated ${dir}/`));
-        } catch (err) {
-          console.log(chalk.red(`  ✖ Failed to update ${dir}/: ${err.message}`));
-          throw err; // Fail completely if required directory can't be updated
-        }
-      }
-      
-      // Update optional directories (only if they exist or --restore is set)
-      for (const dir of optionalDirs) {
+      // Use degit to get the desired directories
+      for (const dir of allDirs) {
         const destPath = path.join(targetDir, dir);
         const dirExists = fs.existsSync(destPath);
         
-        if (dirExists || options.restore) {
+        if (requiredDirs.includes(dir) || dirExists || options.restore) {
+          spinner.text = `${dirExists ? 'Updating' : 'Restoring'} ${dir}/ from GitHub...`;
           try {
-            console.log(chalk.blue(`- ${dirExists ? 'Updating' : 'Restoring'} ${dir}/...`));
+            // Remove the existing directory before cloning to ensure a clean update
+            await fs.remove(destPath);
             
-            execSync(`cd ${path.join(tempDir, 'semantq')} && git sparse-checkout set ${dir}`, { stdio: 'pipe' });
-            
-            // Remove existing directory if it exists
-            if (dirExists) {
-              fs.rmSync(destPath, { recursive: true, force: true });
-            }
-            
-            // Copy new files
-            fs.copySync(path.join(tempDir, 'semantq', dir), destPath);
-            
-            console.log(chalk.green(`  ✓ ${dirExists ? 'Updated' : 'Restored'} ${dir}/`));
+            // Corrected degit clone string to target the subdirectory from the main branch
+            const emitter = degit(`${GITHUB_REPO}/${dir}#main`, {
+              cache: false,
+              force: true,
+              verbose: true
+            });
+            await emitter.clone(destPath);
+            spinner.succeed(`${dirExists ? 'Updated' : 'Restored'} ${dir}/`);
           } catch (err) {
-            console.log(chalk.yellow(`  ⚠️ Could not ${dirExists ? 'update' : 'restore'} ${dir}/: ${err.message}`));
+            spinner.fail(`Failed to ${dirExists ? 'update' : 'restore'} ${dir}/: ${err.message}`);
+            throw new Error(`Update failed for ${dir}/`);
           }
         } else {
-          console.log(chalk.gray(`- Skipping ${dir}/ (not present in project)`));
+          spinner.info(`Skipping ${dir}/ (not present in project and --restore not set)`);
         }
       }
-      
-      // Clean up temp directory
-      fs.rmSync(tempDir, { recursive: true, force: true });
 
-      // 3. Preserve config (show diff if modified)
+      // Clean up temp directory
+      await fs.remove(tempDir);
+
+      // Preserve config (show diff if modified)
+      spinner.text = 'Finalizing update...';
       const userConfigPath = path.join(targetDir, 'semantq.config.js');
-      const defaultConfigPath = path.join('node_modules', 'semantq', 'semantq.config.default.js');
+      const defaultConfigPath = path.join(targetDir, 'node_modules', 'semantq', 'semantq.config.default.js');
 
       if (fs.existsSync(userConfigPath)) {
-        console.log(chalk.yellow('\n⚠️ semantq.config.js was preserved (may need manual updates)'));
+        spinner.warn('semantq.config.js was preserved (may need manual updates)');
         if (fs.existsSync(defaultConfigPath)) {
           console.log(chalk.gray('Compare with default config:'));
           console.log(chalk.gray(`  ${defaultConfigPath}`));
         }
       }
 
-      console.log(chalk.green.bold('\n✓ Update complete!'));
+      spinner.succeed(chalk.green.bold('Update complete!'));
       console.log(chalk.blue('Restart your dev server to apply changes.'));
 
     } catch (error) {
-      console.error(chalk.red('\n✖ Update failed:'), error.message);
+      spinner.fail(chalk.red('Update failed.'));
+      console.error(chalk.red('\n✖ Error:'), error.message);
       process.exit(1);
     }
   });
+
 // ===============================
 // ADD MODULE COMMAND
 // ===============================
