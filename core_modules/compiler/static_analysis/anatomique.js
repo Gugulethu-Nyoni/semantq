@@ -20,6 +20,10 @@ function transformReactiveIdentifiersInExpression(node, isReactiveVariableFn) {
         return node;
     }
 
+    if (node.type === 'TemplateLiteral') {
+        console.log('Processing template literal:', escodegen.generate(node));
+    }
+
     // Process the current node
     if (node.type === 'Identifier' && isReactiveVariableFn(node.name)) {
         // If this identifier is a reactive variable, transform it to `identifier.value`
@@ -82,6 +86,8 @@ export default class Anatomique {
 
         //this.analyzeJsAST(); // Populate `this.reactiveVariables` and `this.staticVariables`
         this.analyzeAndFilterJsAST();
+
+
         
         this.nodeToTranspilerMap = {
             Element: this.Element.bind(this),
@@ -136,61 +142,44 @@ export default class Anatomique {
 
 
     analyzeAndFilterJsAST() {
-    if (!this.jsAST || !this.jsAST.content) {
-        return;
-    }
+    if (!this.jsAST || !this.jsAST.content) return;
 
-    const filteredBody = [];
-    estraverse.traverse(this.jsAST.content, {
+    this.onMountCallbacks = [];
+    const topLevelNodesToKeep = [];
+
+    this.jsAST.content.body.forEach(node => {
+        if (node.type === 'ImportDeclaration') {
+            return;
+        }
+        
+        if (node.type === 'ExpressionStatement' &&
+            node.expression?.type === 'CallExpression' &&
+            node.expression.callee?.name === '$onMount') {
+            this.onMountCallbacks.push(node);
+            return;
+        }
+        
+        topLevelNodesToKeep.push(node);
+    });
+
+    estraverse.traverse({ type: 'Program', body: topLevelNodesToKeep }, {
         enter: (node, parent) => {
-            // Analyze all top-level variable declarations, even inside onMount for now
             if (node.type === 'VariableDeclarator') {
                 const varName = node.id.name;
                 if (node.init?.type === 'CallExpression') {
                     const calleeName = node.init.callee?.name;
-                    if (calleeName === '$state' || calleeName === '$derived' || calleeName === '$props') {
+                    if (['$state', '$derived', '$props'].includes(calleeName)) {
                         this.reactiveVariables.add(varName);
                         this.staticVariables.delete(varName);
-                    } else {
-                        if (!this.reactiveVariables.has(varName)) {
-                            this.staticVariables.add(varName);
-                        }
-                    }
-                } else if (node.id.type === 'Identifier') {
-                    if (!this.reactiveVariables.has(varName)) {
-                        this.staticVariables.add(varName);
                     }
                 }
-            }
-
-            // Identify and extract $onMount calls
-            if (node.type === 'ExpressionStatement' && node.expression?.type === 'CallExpression' && node.expression.callee?.name === '$onMount') {
-                const onMountFunction = node.expression.arguments[0];
-                if (onMountFunction && (onMountFunction.type === 'ArrowFunctionExpression' || onMountFunction.type === 'FunctionExpression')) {
-                    const functionBody = onMountFunction.body;
-
-                    if (functionBody.type === 'BlockStatement') {
-                        this.onMountCallbacks.push(...functionBody.body);
-                    } else {
-                        this.onMountCallbacks.push(functionBody);
-                    }
-                }
-                return estraverse.VisitorOption.Skip; // Skip this node for the main body
             }
         },
-        leave: (node, parent) => {
-            // This is the updated condition to also exclude ImportDeclarations
-            if (parent?.type === 'Program' && node.type !== 'ImportDeclaration' && !(node.type === 'ExpressionStatement' && node.expression?.type === 'CallExpression' && node.expression.callee?.name === '$onMount')) {
-                filteredBody.push(node);
-            }
-        }
     });
 
-    // Store the filtered AST and generate the clean JS string
-    this.jsAST.content.body = filteredBody;
+    this.jsAST.content.body = topLevelNodesToKeep;
     this.mainPageOriginalJS = escodegen.generate(this.jsAST.content);
 }
-
 
     analyzeJsAST() {
         if (!this.jsAST || !this.jsAST.content) {
@@ -236,9 +225,9 @@ export default class Anatomique {
         });
 
         this.jsAST.content.body = filteredBody;
-        console.log("REACTIVE VARS", this.reactiveVariables);
-        console.log("STATIC VARS", this.staticVariables);
-        console.log("onMountCallbacks", JSON.stringify(this.onMountCallbacks,null,2));
+        //console.log("REACTIVE VARS", this.reactiveVariables);
+        //console.log("STATIC VARS", this.staticVariables);
+        //console.log("onMountCallbacks", JSON.stringify(this.onMountCallbacks,null,2));
     }
 
 
@@ -271,6 +260,11 @@ export default class Anatomique {
     isReactiveVariable(varName) {
         return this.reactiveVariables.has(varName);
     }
+
+    isFunction(varName) {
+    const varDecl = this.findVariableDeclaration(varName);
+    if (!varDecl) return false;
+}
 
     getUniqueId(prefix = '') {
         return `${prefix}${Math.random().toString(36).slice(2, 8)}`;
@@ -382,25 +376,62 @@ export default class Anatomique {
     // --- Node Transpilation Methods ---
 
     Element(node, parentVar, context = {}) {
-        const varName = `${node.name}_elem_${this.getUniqueId()}`;
-        //console.log(`DEBUG: Element - Creating element ${node.name} with var ${varName}`);
-
+    const varName = `${node.name}_elem_${this.getUniqueId()}`;
+    
+    // Check if the element is a <pre> or <code> tag
+    if (node.name === 'pre' || node.name === 'code') {
+        const rawContent = this.preserveRawContent(node.children);
         this.transpiledJSContent.push(`const ${varName} = document.createElement("${node.name}");`);
+        this.transpiledJSContent.push(`${varName}.textContent = \`${rawContent}\`;`);
         this.transpiledJSContent.push(`${parentVar}.appendChild(${varName});`);
-
-        if (Array.isArray(node.attributes)) {
-            //console.log(`DEBUG: Element - Processing ${node.attributes.length} attributes for ${varName}.`);
-            for (const attr of node.attributes) {
-                const transpileFn = this.nodeToTranspilerMap[attr.type];
-                if (transpileFn) transpileFn(attr, varName, context);
-            }
-        }
-
-        // --- FIX: Ensure node.children is an array before passing to transpileBlock ---
-        // This prevents `TypeError: blockNodes is not iterable` if an element has no children.
-        this.transpileBlock(Array.isArray(node.children) ? node.children : [], { ...context, parentVar: varName });
+        
+        // Return here to prevent further child processing
+        return; 
     }
 
+    // Existing logic for other elements
+    this.transpiledJSContent.push(`const ${varName} = document.createElement("${node.name}");`);
+    this.transpiledJSContent.push(`${parentVar}.appendChild(${varName});`);
+
+    if (Array.isArray(node.attributes)) {
+        for (const attr of node.attributes) {
+            const transpileFn = this.nodeToTranspilerMap[attr.type];
+            if (transpileFn) transpileFn(attr, varName, context);
+        }
+    }
+
+    this.transpileBlock(Array.isArray(node.children) ? node.children : [], { ...context, parentVar: varName });
+}
+
+
+preserveRawContent(children) {
+    let content = '';
+    
+    // Simple recursive walker to extract all text content
+    function walk(nodes) {
+        if (!nodes || !Array.isArray(nodes)) return;
+        for (const child of nodes) {
+            if (child.type === 'TextNode') {
+                content += child.value;
+            } else if (child.type === 'Element' || child.type === 'MustacheTag') {
+                // For nested elements or mustache tags, get their original names and text
+                content += `<${child.name}>`;
+                walk(child.children);
+                content += `</${child.name}>`;
+            } else {
+                // Handle any other node types gracefully
+                // You might need to add more cases here depending on your AST structure
+            }
+        }
+    }
+    
+    walk(children);
+
+    // Escape special HTML characters to ensure they display as text
+    return content.replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;');
+}
     Fragment(node, parentVar, context = {}) {
         ////console.log(`DEBUG: Fragment - Transpiling fragment.`);
         // --- FIX: Ensure node.children is an array before passing to transpileBlock ---
@@ -409,81 +440,135 @@ export default class Anatomique {
     }
 
     Attribute(attr, elementVarName, context = {}) {
-        ////console.log(`DEBUG: Attribute - Processing attribute type: ${attr.type} for element ${elementVarName}`);
+       // console.log(`DEBUG: ${JSON.stringify(attr)} Attribute - Processing attribute type: ${attr.type} for element ${elementVarName}`);
         switch (attr.type) {
-            case "KeyValueAttribute": {
-                const attrName = attr.name;
-                const attrValue = attr.value?.[0]?.data || "";
-                this.transpiledJSContent.push(`${elementVarName}.setAttribute("${attrName}", ${JSON.stringify(attrValue)});`);
-                break;
+             case "KeyValueAttribute": {
+            // Check for a boolean attribute based on the AST structure.
+            // A boolean attribute has a 'null' value and a dynamic expression.
+            if (attr.value === null && attr.expression) {
+                const expressionCode = escodegen.generate(attr.expression);
+                this.transpiledJSContent.push(`
+                    // Dynamic boolean attribute: ${attr.name}
+                    (function() {
+                        if (${expressionCode}) {
+                            ${elementVarName}.setAttribute('${attr.name}', '');
+                        } else {
+                            ${elementVarName}.removeAttribute('${attr.name}');
+                        }
+                    })();
+                `);
+                return;
             }
+            
+            // Standard KeyValueAttribute handling (for attributes with string values).
+            const attrValue = attr.value || [];
+            const values = attrValue.map(valNode => {
+                if (valNode.type === "Text") {
+                    return `\`${valNode.raw}\``;
+                }
+                if (valNode.type === "MustacheTag") {
+                    const expressionCode = escodegen.generate(valNode.expression);
+                    return `(${expressionCode})`;
+                }
+                return '';
+            });
+
+            const valueCode = values.join(' + ');
+            this.transpiledJSContent.push(`${elementVarName}.setAttribute('${attr.name}', ${valueCode});`);
+            break;
+        }
+
 
             case "TwoWayBindingAttribute": {
-                const bindVarName = attr.expression?.name; // Assumes simple Identifier for binding
+  const bindVarName = attr.expression?.name;
+  if (!bindVarName) {
+    console.error(`ERROR: Two-way binding: Missing variable name for ${attr.name} on element ${elementVarName}.`);
+    return;
+  }
+  if (!this.isReactiveVariable(bindVarName)) {
+    console.error(
+      `ERROR: Two-way binding (bind:${attr.name}) can only be used with reactive variables ` +
+      `(declared with $state()). '${bindVarName}' is not a reactive variable.`
+    );
+    return;
+  }
+  this.transpiledJSContent.push(`bind(${elementVarName}, ${bindVarName});`);
+  break;
+}
 
-                if (!bindVarName) {
-                    console.error(`ERROR: Two-way binding: Missing variable name for ${attr.name} on element ${elementVarName}.`);
-                    return;
-                }
 
-                if (!this.isReactiveVariable(bindVarName)) {
-                    console.error(
-                        `ERROR: Two-way binding (bind:${attr.name}) can only be used with reactive variables ` +
-                        `(declared with $state()). '${bindVarName}' is not a reactive variable.`
-                    );
-                    return;
-                }
-                this.transpiledJSContent.push(`bind(${elementVarName}, ${bindVarName});`);
-                break;
-            }
+case "MustacheAttribute": {
+ const expression = attr.expression;
+ if (!expression) {
+  console.error("MustacheAttribute: Missing expression");
+  return;
+ }
 
-            case "MustacheAttribute": {
-                const expression = attr.expression;
-                if (!expression) {
-                    console.error("MustacheAttribute: Missing expression");
-                    return;
-                }
+ let expressionCode;
 
-                // Check if this is a static string variable (like boolAttr = 'disabled')
-                if (expression.type === 'Identifier') {
-                    const varName = expression.name;
-                    const varDecl = this.findVariableDeclaration(varName);
+ // 1. Check for simple identifiers that might be a function call
+ if (expression.type === 'Identifier') {
+  const varName = expression.name;
+  const varDecl = this.findVariableDeclaration(varName);
 
-                    // If it's a const declaration with a string literal value
-                    if (varDecl && varDecl.kind === 'const' &&
-                        varDecl.init && varDecl.init.type === 'Literal' &&
-                        typeof varDecl.init.value === 'string') {
+  // If it's a const declaration with a static string value
+  if (varDecl && varDecl.kind === 'const' && varDecl.init && varDecl.init.type === 'Literal' && typeof varDecl.init.value === 'string') {
+   this.transpiledJSContent.push(
+    `${elementVarName}.setAttribute("${varDecl.init.value}", "");`
+   );
+   break;
+  }
+  // If it's a function, generate a function call
+  if (this.isFunction(varName)) {
+   expressionCode = `${varName}()`;
+  } else {
+   // Otherwise, it's a regular identifier
+   expressionCode = escodegen.generate(expression);
+  }
+ } else {
+  // 2. Handle all other complex expressions (e.g., CallExpression, BinaryExpression)
+  expressionCode = escodegen.generate(expression);
+ }
 
-                        // Directly use the static string value
-                        this.transpiledJSContent.push(
-                            `${elementVarName}.setAttribute("${varDecl.init.value}", "");`
-                        );
-                        break;
-                    }
-                }
+ // Get or create a reactive derived variable for the expression
+ const derivedAttrValueVar = this.getOrCreateDerived(expressionCode, context);
 
-                // Fallback to reactive handling for dynamic values
-                const dynValueCode = escodegen.generate(expression);
-                const derivedAttrValueVar = this.getOrCreateDerived(dynValueCode, context);
-
-                if (!attr.name) {
-                    // Boolean attribute spread
-                    this.transpiledJSContent.push(
-                        `if (${derivedAttrValueVar}.value) {`,
-                        `  ${elementVarName}.setAttribute(${derivedAttrValueVar}.value, '');`,
-                        `} else {`,
-                        `  ${elementVarName}.removeAttribute(${derivedAttrValueVar}.value);`,
-                        `}`
-                    );
-                } else {
-                    // Regular mustache attribute
-                    this.transpiledJSContent.push(
-                        `bindAttr(${elementVarName}, "${attr.name}", () => ${derivedAttrValueVar}.value);`
-                    );
-                }
-                break;
-            }
-
+ // 3. Handle boolean-type attributes
+ if (attr.name && (attr.name === 'disabled' || attr.name === 'required' || attr.name === 'readonly')) {
+  this.transpiledJSContent.push(
+   `$effect(() => {`,
+   ` ${elementVarName}.toggleAttribute("${attr.name}", !!${derivedAttrValueVar}.value);`,
+   `});`
+  );
+ }
+ // 4. Handle attribute spread (no name)
+ else if (!attr.name) {
+  this.transpiledJSContent.push(
+   `$effect(() => {`,
+   ` if (${derivedAttrValueVar}.value) {`,
+   `  ${elementVarName}.setAttribute(${derivedAttrValueVar}.value, '');`,
+   ` } else {`,
+   `  ${elementVarName}.removeAttribute(${derivedAttrValueVar}.value);`,
+   ` }`,
+   `});`
+  );
+ }
+ // 5. Handle special attributes that need direct `$effect` for reactivity (e.g., 'min')
+ else if (attr.name === 'min') {
+  this.transpiledJSContent.push(
+   `$effect(() => {`,
+   ` ${elementVarName}.setAttribute("${attr.name}", ${derivedAttrValueVar}.value);`,
+   `});`
+  );
+ }
+ // 6. Handle all other regular mustache attributes
+ else {
+  this.transpiledJSContent.push(
+   `bindAttr(${elementVarName}, "${attr.name}", () => ${derivedAttrValueVar}.value);`
+  );
+ }
+ break;
+}
 
             case "EventHandler": {
                 const eventName = attr.name;
@@ -530,7 +615,14 @@ export default class Anatomique {
 
 
 
-            case "BooleanAttribute":
+            case "BooleanAttribute": {
+  const attrName = attr.name;
+  const attrValue = attr.value; // This will be true or false
+  this.transpiledJSContent.push(
+    `${elementVarName}.toggleAttribute("${attrName}", ${attrValue});`
+  );
+  break;
+}
             case "BooleanIdentifierAttribute": {
                 const attrName = attr.name;
                 const attrValue = attr.value; // This could be a string (e.g., "true", "false", or var name) or AST node
@@ -796,50 +888,59 @@ async output() {
         const mainComponentJS = this.transpiledJSContent.join('\n');
         const mainComponentCleanups = this.componentCleanups.join('\n');
         const generatedDerivedDeclarations = this.globalDerivedDeclarations.join('\n');
-        
-        // Process onMount callbacks
-        const onMountEffects = this.onMountCallbacks.map((callback) => {
-            const code = escodegen.generate(callback);
-            return `
-                $effect(() => {
-                    let cleanupFn;
-                    const mount = () => {
-                        try {
-                            ${code}
-                            
-                            // Auto-detect cleanup
-                            if (typeof ${callback.id} === 'object' && ${callback.id} !== null) {
-                                if (typeof ${callback.id}.destroy === 'function') {
-                                    cleanupFn = () => ${callback.id}.destroy();
-                                } else if (typeof ${callback.id}.dispose === 'function') {
-                                    cleanupFn = () => ${callback.id}.dispose();
+
+        // Process $onMount blocks with proper async handling
+       // In your output() method, modify this part:
+const onMountEffects = this.onMountCallbacks.map((onMountNode) => {
+    const callback = onMountNode.expression.arguments[0];
+    const isAsync = callback.async;
+    
+    // Generate the body with proper async handling
+    const body = escodegen.generate(callback.body);
+    
+    return `
+        // $onMount effect
+        $effect(() => {
+            let cleanupFn;
+            const mount = ${isAsync ? 'async ' : ''}function() {
+                try {
+                    ${body}
+                } catch (e) {
+                    console.error('Mount error:', e);
+                    throw e;
+                }
+            };
+
+            // Double RAF for reliable DOM mounting
+            let rafId;
+            const scheduleMount = () => {
+                cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(() => {
+                    requestAnimationFrame(${isAsync ? 'async ' : ''}() => {
+                        const result = mount();
+                        if (result && typeof result.then === 'function') {
+                            result.then(cleanup => {
+                                if (typeof cleanup === 'function') {
+                                    cleanupFn = cleanup;
                                 }
-                            }
-                        } catch (e) {
-                            console.error('Mount error:', e);
-                        }
-                    };
-                    
-                    // Double RAF for reliable mounting
-                    let rafId;
-                    const scheduleMount = () => {
-                        cancelAnimationFrame(rafId);
-                        rafId = requestAnimationFrame(() => {
-                            requestAnimationFrame(() => {
-                                mount();
                             });
-                        });
-                    };
-                    
-                    scheduleMount();
-                    
-                    return () => {
-                        cancelAnimationFrame(rafId);
-                        if (cleanupFn) cleanupFn();
-                    };
+                        } else if (typeof result === 'function') {
+                            cleanupFn = result;
+                        }
+                    });
                 });
-            `;
-        }).join('\n');
+            };
+            
+            scheduleMount();
+            
+            return () => {
+                cancelAnimationFrame(rafId);
+                if (cleanupFn) cleanupFn();
+            };
+        });
+    `;
+}).join('\n');
+
 
         const finalJsCode = `
 ${this.mainPageOriginalJS}
@@ -852,6 +953,10 @@ export function renderComponent(targetElement) {
     if (!appRoot) {
         console.error("App root element not found");
         return () => {};
+    }
+
+    while (appRoot.firstChild) {
+        appRoot.removeChild(appRoot.firstChild);
     }
 
     ${mainComponentJS}
@@ -873,11 +978,8 @@ export function renderComponent(targetElement) {
         return {};
     }
 }
-/*
-    generateStateImports() {
-        return `import { $state, $derived, $effect, bind, bindText, bindAttr, bindClass, $props } from '@semantq/ql';\n\n`; // Added $props
-    }
 
-*/
+
+
 
 }
