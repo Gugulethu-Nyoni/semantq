@@ -70,7 +70,6 @@ async function readSMQHTMLFiles(directory) {
       console.error('Error reading directory:', err);
       return;
     }
-    //console.log("ALL Files", files);
 
     files.forEach((file) => {
       const filePath = path.join(directory, file);
@@ -86,39 +85,19 @@ async function readSMQHTMLFiles(directory) {
           const fileName = path.basename(file).toLowerCase();
           const resolvedASTPath = path.join(directory, '@page.resolved.ast');
           const smqASTPath = path.join(directory, '@page.smq.ast');
-          //const layoutSmqASTPath = path.join(directory, '@layout.smq.ast');
-          //const layoutResolvedASTPath = path.join(directory, '@layout.resolved.ast');
 
-          // Check for @page.resolved.ast first
-          // || fileName === '@layout.smq.ast' || fileName === '@layout.resolved.ast'
           if (fileName === '@page.resolved.ast' || fileName === '@page.smq.ast') {
-            
             let fileToRead = null;
 
             if (fs.existsSync(resolvedASTPath)) {
               fileToRead = resolvedASTPath;
-            } 
+            }
 
             if (fs.existsSync(smqASTPath)) {
               fileToRead = smqASTPath;
             }
 
-            /*
-
-            if (fs.existsSync(layoutSmqASTPath)) {
-              fileToRead = layoutSmqASTPath;
-            }
-
-            if (fs.existsSync(layoutResolvedASTPath)) {
-              fileToRead = layoutResolvedASTPath;
-            }
-            */
-
-
-
-
             if (fileToRead) {
-              //console.log(fileToRead);
               fs.readFile(fileToRead, 'utf8', async (err, data) => {
                 if (err) {
                   console.error('Error reading file:', err);
@@ -128,44 +107,57 @@ async function readSMQHTMLFiles(directory) {
                 try {
                   const astObject = JSON.parse(data);
                   const jsAST = astObject.jsAST;
-                  //console.log("HERE1",JSON.stringify(jsAST,null,2));
                   const cssASTObject = astObject.cssAST;
 
                   let cssAST = '';
                   if (cssASTObject && cssASTObject.content && Array.isArray(cssASTObject.content.nodes) && cssASTObject.content.nodes.length > 0) {
-                    
-                     //console.log(JSON.stringify(cssASTObject,null,2));
                     cssAST = convertCssASTToString(cssASTObject);
-
-                    //console.log("FINAL CSS",JSON.stringify(cssAST,null,2))
                   }
 
-                  const customSyntaxAST = astObject.customAST.content;
-                  const customSyntaxObject = customSyntaxAST[0];
+                  // Corrected customAST access
+                  // customSyntaxContainer holds: { html: { type: "Fragment", children: [...] } }
+                  const customSyntaxContainer = astObject.customAST.content;
 
-
-                  /* EXRACT JS IMPORTS */
-                // Dynamically import the module and apply transformations
-                  try {
-                    if (jsAST.content.body.length > 0 || customSyntaxAST[0].html.children[0].children[0].length > 0) {
-                      //console.log(jsAST.content.body);
-                      const fileName = path.basename(filePath);
-                      // exclude transformation of layout ast files for now
-                      if (fileName.includes('@page')) {
-                      const atomiqueModule = await import('./static_analysis/anatomique.js');
-                      const transformASTs = atomiqueModule.default; // If using default export
-                      //console.log(JSON.stringify(cssAST,null,2));
-                      await transformASTs(jsAST.content, cssAST, customSyntaxAST, filePath);
+                  let htmlChildrenForTransformer = [];
+                  if (customSyntaxContainer?.html?.children?.length > 0) {
+                    // Assuming 'customSyntax' element is always the first child of the HTML fragment
+                    const customSyntaxElement = customSyntaxContainer.html.children[0];
+                    if (customSyntaxElement && customSyntaxElement.name === 'customSyntax' && Array.isArray(customSyntaxElement.children)) {
+                      htmlChildrenForTransformer = customSyntaxElement.children; // These are your span, div, button, MustacheTag
+                    } else {
+                      console.warn(`File: ${filePath} - Expected 'customSyntax' element as the first child of HTML fragment, but found:`, customSyntaxElement);
+                      // If 'customSyntax' isn't strictly guaranteed to be the *first* child,
+                      // you might need a more robust search here (e.g., using a tree traversal utility).
                     }
+                  }
+
+                  // Dynamically import the module and apply transformations
+                  try {
+                    // Check if either JS AST body has content or the extracted HTML children have content
+                    if (jsAST?.content?.body?.length > 0 || htmlChildrenForTransformer.length > 0) {
+                      const currentFileName = path.basename(filePath);
+                      // exclude transformation of layout ast files for now
+                      //console.log("resolved FILES?", filePath);
+                      if (currentFileName.includes('@page')) {
+                        const atomiqueModule = await import('./static_analysis/index.js');
+                        const transformASTs = atomiqueModule.default; // If using default export
+                        
+                        // Pass jsAST.content, cssAST string, and the html fragment content to the transformer
+                        // The transformer will need to know how to handle these different structures.
+                        // For html, you might want to pass the `html` object itself or its children.
+                        // Assuming `transformASTs` expects the `html` object (Fragment type)
+                         //console.log("STRUCTURE",JSON.stringify(customSyntaxContainer.html,null,2));
+                        await transformASTs(jsAST.content, cssAST, customSyntaxContainer.html, filePath); 
+                      }
 
                     } else {
-                      console.log(`Transformer not run for ${filePath} - Either JS or HTML not found`);
+                      console.log(`Transformer not run for ${filePath} - Either JS or HTML content not found`);
                     }
                   } catch (importErr) {
-                    console.error('Error importing module:', importErr);
+                    console.error(`Error importing module for ${filePath}:`, importErr);
                   }
                 } catch (parseErr) {
-                  console.error('Error parsing JSON:', parseErr);
+                  console.error(`Error parsing JSON for ${filePath}:`, parseErr);
                 }
               });
             } else {
@@ -181,14 +173,6 @@ async function readSMQHTMLFiles(directory) {
 /**
  * Start the transformation process.
  */
-
-/*
-export function transformSMQFiles(destDir) {
-  //const directory = '../../build/routes'; // src directory
-  return readSMQHTMLFiles(destDir);
-}
-*/
-
 export function transformSMQFiles(destDir) {
   // Recursively process the directory
   processDirectory(destDir);
@@ -246,6 +230,3 @@ function processDirectory(dir) {
   });
 }
 
-
-
-//transformSMQFiles();
