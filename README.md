@@ -412,7 +412,7 @@ $effect(() => {
 | `semantq create myapp`                       | Scaffold new project                                            |
 | `semantq make:route dashboard --auth --crud` | Create authenticated CRUD route                                 |
 | `semantq install:tailwind`                   | Setup Tailwind CSS                                              |
-| `semantq update`                             | Update core dev modules (with confirmation prompts)             |
+| `semantq update`                             | Update core dev modules (with confirmation prompts) Semantq will auto backup your core_modules dir             |
 | `semantq create my_crud_app -fs`             | Full-stack scaffold (frontend + SemantqQL + auth)               |
 | `semantq make:resource Product`              | Generate full MCSR resource (model, controller, service, route) |
 
