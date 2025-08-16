@@ -84,7 +84,6 @@ export default class Anatomique {
         this.localDerivedDeclarations = null; // A temporary array for block-local deriveds
 
 
-        //this.analyzeJsAST(); // Populate `this.reactiveVariables` and `this.staticVariables`
         this.analyzeAndFilterJsAST();
 
 
@@ -181,55 +180,7 @@ export default class Anatomique {
     this.mainPageOriginalJS = escodegen.generate(this.jsAST.content);
 }
 
-    analyzeJsAST() {
-        if (!this.jsAST || !this.jsAST.content) {
-            return;
-        }
-
-        const filteredBody = [];
-        estraverse.traverse(this.jsAST.content, {
-            enter: (node, parent) => {
-                // If it's a top-level VariableDeclaration, analyze it immediately
-                if (parent?.type === 'Program' && node.type === 'VariableDeclaration') {
-                    this.analyzeNode(node);
-                    filteredBody.push(node);
-                    return estraverse.VisitorOption.Skip; // Skip traversal of its children
-                }
-
-                // Logic to identify and extract $onMount calls
-                if (node.type === 'ExpressionStatement' && node.expression?.type === 'CallExpression' && node.expression.callee?.name === '$onMount') {
-                    const onMountFunction = node.expression.arguments[0];
-                    if (onMountFunction && (onMountFunction.type === 'ArrowFunctionExpression' || onMountFunction.type === 'FunctionExpression')) {
-                        const functionBody = onMountFunction.body;
-
-                        // NEW: Analyze the variables inside the onMount block
-                        this.analyzeNode(functionBody);
-
-                        // Store the function body as a single BlockStatement node
-                        if (functionBody.type === 'BlockStatement') {
-                            this.onMountCallbacks.push(...functionBody.body);
-                        } else {
-                            this.onMountCallbacks.push(functionBody);
-                        }
-                    }
-                    // Skip this node so it doesn't get added to the filteredBody
-                    return estraverse.VisitorOption.Skip;
-                }
-            },
-            leave: (node, parent) => {
-                // Only push nodes to filteredBody if they are top-level and haven't been skipped
-                if (parent?.type === 'Program' && !node.onMountHandled) {
-                    filteredBody.push(node);
-                }
-            }
-        });
-
-        this.jsAST.content.body = filteredBody;
-        //console.log("REACTIVE VARS", this.reactiveVariables);
-        //console.log("STATIC VARS", this.staticVariables);
-        //console.log("onMountCallbacks", JSON.stringify(this.onMountCallbacks,null,2));
-    }
-
+    
 
      // NEW: Method to generate the filtered JS string
     generateMainPageOriginalJS() {
