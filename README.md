@@ -263,11 +263,6 @@ Final resolved mark up:
 * Shorthand automatically resolves to `src/components/global/Animation.smq`
 * Useful for reusable components such as headers, footers, nav, modals, and more
 
-## Named Slots
-
-Here’s a refined **Markdown section** for your Semantq README that demonstrates a reusable child component with full markup, clean parent usage via named slots, and a clear warning about keeping the child self-contained. I’ve chosen a **small “Documentation Footnote” card** use case that fits your docs context.
-
-
 ## Named Slots for Reusable Components
 
 Semantq supports **named slots** that allow you to keep your main page cleaner while making child components reusable.
@@ -691,10 +686,6 @@ You can query the generated endpoint directly:
 ```bash
 curl -X GET http://localhost:3003/product/products
 ```
-
-Here’s a refined version in clean Markdown:
-
----
 
 You can add your **Product** schema in `project_root/semantqQL/prisma/schema.prisma`:
 
