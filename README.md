@@ -46,11 +46,10 @@
 13. [Full-Stack Integration with SemantqQL](#full-stack-integration-with-semantqql)
     - [Abstraction with smQL](#abstraction-with-smql)
     - [Side-by-Side Comparison](#side-by-side-comparison)
-14. [Feature/Module Specific Docs](#feature--module-specific-docs)
+14. [Feature/Module Specific Docs](#featuremodule-specific-docs)
 15. [License](#license)
 
-
-### Key goals:
+### Key goals
 
 * Declarative HTML with reactive features
 * Reusable components and layouts
