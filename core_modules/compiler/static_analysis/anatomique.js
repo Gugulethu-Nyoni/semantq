@@ -101,6 +101,8 @@ export default class Anatomique {
             MustacheTag: this.MustacheTag.bind(this),
             IfStatement: this.IfStatement.bind(this),
             EachStatement: this.EachStatement.bind(this),
+            RawHtmlBlock: this.RawHtmlBlock.bind(this), 
+
 
         };
 
@@ -326,63 +328,182 @@ export default class Anatomique {
 
     // --- Node Transpilation Methods ---
 
-    Element(node, parentVar, context = {}) {
-    const varName = `${node.name}_elem_${this.getUniqueId()}`;
+    // 1. escapeCodeContent - Final perfected version
+escapeCodeContent(raw) {
+    if (!raw) return '';
+    // Escape HTML special chars
+    const escaped = raw
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/`/g, '&#96;');
     
-    // Check if the element is a <pre> or <code> tag
-    if (node.name === 'pre' || node.name === 'code') {
-        const rawContent = this.preserveRawContent(node.children);
-        this.transpiledJSContent.push(`const ${varName} = document.createElement("${node.name}");`);
-        this.transpiledJSContent.push(`${varName}.textContent = \`${rawContent}\`;`);
-        this.transpiledJSContent.push(`${parentVar}.appendChild(${varName});`);
-        
-        // Return here to prevent further child processing
-        return; 
+    // Preserve indentation: replace leading spaces on each line with &nbsp;
+    return escaped.replace(/^ +/gm, match => '&nbsp;'.repeat(match.length));
+}
+
+
+
+// 2. RawHtmlBlock - Complete handler
+RawHtmlBlock(node, parentVar, context = {}) {
+    const varName = `${node.tag}_elem_${this.getUniqueId()}`;
+
+    // 1. Create <pre> element
+    this.transpiledJSContent.push(
+        `const ${varName} = document.createElement('${node.tag}');`,
+        `${parentVar}.appendChild(${varName});`,
+        `${varName}.style.whiteSpace = 'pre-wrap';`,
+        //`${varName}.style.fontFamily = 'monospace, Consolas, "Courier New"';`,
+        `${varName}.style.lineHeight = '1.5';`
+    );
+
+    // 2. Pre-specific styling
+    if (node.tag === 'pre') {
+        this.transpiledJSContent.push(
+            `${varName}.style.margin = '16px 0';`,
+            `${varName}.style.padding = '12px 16px';`,
+            //`${varName}.style.backgroundColor = '#f7f7f9';`,
+            `${varName}.style.borderRadius = '4px';`,
+            `${varName}.style.overflowX = 'auto';`
+        );
     }
 
-    // Existing logic for other elements
-    this.transpiledJSContent.push(`const ${varName} = document.createElement("${node.name}");`);
-    this.transpiledJSContent.push(`${parentVar}.appendChild(${varName});`);
+    // 3. Capture raw content (PreText, CodeFence, nested <code>)
+    let rawContent = '';
+    if (Array.isArray(node.content)) {
+        rawContent = node.content
+            .map(c => {
+                if (c.type === 'PreText') return c.content || '';
+                if (c.type === 'CodeFence' || c.name === 'code') {
+                    return this.extractRawContent(c);
+                }
+                return '';
+            })
+            .join('\n'); // preserve logical line breaks
+    }
 
+    // 4. Use textContent instead of innerHTML
+    this.transpiledJSContent.push(
+        `const code_${varName} = document.createElement('code');`,
+        `code_${varName}.textContent = \`${rawContent}\`;`,
+        `${varName}.appendChild(code_${varName});`
+    );
+
+    // 5. Process attributes
     if (Array.isArray(node.attributes)) {
-        for (const attr of node.attributes) {
-            const transpileFn = this.nodeToTranspilerMap[attr.type];
-            if (transpileFn) transpileFn(attr, varName, context);
-        }
+        node.attributes.forEach(attr => {
+            this.Attribute(attr, varName, context);
+        });
     }
-
-    this.transpileBlock(Array.isArray(node.children) ? node.children : [], { ...context, parentVar: varName });
 }
 
 
-preserveRawContent(children) {
-    let content = '';
-    
-    // Simple recursive walker to extract all text content
-    function walk(nodes) {
-        if (!nodes || !Array.isArray(nodes)) return;
-        for (const child of nodes) {
-            if (child.type === 'TextNode') {
-                content += child.value;
-            } else if (child.type === 'Element' || child.type === 'MustacheTag') {
-                // For nested elements or mustache tags, get their original names and text
-                content += `<${child.name}>`;
-                walk(child.children);
-                content += `</${child.name}>`;
-            } else {
-                // Handle any other node types gracefully
-                // You might need to add more cases here depending on your AST structure
-            }
-        }
-    }
-    
-    walk(children);
+// 3. Element - Complete handler with code/pre support
+Element(node, parentVar, context = {}) {
+    if (node.__processed) return;
+    node.__processed = true;
 
-    // Escape special HTML characters to ensure they display as text
-    return content.replace(/&/g, '&amp;')
-                  .replace(/</g, '&lt;')
-                  .replace(/>/g, '&gt;');
+    const varName = `${node.name}_elem_${this.getUniqueId()}`;
+
+    // 1. Base element creation
+    this.transpiledJSContent.push(
+        `const ${varName} = document.createElement("${node.name}");`,
+        `${parentVar}.appendChild(${varName});`
+    );
+
+    // 2. Special handling for <pre> / <code> blocks
+    if (node.name === 'pre' || node.name === 'code') {
+        let rawContent = this.extractRawContent(node);
+
+        // Escape backticks, backslashes, and dollar signs for safe JS string
+        const safeContent = rawContent
+            .replace(/\\/g, '\\\\')
+            .replace(/`/g, '\\`')
+            .replace(/\$/g, '\\$');
+
+        // Create <code> wrapper inside <pre> for semantics
+        const codeVarName = node.name === 'pre' ? `code_${varName}` : varName;
+
+        if (node.name === 'pre') {
+            this.transpiledJSContent.push(
+                `const ${codeVarName} = document.createElement('code');`,
+                `${codeVarName}.textContent = \`${safeContent}\`;`,
+                `${varName}.appendChild(${codeVarName});`
+            );
+        } else {
+            this.transpiledJSContent.push(
+                `${varName}.textContent = \`${safeContent}\`;`
+            );
+        }
+
+        // Common styling
+        this.transpiledJSContent.push(
+            `${varName}.style.whiteSpace = 'pre-wrap';`,
+            //`${varName}.style.fontFamily = 'monospace, Consolas, "Courier New"';`,
+            `${varName}.style.lineHeight = '1.5';`
+        );
+
+        // Additional <pre> styling
+        if (node.name === 'pre') {
+            this.transpiledJSContent.push(
+                `${varName}.style.margin = '16px 0';`,
+                `${varName}.style.padding = '12px 16px';`,
+                //`${varName}.style.backgroundColor = '#f7f7f9';`,
+                `${varName}.style.borderRadius = '4px';`,
+                `${varName}.style.overflowX = 'auto';`
+            );
+        }
+
+        return; // Done for pre/code
+    }
+
+    // 3. Process attributes
+    if (Array.isArray(node.attributes)) {
+        node.attributes.forEach(attr => {
+            this.Attribute(attr, varName, context);
+        });
+    }
+
+    // 4. Process children (skip for pre/code)
+    if (Array.isArray(node.children) && !['pre', 'code'].includes(node.name)) {
+        this.transpileBlock(node.children, {
+            ...context,
+            parentVar: varName
+        });
+    }
+
+    // 5. Add spacing after block elements
+    const blockElements = ['div', 'pre', 'ul', 'ol', 'p', 'h1', 'h2', 'h3', 'h4'];
+    if (blockElements.includes(node.name)) {
+        this.transpiledJSContent.push(
+            `${parentVar}.appendChild(document.createTextNode('\\n'));`
+        );
+    }
 }
+
+// Helper method
+extractRawContent(node) {
+    if (!node) return '';
+    if (node.name === 'code' && Array.isArray(node.children)) {
+        return node.children
+            .map(c => c.value || c.content || '')
+            .join('\n');
+    } else if (node.name === 'pre') {
+        const codeNode = node.children?.find(c => c.name === 'code');
+        if (codeNode) return this.extractRawContent(codeNode);
+    }
+    return '';
+}
+
+
+
+
+
+
+
+
+
+
     Fragment(node, parentVar, context = {}) {
         ////console.log(`DEBUG: Fragment - Transpiling fragment.`);
         // --- FIX: Ensure node.children is an array before passing to transpileBlock ---
