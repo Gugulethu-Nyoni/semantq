@@ -395,7 +395,7 @@ $effect(() => {
 | Module          | Description                                               |
 | --------------- | --------------------------------------------------------- |
 | [Formique](https://github.com/Gugulethu-Nyoni/formique)       | No-code, low-code Schema Definition Language form builder with API integration        |
-| [AnyGridJS](https://github.com/Gugulethu-Nyoni/anygrid)       | Searchable, paginated, sortable data visualization with on-screen edit/delete API support |
+| [AnyGrid](https://github.com/Gugulethu-Nyoni/anygrid)       | Searchable, paginated, sortable data visualization with on-screen edit/delete API support |
 | [@semantq/state](https://www.npmjs.com/package/@semantq/state)  | Framework-agnostic state management library               |
 | [@semantqQL](https://github.com/Gugulethu-Nyoni/semantqQL)    | MCSR Node.js server (model, controller, service, route)   |
 | [@semantq/auth](https://github.com/Gugulethu-Nyoni/semantq_auth)   | Full-stack auth server with database and email support    |
