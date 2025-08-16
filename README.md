@@ -65,7 +65,7 @@ Install Semantq via npm:
 ```bash
 npm install semantq
 ```
-OR install globally to use it anywhere in your app
+OR install globally to use it anywhere in your system
 
 ```bash
 npm install -g semantq
@@ -204,6 +204,8 @@ Options:
 
 * Default and named slots supported
 
+## Default Slots
+
 ```html
 <!-- src/components/global/Animation.smq -->
 
@@ -261,6 +263,93 @@ Final resolved mark up:
 * Shorthand automatically resolves to `src/components/global/Animation.smq`
 * Useful for reusable components such as headers, footers, nav, modals, and more
 
+## Named Slots
+
+Here’s a refined **Markdown section** for your Semantq README that demonstrates a reusable child component with full markup, clean parent usage via named slots, and a clear warning about keeping the child self-contained. I’ve chosen a **small “Documentation Footnote” card** use case that fits your docs context.
+
+
+## Named Slots for Reusable Components
+
+Semantq supports **named slots** that allow you to keep your main page cleaner while making child components reusable.
+
+
+**⚠️ Warning:** The child component should generally have **self-contained markup**. Prefer using elements like `<div>` or `<section>` in the child component to avoid situations where parent-provided content (e.g., a `<div>`) ends up wrapped in invalid HTML such as a `<p>`. Modern browsers may tolerate this, but it can lead to unpredictable rendering.
+
+
+### Child Component (`FootnoteCard.smq`)
+
+```mark
+@script
+ //some js for the component
+@end
+
+@style
+  /* some css for the component */
+@end
+
+@html
+<div class="footnote-card">
+  <div class="footnote-header">
+    <slot name="header" />
+  </div>
+
+  <div class="footnote-body">
+    <slot name="body" />
+  </div>
+
+  <div class="footnote-footer">
+    <slot name="footer" />
+  </div>
+</div>
+```
+
+* The child defines **named slots**: `header`, `body`, and `footer`.
+* It wraps content in full `<div>` structure to ensure valid HTML regardless of what the parent passes.
+
+
+### Parent Usage (`DocsPage.smq`)
+
+```mark
+<FootnoteCard>
+  <div slot="header">Note</div>
+
+  <div slot="body">
+    This section explains the key usage of Semantq slots.
+  </div>
+
+  <div slot="footer">
+    <a href="#more-info">Learn more</a>
+  </div>
+</FootnoteCard>
+```
+
+* The parent only provides **minimal, surgical content** for each slot.
+* The child handles all layout, styling, and structure, keeping the page markup clean and maintainable.
+
+
+### Final Rendered Mark
+
+```mark
+<div class="footnote-card">
+  <div class="footnote-header">
+    <div>Note</div>
+  </div>
+
+  <div class="footnote-body">
+    <div>This section explains the key usage of Semantq slots.</div>
+  </div>
+
+  <div class="footnote-footer">
+    <div><a href="#more-info">Learn more</a></div>
+  </div>
+</div>
+```
+
+**Benefits:**
+
+* Reusable components without worrying about parent markup conflicts.
+* Named slots allow selective content injection.
+* Keeps main documentation page markup neat and readable.
 
 
 ## NPM Integration
@@ -272,8 +361,7 @@ Final resolved mark up:
 import _ from 'lodash';
 ```
 
-* Works seamlessly with Semantq’s bundler
-
+* Works seamlessly with Semantq’s Vite powered bundler
 
 ## State Management
 
@@ -302,22 +390,20 @@ $effect(() => {
 * This applies only to the entry page: `project_root/index.html` on the Single Page Application (SPA) contexts. 
 
 
-
 ## Semantq Ecosystem
 
 | Module          | Description                                               |
 | --------------- | --------------------------------------------------------- |
-| Formique        | No-code/low-code form builder with API integration        |
-| AnyGridJS       | Data visualization with on-screen edit/delete API support |
-| @semantq/state  | Framework-agnostic state management library               |
-| @semantqQL      | MCSR Node.js server (model, controller, service, route)   |
-| @semantq/auth   | Full-stack auth server with database and email support    |
-| @semantq/ql     | JS fetch abstraction and CRUD functions                   |
-| SemantqCommerce | Plug-and-play e-commerce solution (WIP)                   |
-| SemantqProse    | SSR blogging & CMS with email marketing (WIP)             |
-| @semantq/iot    | IoT module for embedded systems (WIP)                     |
-
-
+| [Formique](https://github.com/Gugulethu-Nyoni/formique)       | No-code, low-code Schema Definition Language form builder with API integration        |
+| [AnyGridJS](https://github.com/Gugulethu-Nyoni/anygrid)       | Searchable, paginated, sortable data visualization with on-screen edit/delete API support |
+| [@semantq/state](https://www.npmjs.com/package/@semantq/state)  | Framework-agnostic state management library               |
+| [@semantqQL](https://github.com/Gugulethu-Nyoni/semantqQL)    | MCSR Node.js server (model, controller, service, route)   |
+| [@semantq/auth](https://github.com/Gugulethu-Nyoni/semantq_auth)   | Full-stack auth server with database and email support    |
+| [@semantq/ql](https://github.com/Gugulethu-Nyoni/smQL)  | JS fetch abstraction and CRUD functions                   |
+| [SemantqCommerce](#) | Plug-and-play e-commerce solution (WIP)                   |
+| [SemantqProse](#)    | SSR blogging & CMS with email marketing (WIP)             |
+| [@semantq/iot](#)    | IoT module for embedded systems (WIP)                     |
+                    |
 
 ## CLI Commands & Project Scaffolding
 
