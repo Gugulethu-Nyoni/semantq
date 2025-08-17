@@ -133,9 +133,9 @@ Create directories under `src/routes`:
 ```
 src/routes/about
 ```
-Then inside the about directory create the file: `@page.smq`.
+Then inside the `about` directory create the file: `@page.smq`.
 
-You can then component your component following this component structure:
+You can then compose your component following this component mark up structure:
 
 ```html
 @script
@@ -168,11 +168,46 @@ The HTML standard also works:
 
 ```
 
-All blocks are optional so this will work:
+All blocks are optional so... this alone will work:
 
 ```html
 <h1> Hello World </h1>
 ```
+
+````markdown
+With the route created, you can now add a link to it. For example, in your entry page:
+
+`project_root/index.html` you might link to the `about` page like this:
+
+```html
+<a href="/about">About Us</a>
+````
+
+**Note:** All routes must start with a leading `/`.
+
+### Using the Auto-Generated Navigation
+
+If you have enabled the auto-generated Semantq navigation module in your `semantq.config.js` (by setting `SemantqNav: true`), then you don’t need to manually build a navigation menu.
+
+Instead, you can simply import and use the `SemantqNav` component in your pages. See the example below. 
+
+```smq
+@script
+import SemantqNav from '$global/SemantqNav';
+const someText = 'We are an amazing company.';
+@end
+
+@html
+<SemantqNav />
+
+<h1>About Us</h1>
+
+<p> { someText } </p>
+```
+
+This will automatically render a file-based menu at the top of your page.
+
+For details on navigation menu configuration and customisation, see [Automated Navigation Menu Generation](#automated-navigation-menu-generation).
 
 
 ### CLI-Based Routing
