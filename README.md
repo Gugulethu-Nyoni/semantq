@@ -612,7 +612,7 @@ Both approaches produce the exact same DOM:
 
 ## Automated Navigation Menu Generation
 
-Semantq can automatically generate a navigation menu based on your defined routes. This reduces boilerplate and ensures your navigation stays consistent as your app grows. Configuration is done inside your `semantq.config.js`:
+Semantq can automatically generate a mobile friendly navigation menu based on your defined routes. This reduces boilerplate and ensures your navigation stays consistent as your app grows. Configuration is done inside your `semantq.config.js`:
 
 ```js
 semantqNav: {
