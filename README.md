@@ -435,31 +435,71 @@ $effect(() => {
 | [@semantq/iot](#)    | IoT module for embedded systems (WIP)                     |
                     |
 
+
+```markdown
 ## CLI Commands & Project Scaffolding
 
-| Command                                      | Description                                                     |
-| -------------------------------------------- | --------------------------------------------------------------- |
-| `semantq create myapp`                       | Scaffold new project                                            |
-| `semantq make:route dashboard --auth --crud` | Create authenticated CRUD route                                 |
-| `semantq install:tailwind`                   | Setup Tailwind CSS                                              |
-| `semantq update`                             | Update core dev modules (with confirmation prompts) Semantq will auto backup your core_modules dir             |
-| `semantq create my_crud_app -fs`             | Full-stack scaffold (frontend + SemantqQL + auth)               |
-| `semantq make:resource Product`              | Generate full MCSR resource (model, controller, service, route) |
-
-Example CRUD fetch:
-
-```bash
-curl -X GET http://localhost:3003/product/products
+| Command                                      | Description                                                                 |
+| -------------------------------------------- | --------------------------------------------------------------------------- |
+| `semantq create myapp`                       | Scaffold a new project                                                       |
+| `semantq make:route dashboard --auth --crud` | Create an authenticated CRUD route                                           |
+| `semantq install:tailwind`                   | Setup Tailwind CSS                                                           |
+| `semantq update`                             | Update core dev modules (with confirmation prompts). Semantq will auto-backup your `core_modules` directory |
+| `semantq create my_crud_app -fs`             | Full-stack scaffold (frontend + SemantqQL + auth)                           |
+| `semantq make:resource Product`              | Generate a full MCSR resource (model, controller, service, route)            |
+| `npm run dev`                                | Run the compiler and render the entry page (`project_root/index.html`). The local dev server usually runs at: `http://localhost:5173/` |
 ```
+
+
+### App Testing & Browser Preview
+
+To test or preview your app in real time:
+
+1. **Development mode**  
+   Run:
+   ```bash
+   npm run dev
+````
+
+This will compile your project and display the entry page in your browser, usually at:
+`http://localhost:5173/`
+
+2. **Build for final deployment**
+   Run:
+
+   ```bash
+   npm run build
+   ```
+
+   This compiles your entire project and generates a build inside `project_root/build`, then bundles the browser-ready distribution into `project_root/dist`.
+
+   **Note** he contents of the `project_root/dist` directory are what you deploy to your production server — for example, in your cPanel `public_html` directory.
+
+3. **Serve and Preview the production dist on local environment**
+   Run:
+
+   ```bash
+   npx serve dist
+   ```
+
+This serves the dist directory of your final compiled app. All pages will be available in the browser, usually at: `http://localhost:3000`
 
 
 ## Declarative Syntax
 
 ### Interpolations
 
-```html
+Semantq Interpolation capabilities enable you to bring JavaScript expressions into html. 
+
+```smq
+@script
+const name = 'John';
+let count = $state(0);
+@end
+
+@html
 <h1> Hello {name} </h1>
-<p>Clicked: {count} {count > 0 ? 'times' : 'time'}</p>
+<p> Clicked: {count} {count > 0 ? 'times' : 'time'} </p>
 ```
 
 ### Event Handlers
@@ -469,6 +509,10 @@ curl -X GET http://localhost:3003/product/products
 ```
 
 ### Logic Blocks
+
+Logic blocks let you express conditional rendering and iteration directly inside your templates using a **declarative syntax**. Instead of writing imperative JavaScript for every case, you can describe the structure of your UI in plain markup (`@if`, `@else`, `@each`). This keeps your code cleaner, closer to the HTML, and easier to reason about — especially when working with dynamic data that should map naturally to the DOM.
+
+#### `@if` and `@each` Logic Blocks
 
 ```html
 <h1>Dashboard</h1>
@@ -485,6 +529,82 @@ curl -X GET http://localhost:3003/product/products
   <p>No items available</p>
 @endif
 ```
+
+
+
+### Rationale for Logic Blocks: Example: Rendering a List of Items
+
+#### Vanilla JS vs Semantq 
+
+Suppose we have this items object (array):
+
+```js
+const items = [
+  { name: "Alice", active: true },
+  { name: "Bob", active: false },
+  { name: "Charlie", active: true }
+];
+```
+
+#### Vanilla JS Imperative Rendering
+
+```html
+<ul id="list"></ul>
+<p id="empty"></p>
+
+<script>
+  const items = [
+    { name: "Alice", active: true },
+    { name: "Bob", active: false },
+    { name: "Charlie", active: true }
+  ];
+
+  const list = document.getElementById('list');
+  const empty = document.getElementById('empty');
+
+  if (items.length > 0) {
+    list.innerHTML = '';
+    items.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item.active ? item.name : 'Member is inactive';
+      list.appendChild(li);
+    });
+    empty.textContent = '';
+  } else {
+    empty.textContent = 'No items available';
+  }
+</script>
+```
+
+
+#### Semantq Declarative Syntax
+
+```html
+@if(items.length > 0)
+  @each(items as item)
+    @if(item.active)
+      <li>{item.name}</li>
+    @else
+      <li>Member is inactive</li>
+    @endif
+  @endeach
+@else
+  <p>No items available</p>
+@endif
+```
+
+
+#### Final Rendered HTML Output
+
+Both approaches produce the exact same DOM:
+
+```html
+<li>Alice</li>
+<li>Member is inactive</li>
+<li>Charlie</li>
+```
+
+ Semantq’s **declarative logic blocks** let you describe the UI in a way that’s cleaner, shorter, and easier to reason about — without writing low-level DOM boilerplate.
 
 * Supported so far: `@if / @else / @endif` and `@each / @endeach`
 * More logic blocks coming
@@ -526,7 +646,7 @@ semantqNav: {
 * **`ulClass` / `liClass`**
   Classes applied to the `<ul>` and `<li>` elements, so you can fully customise the look and feel of the menu.
 
-This means you can instruct Semantq to generate a navigation menu that suits your styles if you don't want to rely on the default css. 
+This means you can instruct Semantq to generate a navigation menu that suits your custom styles if you don't want to rely on the default css for the navigation menu. 
 
 * **`priorityRoutes`**
   An array of routes that should always appear that order in  the navigation, regardless of alphabetical order or hierarchy.
