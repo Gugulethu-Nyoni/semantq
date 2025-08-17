@@ -84,6 +84,7 @@ export default class Anatomique {
         this.localDerivedDeclarations = null; // A temporary array for block-local deriveds
 
 
+        //this.analyzeJsAST(); // Populate `this.reactiveVariables` and `this.staticVariables`
         this.analyzeAndFilterJsAST();
 
 
@@ -101,8 +102,7 @@ export default class Anatomique {
             MustacheTag: this.MustacheTag.bind(this),
             IfStatement: this.IfStatement.bind(this),
             EachStatement: this.EachStatement.bind(this),
-            RawHtmlBlock: this.RawHtmlBlock.bind(this), 
-
+            RawHTMLBlock: this.RawHTMLBlock.bind(this)
 
         };
 
@@ -182,7 +182,55 @@ export default class Anatomique {
     this.mainPageOriginalJS = escodegen.generate(this.jsAST.content);
 }
 
-    
+    analyzeJsAST() {
+        if (!this.jsAST || !this.jsAST.content) {
+            return;
+        }
+
+        const filteredBody = [];
+        estraverse.traverse(this.jsAST.content, {
+            enter: (node, parent) => {
+                // If it's a top-level VariableDeclaration, analyze it immediately
+                if (parent?.type === 'Program' && node.type === 'VariableDeclaration') {
+                    this.analyzeNode(node);
+                    filteredBody.push(node);
+                    return estraverse.VisitorOption.Skip; // Skip traversal of its children
+                }
+
+                // Logic to identify and extract $onMount calls
+                if (node.type === 'ExpressionStatement' && node.expression?.type === 'CallExpression' && node.expression.callee?.name === '$onMount') {
+                    const onMountFunction = node.expression.arguments[0];
+                    if (onMountFunction && (onMountFunction.type === 'ArrowFunctionExpression' || onMountFunction.type === 'FunctionExpression')) {
+                        const functionBody = onMountFunction.body;
+
+                        // NEW: Analyze the variables inside the onMount block
+                        this.analyzeNode(functionBody);
+
+                        // Store the function body as a single BlockStatement node
+                        if (functionBody.type === 'BlockStatement') {
+                            this.onMountCallbacks.push(...functionBody.body);
+                        } else {
+                            this.onMountCallbacks.push(functionBody);
+                        }
+                    }
+                    // Skip this node so it doesn't get added to the filteredBody
+                    return estraverse.VisitorOption.Skip;
+                }
+            },
+            leave: (node, parent) => {
+                // Only push nodes to filteredBody if they are top-level and haven't been skipped
+                if (parent?.type === 'Program' && !node.onMountHandled) {
+                    filteredBody.push(node);
+                }
+            }
+        });
+
+        this.jsAST.content.body = filteredBody;
+        //console.log("REACTIVE VARS", this.reactiveVariables);
+        //console.log("STATIC VARS", this.staticVariables);
+        //console.log("onMountCallbacks", JSON.stringify(this.onMountCallbacks,null,2));
+    }
+
 
      // NEW: Method to generate the filtered JS string
     generateMainPageOriginalJS() {
@@ -328,182 +376,129 @@ export default class Anatomique {
 
     // --- Node Transpilation Methods ---
 
-    // 1. escapeCodeContent - Final perfected version
-escapeCodeContent(raw) {
-    if (!raw) return '';
-    // Escape HTML special chars
-    const escaped = raw
+    Element(node, parentVar, context = {}) {
+    const varName = `${node.name}_elem_${this.getUniqueId()}`;
+    
+    // Check if the element is a <pre> or <code> tag
+    if (node.name === 'pre' || node.name === 'code') {
+        const rawContent = this.preserveRawContent(node.children);
+        this.transpiledJSContent.push(`const ${varName} = document.createElement("${node.name}");`);
+        this.transpiledJSContent.push(`${varName}.textContent = \`${rawContent}\`;`);
+        this.transpiledJSContent.push(`${parentVar}.appendChild(${varName});`);
+        
+        // Return here to prevent further child processing
+        return; 
+    }
+
+    // Existing logic for other elements
+    this.transpiledJSContent.push(`const ${varName} = document.createElement("${node.name}");`);
+    this.transpiledJSContent.push(`${parentVar}.appendChild(${varName});`);
+
+    if (Array.isArray(node.attributes)) {
+        for (const attr of node.attributes) {
+            const transpileFn = this.nodeToTranspilerMap[attr.type];
+            if (transpileFn) transpileFn(attr, varName, context);
+        }
+    }
+
+    this.transpileBlock(Array.isArray(node.children) ? node.children : [], { ...context, parentVar: varName });
+}
+
+
+
+RawHTMLBlock(node, parentVar, context = {}) {
+    const rawContent = node.content;
+    const containerVar = `rawhtml_${this.getUniqueId()}`;
+    
+    // For <pre> and <code> tags, we'll use textContent instead of innerHTML
+    // to prevent double-escaping and preserve exact formatting
+    if (node.name === 'pre' || node.name === 'code') {
+        this.transpiledJSContent.push(
+            `const ${containerVar} = document.createElement('${node.name}');`,
+            `${containerVar}.style.whiteSpace = 'pre';`,
+            // Use textContent instead of innerHTML to avoid escaping
+            `${containerVar}.textContent = ${JSON.stringify(rawContent)};`,
+            `${parentVar}.appendChild(${containerVar});`
+        );
+    } 
+    // For other elements, use innerHTML with proper escaping
+    else {
+        const escapedContent = this.escapeHtml(rawContent)
+            .replace(/\\`/g, '`')
+            .replace(/\\\$/g, '$');
+            
+        this.transpiledJSContent.push(
+            `const ${containerVar} = document.createElement('${node.name || 'div'}');`,
+            `${containerVar}.innerHTML = \`${escapedContent}\`;`,
+            `${parentVar}.appendChild(${containerVar});`
+        );
+    }
+}
+
+// Simplified escapeHtml (only needed for non-pre/code elements)
+escapeHtml(unsafe) {
+    return unsafe
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/`/g, '&#96;');
+        .replace(/>/g, '&gt;');
+}
+
+
+
+
+
+// If you want to handle indentation based on AST position:
+calculateIndentation(node) {
+    if (!node.start || !this.customAST?.source) return '';
     
-    // Preserve indentation: replace leading spaces on each line with &nbsp;
-    return escaped.replace(/^ +/gm, match => '&nbsp;'.repeat(match.length));
-}
-
-
-
-// 2. RawHtmlBlock - Complete handler
-RawHtmlBlock(node, parentVar, context = {}) {
-    const varName = `${node.tag}_elem_${this.getUniqueId()}`;
-
-    // 1. Create <pre> element
-    this.transpiledJSContent.push(
-        `const ${varName} = document.createElement('${node.tag}');`,
-        `${parentVar}.appendChild(${varName});`,
-        `${varName}.style.whiteSpace = 'pre-wrap';`,
-        //`${varName}.style.fontFamily = 'monospace, Consolas, "Courier New"';`,
-        `${varName}.style.lineHeight = '1.5';`
-    );
-
-    // 2. Pre-specific styling
-    if (node.tag === 'pre') {
-        this.transpiledJSContent.push(
-            `${varName}.style.margin = '16px 0';`,
-            `${varName}.style.padding = '12px 16px';`,
-            //`${varName}.style.backgroundColor = '#f7f7f9';`,
-            `${varName}.style.borderRadius = '4px';`,
-            `${varName}.style.overflowX = 'auto';`
-        );
+    // Get the line start position
+    const source = this.customAST.source;
+    let lineStart = node.start;
+    while (lineStart > 0 && source[lineStart - 1] !== '\n') {
+        lineStart--;
     }
-
-    // 3. Capture raw content (PreText, CodeFence, nested <code>)
-    let rawContent = '';
-    if (Array.isArray(node.content)) {
-        rawContent = node.content
-            .map(c => {
-                if (c.type === 'PreText') return c.content || '';
-                if (c.type === 'CodeFence' || c.name === 'code') {
-                    return this.extractRawContent(c);
-                }
-                return '';
-            })
-            .join('\n'); // preserve logical line breaks
-    }
-
-    // 4. Use textContent instead of innerHTML
-    this.transpiledJSContent.push(
-        `const code_${varName} = document.createElement('code');`,
-        `code_${varName}.textContent = \`${rawContent}\`;`,
-        `${varName}.appendChild(code_${varName});`
-    );
-
-    // 5. Process attributes
-    if (Array.isArray(node.attributes)) {
-        node.attributes.forEach(attr => {
-            this.Attribute(attr, varName, context);
-        });
-    }
-}
-
-
-// 3. Element - Complete handler with code/pre support
-Element(node, parentVar, context = {}) {
-    if (node.__processed) return;
-    node.__processed = true;
-
-    const varName = `${node.name}_elem_${this.getUniqueId()}`;
-
-    // 1. Base element creation
-    this.transpiledJSContent.push(
-        `const ${varName} = document.createElement("${node.name}");`,
-        `${parentVar}.appendChild(${varName});`
-    );
-
-    // 2. Special handling for <pre> / <code> blocks
-    if (node.name === 'pre' || node.name === 'code') {
-        let rawContent = this.extractRawContent(node);
-
-        // Escape backticks, backslashes, and dollar signs for safe JS string
-        const safeContent = rawContent
-            .replace(/\\/g, '\\\\')
-            .replace(/`/g, '\\`')
-            .replace(/\$/g, '\\$');
-
-        // Create <code> wrapper inside <pre> for semantics
-        const codeVarName = node.name === 'pre' ? `code_${varName}` : varName;
-
-        if (node.name === 'pre') {
-            this.transpiledJSContent.push(
-                `const ${codeVarName} = document.createElement('code');`,
-                `${codeVarName}.textContent = \`${safeContent}\`;`,
-                `${varName}.appendChild(${codeVarName});`
-            );
+    
+    // Count whitespace characters
+    let indent = '';
+    for (let i = lineStart; i < node.start; i++) {
+        if (source[i] === ' ' || source[i] === '\t') {
+            indent += source[i];
         } else {
-            this.transpiledJSContent.push(
-                `${varName}.textContent = \`${safeContent}\`;`
-            );
+            break;
         }
-
-        // Common styling
-        this.transpiledJSContent.push(
-            `${varName}.style.whiteSpace = 'pre-wrap';`,
-            //`${varName}.style.fontFamily = 'monospace, Consolas, "Courier New"';`,
-            `${varName}.style.lineHeight = '1.5';`
-        );
-
-        // Additional <pre> styling
-        if (node.name === 'pre') {
-            this.transpiledJSContent.push(
-                `${varName}.style.margin = '16px 0';`,
-                `${varName}.style.padding = '12px 16px';`,
-                //`${varName}.style.backgroundColor = '#f7f7f9';`,
-                `${varName}.style.borderRadius = '4px';`,
-                `${varName}.style.overflowX = 'auto';`
-            );
-        }
-
-        return; // Done for pre/code
     }
-
-    // 3. Process attributes
-    if (Array.isArray(node.attributes)) {
-        node.attributes.forEach(attr => {
-            this.Attribute(attr, varName, context);
-        });
-    }
-
-    // 4. Process children (skip for pre/code)
-    if (Array.isArray(node.children) && !['pre', 'code'].includes(node.name)) {
-        this.transpileBlock(node.children, {
-            ...context,
-            parentVar: varName
-        });
-    }
-
-    // 5. Add spacing after block elements
-    const blockElements = ['div', 'pre', 'ul', 'ol', 'p', 'h1', 'h2', 'h3', 'h4'];
-    if (blockElements.includes(node.name)) {
-        this.transpiledJSContent.push(
-            `${parentVar}.appendChild(document.createTextNode('\\n'));`
-        );
-    }
+    
+    return indent;
 }
 
-// Helper method
-extractRawContent(node) {
-    if (!node) return '';
-    if (node.name === 'code' && Array.isArray(node.children)) {
-        return node.children
-            .map(c => c.value || c.content || '')
-            .join('\n');
-    } else if (node.name === 'pre') {
-        const codeNode = node.children?.find(c => c.name === 'code');
-        if (codeNode) return this.extractRawContent(codeNode);
+preserveRawContent(children) {
+    let content = '';
+    
+    // Simple recursive walker to extract all text content
+    function walk(nodes) {
+        if (!nodes || !Array.isArray(nodes)) return;
+        for (const child of nodes) {
+            if (child.type === 'TextNode') {
+                content += child.value;
+            } else if (child.type === 'Element' || child.type === 'MustacheTag') {
+                // For nested elements or mustache tags, get their original names and text
+                content += `<${child.name}>`;
+                walk(child.children);
+                content += `</${child.name}>`;
+            } else {
+                // Handle any other node types gracefully
+                // You might need to add more cases here depending on your AST structure
+            }
+        }
     }
-    return '';
+    
+    walk(children);
+
+    // Escape special HTML characters to ensure they display as text
+    return content.replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;');
 }
-
-
-
-
-
-
-
-
-
-
     Fragment(node, parentVar, context = {}) {
         ////console.log(`DEBUG: Fragment - Transpiling fragment.`);
         // --- FIX: Ensure node.children is an array before passing to transpileBlock ---
@@ -512,134 +507,131 @@ extractRawContent(node) {
     }
 
     Attribute(attr, elementVarName, context = {}) {
-       // console.log(`DEBUG: ${JSON.stringify(attr)} Attribute - Processing attribute type: ${attr.type} for element ${elementVarName}`);
-        switch (attr.type) {
-             case "KeyValueAttribute": {
-            // Check for a boolean attribute based on the AST structure.
-            // A boolean attribute has a 'null' value and a dynamic expression.
-            if (attr.value === null && attr.expression) {
-                const expressionCode = escodegen.generate(attr.expression);
-                this.transpiledJSContent.push(`
-                    // Dynamic boolean attribute: ${attr.name}
-                    (function() {
-                        if (${expressionCode}) {
-                            ${elementVarName}.setAttribute('${attr.name}', '');
-                        } else {
-                            ${elementVarName}.removeAttribute('${attr.name}');
-                        }
-                    })();
-                `);
-                return;
+  // console.log(`DEBUG: ${JSON.stringify(attr)} Attribute - Processing attribute type: ${attr.type} for element ${elementVarName}`);
+  switch (attr.type) {
+    case "KeyValueAttribute": {
+      // Check for a boolean attribute based on the AST structure.
+      if (attr.value === null && attr.expression) {
+        const expressionCode = escodegen.generate(attr.expression);
+        this.transpiledJSContent.push(`
+          // Dynamic boolean attribute: ${attr.name}
+          (function() {
+            if (${expressionCode}) {
+              ${elementVarName}.setAttribute('${attr.name}', '');
+            } else {
+              ${elementVarName}.removeAttribute('${attr.name}');
             }
-            
-            // Standard KeyValueAttribute handling (for attributes with string values).
-            const attrValue = attr.value || [];
-            const values = attrValue.map(valNode => {
-                if (valNode.type === "Text") {
-                    return `\`${valNode.raw}\``;
-                }
-                if (valNode.type === "MustacheTag") {
-                    const expressionCode = escodegen.generate(valNode.expression);
-                    return `(${expressionCode})`;
-                }
-                return '';
-            });
-
-            const valueCode = values.join(' + ');
-            this.transpiledJSContent.push(`${elementVarName}.setAttribute('${attr.name}', ${valueCode});`);
-            break;
+          })();
+        `);
+        return;
+      }
+      
+      // Standard KeyValueAttribute handling (for attributes with string values).
+      const attrValue = attr.value || [];
+      const values = attrValue.map(valNode => {
+        if (valNode.type === "Text") {
+          return `\`${valNode.raw}\``;
         }
+        if (valNode.type === "MustacheTag") {
+          const expressionCode = escodegen.generate(valNode.expression);
+          return `(${expressionCode})`;
+        }
+        return '';
+      });
 
+      const valueCode = values.join(' + ');
+      this.transpiledJSContent.push(`${elementVarName}.setAttribute('${attr.name}', ${valueCode});`);
+      break;
+    }
 
-            case "TwoWayBindingAttribute": {
-  const bindVarName = attr.expression?.name;
-  if (!bindVarName) {
-    console.error(`ERROR: Two-way binding: Missing variable name for ${attr.name} on element ${elementVarName}.`);
-    return;
-  }
-  if (!this.isReactiveVariable(bindVarName)) {
-    console.error(
-      `ERROR: Two-way binding (bind:${attr.name}) can only be used with reactive variables ` +
-      `(declared with $state()). '${bindVarName}' is not a reactive variable.`
-    );
-    return;
-  }
-  this.transpiledJSContent.push(`bind(${elementVarName}, ${bindVarName});`);
-  break;
-}
-
-
-case "MustacheAttribute": {
- const expression = attr.expression;
- if (!expression) {
-  console.error("MustacheAttribute: Missing expression");
+    case "TwoWayBindingAttribute": {
+ const bindVarName = attr.expression?.name;
+ if (!bindVarName) {
+  console.error(`ERROR: Two-way binding: Missing variable name for ${attr.name} on element ${elementVarName}.`);
   return;
  }
-
- let expressionCode;
-
- // 1. Check for simple identifiers that might be a function call
- if (expression.type === 'Identifier') {
-  const varName = expression.name;
-  const varDecl = this.findVariableDeclaration(varName);
-
-  // If it's a const declaration with a static string value
-  if (varDecl && varDecl.kind === 'const' && varDecl.init && varDecl.init.type === 'Literal' && typeof varDecl.init.value === 'string') {
-   this.transpiledJSContent.push(
-    `${elementVarName}.setAttribute("${varDecl.init.value}", "");`
-   );
-   break;
-  }
-  // If it's a function, generate a function call
-  if (this.isFunction(varName)) {
-   expressionCode = `${varName}()`;
-  } else {
-   // Otherwise, it's a regular identifier
-   expressionCode = escodegen.generate(expression);
-  }
- } else {
-  // 2. Handle all other complex expressions (e.g., CallExpression, BinaryExpression)
-  expressionCode = escodegen.generate(expression);
- }
-
- // Get or create a reactive derived variable for the expression
- const derivedAttrValueVar = this.getOrCreateDerived(expressionCode, context);
-
- // 3. Handle boolean-type attributes
- if (attr.name && (attr.name === 'disabled' || attr.name === 'required' || attr.name === 'readonly')) {
-  this.transpiledJSContent.push(
-   `$effect(() => {`,
-   ` ${elementVarName}.toggleAttribute("${attr.name}", !!${derivedAttrValueVar}.value);`,
-   `});`
+ if (!this.isReactiveVariable(bindVarName)) {
+  console.error(
+   `ERROR: Two-way binding (bind:${attr.name}) can only be used with reactive variables ` +
+   `(declared with $state()). '${bindVarName}' is not a reactive variable.`
   );
+  return;
  }
- // 4. Handle attribute spread (no name)
- else if (!attr.name) {
-  this.transpiledJSContent.push(
-   `$effect(() => {`,
-   ` if (${derivedAttrValueVar}.value) {`,
-   `  ${elementVarName}.setAttribute(${derivedAttrValueVar}.value, '');`,
-   ` } else {`,
-   `  ${elementVarName}.removeAttribute(${derivedAttrValueVar}.value);`,
-   ` }`,
-   `});`
-  );
- }
- // 5. Handle special attributes that need direct `$effect` for reactivity (e.g., 'min')
- else if (attr.name === 'min') {
-  this.transpiledJSContent.push(
-   `$effect(() => {`,
-   ` ${elementVarName}.setAttribute("${attr.name}", ${derivedAttrValueVar}.value);`,
-   `});`
-  );
- }
- // 6. Handle all other regular mustache attributes
- else {
-  this.transpiledJSContent.push(
-   `bindAttr(${elementVarName}, "${attr.name}", () => ${derivedAttrValueVar}.value);`
-  );
- }
+ this.transpiledJSContent.push(`bind(${elementVarName}, ${bindVarName});`);
  break;
+}
+
+case "MustacheAttribute": {
+const expression = attr.expression;
+if (!expression) {
+ console.error("MustacheAttribute: Missing expression");
+ return;
+}
+
+let expressionCode;
+
+// 1. Check for simple identifiers that might be a function call
+if (expression.type === 'Identifier') {
+ const varName = expression.name;
+ const varDecl = this.findVariableDeclaration(varName);
+
+ // Corrected logic: Set the attribute name as 'src' and the value as the variable's value
+ if (varDecl && varDecl.kind === 'const' && varDecl.init && varDecl.init.type === 'Literal' && typeof varDecl.init.value === 'string') {
+  this.transpiledJSContent.push(
+   `${elementVarName}.setAttribute('${attr.name}', '${varDecl.init.value}');`
+  );
+  break;
+ }
+ // If it's a function, generate a function call
+ if (this.isFunction(varName)) {
+ expressionCode = `${varName}()`;
+ } else {
+ // Otherwise, it's a regular identifier
+ expressionCode = escodegen.generate(expression);
+ }
+} else {
+ // 2. Handle all other complex expressions (e.g., CallExpression, BinaryExpression)
+ expressionCode = escodegen.generate(expression);
+}
+
+// Get or create a reactive derived variable for the expression
+const derivedAttrValueVar = this.getOrCreateDerived(expressionCode, context);
+
+// 3. Handle boolean-type attributes
+if (attr.name && (attr.name === 'disabled' || attr.name === 'required' || attr.name === 'readonly')) {
+ this.transpiledJSContent.push(
+ `$effect(() => {`,
+ ` ${elementVarName}.toggleAttribute("${attr.name}", !!${derivedAttrValueVar}.value);`,
+ `});`
+ );
+}
+// 4. Handle attribute spread (no name)
+else if (!attr.name) {
+ this.transpiledJSContent.push(
+ `$effect(() => {`,
+ ` if (${derivedAttrValueVar}.value) {`,
+ ` ${elementVarName}.setAttribute(${derivedAttrValueVar}.value, '');`,
+ ` } else {`,
+ ` ${elementVarName}.removeAttribute(${derivedAttrValueVar}.value);`,
+ ` }`,
+ `});`
+ );
+}
+// 5. Handle special attributes that need direct `$effect` for reactivity (e.g., 'min')
+else if (attr.name === 'min') {
+ this.transpiledJSContent.push(
+ `$effect(() => {`,
+ ` ${elementVarName}.setAttribute("${attr.name}", ${derivedAttrValueVar}.value);`,
+ `});`
+ );
+}
+// 6. Handle all other regular mustache attributes
+else {
+ this.transpiledJSContent.push(
+ `bindAttr(${elementVarName}, "${attr.name}", () => ${derivedAttrValueVar}.value);`
+ );
+}
+break;
 }
 
             case "EventHandler": {
