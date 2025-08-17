@@ -153,6 +153,34 @@ Here's how you can use the `@each` block with JavaScript data, combining the dif
 @endif
 ```
 
+### Unlimited Nesting
+
+```html
+@if(data.users.length > 0)
+    @each(data.users as user)
+        @if(user.isAdmin)
+            <div class="user-block">
+                <h3>Admin: {user.name}</h3>
+                @each(user.permissions as perm)
+                    @if(perm.isGranted)
+                        <p>{perm.name} granted</p>
+                    @else
+                        <p>{perm.name} denied</p>
+                    @endif
+                @endeach
+            </div>
+        @else
+            <div class="user-block">
+                <h3>User: {user.name}</h3>
+                <p>Status: Regular Member</p>
+            </div>
+        @endif
+    @endeach
+@else
+    <p>No users found.</p>
+@endif
+```
+
 ### Explanation:
 - The JavaScript array `items` contains objects with properties such as `name`, `active`, and `show`.
 - The `@if` block checks if there are any items in the `items` array.

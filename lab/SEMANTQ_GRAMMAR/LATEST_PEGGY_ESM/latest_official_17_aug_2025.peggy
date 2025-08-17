@@ -1,3 +1,64 @@
+/*
+
+Semantq Parser:
+
+takes:
+
+1. html open close and self closing tags 
+2. Plain text with some characters e.g. Clicked: or new-name or Hello World 
+3. Html icludes custom syntax logic blocks as shown below
+
+Test with: 
+
+
+<body>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h1>Welcome to my page!</h1>
+      <p>This is some sample content: {counter} - there we go! </p>
+    </section>
+  </main>
+
+  <div> 
+
+  @if(isAdmin > 2)
+
+  Clicked: {counter > 1? 'times' : 'times'}
+
+  @endif
+
+  </div>
+
+  <footer>
+    <p>&copy; 2024 My Page</p>
+  </footer>
+</body>
+
+
+ALSO TEST WITH: 
+
+
+<div>
+<button> Clicked: {counter} {counter > 1? 'times' : 'time'}  </button> 
+</div>
+
+
+ALSO: 
+
+<input type="text" @click={rejuice} value={counter} disabled /> + - () 
+
+*/
+
 
 {
 
@@ -281,29 +342,27 @@ __ "required whitespace"
   = [ \r\t\n]+
 
 TextNode
-  = text:$(![<] [^@{}\n<]+) {
-      return {
-        type: 'TextNode',
-        value: text, // Removed .trim()
-        raw: text, // Add a raw value for debugging/preservation
-        start: location().start,
-        end: location().end,
-        loc: {
-          start: location().start,
-          end: location().end
-        }
-      };
-    }
+ = text:$(!('@if' / '@each' / '<') [^<]+) {
+  return {
+   type: 'TextNode',
+   value: text,
+   raw: text,
+   start: location().start,
+   end: location().end,
+   loc: {
+    start: location().start,
+    end: location().end
+   }
+  };
+ }
 
 
-CommentBlock
+CommentBlock 
   = "<!--" content:$((!"-->" .)*) "-->" _
     {
       return {
         type: 'CommentBlock',
-        content: content,
-        start: location().start.offset,
-        end: location().end.offset
+        content: content
       };
     }
 
@@ -340,10 +399,16 @@ HTML
     };
   }
 
+// Find this rule in your grammar and update the order
 Fragment
-  = fragments:(MustacheTag / RawHtmlBlock / CodeFence / LogicBlock / OpenCloseTags / SelfClosingTags / AtIdentifier / TextNode / CommentBlock)+ {
-      return createMixedContentNode(fragments);
-    }
+ = fragments:(LogicBlock / RawPreBlock / RawCodeBlock / MustacheTag / OpenCloseTags / SelfClosingTags / TextNode / CommentBlock)+ {
+  const start = fragments[0].start;
+  const end = fragments[fragments.length - 1].end;
+  return createNode('Fragment', start, end, {
+   children: fragments.filter(x => x !== null && x !== undefined)
+  });
+ }
+
 
 /*
 OpenCloseTags
@@ -353,13 +418,13 @@ OpenCloseTags
 */
 
 OpenCloseTags
-  = _ codeTag:CodeHtmlTag { return codeTag; }
-  / _ openTag:OpenTag _
-    innerContent:InnerContent? // Make innerContent optional and directly use its result
-    _ closeTag:CloseTag _ {
-      const children = innerContent ? (innerContent.type === 'Fragment' ? innerContent.children : [innerContent]) : [];
-      return createElement(openTag.start, closeTag.end, openTag.name, openTag.attributes, children);
-    }
+ = _ rawHtml:(RawPreBlock / RawCodeBlock) { return rawHtml; }
+ / _ openTag:OpenTag _
+  innerContent:InnerContent?
+  _ closeTag:CloseTag _ {
+   const children = innerContent ? (innerContent.type === 'Fragment' ? innerContent.children : [innerContent]) : [];
+   return createElement(openTag.start, closeTag.end, openTag.name, openTag.attributes, children);
+  }
     
 
 SelfClosingTags
@@ -387,58 +452,44 @@ SelfClosingTag
       };
     }
 
-CodeHtmlTag
-  = _ "<" "code" _ attributes:Attributes? _ ">" codeContent:CodeContent "</code>" _ {
-      return createElement(location().start.offset, location().end.offset, "code", attributes || [], [codeContent]);
-    }
-
-/*
-SelfClosingTag
-  = _ "<" tagName:TagName _ attributes:Attributes? _ "/>" _ {
-      return { 
-        start: location().start.offset, 
-        end: location().end.offset, 
-        name: tagName, 
-        attributes: attributes || [] 
-      };
-    }
-  / "<" tagName:TagName _ attributes:Attributes? _ ">" {
-      error("Expected '/>' to close self-closing tag. Either: \n" +
-            "1. Add '/>' to make self-closing (like <" + tagName + "/>), or\n" +
-            "2. Add closing tag </" + tagName + "> to make a complete element");
-    }
-  / "<" tagName:TagName {
-      error("Incomplete tag. Expected either:\n" +
-            "- Self-closing syntax: <" + tagName + " ... />\n" +
-            "- Complete element: <" + tagName + ">...</" + tagName + ">");
-    }
-
-
-
-SelfClosingTag
-  = _ "<" tagName:TagName _ attributes:Attributes? _ "/>" _ {
-      return { 
-        start: location().start.offset, 
-        end: location().end.offset, 
-        name: tagName, 
-        attributes: attributes || [] 
-      };
-    }
-  / "<" tagName:TagName _ attributes:Attributes? _ ">" {
-      // Remove this error case since it conflicts with OpenCloseTags
-      return null; // Let OpenCloseTags handle this case
-    }
-  / "<" tagName:TagName {
-      error("Incomplete tag. Expected either:\n" +
-            "- Self-closing syntax: <" + tagName + " ... />\n" +
-            "- Complete element: <" + tagName + ">...</" + tagName + ">");
-    }
-*/
-
-
 
 TagName
   = name:$([a-zA-Z0-9]+) { return name; }
+
+
+RawPreBlock "pre block"
+  = "<" "pre" _ attributes:Attributes? _ ">"
+    content:$((!"</pre>") .)*
+    "</pre>"
+    {
+      const loc = location();
+      return {
+        type: "RawHTMLBlock",
+        name: "pre",
+        attributes: attributes || [],
+        content: content,
+        start: loc.start.offset,
+        end: loc.end.offset
+      };
+    }
+
+RawCodeBlock "code block"
+  = "<" "code" _ attributes:Attributes? _ ">"
+    content:$((!"</code>") .)*
+    "</code>"
+    {
+      const loc = location();
+      return {
+        type: "RawHTMLBlock",
+        name: "code",
+        attributes: attributes || [],
+        content: content,
+        start: loc.start.offset,
+        end: loc.end.offset
+      };
+    }
+
+
 
 
 /* START ATTRIBUTE BLOCK */
@@ -968,23 +1019,23 @@ IfStatement
 
 
 ContentBody
-  = _ contents:(ContentLine / __)* _ {
-      // Flatten and filter valid nodes
-      const flattened = contents.flat().filter(x => 
-        x && (x.type || (typeof x === 'object' && Object.keys(x).length > 0))
-      );
-      return flattened;
-    }
+  = _ contents:((!("@else" / "@endif" / "@endeach") ContentLine) / __)* _ {
+    // Flatten and filter valid nodes
+    const flattened = contents.flat().filter(x => 
+      x && (x.type || (typeof x === 'object' && Object.keys(x).length > 0))
+    );
+    return flattened;
+  }
+
+
 
 ContentLine
   = content:(
-      RawHtmlBlock
-      / CodeFence // <-- Add this rule here.
-      / IfStatement
+      IfStatement
       / EachStatement
       / HtmlTagWithExpressions
-      / Interpolations
-      / ConsequentContentBlock
+      / Interpolations // This is MustacheTag for HTML interpolation
+      / ConsequentContentBlock // Use ConsequentContentBlock for general nested content
       / TextNode
       / CommentBlock
     ) _ {
@@ -999,94 +1050,20 @@ HtmlTagWithExpressions
 
 
 TextWithExpressions
-  = parts:(TextPart / MustacheTag / AtIdentifier / ConsequentExpression / CommentBlock / ConsequentContentBlock)+ {
+  = parts:(TextPart / MustacheTag / ConsequentExpression / CommentBlock / ConsequentContentBlock)+ { // Changed to ConsequentContentBlock
       const validParts = parts.flatMap(part =>
         Array.isArray(part) ? part : [part]
       ).filter(part =>
         part && (part.type !== 'TextNode' || part.value.trim().length > 0)
       );
+
       if (validParts.length === 1) return validParts[0];
       return createMixedContentNode(validParts);
     }
 
 
-// ======================
-// Attribute Rules
-// ======================
-RawHtmlAttributes
-  = attributes:(RawHtmlAttribute (_ RawHtmlAttribute)*) {
-      return Object.assign({}, ...attributes);
-    }
-
-RawHtmlAttribute
-  = name:$([a-z-]+) _ "=" _ value:RawHtmlAttributeValue { return { [name]: value }; }
-  / name:$([a-z-]+) { return { [name]: true }; }
-
-RawHtmlAttributeValue
-  = "\"" value:$([^"]*) "\"" { return value; }
-  / "'" value:$([^']*) "'" { return value; }
-
-// ======================
-// Code Fence Rules
-// ======================
-CodeFence
-  = "```" language:Identifier? _ ("\n")?
-    content:$((!"```" .)*)
-    "```" {
-      return {
-        type: "CodeFence",
-        language: language || null,
-        content,
-        start: location().start.offset,
-        end: location().end.offset,
-        loc: location()
-      };
-    }
-
-
-// ======================
-// Content Handling
-// ======================
-PreContent
-  = parts:(CodeFenceContent / PreTextContent)*  {
-      return parts.flat().filter(Boolean);
-    }
-
-CodeFenceContent
-  = code:CodeFence { return code; }
-
-PreTextContent
-  = text:$((!("```" / "</pre>") .)+)  {
-      return {
-        type: "PreText",
-        content: text,
-        start: location().start.offset,
-        end: location().end.offset
-      };
-    }
-
-// ======================
-// Main Block Rule
-// ======================
-RawHtmlBlock
-  = "<pre" _ attributes:RawHtmlAttributes? ">" 
-    content:PreContent 
-    "</pre>" _ {
-      return {
-        type: "RawHtmlBlock",
-        tag: "pre",
-        content: content,
-        attributes: attributes || {},
-        start: location().start.offset,
-        end: location().end.offset,
-        loc: location()
-      };
-    }
-
-
-
 TextPart
-  = text:$([^{}\n<]+) { // Removed leading/trailing _ (optional whitespace) as the content itself can include space.
+  = text:$([^@{}\n<]+) { // Removed leading/trailing _ (optional whitespace) as the content itself can include space.
                           // The surrounding rules like `InnerContent` will handle optional whitespace between *elements*.
       // Only return null if the text is empty after being captured.
       // We want to preserve spaces, so we only trim if we're checking for *actual* content
@@ -1100,19 +1077,6 @@ TextPart
         end: location().end
       };
     }
-
-
-
-AtIdentifier
-  = "@" name:$([a-zA-Z][a-zA-Z0-9]*) {
-      return {
-        type: 'AtIdentifier',
-        name: name,
-        start: location().start,
-        end: location().end
-      };
-    }
-
 
 /* ADD HERE */
 
