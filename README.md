@@ -151,7 +151,7 @@ You can then compose your component following this component mark up structure:
 all blocks are optional 
 ```
 
-**Note** the @html tag is optional just for your visual clarity - also note that the tag doesn't not have a closing tag (`@end`). If you include a closing tag `@end` for the `@html` block the compiler will throw an error.
+**Note** the @html tag is optional just for your visual clarity - also note that the tag doesn't have a closing tag (`@end`). If you include a closing tag `@end` for the `@html` block the compiler will throw an error.
 
 The HTML standard also works:
 
