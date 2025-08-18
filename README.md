@@ -420,23 +420,27 @@ $effect(() => {
 * This applies only to the entry page: `project_root/index.html` on the Single Page Application (SPA) contexts. 
 
 
+
 ## Semantq Ecosystem
 
-| Module          | Description                                               |
-| --------------- | --------------------------------------------------------- |
-| [Formique](https://github.com/Gugulethu-Nyoni/formique)       | No-code, low-code Schema Definition Language form builder with API integration        |
-| [AnyGrid](https://github.com/Gugulethu-Nyoni/anygrid)       | Searchable, paginated, sortable data visualization with on-screen edit/delete API support |
-| [@semantq/state](https://www.npmjs.com/package/@semantq/state)  | Framework-agnostic state management library               |
-| [@semantqQL](https://github.com/Gugulethu-Nyoni/semantqQL)    | MCSR Node.js server (model, controller, service, route)   |
-| [@semantq/auth](https://github.com/Gugulethu-Nyoni/semantq_auth)   | Full-stack auth server with database and email support    |
-| [@semantq/ql](https://github.com/Gugulethu-Nyoni/smQL)  | JS fetch abstraction and CRUD functions                   |
-| [SemantqCommerce](#) | Plug-and-play e-commerce solution (WIP)                   |
-| [SemantqProse](#)    | SSR blogging & CMS with email marketing (WIP)             |
-| [@semantq/iot](#)    | IoT module for embedded systems (WIP)                     |
-                    |
 
 
-```markdown
+| Module                                                                 | Description                                                                 |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| [Formique](https://github.com/Gugulethu-Nyoni/formique)                 | No-code, low-code Schema Definition Language form builder with API integration |
+| [AnyGrid](https://github.com/Gugulethu-Nyoni/anygrid)                   | Searchable, paginated, sortable data visualization with on-screen edit/delete API support |
+| [@semantq/state](https://www.npmjs.com/package/@semantq/state)          | Framework-agnostic state management library                                 |
+| [@semantqQL](https://github.com/Gugulethu-Nyoni/semantqQL)              | MCSR Node.js server (model, controller, service, route)                     |
+| [@semantq/auth](https://github.com/Gugulethu-Nyoni/semantq_auth)        | Full-stack auth server with database and email support                      |
+| [@semantq/ql](https://github.com/Gugulethu-Nyoni/smQL)                  | JS fetch abstraction and CRUD functions                                     |
+| SemantqCommerce                                                         | Plug-and-play e-commerce solution (WIP)                                     |
+| SemantqProse                                                            | SSR blogging & CMS with email marketing (WIP)                               |
+| @semantq/iot                                                            | IoT module for embedded systems (WIP)                                       |
+
+
+
+
+
 ## CLI Commands & Project Scaffolding
 
 | Command                                      | Description                                                                 |
@@ -448,7 +452,7 @@ $effect(() => {
 | `semantq create my_crud_app -fs`             | Full-stack scaffold (frontend + SemantqQL + auth)                           |
 | `semantq make:resource Product`              | Generate a full MCSR resource (model, controller, service, route)            |
 | `npm run dev`                                | Run the compiler and render the entry page (`project_root/index.html`). The local dev server usually runs at: `http://localhost:5173/` |
-```
+
 
 
 ### App Testing & Browser Preview
