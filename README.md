@@ -461,9 +461,9 @@ To test or preview your app in real time:
 
 1. **Development mode**  
    Run:
-   ```bash
-   npm run dev
-````
+```bash
+npm run dev
+```
 
 This will compile your project and display the entry page in your browser, usually at:
 `http://localhost:5173/`
@@ -533,7 +533,6 @@ Logic blocks let you express conditional rendering and iteration directly inside
   <p>No items available</p>
 @endif
 ```
-
 
 
 ### Rationale for Logic Blocks: Example: Rendering a List of Items
