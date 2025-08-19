@@ -480,6 +480,8 @@ This will compile your project and display the entry page in your browser, usual
 
 **Note** The contents of the `project_root/dist` directory are what you should deploy to your production server — for example, in the `public_html` directory on cPanel.
 
+When running the final build for production with auto navigation menu generation enabled, remember to update the `targetHost` setting in your config with your production domain (e.g., `https://mywebsitename.com`). This value is used to generate your navigation menu.
+
 
 3. **Serve and Preview the production dist on local environment**
    Run:
