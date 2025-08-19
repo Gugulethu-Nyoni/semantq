@@ -902,13 +902,12 @@ fetchProducts();
 ```js
 import { smQL } from '@semantq/ql';
 
-// fetch data
+// api set up
 const api = new smQL('http://localhost:3003');
 
-// Example: DELETE request
+// fetch data example
 const response = await api.get('/product/products');
-// OR
-//const response = await api.delete(`/product/products/${product.id}`);
+
 
 // Extract valid product objects
 const products = Object.values(response).filter(
@@ -916,6 +915,9 @@ const products = Object.values(response).filter(
 );
 
 console.log(products);
+
+// DELETE request
+const response = await api.delete(`/product/products/${product.id}`);
 ```
 
 
