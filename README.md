@@ -477,7 +477,9 @@ This will compile your project and display the entry page in your browser, usual
 
    This compiles your entire project and generates a build inside `project_root/build`, then bundles the browser-ready distribution into `project_root/dist`.
 
-   **Note** he contents of the `project_root/dist` directory are what you deploy to your production server — for example, in your cPanel `public_html` directory.
+
+**Note** The contents of the `project_root/dist` directory are what you should deploy to your production server — for example, in the `public_html` directory on cPanel.
+
 
 3. **Serve and Preview the production dist on local environment**
    Run:
