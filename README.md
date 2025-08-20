@@ -336,7 +336,6 @@ Semantq supports **named slots** that allow you to keep your main page cleaner w
 * The child defines **named slots**: `header`, `body`, and `footer`.
 * It wraps content in full `<div>` structure to ensure valid HTML regardless of what the parent passes.
 
-
 ### Parent Usage (`DocsPage.smq`)
 
 ```mark
@@ -599,7 +598,6 @@ const items = [
   <p>No items available</p>
 @endif
 ```
-
 
 #### Final Rendered HTML Output
 
