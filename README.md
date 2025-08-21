@@ -412,6 +412,35 @@ $effect(() => {
 * `$effect` → auto-run reactive effect
 
 
+## **`$onMount`** Lifecycle Hook In **Semantq**:
+
+```markdown
+## `$onMount`
+
+The `$onMount` lifecycle hook lets you run JavaScript after a component is mounted and the DOM is ready.  
+This is useful for attaching event listeners, running animations, or targeting DOM elements without relying on  
+`document.addEventListener('DOMContentLoaded', ...)`.
+```
+
+### Usage
+
+```js
+$onMount(() => {
+  // Your DOM-ready logic here
+  const el = document.querySelector('#myElement');
+  el.focus();
+});
+```
+
+### Why `$onMount`?
+
+* Cleaner than using `document.addEventListener('DOMContentLoaded', ...)`
+* Automatically scoped to the component lifecycle
+* Ensures your code runs when the component is actually in the DOM
+
+
+
+
 ## Hot Module Replacement with Vite
 
 * Automatic reload of HTML and CSS on changes
