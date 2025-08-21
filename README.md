@@ -432,13 +432,30 @@ $onMount(() => {
 });
 ```
 
+### Async Usage (e.g. Fetch Calls)
+
+You can also pass an `async` arrow function into `$onMount`.
+This is useful when you need to fetch data or run other asynchronous logic once the component is mounted.
+
+```js
+$onMount(async () => {
+  try {
+    const res = await fetch('https://api.example.com/data');
+    const data = await res.json();
+    
+    console.log('Fetched data:', data);
+    // You can now update the DOM or component state with the data
+  } catch (err) {
+    console.error('Failed to fetch:', err);
+  }
+});
+```
+
 ### Why `$onMount`?
 
 * Cleaner than using `document.addEventListener('DOMContentLoaded', ...)`
 * Automatically scoped to the component lifecycle
 * Ensures your code runs when the component is actually in the DOM
-
-
 
 
 ## Hot Module Replacement with Vite
