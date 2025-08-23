@@ -333,6 +333,24 @@ Semantq supports **named slots** that allow you to keep your main page cleaner w
 </div>
 ```
 
+OR if you want to include fall back content in the child component named slots. 
+
+```html
+<div class="footnote-card">
+  <div class="footnote-header">
+    <slot name="header">Default Header</slot>
+  </div>
+
+  <div class="footnote-body">
+    <slot name="body">Default body content goes here. This is the fallback text if no content is provided.</slot>
+  </div>
+
+  <div class="footnote-footer">
+    <slot name="footer">Default Footer</slot>
+  </div>
+</div>
+```
+
 * The child defines **named slots**: `header`, `body`, and `footer`.
 * It wraps content in full `<div>` structure to ensure valid HTML regardless of what the parent passes.
 
