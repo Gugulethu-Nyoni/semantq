@@ -162,7 +162,7 @@ The HTML standard also works:
 
 <style>
   /* css here */
-<style>
+</style>
 
 <h1> Hello World </h1> 
 
