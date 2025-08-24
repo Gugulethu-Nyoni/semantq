@@ -1001,7 +1001,7 @@ For a comprehensive guide on **smQL features**, please visit:
 ## Feature/Module Specific Docs
 
 ### Core Features
-- [Semantq AI CLI Guide](docs/SemantqAI.md) - Generate compliant code using AI
+<!-- - [Semantq AI CLI Guide](docs/SemantqAI.md) - Generate compliant code using AI -->
 - [Semantq Config Guide](docs/SemantqConfig.md) - Manage app configuration
 - [Semantq State Guide](docs/SemantqState.md) - Reactive state management system
 - [Semantq Core State Guide](docs/SemantqStateCore.md) - Core state management

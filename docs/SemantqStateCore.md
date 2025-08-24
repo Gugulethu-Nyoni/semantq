@@ -17,7 +17,6 @@
 - [Effects](#effects)
 - [Conclusion](#conclusion)
 
----
 
 ## General Philosophy
 
@@ -29,7 +28,6 @@ Semantq philosophy is that state is a stream and not a snapshot.
 - **Declarative Syntax:** Use custom shorthand syntax for binding data and handling events.
 - **Component-Based:** State is scoped to individual components, allowing for modular, reusable code.
 
----
 
 ## Installation and Setup
 
@@ -47,7 +45,6 @@ Once installed, you can import the necessary functions into your Semantq compone
 @end
 ```
 
----
 
 ## Using Reactive States
 
@@ -73,7 +70,6 @@ In this example:
 - The `increment` function updates the value of `count` when the button is clicked.
 - The `@bind={count}` directive ensures the `<p>` text element automatically updates when `count` changes.
 
----
 
 ## Derived States
 
@@ -89,14 +85,12 @@ Derived states allow you to create computed values based on other reactive state
 
 @html
   <p @bind={doubled}></p>
-  <button @click={() => count.value++}> + </button>
+  <button @click={() => count.value++ }> + </button>
 ```
 
 Here:
 - `doubled` is a derived state based on `count`.
 - It automatically updates whenever `count` changes, and binds to the `<p>` tag for display.
-
----
 
 ## Handling Input Elements
 
@@ -155,7 +149,7 @@ This binds the checkbox’s checked state to the `isChecked` reactive state.
 In this case:
 - The radio buttons are bound to the `selectedOption` state, and the selected option will be reflected in the `<p>` tag.
 
----
+
 
 ## Handling Select and Multi-Select Inputs
 
@@ -194,7 +188,7 @@ You can bind `<select>` and `<select multiple>` elements to reactive states, all
 In these examples:
 - The selected value(s) from the `<select>` element will automatically bind to the respective state (`selectedOption` or `multiSelect`).
 
----
+
 
 ## Managing Tab Indexes
 
@@ -207,13 +201,13 @@ You can bind the `tabindex` attribute to a reactive state, enabling dynamic focu
   let tabbed = $state(0);
 @html
   <input @bind={tabbed} tabindex />
-  <button @click={() => tabbed.value++}>Toggle Tab Index</button>
+  <button @click={() => tabbed.value++ }>Toggle Tab Index</button>
 ```
 
 This example:
 - Changes the `tabindex` of the input element based on the value of the `tabbed` state.
 
----
+
 
 
 ## Range Input Binding
@@ -297,7 +291,7 @@ Effects allow you to run side effects based on state changes. They are ideal for
 In this example:
 - The `$effect` will log the value of `username` every time it changes. This is particularly useful in cases where you want to track form field changes, such as saving user input as they type or validating data in real time.
 
----
+
 
 ## Conclusion
 
