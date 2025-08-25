@@ -982,7 +982,6 @@ console.log(products);
 const response = await api.delete(`/product/products/${product.id}`);
 ```
 
-
 ### Side-by-Side Comparison
 
 | **Operation**   | **Raw Fetch**                                                      | **smQL**                                |
