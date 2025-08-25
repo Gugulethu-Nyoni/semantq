@@ -61,14 +61,14 @@ In Semantq, you can define reactive states using the `$state` function. Once a s
 @end
 
 @html
-  <p @bind={count}></p>
+  <p bind:value={count}></p>
   <button @click={increment}> + </button>
 ```
 
 In this example:
 - The `count` state is initialized with a value of `0`.
 - The `increment` function updates the value of `count` when the button is clicked.
-- The `@bind={count}` directive ensures the `<p>` text element automatically updates when `count` changes.
+- The `bind:value={count}` directive ensures the `<p>` text element automatically updates when `count` changes.
 
 
 ## Derived States
@@ -84,7 +84,7 @@ Derived states allow you to create computed values based on other reactive state
 @end
 
 @html
-  <p @bind={doubled}></p>
+  <p bind:value={doubled}></p>
   <button @click={() => count.value++ }> + </button>
 ```
 
@@ -104,8 +104,8 @@ You can easily bind different types of inputs to reactive states. This works for
 @end
 
 @html
-  <input @bind={textInput} type="text" />
-  <p @bind={textInput}></p>
+  <input bind:value={textInput} type="text" />
+  <p bind:value={textInput}></p>
 ```
 
 In this example:
@@ -121,10 +121,10 @@ In this example:
 
 @html
   <label>
-    <input @bind={isChecked} type="checkbox" />
+    <input bind:value={isChecked} type="checkbox" />
     Check me
   </label>
-  <p @bind={isChecked}></p>
+  <p bind:value={isChecked}></p>
 ```
 
 This binds the checkbox’s checked state to the `isChecked` reactive state.
@@ -138,12 +138,12 @@ This binds the checkbox’s checked state to the `isChecked` reactive state.
 
 @html
   <label>
-    <input @bind={selectedOption} type="radio" value="option1" /> Option 1
+    <input bind:value={selectedOption} type="radio" value="option1" /> Option 1
   </label>
   <label>
-    <input @bind={selectedOption} type="radio" value="option2" /> Option 2
+    <input bind:value={selectedOption} type="radio" value="option2" /> Option 2
   </label>
-  <p @bind={selectedOption}></p>
+  <p bind:value={selectedOption}></p>
 ```
 
 In this case:
@@ -163,12 +163,12 @@ You can bind `<select>` and `<select multiple>` elements to reactive states, all
 @end
 
 @html
-  <select @bind={selectedOption}>
+  <select bind:value={selectedOption}>
     <option value="one">One</option>
     <option value="two">Two</option>
     <option value="three">Three</option>
   </select>
-  <p @bind={selectedOption}></p>
+  <p bind:value={selectedOption}></p>
 ```
 
 ### Example: Multi-Select Binding
@@ -177,12 +177,12 @@ You can bind `<select>` and `<select multiple>` elements to reactive states, all
 @script
   let multiSelect = $state(["apple"]);
 @html
-  <select @bind={multiSelect} multiple size="3">
+  <select bind:value={multiSelect} multiple size="3">
     <option value="apple" selected>Apple</option>
     <option value="banana">Banana</option>
     <option value="cherry">Cherry</option>
   </select>
-  <p @bind={multiSelect}></p>
+  <p bind:value={multiSelect}></p>
 ```
 
 In these examples:
@@ -200,7 +200,7 @@ You can bind the `tabindex` attribute to a reactive state, enabling dynamic focu
 @script
   let tabbed = $state(0);
 @html
-  <input @bind={tabbed} tabindex />
+  <input bind:value={tabbed} tabindex />
   <button @click={() => tabbed.value++ }>Toggle Tab Index</button>
 ```
 
@@ -220,7 +220,7 @@ Bind a range slider to a reactive state and display the value as text.
 <label>
     Volume: <span @text={volume} @format={(val) => val }></span>
   </label>
-  <input type="range" min="0" max="100" @bind={volume} />
+  <input type="range" min="0" max="100" bind:value={volume} />
 ```
 
 ```js
@@ -242,7 +242,7 @@ Toggle a CSS class dynamically based on a reactive boolean state.
 ### Example
 
 ```html
- <input type="checkbox" @bind={isActive} /> Toggle Active
+ <input type="checkbox" bind:value={isActive} /> Toggle Active
 
   <div id="status-box" @class:active={isActive}>
     This box changes style when active
@@ -284,8 +284,8 @@ Effects allow you to run side effects based on state changes. They are ideal for
   });
 @end
 @html
-  <input @bind={username} type="text" placeholder="Enter username" />
-  <p @bind={username}></p>
+  <input bind:value={username} type="text" placeholder="Enter username" />
+  <p bind:value={username}></p>
 ```
 
 In this example:
