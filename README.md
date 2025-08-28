@@ -1007,9 +1007,9 @@ For a comprehensive guide on **smQL features**, please visit:
 - [Semantq Reactivity Guide](docs/SemantqCoreReactivity.md) - Semantq Reactivity Guide
 
 ### Template System
+- [Syntax Guide](docs/SemantqSyntaxComprehensive.md) - Comprehensive syntax reference
 - [If Logic Block](docs/logicBlocks/if.md) - If Logic Block Guide
 - [Each Logic Block](docs/logicBlocks/each.md) - Each Logic Block Guide
-- [Syntax Guide](docs/SemantqSyntaxComprehensive.md) - Comprehensive syntax reference
 - [Slot Composition](docs/SemantqSlots.md) - Component slot patterns
 - [Layout System](docs/SemantqLayouts.md) - Application layout management
 
