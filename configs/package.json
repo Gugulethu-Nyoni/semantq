@@ -10,7 +10,7 @@
     "compile": "node core_modules/compiler/compiler.js",
     "dev": "npm run compile && vite",
     "dev-s": "npm run compile && concurrently \"npm run app-server\" \"vite\"",
-    "app-server": "node ./semantqQL/server.js",
+    "server": "node ./semantqQL/server.js",
     "build": "npm run compile && vite build",
     "postbuild": "node core_modules/post-build.js"
   },
