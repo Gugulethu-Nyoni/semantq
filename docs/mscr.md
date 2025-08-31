@@ -1,20 +1,20 @@
 # Semantq MSCR Architecture: Full-Stack Setup Guide
 
-Welcome to the **Semantq MSCR Architecture** documentation. This guide will walk you through the server up setup, usage, and workflow of the **Model-Service-Controller-Routes (MSCR)** architecture for building scalable and maintainable full-stack applications. Whether you're creating individual components or generating a full resource, Semantq's CLI makes it easy to scaffold your backend with support for database adapters like **Supabase** and **MongoDB**. (More adapters to be added.)
+Welcome to the **Semantq MSCR Architecture** documentation. This guide will walk you through the semantqQL up setup, usage, and workflow of the **Model-Service-Controller-Routes (MSCR)** architecture for building scalable and maintainable full-stack applications. Whether you're creating individual components or generating a full resource, Semantq's CLI makes it easy to scaffold your backend with support for database adapters like **Supabase** and **MongoDB**. (More adapters to be added.)
 
 ---
 
 
 
-### 1. Install the Server
-To set up the server directory and initialize the `server.js` file, run:
+### 1. Install the semantqQL
+To set up the semantqQL directory and initialize the `semantqQL.js` file, run:
 ```bash
-semantq install:server
+semantq install:semantqQL
 ```
 
 This will:
-- Create a `server` directory.
-- Generate a `server.js` file with the necessary boilerplate code.
+- Create a `semantqQL` directory.
+- Generate a `semantqQL.js` file with the necessary boilerplate code.
 
 
 
@@ -35,16 +35,16 @@ Make sure that you have the correct .env set up for your SUPABASE_URL and  SUPAB
 
 ## 🏗️ Project Structure
 
-After running the installation commands, your project server will have the following structure:
+After running the installation commands, your project semantqQL will have the following structure:
 
 ```
 project-root/
-├── server/
+├── semantqQL/
 │   ├── models/            # Database models
 │   ├── services/          # Business logic
 │   ├── controllers/       # HTTP request handlers
 │   ├── routes/            # API routes
-│   └── server.js          # Main server file
+│   └── semantqQL.js          # Main semantqQL file
 ├── lib/
 │   └── supabaseConfig.js  # Supabase configuration
 
@@ -70,7 +70,7 @@ semantq make:resource User -a mongo
 When you generate a resource (e.g., `User`), the following files are created:
 
 ```
-server/
+semantqQL/
 ├── models/
 │   └── User.js          # Model file for database operations
 ├── services/
@@ -131,9 +131,9 @@ Here’s how the MSCR architecture handles a form submission:
    };
    ```
 
-2. **Proxy Server**:
-   - The request is routed to the proxy server (e.g., Express.js).
-   - The proxy server matches the request URL to the appropriate route.
+2. **Proxy semantqQL**:
+   - The request is routed to the proxy semantqQL (e.g., Express.js).
+   - The proxy semantqQL matches the request URL to the appropriate route.
 
 3. **Route**:
    - The route (`userRoutes.js`) maps the request to the corresponding controller method.
@@ -194,7 +194,7 @@ semantq make:resource User -a supabase
 
 This command generates the following files:
 
-#### `server/models/User.js`
+#### `semantqQL/models/User.js`
 ```javascript
 import { supabase } from '../utils/supabaseClient.js';
 
@@ -242,7 +242,7 @@ export default class User {
 }
 ```
 
-#### `server/services/userService.js`
+#### `semantqQL/services/userService.js`
 ```javascript
 import User from '../models/User.js';
 
@@ -271,7 +271,7 @@ class UserService {
 export default new UserService();
 ```
 
-#### `server/controllers/userController.js`
+#### `semantqQL/controllers/userController.js`
 ```javascript
 import userService from '../services/userService.js';
 
@@ -325,7 +325,7 @@ class UserController {
 export default new UserController();
 ```
 
-#### `server/routes/userRoutes.js`
+#### `semantqQL/routes/userRoutes.js`
 ```javascript
 import express from 'express';
 import userController from '../controllers/userController.js';
