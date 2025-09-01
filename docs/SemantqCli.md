@@ -31,12 +31,14 @@ Welcome to the Semantq CLI Commands Guide! This document provides an overview of
    - `-s, --server` - Include server handlers server.js
    - `-a, --all` - Create all resources (@page.smq,@layout.smq,config.js,server.js)
 
+<!--
 ### AI Commands
 12. `semantq ai <prompt>` - Generate code using AI
    - `-r, --route` - Specify target route directory (required)
    - `--full` - Wrap in Semantq tags
    - `--js`/`--css`/`--html` - Generate specific code type
    - `--append` - Append to existing file
+-->
 
 #### Utility
 13. `semantq -v, --version` - Show version number
