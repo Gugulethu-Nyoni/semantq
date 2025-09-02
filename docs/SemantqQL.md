@@ -38,7 +38,7 @@ Then add the full stack infrastructure (server, db driven auth module backend an
 
 ```bash
 semantq create myapp --fullstack
-# or
+# OR
 semantq create myapp -fs
 ```
 
@@ -49,7 +49,7 @@ semantq create myapp -fs
 ```
 project_root/
 │
-├── semantq_server/                     # Node.js server (Express + Semantq API system)
+├── semantqQL/                     # Node.js server (Express + Semantq API system)
 │   ├── node_modules/semantq_auth       # Auth API module (logic)
 │   ├── packages/                       # Custom modules go here
 │   ├── prisma/schema.prisma            # Prisma schema file
@@ -100,14 +100,14 @@ Use the same `:root` variables to customize your dashboard appearance.
 From project root:
 
 ```bash
-cd semantq_server
+cd semantqQL
 npm run init
 ```
 
 This initializes:
 
 ```
-semantq_server/semantq.config.js
+semantqQL/semantq.config.js
 ```
 
 ### Modify `semantq.config.js`:
@@ -126,7 +126,7 @@ Ensure you update:
 Update the Prisma schema:
 
 ```
-semantq_server/prisma/schema.prisma
+semantqQL/prisma/schema.prisma
 ```
 
 > Preconfigured with **auth-related models**. Extend it with your app models.
@@ -148,7 +148,7 @@ semantq make:resource Product
 This will generate these resources:
 
 ```
-semantq_server/
+semantqQL/
 ├── models/{dbadapter e.g. mysql or supabase}/product.js
 ├── controllers/productController.js
 ├── services/productService.js
@@ -163,7 +163,7 @@ API base:
 ```
 http://localhost:3003
 ```
-You can configure the port in the semantq_server/.env
+You can configure the port in the semantqQL/.env
 
 ```bash
 PORT=3003
@@ -189,7 +189,7 @@ npm run install:module <package-name>
 Modules are stored here:
 
 ```
-semantq_server/packages/
+semantqQL/packages/
 ```
 
 > Semantq auto-detects these packages on server boot.
@@ -203,7 +203,7 @@ If needed as a fallback or to integrate into an existing app:
 semantq install:server
 ```
 
-This installs only the server in `semantq_server/`.  
+This installs only the server in `semantqQL/`.  
 
 You can add all other related modules such as: `npm i @semantq/auth` and `semantq add: auth-ui` if you prefer to install these individually. 
 
@@ -212,7 +212,7 @@ You can add all other related modules such as: `npm i @semantq/auth` and `semant
 | Action                   | Command/Path                             |
 | ------------------------ | ---------------------------------------- |
 | Create full stack app    | `semantq create myapp --fullstack`       |
-| Initialize server config | `cd semantq_server && npm run init`      |
+| Initialize server config | `cd semantqQL && npm run init`      |
 | Set DB & env settings    | `semantq.config.js`                      |
 | Run migrations           | `npx prisma migrate dev --name init_app` |
 | Generate CRUD resource   | `semantq make:resource Product`          |
