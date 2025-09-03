@@ -256,7 +256,7 @@ To reduce FOUC, it’s best to import your CSS directly in the script block of y
 
 ```smq
 @script
-import '/components.css';
+import '/components.css'; // if your css file is in project_root/public/components.css
 @end
 ```
 By importing CSS in the `@script` block of your `@page.smq`, Semantq ensures that styles are loaded and applied as part of the rendering pipeline, reducing the chance of unstyled content appearing during page load.
