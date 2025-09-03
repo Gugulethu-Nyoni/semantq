@@ -232,6 +232,38 @@ Options:
 
 
 
+## Layout Composition
+
+If your page requires additional JS or CSS assets (from a CDN or local files), you can define them in the `@layout.smq` file within the same route directory.  
+For example, adding Bootstrap from a CDN:
+
+```smq
+@head
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+@end
+```
+
+## Dealing with FOUC (Flash of Unstyled Content)
+
+**What is FOUC?**  
+FOUC (Flash of Unstyled Content) happens when the browser renders a page’s HTML before its CSS has fully loaded, causing a brief “unstyled” flash.  
+
+To reduce FOUC, it’s best to import your CSS directly in the script block of your `@page.smq` file:
+
+```smq
+@script
+import '/components.css';
+@end
+```
+By importing CSS in the `@script` block of your `@page.smq`, Semantq ensures that styles are loaded and applied as part of the rendering pipeline, reducing the chance of unstyled content appearing during page load.
+
+
+Your JavaScript assets (CDN or local) can still be defined in the layout file, while CSS critical to rendering should be imported at the page level.
+
 
 ## Component Composition
 
