@@ -264,6 +264,7 @@ By importing CSS in the `@script` block of your `@page.smq`, Semantq ensures tha
 
 Your JavaScript assets (CDN or local) can still be defined in the layout file, while CSS critical to rendering should be imported at the page level.
 
+The layout file has more blocks such as `@script ... @end`, `@head ...@end`, `@body ... @end`, `@footer ..@end` - all blocks are optional and you only use what you need. Please see the link to the comprehensive Layout Composition guide for more on this.
 
 ## Component Composition
 
@@ -1043,7 +1044,7 @@ For a comprehensive guide on **smQL features**, please visit:
 - [If Logic Block](docs/logicBlocks/if.md) - If Logic Block Guide
 - [Each Logic Block](docs/logicBlocks/each.md) - Each Logic Block Guide
 - [Slot Composition](docs/SemantqSlots.md) - Component slot patterns
-- [Layout System](docs/SemantqLayouts.md) - Application layout management
+- [Layout Composition](docs/SemantqLayouts.md) - Page layout assets set up
 
 ### Application Architecture
 - [Semantq Full Stack Quick Start](docs/SemantqFullStack.md) - Guide for Building CRUD projects with Semantq.
