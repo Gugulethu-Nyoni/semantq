@@ -2,7 +2,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 
-
+/**
+ * Recursively reads SMQ files from a directory and processes them.
+ * @param {string} directory - The directory path to search for SMQ files.
+ * @returns {void}
+ */
 function readSMQFiles(directory) {
  fs.readdir(directory, (err, files) => {
   if (err) {
@@ -40,7 +44,11 @@ function readSMQFiles(directory) {
  });
 }
 
-
+/**
+ * Reads and compiles an SMQ file, extracting script, style, and HTML content.
+ * @param {string} filePath - The path to the SMQ file to compile.
+ * @returns {Promise<void>}
+ */
 async function readAndCompileSMQFile(filePath) {
   try {
     const data = await fs.promises.readFile(filePath, 'utf8');
@@ -143,7 +151,13 @@ async function readAndCompileSMQFile(filePath) {
   }
 }
 
-
+/**
+ * Compiles SMQ content by processing custom syntax tags and converting them to HTML.
+ * @param {string} content - The SMQ content to compile.
+ * @param {string} filePath - The path to the file being compiled (for error reporting).
+ * @returns {string} The compiled HTML content.
+ * @throws {Error} If invalid tag cases or missing end tags are detected.
+ */
 function compileSMQContent(content, filePath) {
  // Split the content into lines
  const lines = content.split('\n');
@@ -212,8 +226,11 @@ function compileSMQContent(content, filePath) {
  return compiledContent;
 }
 
-
-// Main function
+/**
+ * Main function to compile SMQ files from a source directory.
+ * @param {string} sourceDir - The source directory containing SMQ files.
+ * @returns {void}
+ */
 export function compileSMQFiles(sourceDir) {
   readSMQFiles(sourceDir);
 }
