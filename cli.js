@@ -139,14 +139,20 @@ async function addSemantqAuthUI(projectRoot) {
     // Copy public/* → projectRoot/public
     const srcPublic = path.join(tempDir, 'public');
     const destPublic = path.join(projectRoot, 'public');
-    await fs.copy(srcPublic, destPublic, { overwrite: true }); // Ensure overwrite is true
+    await fs.copy(srcPublic, destPublic, { overwrite: true });
     console.log(blue('✓ Copied public assets to /public'));
 
     // Copy routes/* → projectRoot/src/routes
     const srcRoutes = path.join(tempDir, 'routes');
     const destRoutes = path.join(projectRoot, 'src', 'routes');
-    await fs.copy(srcRoutes, destRoutes, { overwrite: true }); // Ensure overwrite is true
+    await fs.copy(srcRoutes, destRoutes, { overwrite: true });
     console.log(blue('✓ Copied route files to /src/routes'));
+
+    // Copy components/* → projectRoot/src/components
+    const srcComponents = path.join(tempDir, 'components');
+    const destComponents = path.join(projectRoot, 'src', 'components');
+    await fs.copy(srcComponents, destComponents, { overwrite: true });
+    console.log(blue('✓ Copied component files to /src/components'));
 
     // Clean up
     await fs.remove(tempDir);
@@ -159,7 +165,6 @@ async function addSemantqAuthUI(projectRoot) {
     throw err; // Re-throw to be caught by the calling command
   }
 }
-
 
 // ===============================
 // CREATE NEW PROJECT COMMAND

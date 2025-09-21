@@ -235,5 +235,5 @@ export function compileSMQFiles(sourceDir) {
   readSMQFiles(sourceDir);
 }
 
-// Compile .smq files
-//compileSMQFiles(sourceDir);
+// compile.smq files
+// compileSMQFiles(sourceDir);
