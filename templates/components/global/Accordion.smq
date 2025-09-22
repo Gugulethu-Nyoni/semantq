@@ -1,0 +1,216 @@
+@script
+
+@end
+
+@style 
+:root {
+  --primary: #A90F13;
+  --secondary: #F7931D;
+  --success: #21ba45;
+  --danger: #A90F13;
+  --warning: #F7931D;
+  --info: #337ab7;
+  --light: #EBEBEB;
+  --dark: #333333;
+  --gray: #666666;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+
+/* SMQ Accordion Styles */
+.smq-accordion {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.smq-accordion-item {
+    border-bottom: 1px solid var(--light);
+}
+
+.smq-accordion-item:last-child {
+    border-bottom: none;
+}
+
+.smq-accordion-header {
+    padding: 1.2rem 1.5rem;
+    background-color: var(--light);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    transition: var(--transition);
+    margin: 0;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-size: 1rem;
+    color: var(--dark);
+}
+
+.smq-accordion-header:hover {
+    background-color: var(--light);
+}
+
+.smq-accordion-header::after {
+    content: '▼';
+    font-size: 0.8rem;
+    color: var(--gray);
+    transition: var(--transition);
+}
+
+.smq-accordion-toggle:checked + .smq-accordion-header {
+    background-color: var(--primary);
+    color: white;
+}
+
+.smq-accordion-toggle:checked + .smq-accordion-header::after {
+    transform: rotate(180deg);
+    color: white;
+}
+
+.smq-accordion-toggle:checked + .smq-accordion-header:hover {
+    background-color: var(--primary);
+}
+
+.smq-accordion-toggle {
+    display: none;
+}
+
+.smq-accordion-content {
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    background: white;
+    border-left: 3px solid transparent;
+}
+
+.smq-accordion-toggle:checked + .smq-accordion-header + .smq-accordion-content {
+    padding: 1.5rem;
+    max-height: 1000px;
+    border-left-color: var(--primary);
+}
+
+/* Optional: Add focus styles for accessibility */
+.smq-accordion-header:focus {
+    outline: 2px solid var(--info);
+    outline-offset: -2px;
+}
+
+/* Optional: Add status color variations */
+.smq-accordion-success .smq-accordion-toggle:checked + .smq-accordion-header {
+    background-color: var(--success);
+}
+
+.smq-accordion-warning .smq-accordion-toggle:checked + .smq-accordion-header {
+    background-color: var(--warning);
+    color: var(--dark);
+}
+
+.smq-accordion-danger .smq-accordion-toggle:checked + .smq-accordion-header {
+    background-color: var(--danger);
+}
+
+@end
+
+<!-- First Accordion -->
+    <div class="smq-accordion">
+        <div class="smq-accordion-item">
+            <input type="checkbox" id="smq-accordion-1" class="smq-accordion-toggle">
+            <label for="smq-accordion-1" class="smq-accordion-header">
+                Accordion Item #1
+            </label>
+            <div class="smq-accordion-content">
+                <div class="sqm-acc-content">
+                    <p>This is the content for the first accordion item. You can put any HTML content here.</p>
+                    <ul>
+                        <li>List item one</li>
+                        <li>List item two</li>
+                        <li>List item three</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="smq-accordion-item">
+            <input type="checkbox" id="smq-accordion-2" class="smq-accordion-toggle">
+            <label for="smq-accordion-2" class="smq-accordion-header">
+                Accordion Item #2
+            </label>
+            <div class="smq-accordion-content">
+                <div class="sqm-acc-content">
+                    <p>This is the content for the second accordion item. The accordion is CSS-only and fully reusable.</p>
+                    <p>You can have multiple accordions on the same page without conflicts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Accordion (reusing the same classes) -->
+    <div class="smq-accordion">
+        <div class="smq-accordion-item">
+            <input type="checkbox" id="smq-accordion-3" class="smq-accordion-toggle">
+            <label for="smq-accordion-3" class="smq-accordion-header">
+                Another Accordion #1
+            </label>
+            <div class="smq-accordion-content">
+                <div class="sqm-acc-content">
+                    <p>This is a completely separate accordion instance using the same CSS classes.</p>
+                    <p>No JavaScript required!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="smq-accordion-item">
+            <input type="checkbox" id="smq-accordion-4" class="smq-accordion-toggle">
+            <label for="smq-accordion-4" class="smq-accordion-header">
+                Another Accordion #2
+            </label>
+            <div class="smq-accordion-content">
+                <div class="sqm-acc-content">
+                    <p>Each accordion item operates independently.</p>
+                    <p>You can open multiple items at the same time.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Third Accordion with different content -->
+    <div class="smq-accordion">
+        <div class="smq-accordion-item">
+            <input type="checkbox" id="smq-accordion-5" class="smq-accordion-toggle">
+            <label for="smq-accordion-5" class="smq-accordion-header">
+                Features
+            </label>
+            <div class="smq-accordion-content">
+                <div class="sqm-acc-content">
+                    <h3>CSS-Only Features:</h3>
+                    <ul>
+                        <li>No JavaScript dependencies</li>
+                        <li>Lightweight and fast</li>
+                        <li>Fully accessible</li>
+                        <li>Reusable across the page</li>
+                        <li>Smooth animations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="smq-accordion-item">
+            <input type="checkbox" id="smq-accordion-6" class="smq-accordion-toggle">
+            <label for="smq-accordion-6" class="smq-accordion-header">
+                Usage Notes
+            </label>
+            <div class="smq-accordion-content">
+                <div class="sqm-acc-content">
+                    <p>Simply copy the HTML structure and ensure each <code>id</code> is unique.</p>
+                    <p>The SMQ prefix prevents conflicts with any existing accordion styles.</p>
+                </div>
+            </div>
+        </div>
+    </div>

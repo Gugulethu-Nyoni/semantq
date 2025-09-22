@@ -7,6 +7,7 @@ export default class Router {
   this.fileBasedRoutes = fileBasedRoutes;
   this.basePath = window.location.origin; // Don't modify it here
   this.localStorageKey = 'Semantq.currentRoute';
+  this.tempParams = null;
 }
 
 
@@ -14,10 +15,41 @@ export default class Router {
     return targetRoute.replace(/build\/routes/g, ''); // Remove /build/routes
   }
 
+/*
   sanitizeHref(href) {
     return href.replace(/[\s<>'"\x00-\x1F\x7F]/g, '');
   }
+*/
 
+sanitizeHref(href) {
+  try {
+    const url = new URL(href, window.location.origin);
+
+    // Extract query parameters and store them
+    const params = Object.fromEntries(url.searchParams.entries());
+    this.tempParams = Object.keys(params).length > 0 ? params : null;
+
+    // Get the pathname and remove any trailing slashes
+    let sanitizedPath = url.pathname.replace(/\/+$/, '');
+
+    // Remove /build/routes if present
+    sanitizedPath = sanitizedPath.replace(/build\/routes/g, '');
+
+    // Ensure the path starts with a slash if it's not the root
+    if (sanitizedPath && sanitizedPath[0] !== '/') {
+      sanitizedPath = '/' + sanitizedPath;
+    }
+
+    return sanitizedPath;
+  } catch (e) {
+    console.error("Error sanitizing href:", e);
+    // Fallback logic
+    const pathWithoutQuery = href.split('?')[0].split('#')[0];
+    return pathWithoutQuery.replace(/[\s<>'"\x00-\x1F\x7F]/g, '');
+  }
+}
+
+  
   isCanonicalRoute(href) {
     try {
       const url = new URL(href);
@@ -38,78 +70,92 @@ export default class Router {
   // Inside your Router class
 
 async handleFileBasedRoute(targetRoute) {
-    console.group('handleFileBasedRoute');
-    console.log('Input targetRoute:', targetRoute); // Log 2
+  console.group('handleFileBasedRoute');
+  console.log('Input targetRoute:', targetRoute);
+  
+  const filePath = this.fileBasedRoutes[targetRoute];
+  console.log('Resolved filePath from fileBasedRoutes:', filePath);
+  
+  if (filePath) {
+    console.log(`Navigating to file-based route: ${targetRoute} -> ${filePath}`);
+
+    console.log('Before manipulation - filePath:', filePath, 'basePath:', this.basePath);
     
-    const filePath = this.fileBasedRoutes[targetRoute];
-    console.log('Resolved filePath from fileBasedRoutes:', filePath); // Log 3
+    const pathToJoin = filePath.startsWith('/') ? filePath.substring(1) : filePath;
+    console.log('After removing leading slash - pathToJoin:', pathToJoin);
+    
+    const url = new URL(pathToJoin, this.basePath);
+    console.log('URL object created:', url);
+
+    // Append stored parameters before navigating
+    if (this.tempParams) {
+      Object.entries(this.tempParams).forEach(([key, value]) => {
+        url.searchParams.append(key, value);
+      });
+      console.log('Re-appended temporary parameters:', this.tempParams);
+      this.tempParams = null; // Clear the parameters after use
+    }
+    
+    const goTo = url.href;
+    console.log('Final href to navigate to:', goTo);
+
+    console.log("Going to:", goTo);
+    window.location.href = goTo;
+  } else {
+    console.error(`File-based route not found: ${targetRoute}`);
+    this.handleRouteError(targetRoute);
+  }
+  console.groupEnd();
+}
+
+async handleDeclaredRoute(targetRoute) {
+  console.group('handleDeclaredRoute');
+  console.log('Input targetRoute:', targetRoute);
+  
+  const routeConfig = this.declaredRoutes.find(route => route.path === targetRoute);
+  console.log('Found routeConfig:', routeConfig);
+  
+  if (routeConfig) {
+    console.log(`Handling declared route: ${targetRoute}`);
+
+    const filePath = routeConfig.filePath;
+    console.log('Resolved filePath from routeConfig:', filePath);
     
     if (filePath) {
-      console.log(`Navigating to file-based route: ${targetRoute} -> ${filePath}`);
+      console.log(`Navigating to declared route: ${targetRoute} -> ${filePath}`);
 
-      // Log before path manipulation
-      console.log('Before manipulation - filePath:', filePath, 'basePath:', this.basePath); // Log 4
+      console.log('Before manipulation - filePath:', filePath, 'basePath:', this.basePath);
       
       const pathToJoin = filePath.startsWith('/') ? filePath.substring(1) : filePath;
-      console.log('After removing leading slash - pathToJoin:', pathToJoin); // Log 5
+      console.log('After removing leading slash - pathToJoin:', pathToJoin);
       
       const url = new URL(pathToJoin, this.basePath);
-      console.log('URL object created:', url); // Log 6
+      console.log('URL object created:', url);
+
+      // Append stored parameters before navigating
+      if (this.tempParams) {
+        Object.entries(this.tempParams).forEach(([key, value]) => {
+          url.searchParams.append(key, value);
+        });
+        console.log('Re-appended temporary parameters:', this.tempParams);
+        this.tempParams = null; // Clear the parameters after use
+      }
       
       const goTo = url.href;
-      console.log('Final href to navigate to:', goTo); // Log 7
+      console.log('Final href to navigate to:', goTo);
 
       console.log("Going to:", goTo);
       window.location.href = goTo;
     } else {
-      console.error(`File-based route not found: ${targetRoute}`);
+      console.error(`File path not found for declared route: ${targetRoute}`);
       this.handleRouteError(targetRoute);
     }
-    console.groupEnd();
+  } else {
+    console.error(`Declared route not found: ${targetRoute}`);
+    this.handleRouteError(targetRoute);
   }
-
-
-async handleDeclaredRoute(targetRoute) {
-    console.group('handleDeclaredRoute');
-    console.log('Input targetRoute:', targetRoute); // Log 8
-    
-    const routeConfig = this.declaredRoutes.find(route => route.path === targetRoute);
-    console.log('Found routeConfig:', routeConfig); // Log 9
-    
-    if (routeConfig) {
-      console.log(`Handling declared route: ${targetRoute}`);
-
-      const filePath = routeConfig.filePath;
-      console.log('Resolved filePath from routeConfig:', filePath); // Log 10
-      
-      if (filePath) {
-        console.log(`Navigating to declared route: ${targetRoute} -> ${filePath}`);
-
-        // Log before path manipulation
-        console.log('Before manipulation - filePath:', filePath, 'basePath:', this.basePath); // Log 11
-        
-        const pathToJoin = filePath.startsWith('/') ? filePath.substring(1) : filePath;
-        console.log('After removing leading slash - pathToJoin:', pathToJoin); // Log 12
-        
-        const url = new URL(pathToJoin, this.basePath);
-        console.log('URL object created:', url); // Log 13
-        
-        const goTo = url.href;
-        console.log('Final href to navigate to:', goTo); // Log 14
-
-        console.log("Going to:", goTo);
-        window.location.href = goTo;
-      } else {
-        console.error(`File path not found for declared route: ${targetRoute}`);
-        this.handleRouteError(targetRoute);
-      }
-    } else {
-      console.error(`Declared route not found: ${targetRoute}`);
-      this.handleRouteError(targetRoute);
-    }
-    console.groupEnd();
-  }
-
+  console.groupEnd();
+}
 
 
   handleRouteError(targetRoute) {
