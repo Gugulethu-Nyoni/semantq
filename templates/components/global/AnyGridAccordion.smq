@@ -1,0 +1,60 @@
+@style
+/* Style for the accordion container */
+.anygrid-accordion-standalone {
+  margin-bottom: 0; /* To fit within table rows without extra spacing */
+}
+
+/* Style for the title bar (the 'summary' element) */
+.anygrid-accordion-title {
+  padding: 0.5rem; /* Reduced padding for a more compact look */
+  font-weight: bold;
+  background-color: transparent; /* No background color */
+  color: var(--dark);
+  cursor: pointer;
+  list-style: none; /* Hides the default arrow/icon */
+  transition: var(--transition);
+}
+
+.anygrid-accordion-title:hover {
+  color: var(--primary); /* Use a subtle highlight color on hover */
+}
+
+/* Add a custom icon for the title */
+.anygrid-accordion-title::before {
+  content: '+';
+  display: inline-block;
+  margin-right: 0.5rem;
+  font-size: 1.2rem; /* Slightly smaller icon */
+  line-height: 1;
+  transition: var(--transition);
+}
+
+/* Change icon when the accordion is open */
+.anygrid-accordion-standalone[open] > .anygrid-accordion-title::before {
+  content: '-';
+}
+
+/* Style for the content area */
+.anygrid-accordion-content {
+  padding: 0.5rem; /* Reduced padding */
+  background-color: transparent; /* No background color */
+}
+@end
+
+<details class="anygrid-accordion-standalone">
+  <summary class="anygrid-accordion-title">
+    Title One
+  </summary>
+  <div class="anygrid-accordion-content">
+    <p>Content for accordion item one...</p>
+  </div>
+</details>
+
+<details class="anygrid-accordion-standalone">
+  <summary class="anygrid-accordion-title">
+    Title Two
+  </summary>
+  <div class="anygrid-accordion-content">
+    <p>Content for accordion item two...</p>
+  </div>
+</details>
