@@ -561,6 +561,7 @@ preserveRawContent(children) {
  break;
 }
 
+/*
 case "MustacheAttribute": {
 const expression = attr.expression;
 if (!expression) {
@@ -633,6 +634,83 @@ else {
 }
 break;
 }
+
+
+*/
+
+case "MustacheAttribute": {
+  const expression = attr.expression;
+  if (!expression) {
+    console.error("MustacheAttribute: Missing expression");
+    return;
+  }
+
+  let expressionCode;
+
+  // 1. Check for simple identifiers that might be a function call
+  if (expression.type === 'Identifier') {
+    const varName = expression.name;
+    const varDecl = this.findVariableDeclaration(varName);
+
+    // Corrected logic: Set the attribute name as 'src' and the value as the variable's value
+    if (varDecl && varDecl.kind === 'const' && varDecl.init && varDecl.init.type === 'Literal' && typeof varDecl.init.value === 'string') {
+      this.transpiledJSContent.push(
+        `${elementVarName}.setAttribute('${attr.name}', '${varDecl.init.value}');`
+      );
+      break;
+    }
+    // If it's a function, generate a function call
+    if (this.isFunction(varName)) {
+      expressionCode = `${varName}()`;
+    } else {
+      // Otherwise, it's a regular identifier
+      expressionCode = escodegen.generate(expression);
+    }
+  } else {
+    // 2. Handle all other complex expressions (e.g., CallExpression, BinaryExpression)
+    expressionCode = escodegen.generate(expression);
+  }
+
+  // Get or create a reactive derived variable for the expression
+  const derivedAttrValueVar = this.getOrCreateDerived(expressionCode, context);
+
+  // 3. Handle boolean-type attributes
+  if (attr.name && (attr.name === 'disabled' || attr.name === 'required' || attr.name === 'readonly')) {
+    this.transpiledJSContent.push(
+      `$effect(() => {`,
+      ` ${elementVarName}.toggleAttribute("${attr.name}", !!${derivedAttrValueVar}.value);`,
+      `});`
+    );
+  }
+  // 4. Handle attribute spread (no name)
+  else if (!attr.name) {
+    this.transpiledJSContent.push(
+      `$effect(() => {`,
+      ` if (${derivedAttrValueVar}.value) {`,
+      ` ${elementVarName}.setAttribute(${derivedAttrValueVar}.value, '');`,
+      ` } else {`,
+      ` ${elementVarName}.removeAttribute(${derivedAttrValueVar}.value);`,
+      ` }`,
+      `});`
+    );
+  }
+  // 5. Handle special attributes that need direct `$effect` for reactivity (e.g., 'min')
+  else if (attr.name === 'min') {
+    this.transpiledJSContent.push(
+      `$effect(() => {`,
+      ` ${elementVarName}.setAttribute("${attr.name}", ${derivedAttrValueVar}.value);`,
+      `});`
+    );
+  }
+  // 6. Handle all other regular mustache attributes - FIXED: Remove the function wrapper
+  else {
+    this.transpiledJSContent.push(
+      `bindAttr(${elementVarName}, "${attr.name}", ${derivedAttrValueVar});`
+    );
+  }
+  break;
+}
+
 
             case "EventHandler": {
                 const eventName = attr.name;
