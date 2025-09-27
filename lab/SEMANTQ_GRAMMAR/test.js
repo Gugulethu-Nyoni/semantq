@@ -1,6 +1,7 @@
-import parser from './latestParser.mjs';
+import parser from './parser_latest.js';
 import fs from 'fs';
 
+/*
 const customSyntax = `
 @if(items.length > 0)
   @each(items as item)
@@ -14,8 +15,22 @@ const customSyntax = `
   <p>No items available</p>
 @endif
 `;
+*/
 
-const ast = parser.parse(customSyntax);
+const input = `@if(isLoggedIn)
+  Welcome back!
+@else
+  @each(tasks as task)
+    @if(task.title == "write")
+      <li> Important task: {task.title} </li>
+    @else
+      <li> {task.title} </li>
+    @endif
+  @endeach
+@endif
+`;
+
+const ast = parser.parse(input);
 const astString = JSON.stringify(ast, null, 2);
 
 // Write to file

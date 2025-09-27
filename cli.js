@@ -67,9 +67,6 @@ const yellow = chalk.hex('#ffff00');
 
 
 
-
-
-
 // ===============================
 // EXTRACTED: INSTALL SERVER LOGIC
 // ===============================
@@ -479,33 +476,29 @@ program
       }
       
       if (options.crud) {
-        if (options.auth) {
-          basePageTemplate += `import '/public/dashboard/js/theme.js';\n`;
-        }
-        basePageTemplate += `import 'https://cdn.jsdelivr.net/npm/chart.js';\n`;
-        basePageTemplate += `import smQL, { Form } from '@semantq/ql';\n`;
+        basePageTemplate += `import { smQL, Form, Notification } from '@semantq/ql';\n`;
         basePageTemplate += `import Formique from '@formique/semantq';\n`;
         basePageTemplate += `import AnyGrid from 'anygridjs';\n`;
         basePageTemplate += `import AppConfig from '/public/auth/js/config.js';\n`;
         basePageTemplate += `const baseUrl = AppConfig.BASE_URL;\n`;
         basePageTemplate += `const baseOrigin = new URL(baseUrl).origin;\n\n`;
+        basePageTemplate += `const api = new smQL(\`\${baseOrigin}\`);\n\n`;
         
         basePageTemplate += `// CRUD Operations\n`;
-        basePageTemplate += `// GET \n`;
-        basePageTemplate += `// const data = await new smQL(\`\${baseOrigin}/product/products\`);\n\n`;
-        
+        basePageTemplate += `// GET for LISTS - many records \n`;
+        basePageTemplate += `// const data = await api.get(\`\${baseOrigin}/product/products\`);\n\n`;
+
         basePageTemplate += `// POST - CREATE \n`;
         basePageTemplate += `// const newCategory = { name: 'Mobiles' }; \n`;
-        basePageTemplate += `// const response = await new smQL(\`\${baseOrigin}/category/categories\`, 'POST', newCategory);\n\n`;
-        
+        basePageTemplate += `// const response = await api.post(\`\${baseOrigin}/category/categories\`, newCategory);\n\n`;
+
         basePageTemplate += `// PUT — Update \n`;
         basePageTemplate += `// const updatedCategory = { name: 'Mobile Phones' }; \n`;
-        basePageTemplate += `// const response = await new smQL(\`\${baseOrigin}/category/categories/\${categoryId}\`, 'PUT', updatedCategory);\n\n`;
-        
+        basePageTemplate += `// const response = await api.put(\`\${baseOrigin}/category/categories/\${categoryId}\`, updatedCategory);\n\n`;
+
         basePageTemplate += `// DELETE \n`;
         basePageTemplate += `// const productId = 42; \n`;
-        basePageTemplate += `// const response = await new smQL(\`\${baseOrigin}/product/products/\${productId}\`, 'DELETE', null, { log: false });\n`;
-      } else if (options.auth) {
+        basePageTemplate += `// const response = await api.delete(\`\${baseOrigin}/product/products/\${productId}\`, { log: false });\n`;      } else if (options.auth) {
         basePageTemplate += `import '/public/dashboard/js/dashboard.js';\n`;
       }
       
