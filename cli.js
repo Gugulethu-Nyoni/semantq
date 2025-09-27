@@ -486,7 +486,8 @@ program
         
         basePageTemplate += `// CRUD Operations\n`;
         basePageTemplate += `// GET for LISTS - many records \n`;
-        basePageTemplate += `// const data = await api.get(\`\${baseOrigin}/product/products\`);\n\n`;
+        basePageTemplate += `// const response = await api.get(\`\${baseOrigin}/product/products\`);\n\n`;
+        basePageTemplate += `// const productsData = api.getData(response);\n\n`;
 
         basePageTemplate += `// POST - CREATE \n`;
         basePageTemplate += `// const newCategory = { name: 'Mobiles' }; \n`;
@@ -499,35 +500,31 @@ program
         basePageTemplate += `// DELETE \n`;
         basePageTemplate += `// const productId = 42; \n`;
         basePageTemplate += `// const response = await api.delete(\`\${baseOrigin}/product/products/\${productId}\`, { log: false });\n`;      } else if (options.auth) {
-        basePageTemplate += `import '/public/dashboard/js/dashboard.js';\n`;
       }
       
       if (options.tailwind) {
-        basePageTemplate += `import '../../../global.css';\n`;
+        basePageTemplate += `import '../../../global.css';\n\n`;
       }
-      
+      basePageTemplate += `// See complete smQL docs here: https://github.com/Gugulethu-Nyoni/smQL \n\n`;
       basePageTemplate += `@end\n\n@style\n\n@end\n\n@html\n ${routeName} Page\n`;
 
-      // Layout content
-      const layoutContent = options.crud ? 
-        `@head\n` +
-        `<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />\n` +
-        `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />\n` +
-        `<link rel="stylesheet" href="https://unpkg.com/formique-css@1.0.13/formique-css.css" />\n` +
-        `<link rel="stylesheet" href="https://unpkg.com/anygridcss@1.0.2/anyGrid.css" />\n` +
-        (options.auth ? `<link href="/dashboard/css/dashboard.css" rel="stylesheet" />\n` : '') +
-        `@end\n` +
-        `@body\n\n@end\n` +
-        `@footer\n\n@end\n` :
-        `@head\n` +
-        `<link rel="stylesheet" href="https://unpkg.com/formique-css@1.0.11/formique-css.css" />\n` +
-        `<link rel="stylesheet" href="https://unpkg.com/anygridcss@1.0.2/anyGrid.css" anygrid-style />\n` +
-        `@end\n\n` +
-        `@script\n// Imports only\n@end\n\n` +
-        `@body\n\n@end\n\n` +
-        `@footer\n\n@end\n`;
+    // Layout content
+    const layoutContent = options.crud ? 
+      `@head\n` +
+      `<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />\n` +
+      `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />\n` +
+      `<link rel="stylesheet" href="https://unpkg.com/formique-css@1.0.13/formique-css.css" />\n` +
+      `<link rel="stylesheet" href="https://unpkg.com/anygridcss@1.0.4/anyGrid.css" />\n` +
+      `@end\n` +
+      `@body\n\n@end\n` +
+      `@footer\n\n@end\n`
+    : 
+      `@head\n@end\n` +
+      `@body\n\n@end\n` +
+      `@footer\n\n@end\n`;
 
-      const files = {
+
+    const files = {
         '@page.smq': basePageTemplate,
         '@layout.smq': options.layout ? layoutContent : null,
         'config.js': options.config ? `export default {
