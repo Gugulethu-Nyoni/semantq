@@ -121,7 +121,7 @@
 <!-- First Accordion -->
     <div class="smq-accordion">
         <div class="smq-accordion-item">
-            <input type="checkbox" id="smq-accordion-1" class="smq-accordion-toggle">
+            <input type="checkbox" id="smq-accordion-1" class="smq-accordion-toggle" />
             <label for="smq-accordion-1" class="smq-accordion-header">
                 Accordion Item #1
             </label>
@@ -138,7 +138,7 @@
         </div>
 
         <div class="smq-accordion-item">
-            <input type="checkbox" id="smq-accordion-2" class="smq-accordion-toggle">
+            <input type="checkbox" id="smq-accordion-2" class="smq-accordion-toggle" />
             <label for="smq-accordion-2" class="smq-accordion-header">
                 Accordion Item #2
             </label>
@@ -154,7 +154,7 @@
     <!-- Second Accordion (reusing the same classes) -->
     <div class="smq-accordion">
         <div class="smq-accordion-item">
-            <input type="checkbox" id="smq-accordion-3" class="smq-accordion-toggle">
+            <input type="checkbox" id="smq-accordion-3" class="smq-accordion-toggle" />
             <label for="smq-accordion-3" class="smq-accordion-header">
                 Another Accordion #1
             </label>
@@ -167,7 +167,7 @@
         </div>
 
         <div class="smq-accordion-item">
-            <input type="checkbox" id="smq-accordion-4" class="smq-accordion-toggle">
+            <input type="checkbox" id="smq-accordion-4" class="smq-accordion-toggle" />
             <label for="smq-accordion-4" class="smq-accordion-header">
                 Another Accordion #2
             </label>
@@ -183,7 +183,7 @@
     <!-- Third Accordion with different content -->
     <div class="smq-accordion">
         <div class="smq-accordion-item">
-            <input type="checkbox" id="smq-accordion-5" class="smq-accordion-toggle">
+            <input type="checkbox" id="smq-accordion-5" class="smq-accordion-toggle" />
             <label for="smq-accordion-5" class="smq-accordion-header">
                 Features
             </label>
@@ -202,7 +202,7 @@
         </div>
 
         <div class="smq-accordion-item">
-            <input type="checkbox" id="smq-accordion-6" class="smq-accordion-toggle">
+            <input type="checkbox" id="smq-accordion-6" class="smq-accordion-toggle" />
             <label for="smq-accordion-6" class="smq-accordion-header">
                 Usage Notes
             </label>
