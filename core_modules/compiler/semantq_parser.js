@@ -5584,7 +5584,7 @@ function peg$parse(input, options) {
     let s0, s1;
 
     s0 = peg$currPos;
-    s1 = peg$parseLogicalORExpression();
+    s1 = peg$parseFullJSExpression();
     if (s1 !== peg$FAILED) {
       peg$savedPos = s0;
       s1 = peg$f80(s1);
@@ -6063,18 +6063,7 @@ function createMixedContentNode(parts) { // Removed start, end params as they ca
       sourceType: "module"
     };
   }
-  /*
-  function createIfStatement(test, consequent, startToken) {
-  return createNode('IfStatement', startToken.start, consequent[consequent.length-1].end, {
-    test,
-    consequent: createNode('BlockStatement', consequent[0].start, consequent[consequent.length-1].end, {
-      body: consequent
-    }),
-    alternate: null
-  });
-}
   
-  */
   
   function createIfStatement(test, consequent, alternate, startToken) {
   const consequentBlock = createNode(
