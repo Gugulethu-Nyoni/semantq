@@ -260,7 +260,7 @@ program
 
           console.log(`${purpleBright('✓')} ${blue('Full stack setup complete!')}`);
           console.log(`
-${purpleBright('» Next steps:')}
+  ${purpleBright('» Next steps:')}
   ${purpleBright('›')} ${gray('Configure your auth settings in')} ${purple('semantqQL/semantq.config.js')}
   ${purpleBright('›')} ${gray('Run database migrations:')} ${purple('cd semantqQL && semantq migrate')}
   ${purpleBright('›')} ${gray('Start both client and server:')}
