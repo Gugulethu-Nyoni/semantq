@@ -1031,16 +1031,13 @@ async output() {
         const mainComponentCleanups = this.componentCleanups.join('\n');
         const generatedDerivedDeclarations = this.globalDerivedDeclarations.join('\n');
 
-        // Process $onMount blocks with proper async handling
-       // In your output() method, modify this part:
-const onMountEffects = this.onMountCallbacks.map((onMountNode) => {
-    const callback = onMountNode.expression.arguments[0];
-    const isAsync = callback.async;
-    
-    // Generate the body with proper async handling
-    const body = escodegen.generate(callback.body);
-    
-    return `
+        // Process $onMount blocks with proper async handling (The $effect/RAF logic)
+        const onMountEffects = this.onMountCallbacks.map((onMountNode) => {
+            const callback = onMountNode.expression.arguments[0];
+            const isAsync = callback.async;
+            const body = escodegen.generate(callback.body);
+            
+            return `
         // $onMount effect
         $effect(() => {
             let cleanupFn;
@@ -1080,12 +1077,11 @@ const onMountEffects = this.onMountCallbacks.map((onMountNode) => {
                 if (cleanupFn) cleanupFn();
             };
         });
-    `;
-}).join('\n');
+        `;
+        }).join('\n');
 
 
         const finalJsCode = `
-${this.mainPageOriginalJS}
 
 ${generatedDerivedDeclarations}
 
@@ -1093,7 +1089,7 @@ export function renderComponent(targetElement) {
     const appRoot = targetElement || document.getElementById("app");
     
     if (!appRoot) {
-        console.error("App root element not found");
+        console.log("App root element not found");
         return () => {};
     }
 
@@ -1101,10 +1097,16 @@ export function renderComponent(targetElement) {
         appRoot.removeChild(appRoot.firstChild);
     }
 
-    ${mainComponentJS}
+    // 1. User's State and Functions (original script content)
+    ${this.mainPageOriginalJS}    
     
+    // 2. Transpiled DOM Creation and Reactive Bindings
+    ${mainComponentJS}    
+    
+    // 3. Mount Effects (triggers $effect/RAF cycle)
     ${onMountEffects}
 
+    // 4. Return Cleanup Function
     return () => {
         ${mainComponentCleanups}
         while (appRoot.firstChild) {
@@ -1114,14 +1116,13 @@ export function renderComponent(targetElement) {
 }
 `.trim();
 
-        return { transpiledJSCode: finalJsCode };
+        // Return only the component definition code
+        return { transpiledJSCode: finalJsCode };    
     } catch (err) {
         console.error('Failed to generate output:', err);
         return {};
     }
 }
-
-
 
 
 }

@@ -500,12 +500,14 @@ program
         basePageTemplate += `// DELETE \n`;
         basePageTemplate += `// const productId = 42; \n`;
         basePageTemplate += `// const response = await api.delete(\`\${baseOrigin}/product/products/\${productId}\`, { log: false });\n`;      } else if (options.auth) {
+
+        basePageTemplate += `// See complete smQL docs here: https://github.com/Gugulethu-Nyoni/smQL \n\n`;
+
       }
       
       if (options.tailwind) {
         basePageTemplate += `import '../../../global.css';\n\n`;
       }
-      basePageTemplate += `// See complete smQL docs here: https://github.com/Gugulethu-Nyoni/smQL \n\n`;
       basePageTemplate += `@end\n\n@style\n\n@end\n\n@html\n ${routeName} Page\n`;
 
     // Layout content

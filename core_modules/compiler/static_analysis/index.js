@@ -24,6 +24,7 @@ export default async function transformASTs(jsAST, cssCode, customSyntaxAST, fil
 
 
         const fileName = path.basename(path.dirname(filePath));
+        //console.log("fileName",fileName);
         const appRootId = 'app';
 
         // 1. First extract imports BEFORE any processing
@@ -49,6 +50,8 @@ export default async function transformASTs(jsAST, cssCode, customSyntaxAST, fil
         // Anatomique transpiles custom HTML (customSyntaxAST) into reactive JS code.
         const transpiler = new Anatomique({ content: jsAST }, cssCode, customSyntaxAST, filePath, mainPageOriginalJS);
         const { transpiledJSCode } = await transpiler.output();
+
+        //console.log("transpiledJSCode", transpiledJSCode);
 
 
         //console.log("Critical",transpiledJSCode);
@@ -182,42 +185,185 @@ function extractLayoutContent(layoutAST) {
  * @param {Object} layoutHTML - Object containing head, main, footer HTML strings.
  * @returns {string} - JavaScript code for rendering the layout.
  */
+/**
+ * Generates JavaScript code for incorporating the layout HTML.
+ * @param {Object} layoutHTML - Object containing head, main, footer HTML strings.
+ * @returns {string} - JavaScript code for rendering the layout.
+ */
 function generateLayoutJS(layoutHTML) {
     return `
-function layoutInit() {
-    const layoutBlocks = {
-        head: \`${layoutHTML.head}\`,
-        body: \`${layoutHTML.main}\`,
-        footer: \`${layoutHTML.footer}\`
-    };
-    function updateHead(html) {
-        // Use a temporary template to parse the incoming HTML string.
-        const tempContainer = document.createElement('div');
-        tempContainer.innerHTML = html;
+// Async layout initialization
+async function layoutInit() {
+    return new Promise((resolve) => {
+        const layoutBlocks = {
+            head: \`${layoutHTML.head}\`,
+            body: \`${layoutHTML.main}\`,
+            footer: \`${layoutHTML.footer}\`
+        };
 
-        // Iterate over all children of the parsed HTML.
-        // Append them directly to the head, preserving existing elements.
-        const head = document.head;
-        while (tempContainer.firstChild) {
-            head.appendChild(tempContainer.firstChild);
+        // --- CRITICAL FIX TRACKERS ---
+        let scriptsToLoad = 0;
+        let scriptsLoaded = 0;
+
+        const checkCompletion = () => {
+            // Resolve only when all tracked scripts are loaded (or if there were none).
+            if (scriptsToLoad === scriptsLoaded) {
+                resolve(); 
+            }
+        };
+        // ------------------------------
+
+        
+function updateHead(html) {
+    const tempContainer = document.createElement("div");
+    tempContainer.innerHTML = html;
+    const head = document.head;
+    
+    // Use a stable array for all nodes
+    const allNodes = Array.from(tempContainer.children); 
+    
+    // 1. Separate CSS/Links from Scripts
+    const linkNodes = allNodes.filter(node => node.tagName === 'LINK');
+    const scriptNodes = allNodes.filter(node => node.tagName === 'SCRIPT');
+    const otherNodes = allNodes.filter(node => node.tagName !== 'LINK' && node.tagName !== 'SCRIPT');
+
+    // 2. PASS 1: Append all CSS and other Link elements first (FOUC prevention)
+    for (const node of linkNodes) {
+        if (node.rel === 'stylesheet') {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            
+            // Copy all attributes
+            for (const attr of node.attributes) {
+                link.setAttribute(attr.name, attr.value);
+            }
+            head.appendChild(link);
+        } else {
+            // Handle other link tags (preload, prefetch, etc.)
+            const link = document.createElement('link');
+            for (const attr of node.attributes) {
+                link.setAttribute(attr.name, attr.value);
+            }
+            head.appendChild(link);
         }
     }
-    function updateBody(html) {
-        document.body.innerHTML = '';
-        const template = document.createElement('template');
-        template.innerHTML = html;
-        document.body.appendChild(template.content.cloneNode(true));
+    
+    // Append any other non-script, non-link elements (e.g., <meta>, <title>, etc.)
+    for (const node of otherNodes) {
+        head.appendChild(node);
     }
-    function appendFooter(html) {
-        const template = document.createElement('template');
-        template.innerHTML = html;
-        document.body.appendChild(template.content.cloneNode(true));
+
+    // 3. PASS 2: Append all Script elements (Dependency loading)
+    for (const node of scriptNodes) {
+        // Handle script tags specially to ensure execution
+        const script = document.createElement('script');
+        
+        // Copy all attributes
+        for (const attr of node.attributes) {
+            script.setAttribute(attr.name, attr.value);
+        }
+        
+        // Copy inline script content
+        if (node.src) {
+            // External script - MUST wait for it to load
+            scriptsToLoad++;
+            script.src = node.src;
+            
+            // *** CRITICAL: Wait for external script to load ***
+            script.onload = () => {
+                scriptsLoaded++;
+                checkCompletion();
+            };
+            script.onerror = (e) => {
+                console.error("[Anatomique] Failed to load CDN script:", node.src, e);
+                scriptsLoaded++; // Prevent hang on error
+                checkCompletion();
+            };
+        } else {
+            // Inline script - preserve content
+            script.textContent = node.textContent;
+        }
+        
+        // Append to head
+        head.appendChild(script);
     }
-    if (layoutBlocks.head) updateHead(layoutBlocks.head);
-    if (layoutBlocks.body) updateBody(layoutBlocks.body);
-    if (layoutBlocks.footer) appendFooter(layoutBlocks.footer);
 }
-layoutInit();`;
+
+
+        function updateBody(html) {
+            document.body.innerHTML = '';
+            const template = document.createElement('template');
+            template.innerHTML = html;
+            document.body.appendChild(template.content.cloneNode(true));
+        }
+        
+        function appendFooter(html) {
+            const tempContainer = document.createElement("div");
+            tempContainer.innerHTML = html;
+            
+            const nodes = Array.from(tempContainer.children); // Use a stable array to iterate
+
+            for (const node of nodes) {
+                // Handle script tags specially to ensure execution
+                if (node.tagName === 'SCRIPT') {
+                    const script = document.createElement('script');
+                    
+                    // Copy all attributes
+                    for (const attr of node.attributes) {
+                        script.setAttribute(attr.name, attr.value);
+                    }
+                    
+                    // Copy inline script content
+                    if (node.src) {
+                        // External script - MUST wait for it to load
+                        scriptsToLoad++;
+                        script.src = node.src;
+
+                        // *** CRITICAL: Wait for external script to load ***
+                        script.onload = () => {
+                            scriptsLoaded++;
+                            checkCompletion();
+                        };
+                        script.onerror = (e) => {
+                            console.error("[Anatomique] Failed to load CDN script:", node.src, e);
+                            scriptsLoaded++; // Prevent hang on error
+                            checkCompletion();
+                        };
+                    } else {
+                        script.textContent = node.textContent;
+                    }
+                    
+                    // Append to body
+                    document.body.appendChild(script);
+                }
+                // Handle link tags in footer 
+                else if (node.tagName === 'LINK') {
+                    const link = document.createElement('link');
+                    
+                    // Copy all attributes
+                    for (const attr of node.attributes) {
+                        link.setAttribute(attr.name, attr.value);
+                    }
+                    
+                    document.head.appendChild(link); // Links should go to head, even if found in footer HTML
+                }
+                else {
+                    // Regular elements can be appended normally
+                    document.body.appendChild(node);
+                }
+            }
+        }
+        
+        if (layoutBlocks.head) updateHead(layoutBlocks.head);
+        if (layoutBlocks.body) updateBody(layoutBlocks.body);
+        if (layoutBlocks.footer) appendFooter(layoutBlocks.footer);
+        
+        // If no scripts were found, resolve immediately
+        if (scriptsToLoad === 0) {
+            resolve();
+        }
+    });
+}`;
 }
 
 /**
@@ -230,70 +376,84 @@ layoutInit();`;
  */
 // In transformASTs.js
 
-// ... other helper functions ...
 
 /**
- * Generates the complete JavaScript bundle.
- * @param {Object} originalJsAST - The initial JavaScript AST.
- * @param {string} transpiledJSCode - The full component JS string from Anatomique.
- * @param {boolean} hasLayout - Whether a layout is present.
- * @param {string} layoutJS - JavaScript code for layout initialization.
- * @returns {Promise<string>} - The complete JS bundle string.
+ * Generates the final, executable JavaScript bundle, including runtime wrappers and global synchronization.
+ * * @param {Array} importsAST - AST nodes for import declarations.
+ * @param {string} transpiledJSCode - The JS code containing the exported renderComponent function.
+ * @param {boolean} hasLayout - Whether a layout (and thus layoutInit()) is present.
+ * @param {string} layoutJS - The raw JS code for the layout, containing definitions like layoutInit().
+ * @param {string} cssCode - The component's CSS code (used to generate an import).
+ * @param {string} fileName - The base name for the component file (used for CSS import).
  */
+async function generateFinalJsBundle(importsAST, jsAST, componentCodeString, hasLayout, layoutJS, cssCode, fileName) {
+    
 
-async function generateFinalJsBundle(importsAST, originalJsAST, transpiledJSCode, hasLayout, layoutJS, cssCode, fileName) {
-    // Hoist imports from the original JS AST
-
-    //console.log("originalJsAST",originalJsAST);
-    //const { importsAST } = hoistImports(originalJsAST);
-
-    ///console.log("cssCode",cssCode);
-
-
-
+    const transpiledJSCode = componentCodeString;
     let allImports = generateBaseImports();
 
-    if (cssCode !=='') {
+    //console.log("fileName 2",fileName);
 
+    if (cssCode !== '') {
         const cssImportNode = {
-          type: 'ImportDeclaration',
-          specifiers: [],
-          source: {
-            type: 'Literal',
-            value: `./${fileName}.css`,
-            raw: `'./${fileName}.css'`
-          }
+            type: 'ImportDeclaration',
+            specifiers: [],
+            source: {
+                type: 'Literal',
+                value: `./${fileName}.css`,
+                raw: `'./${fileName}.css'`
+            }
         };
+        importsAST.unshift(cssImportNode);
+    }
 
-        // Add the new AST node to the existing imports array
-        importsAST.unshift(cssImportNode); // Use unshift to add it to the beginning of the array
-   } 
-        if (importsAST.length > 0) {
-            allImports += escodegen.generate({
-                type: "Program",
-                body: importsAST,
-                sourceType: "module"
-            });
-        }
+    if (importsAST.length > 0) {
+        allImports += escodegen.generate({
+            type: "Program",
+            body: importsAST,
+            sourceType: "module"
+        });
+    }
 
-        //console.log("allImports",allImports);
+    const wrappedTranspiledCode = hasLayout ? `
+${transpiledJSCode}
 
+let layoutAndDomReady = false;
+async function initializeLayoutAndRender() {
+    if (layoutAndDomReady) return;
+    
+    console.log('[Anatomique] Awaiting layout/CDN initialization...');
+    try {
+        await layoutInit(); 
+    } catch (e) {
+        console.error('[Anatomique] Layout initialization failed:', e);
+    }
+    
+    console.log('[Anatomique] Layout ready. Rendering component to #app.');
+    
+    const cleanup = renderComponent(document.getElementById("app"));
 
-    // also get imports from originalJsAST if any and add them to allImports
+    layoutAndDomReady = true;
 
-    //console.log("JS AST",JSON.stringify(originalJsAST,null,2))
+    return cleanup;
+}
 
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeLayoutAndRender);
+} else {
+    initializeLayoutAndRender();
+}
+` : `
+${transpiledJSCode}
+renderComponent(document.getElementById("app"));
+`;
 
     const finalJsBundle = await formatCode(`
-    ${allImports}
-    ${hasLayout ? `
-    // Layout initialization script
-    ${layoutJS}
-    ` : ''}
+${allImports}
+${hasLayout ? layoutJS : ''}
 
-    // Transpiled code from Anatomique, including renderComponent and all page logic
-    ${transpiledJSCode}
-    `, 'babel');
+${wrappedTranspiledCode}
+`, 'babel');
 
     return finalJsBundle;
 }
@@ -357,7 +517,7 @@ async function writeOutputFiles(originalFilePath, jsCode, cssCode, fileName, app
     const { brand, pageTitle, metaDescription } = config.default;
 
 // removed: ${cssCode ? `<link rel="stylesheet" href="./${fileName}.css">` : ''}
-    const htmlContent = await formatCode(`
+   const htmlContent = await formatCode(`
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -370,14 +530,7 @@ async function writeOutputFiles(originalFilePath, jsCode, cssCode, fileName, app
 </head>
 <body>
     <div id="${appRootId}"></div>
-    <script type="module">
-        import { renderComponent } from './${fileName}.js';
-        document.addEventListener("DOMContentLoaded", () => {
-            
-            renderComponent();
-            
-        });
-    </script>
+    <script type="module" src="./${fileName}.js"></script>
 </body>
 </html>`, 'html');
 
