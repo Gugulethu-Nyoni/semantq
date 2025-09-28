@@ -1083,8 +1083,6 @@ async output() {
 
         const finalJsCode = `
 
-${generatedDerivedDeclarations}
-
 export function renderComponent(targetElement) {
     const appRoot = targetElement || document.getElementById("app");
     
@@ -1099,14 +1097,17 @@ export function renderComponent(targetElement) {
 
     // 1. User's State and Functions (original script content)
     ${this.mainPageOriginalJS}    
-    
-    // 2. Transpiled DOM Creation and Reactive Bindings
+
+    // 2. Derived vars
+    ${generatedDerivedDeclarations}
+
+    // 3. Transpiled DOM Creation and Reactive Bindings
     ${mainComponentJS}    
     
-    // 3. Mount Effects (triggers $effect/RAF cycle)
+    // 4. Mount Effects (triggers $effect/RAF cycle)
     ${onMountEffects}
 
-    // 4. Return Cleanup Function
+    // 5. Return Cleanup Function
     return () => {
         ${mainComponentCleanups}
         while (appRoot.firstChild) {
