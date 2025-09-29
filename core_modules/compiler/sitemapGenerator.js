@@ -90,16 +90,186 @@ const generateSitemap = async () => {
 
     xml += `</urlset>\n`;
 
-    // Save XML Sitemap
-    const publicDir = path.join(process.cwd(), 'public');
-    const xmlSitemapPath = path.join(publicDir, 'sitemap.xml');
-
-    if (!fs.existsSync(publicDir)) {
-      fs.mkdirSync(publicDir, { recursive: true });
+    // Create sitemap directory
+    const sitemapDir = path.join(process.cwd(), 'build/routes/sitemap');
+    if (!fs.existsSync(sitemapDir)) {
+      fs.mkdirSync(sitemapDir, { recursive: true });
     }
 
+    // Save XML Sitemap to the same location as HTML sitemap
+    const xmlSitemapPath = path.join(sitemapDir, 'sitemap.xml');
     fs.writeFileSync(xmlSitemapPath, xml, 'utf8');
     //console.log(`XML sitemap generated at ${xmlSitemapPath}`);
+
+    // --- Styled XML Sitemap Viewer Generation ---
+    let styledSitemapHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XML Sitemap - ${config.pageTitle}</title>
+  <style>
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      line-height: 1.6; 
+      padding: 40px; 
+      max-width: 1000px; 
+      margin: 0 auto; 
+      background: white;
+      color: #333;
+    }
+    h1 { 
+      color: #1a1a1a; 
+      border-bottom: 2px solid #007cba; 
+      padding-bottom: 15px;
+      margin-bottom: 30px;
+    }
+    .url-entry { 
+      background: #f8f9fa; 
+      margin: 15px 0; 
+      padding: 20px; 
+      border-radius: 8px;
+      border-left: 4px solid #007cba;
+    }
+    .url-loc { 
+      font-size: 1.2em; 
+      font-weight: 600; 
+      color: #007cba;
+      margin-bottom: 10px;
+    }
+    .url-meta { 
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .meta-item {
+      background: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    .priority-high { color: #d63638; font-weight: bold; }
+    .priority-normal { color: #00a32a; }
+    .nav-links { 
+      margin: 30px 0; 
+      display: flex; 
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .nav-button {
+      padding: 10px 20px;
+      background: #007cba;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    .nav-button:hover {
+      background: #005a87;
+    }
+    .nav-button.secondary {
+      background: #6c757d;
+    }
+    .nav-button.secondary:hover {
+      background: #545b62;
+    }
+    .info-text {
+      background: #e7f3ff;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      border-left: 4px solid #007cba;
+    }
+  </style>
+</head>
+<body>
+  <h1>XML Sitemap</h1>
+  
+  <div class="info-text">
+    <strong>About this sitemap:</strong> This is a user-friendly view of our XML sitemap. 
+    Search engines should use the <a href="/sitemap.xml">raw XML version</a> for optimal crawling.
+  </div>
+
+  <div class="nav-links">
+    <a href="/sitemap" class="nav-button">HTML Sitemap</a>
+    <a href="/sitemap.xml" class="nav-button secondary">Raw XML Version</a>
+    <a href="/" class="nav-button secondary">Back to Home</a>
+  </div>
+
+  <div class="sitemap-content">
+`;
+
+    // Generate styled URL entries
+    const urlEntries = [];
+    for (const [key, route] of Object.entries(allRoutes)) {
+      if (typeof route !== 'string') continue;
+
+      // Skip excluded routes
+      if (excludeRoutes.includes(key) || excludeRoutes.includes(route)) {
+        continue;
+      }
+
+      // Handle URL construction
+      let url;
+      try {
+        // For external URLs, skip if not matching our target host
+        if (route.startsWith('http')) {
+          const routeUrl = new URL(route);
+          if (routeUrl.origin !== targetHostOrigin) {
+            continue;
+          }
+          url = routeUrl.href;
+        } else {
+          // For internal routes
+          url = new URL(
+            route === '/' ? '' : route.replace(/^\/+/, '/'), 
+            targetHostOrigin
+          ).href;
+        }
+      } catch (e) {
+        continue;
+      }
+
+      // Skip if we've already processed this URL
+      if (processedUrls.has(url)) continue;
+      processedUrls.add(url);
+
+      // Determine priority (higher for priority routes)
+      const priority = priorityRoutes.includes(key) ? '1.0' : '0.8';
+      const priorityClass = priority === '1.0' ? 'priority-high' : 'priority-normal';
+
+      urlEntries.push(`
+    <div class="url-entry">
+      <div class="url-loc">
+        <a href="${url}" target="_blank">${url}</a>
+      </div>
+      <div class="url-meta">
+        <div class="meta-item"><strong>Last Modified:</strong> ${new Date().toISOString().split('T')[0]}</div>
+        <div class="meta-item"><strong>Change Frequency:</strong> Weekly</div>
+        <div class="meta-item"><strong>Priority:</strong> <span class="${priorityClass}">${priority}</span></div>
+      </div>
+    </div>
+      `);
+    }
+
+    styledSitemapHTML += urlEntries.join('');
+    styledSitemapHTML += `
+  </div>
+
+  <div class="nav-links">
+    <a href="/sitemap" class="nav-button">HTML Sitemap</a>
+    <a href="/sitemap.xml" class="nav-button secondary">Raw XML Version</a>
+    <a href="/" class="nav-button secondary">Back to Home</a>
+  </div>
+</body>
+</html>`;
+
+    // Save the styled sitemap page
+    const styledSitemapPath = path.join(sitemapDir, 'styled.html');
+    fs.writeFileSync(styledSitemapPath, styledSitemapHTML, 'utf8');
+    //console.log(`Styled XML sitemap generated at ${styledSitemapPath}`);
 
     // --- HTML Sitemap Generation ---
     let html = `<!DOCTYPE html>
@@ -116,10 +286,20 @@ const generateSitemap = async () => {
     a { color: #007BFF; text-decoration: none; font-size: 1.1em; }
     a:hover { text-decoration: underline; }
     .priority { background-color: #f0f8ff; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; color: #0066cc; }
+    .nav-links { margin: 20px 0; display: flex; gap: 10px; }
+    .nav-button { padding: 8px 16px; background: #007BFF; color: white; text-decoration: none; border-radius: 4px; }
+    .nav-button:hover { background: #0056b3; }
   </style>
 </head>
 <body>
   <h1>HTML Sitemap</h1>
+  
+  <div class="nav-links">
+    <a href="/sitemap/styled.html" class="nav-button">XML Sitemap View</a>
+    <a href="/sitemap.xml" class="nav-button">Raw XML</a>
+    <a href="/" class="nav-button">Home</a>
+  </div>
+
   <ul>
 `;
 
@@ -176,18 +356,19 @@ const generateSitemap = async () => {
     }
 
     html += `  </ul>
+  
+  <div class="nav-links">
+    <a href="/sitemap/styled.html" class="nav-button">XML Sitemap View</a>
+    <a href="/sitemap.xml" class="nav-button">Raw XML</a>
+    <a href="/" class="nav-button">Home</a>
+  </div>
+
   <script src="./sitemap.js" type="module"></script>
 </body>
 </html>`;
 
     // Save HTML Sitemap
-    const sitemapDir = path.join(process.cwd(), 'build/routes/sitemap');
     const htmlSitemapPath = path.join(sitemapDir, 'index.html');
-
-    if (!fs.existsSync(sitemapDir)) {
-      fs.mkdirSync(sitemapDir, { recursive: true });
-    }
-
     fs.writeFileSync(htmlSitemapPath, html, 'utf8');
     //console.log(`HTML sitemap generated at ${htmlSitemapPath}`);
 
