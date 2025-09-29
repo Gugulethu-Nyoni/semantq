@@ -266,10 +266,16 @@ const generateSitemap = async () => {
 </body>
 </html>`;
 
-    // Save the styled sitemap page
-    const styledSitemapPath = path.join(sitemapDir, 'styled.html');
-    fs.writeFileSync(styledSitemapPath, styledSitemapHTML, 'utf8');
-    //console.log(`Styled XML sitemap generated at ${styledSitemapPath}`);
+ 
+   // Create styled directory and save as index.html
+  const styledDir = path.join(sitemapDir, 'styled');
+  if (!fs.existsSync(styledDir)) {
+    fs.mkdirSync(styledDir, { recursive: true });
+  }
+
+const styledSitemapPath = path.join(styledDir, 'index.html');
+fs.writeFileSync(styledSitemapPath, styledSitemapHTML, 'utf8');
+//console.log(`Styled XML sitemap generated at ${styledSitemapPath}`);
 
     // --- HTML Sitemap Generation ---
     let html = `<!DOCTYPE html>
@@ -295,7 +301,7 @@ const generateSitemap = async () => {
   <h1>HTML Sitemap</h1>
   
   <div class="nav-links">
-    <a href="/sitemap/styled.html" class="nav-button">XML Sitemap View</a>
+    <a href="/sitemap/styled" class="nav-button">XML Sitemap View</a>
     <a href="/sitemap.xml" class="nav-button">Raw XML</a>
     <a href="/" class="nav-button">Home</a>
   </div>
@@ -358,12 +364,12 @@ const generateSitemap = async () => {
     html += `  </ul>
   
   <div class="nav-links">
-    <a href="/sitemap/styled.html" class="nav-button">XML Sitemap View</a>
+    <a href="/sitemap/styled" class="nav-button">XML Sitemap View</a>
     <a href="/sitemap.xml" class="nav-button">Raw XML</a>
     <a href="/" class="nav-button">Home</a>
   </div>
 
-  <script src="./sitemap.js" type="module"></script>
+  <!-- <script src="./sitemap.js" type="module"></script> -->
 </body>
 </html>`;
 
@@ -404,8 +410,8 @@ async function main() {
 main();
 `;
 
-    const sitemapJsPath = path.join(sitemapDir, 'sitemap.js');
-    fs.writeFileSync(sitemapJsPath, sitemapJsContent, 'utf8');
+   // const sitemapJsPath = path.join(sitemapDir, 'sitemap.js');
+   //  fs.writeFileSync(sitemapJsPath, sitemapJsContent, 'utf8');
     //console.log(`sitemap.js generated at ${sitemapJsPath}`);
 
   } catch (err) {

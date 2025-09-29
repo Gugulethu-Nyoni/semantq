@@ -1,5 +1,6 @@
-import fileBasedRoutes from '/build/routes/fileBasedRoutes.js';
+import fileBasedRoutes, { targetHost } from '/build/routes/fileBasedRoutes.js';
 import declaredRoutes from '/build/routes/routes.js';
+
 
 export default class Router {
   constructor(declaredRoutes, fileBasedRoutes) {
@@ -21,6 +22,8 @@ export default class Router {
   }
 */
 
+
+
 sanitizeHref(href) {
   try {
     const url = new URL(href, window.location.origin);
@@ -29,23 +32,41 @@ sanitizeHref(href) {
     const params = Object.fromEntries(url.searchParams.entries());
     this.tempParams = Object.keys(params).length > 0 ? params : null;
 
-    // Get the pathname and remove any trailing slashes
-    let sanitizedPath = url.pathname.replace(/\/+$/, '');
+    // Get the pathname
+    let sanitizedPath = url.pathname;
+    
+    console.log('sanitizeHref - original pathname:', sanitizedPath);
 
     // Remove /build/routes if present
     sanitizedPath = sanitizedPath.replace(/build\/routes/g, '');
 
-    // Ensure the path starts with a slash if it's not the root
-    if (sanitizedPath && sanitizedPath[0] !== '/') {
+    // Handle root path specifically
+    if (sanitizedPath === '/' || sanitizedPath === '') {
+      return '/';
+    }
+
+    // Remove trailing slashes only for non-root paths
+    sanitizedPath = sanitizedPath.replace(/\/+$/, '');
+
+    // Ensure the path starts with a slash
+    if (sanitizedPath[0] !== '/') {
       sanitizedPath = '/' + sanitizedPath;
     }
 
+    console.log('sanitizeHref - final sanitizedPath:', sanitizedPath);
     return sanitizedPath;
   } catch (e) {
     console.error("Error sanitizing href:", e);
     // Fallback logic
     const pathWithoutQuery = href.split('?')[0].split('#')[0];
-    return pathWithoutQuery.replace(/[\s<>'"\x00-\x1F\x7F]/g, '');
+    let cleanedPath = pathWithoutQuery.replace(/[\s<>'"\x00-\x1F\x7F]/g, '');
+    
+    // Handle root path in fallback
+    if (cleanedPath === '' || cleanedPath === '/') {
+      return '/';
+    }
+    
+    return cleanedPath;
   }
 }
 
@@ -58,6 +79,24 @@ sanitizeHref(href) {
       return false;
     }
   }
+
+
+  isFileWithExtension(href) {
+  try {
+    const url = new URL(href, window.location.origin);
+    
+    // Check if domain matches targetHost (now imported from fileBasedRoutes)
+    const targetHostUrl = new URL(targetHost);
+    const domainMatches = url.origin === targetHostUrl.origin;
+    
+    // Check if pathname ends with a file extension
+    const hasFileExtension = /\.[a-zA-Z0-9]+$/.test(url.pathname);
+    
+    return domainMatches && hasFileExtension;
+  } catch (e) {
+    return false;
+  }
+}
 
   isFileBasedRoute(targetRoute) {
     return this.fileBasedRoutes.hasOwnProperty(targetRoute);
@@ -198,10 +237,17 @@ interceptClicks() {
         return;
       }
 
+      // NEW CHECK: If it's a file with extension on our domain, let browser handle it
+      if (this.isFileWithExtension(href)) {
+        console.log("Route flow 0.5: isFileWithExtension", href);
+        console.log(`File with extension detected on our domain: ${href}. Letting the browser handle it.`);
+        return;
+      }
+
       event.preventDefault();
 
       const targetRoute = this.sanitizeHref(href);
-      console.log("Route flow 1: isNoTCanonicalRoute", targetRoute);
+      console.log("Route flow 1: isNotCanonicalRoute", targetRoute);
 
       // Skip if the route is already being processed
       if (this.isRouteBeingProcessed(targetRoute)) {
@@ -227,6 +273,8 @@ interceptClicks() {
   });
 }
 
+
+// class wrapper
 }
 
 

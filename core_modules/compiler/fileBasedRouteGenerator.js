@@ -15,8 +15,29 @@ export function generateFileBasedRoutes(basePath) {
     };
 
     try {
-        traverseDirectory(basePath, '', fileBasedRoutes);
+        // --- ADDED LOGIC HERE ---
+        // 1. Include routes from config.semantqNav.includeRoutes
+        const includeRoutes = config.semantqNav?.includeRoutes || {};
+        
+        for (const [key, value] of Object.entries(includeRoutes)) {
+            // Include routes from config.semantqNav.includeRoutes
+            // The key is the route path (e.g., '/settings'), and the value is the target (e.g., '/settings' or a full URL)
+            fileBasedRoutes[key] = value;
+        }
+
+        // 2. Set default routes from config
+        const rootTargetPath = config.targetHost;
+        fileBasedRoutes['/'] = rootTargetPath;
+        fileBasedRoutes['/home'] = rootTargetPath;
+        
+        // --- END ADDED LOGIC ---
+
+        // 3. Traverse directories
+        traverseDirectory(basePath, '', fileBasedRoutes, config); 
+        
+        // 4. Write to file
         writeRoutesToFile(basePath, fileBasedRoutes);
+
         console.log('File-based routes generated successfully.');
     } catch (err) {
         console.error('Error generating routes:', err);
@@ -26,13 +47,9 @@ export function generateFileBasedRoutes(basePath) {
 /**
  * Recursively traverses directories to build route map
  */
-function traverseDirectory(directoryPath, relativePath, fileBasedRoutes) {
-    // Use values from config
-    const rootTargetPath = config.targetHost;
-
-    // Set both '/' and '/home' to the same targetHost value
-    fileBasedRoutes['/'] = rootTargetPath;
-    fileBasedRoutes['/home'] = rootTargetPath;
+function traverseDirectory(directoryPath, relativePath, fileBasedRoutes, config) {
+    // Note: The setting of '/' and '/home' is moved to generateFileBasedRoutes
+    // to avoid re-setting them on every recursion.
 
     const files = fs.readdirSync(directoryPath);
     files.forEach(file => {
@@ -48,14 +65,17 @@ function traverseDirectory(directoryPath, relativePath, fileBasedRoutes) {
             // Create route value without leading slash
             const value = newRelativePath;
             
-            fileBasedRoutes[key] = key; //value;
+            fileBasedRoutes[key] = key; // The route value is often the same as the key for internal directory routes
 
             // Recurse into subdirectory
-            traverseDirectory(filePath, newRelativePath, fileBasedRoutes);
+            traverseDirectory(filePath, newRelativePath, fileBasedRoutes, config);
         }
     });
 }
 
+/**
+ * Writes the generated routes to fileBasedRoutes.js, sorted alphabetically
+ */
 /**
  * Writes the generated routes to fileBasedRoutes.js, sorted alphabetically
  */
@@ -70,7 +90,12 @@ function writeRoutesToFile(basePath, fileBasedRoutes) {
             return acc;
         }, {});
 
-    const fileContent = `const fileBasedRoutes = ${JSON.stringify(sortedRoutes, null, 2)};\n\nexport default fileBasedRoutes;`;
+    // NEW: Include targetHost in the exported file
+    const fileContent = `const fileBasedRoutes = ${JSON.stringify(sortedRoutes, null, 2)};
+const targetHost = ${JSON.stringify(config.targetHost)};
+
+export default fileBasedRoutes;
+export { targetHost };`;
 
     fs.writeFileSync(filePath, fileContent);
 }
