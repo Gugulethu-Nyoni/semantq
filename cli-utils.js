@@ -412,15 +412,44 @@ export function generateRoute(name, baseDir) {
   const routeTemplate = `
 import express from 'express';
 import ${nameCamel}Controller from '../controllers/${nameCamel}Controller.js';
+// Import authentication and authorization middleware
+import { validateApiKey } from '../middleware/validateApiKey.js';
+import { authenticateToken } from '@semantq/auth/lib/middleware/authMiddleware.js';
+import { authorize } from '@semantq/auth/lib/middleware/authorize.js';
 
 const router = express.Router();
 
-// 🟢 Public ${namePascal} Routes
-router.get('/${pluralNameCamel}', ${nameCamel}Controller.getAll${namePascal}s);
-router.get('/${pluralNameCamel}/:id', ${nameCamel}Controller.get${namePascal}ById);
-router.post('/${pluralNameCamel}', ${nameCamel}Controller.create${namePascal});
-router.put('/${pluralNameCamel}/:id', ${nameCamel}Controller.update${namePascal});
-router.delete('/${pluralNameCamel}/:id', ${nameCamel}Controller.delete${namePascal});
+// =========================================================================
+// 🔵 API_KEY - Service-to-service communication - DIRECT MIDDLEWARE
+// THIS MUST COME FIRST to ensure it is not blocked by /${pluralNameCamel}/:id
+// For example:
+// router.get('/${pluralNameCamel}/stats', validateApiKey, ${nameCamel}Controller.get${namePascal}Stats);
+// =========================================================================
+
+// 🟢 PUBLIC - No authentication
+// For example:
+// router.get('/${pluralNameCamel}/public/:id', ${nameCamel}Controller.getPublic${namePascal}ById);
+// router.get('/${pluralNameCamel}/latest', ${nameCamel}Controller.getLatest${namePascal}s);
+
+// 🟡 AUTHENTICATED - Logged-in users only
+router.get('/${pluralNameCamel}', authenticateToken, ${nameCamel}Controller.getAll${namePascal}s);
+router.get('/${pluralNameCamel}/:id', authenticateToken, ${nameCamel}Controller.get${namePascal}ById);
+router.post('/${pluralNameCamel}', authenticateToken, ${nameCamel}Controller.create${namePascal});
+router.put('/${pluralNameCamel}/:id', authenticateToken, ${nameCamel}Controller.update${namePascal});
+router.delete('/${pluralNameCamel}/:id', authenticateToken, ${nameCamel}Controller.delete${namePascal}); // 🆕 DELETE route added
+
+// 🟠 AUTHORIZED - Specific user roles
+// For example, this route requires an access level of 2
+// router.patch('/${pluralNameCamel}/:id', authenticateToken, authorize(2), ${nameCamel}Controller.patch${namePascal});
+// router.delete('/${pluralNameCamel}/:id/admin', authenticateToken, authorize(3), ${nameCamel}Controller.adminDelete${namePascal});
+
+// 🔴 FULLY_PROTECTED - API key + user authentication
+// For example:
+// router.post('/${pluralNameCamel}/bulk', validateApiKey, authenticateToken, ${nameCamel}Controller.bulkCreate${namePascal}s);
+
+// 🚨 FULLY_AUTHORIZED - API key + user authentication + specific role
+// For example:
+// router.post('/${pluralNameCamel}/system', validateApiKey, authenticateToken, authorize(3), ${nameCamel}Controller.systemCreate${namePascal});
 
 export default router;
 `;
@@ -449,6 +478,8 @@ export async function generateResource(name, baseDir, database) {
 
   console.log(`\n${SPARKLES_ICON} ${purpleBright(`Successfully generated ${namePascal} resource files!`)}\n`);
 }
+
+
 
 async function readServerConfig(projectRoot) {
   const configPath = path.join(projectRoot, 'semantq_server', 'semantq.config.js');
