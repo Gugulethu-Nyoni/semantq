@@ -735,14 +735,27 @@ program
 // function to read the config
 // Use dynamic import to support JS config files
 async function readServerConfig(projectRoot) {
-  const configPath = path.join(projectRoot, 'semantqQL', 'semantq.config.js');
+  // 1. Find server.config.js in projectRoot/semantqQL rather than in project root
+  const configPath = path.join(projectRoot, 'semantqQL', 'server.config.js');
+  
   try {
     // Dynamically import the config file
+    // Note: dynamic 'import()' requires a file URL (pathToFileURL) for local files
     const config = await import(pathToFileURL(configPath).href);
+    
     // Return the default export, or the entire module if no default
     return config.default || config;
   } catch (error) {
-    console.log(chalk.yellow(`⚠ Could not read semantq.config.js: ${error.message}`));
+    // Check if chalk is available before using it
+    const logMessage = `⚠ Could not read server.config.js at ${configPath}: ${error.message}`;
+    
+    if (global.chalk && global.chalk.yellow) {
+      console.log(global.chalk.yellow(logMessage));
+    } else {
+      // Fallback console log if chalk is not available or imported
+      console.log(logMessage); 
+    }
+    
     // Return a default configuration if the file cannot be read or imported
     return { database: { adapter: 'mysql' } };
   }
@@ -755,7 +768,9 @@ program
   .action(async (resourceName) => {
     const targetBaseDir = process.cwd();
     const serverDir = path.join(targetBaseDir, 'semantqQL');
-    const configPath = path.join(serverDir, 'semantq.config.js');
+    
+    // 💡 UPDATED: Use 'server.config.js' instead of 'semantq.config.js'
+    const configPath = path.join(serverDir, 'server.config.js'); 
 
     try {
       // Verify server directory exists
@@ -766,7 +781,9 @@ program
         return;
       }
 
-      // Load the configuration
+      // Load the configuration. 
+      // The readServerConfig function should handle finding 'server.config.js' 
+      // inside 'semantqQL', so we still pass 'targetBaseDir' (projectRoot)
       const serverConfig = await readServerConfig(targetBaseDir);
       
       // Get the database adapter - this is the key fix
@@ -783,7 +800,7 @@ ${purpleBright('» Next steps:')}
   ${databaseAdapter === 'mongo' ?
     `${purpleBright('›')} ${gray('Your MongoDB model is ready to use')}` :
     `${purpleBright('›')} ${gray('Add the model to your schema.prisma')}
-     ${purpleBright('›')} ${gray('Run:')} ${purple(`npx prisma migrate dev --name add_${resourceName.toLowerCase()}_model`)}`
+      ${purpleBright('›')} ${gray('Run:')} ${purple(`npx prisma migrate dev --name add_${resourceName.toLowerCase()}_model`)}`
   }
   ${purpleBright('›')} ${gray('Add the route to your main router if needed')}
   ${purpleBright('›')} ${gray('Restart your server to apply changes')}
@@ -796,7 +813,6 @@ ${purpleBright('» Next steps:')}
       process.exit(1);
     }
   });
-
 
 // ===============================
 // UPDATE COMMAND
