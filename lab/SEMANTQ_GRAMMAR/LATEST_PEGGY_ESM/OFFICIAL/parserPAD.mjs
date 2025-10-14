@@ -2090,20 +2090,17 @@ function peg$parse(input, options) {
   function peg$parseBasicHtmlAttribute() {
     let s0;
 
-    s0 = peg$parseLogicBlock();
+    s0 = peg$parseEventHandler();
     if (s0 === peg$FAILED) {
-      s0 = peg$parseEventHandler();
+      s0 = peg$parseTwoWayBindingAttribute();
       if (s0 === peg$FAILED) {
-        s0 = peg$parseTwoWayBindingAttribute();
+        s0 = peg$parseMustacheAttribute();
         if (s0 === peg$FAILED) {
-          s0 = peg$parseMustacheAttribute();
+          s0 = peg$parseKeyValueAttribute();
           if (s0 === peg$FAILED) {
-            s0 = peg$parseKeyValueAttribute();
+            s0 = peg$parseBooleanIdentifierAttribute();
             if (s0 === peg$FAILED) {
-              s0 = peg$parseBooleanIdentifierAttribute();
-              if (s0 === peg$FAILED) {
-                s0 = peg$parseBooleanAttribute();
-              }
+              s0 = peg$parseBooleanAttribute();
             }
           }
         }
@@ -5925,7 +5922,8 @@ function peg$parse(input, options) {
   }
 
 
-//
+
+/* GLOBAL GENERIC HELPERS */ 
   
   
  function createNode(type, start, end, additionalProps) {
@@ -6045,7 +6043,7 @@ function createMixedContentNode(parts) { // Removed start, end params as they ca
 
 
 
-
+/* START IF BLOCK HELPERS */
 
  
   function createBinaryExpression(left, operator, right) {
