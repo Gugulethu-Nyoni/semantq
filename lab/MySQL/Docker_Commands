@@ -21,3 +21,9 @@ Password is: my-secret-pw
 5. Stop MySQL container
 docker stop my-mysql
 
+
+DUMP
+
+docker exec my-mysql mysqldump -u root -pmy-secret-pw botaniq > botaniq.sql
+
+

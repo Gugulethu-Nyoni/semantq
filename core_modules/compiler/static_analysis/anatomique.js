@@ -21,7 +21,7 @@ function transformReactiveIdentifiersInExpression(node, isReactiveVariableFn) {
     }
 
     if (node.type === 'TemplateLiteral') {
-        console.log('Processing template literal:', escodegen.generate(node));
+        //console.log('Processing template literal:', escodegen.generate(node));
     }
 
     // Process the current node
