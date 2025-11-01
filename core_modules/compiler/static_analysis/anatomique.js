@@ -21,7 +21,7 @@ function transformReactiveIdentifiersInExpression(node, isReactiveVariableFn) {
     }
 
     if (node.type === 'TemplateLiteral') {
-        //console.log('Processing template literal:', escodegen.generate(node));
+       // console.log('Processing template literal:', escodegen.generate(node));
     }
 
     // Process the current node
@@ -509,42 +509,64 @@ preserveRawContent(children) {
     Attribute(attr, elementVarName, context = {}) {
   // console.log(`DEBUG: ${JSON.stringify(attr)} Attribute - Processing attribute type: ${attr.type} for element ${elementVarName}`);
   switch (attr.type) {
+    
     case "KeyValueAttribute": {
-      // Check for a boolean attribute based on the AST structure.
-      if (attr.value === null && attr.expression) {
-        const expressionCode = escodegen.generate(attr.expression);
-        this.transpiledJSContent.push(`
-          // Dynamic boolean attribute: ${attr.name}
-          (function() {
-            if (${expressionCode}) {
-              ${elementVarName}.setAttribute('${attr.name}', '');
-            } else {
-              ${elementVarName}.removeAttribute('${attr.name}');
-            }
-          })();
-        `);
-        return;
-      }
-      
-      // Standard KeyValueAttribute handling (for attributes with string values).
-      const attrValue = attr.value || [];
-      const values = attrValue.map(valNode => {
-        if (valNode.type === "Text") {
-          return `\`${valNode.raw}\``;
+  // Check for a boolean attribute based on the AST structure.
+  if (attr.value === null && attr.expression) {
+    const expressionCode = escodegen.generate(attr.expression);
+    this.transpiledJSContent.push(`
+      // Dynamic boolean attribute: ${attr.name}
+      (function() {
+        if (${expressionCode}) {
+          ${elementVarName}.setAttribute('${attr.name}', '');
+        } else {
+          ${elementVarName}.removeAttribute('${attr.name}');
         }
-        if (valNode.type === "MustacheTag") {
-          const expressionCode = escodegen.generate(valNode.expression);
-          return `(${expressionCode})`;
-        }
-        return '';
-      });
-
-      const valueCode = values.join(' + ');
-      this.transpiledJSContent.push(`${elementVarName}.setAttribute('${attr.name}', ${valueCode});`);
-      break;
+      })();
+    `);
+    return;
+  }
+  
+  // Handle attribute values that contain logic blocks (if/else statements)
+  if (Array.isArray(attr.value) && attr.value.some(val => val.type === "IfStatement")) {
+    // For logic blocks in attributes, create a derived variable and use bindAttr
+    const attrValueCode = this.generateAttributeValueCode(attr.value, context);
+    const derivedAttrValue = this.getOrCreateDerived(attrValueCode, context);
+    
+    this.transpiledJSContent.push(
+      `bindAttr(${elementVarName}, "${attr.name}", ${derivedAttrValue});`
+    );
+    return;
+  }
+  
+  // Standard KeyValueAttribute handling (for attributes with simple string values)
+  const attrValue = attr.value || [];
+  const values = attrValue.map(valNode => {
+    if (valNode.type === "TextNode") {
+      return `\`${valNode.raw}\``;
     }
+    if (valNode.type === "MustacheTag") {
+      const expressionCode = escodegen.generate(valNode.expression);
+      return `(${expressionCode})`;
+    }
+    return '';
+  });
 
-    case "TwoWayBindingAttribute": {
+  const valueCode = values.join(' + ');
+  
+  // Handle empty class attributes (the specific bug you're encountering)
+  if (valueCode.trim() === '') {
+    this.transpiledJSContent.push(`${elementVarName}.setAttribute('${attr.name}', '');`);
+  } else {
+    this.transpiledJSContent.push(`${elementVarName}.setAttribute('${attr.name}', ${valueCode});`);
+  }
+  break;
+}
+
+
+
+
+case "TwoWayBindingAttribute": {
  const bindVarName = attr.expression?.name;
  if (!bindVarName) {
   console.error(`ERROR: Two-way binding: Missing variable name for ${attr.name} on element ${elementVarName}.`);
@@ -795,6 +817,48 @@ case "MustacheAttribute": {
                 this.transpiledJSContent.push(`// Unknown attribute type: ${attr.type}`);
         }
     }
+
+
+// Helper method to generate code for attribute values containing logic blocks
+generateAttributeValueCode(valueNodes, context = {}) {
+  if (!Array.isArray(valueNodes) || valueNodes.length === 0) {
+    return '""';
+  }
+
+  // If it's a single IfStatement, handle it directly
+  if (valueNodes.length === 1 && valueNodes[0].type === "IfStatement") {
+    return this.generateIfStatementCode(valueNodes[0], context);
+  }
+
+  // For mixed content (text + logic), concatenate all parts
+  const parts = valueNodes.map(node => {
+    switch (node.type) {
+      case "TextNode":
+        return `\`${node.raw}\``;
+      case "MustacheTag":
+        const expressionCode = escodegen.generate(node.expression);
+        return `(${expressionCode})`;
+      case "IfStatement":
+        return this.generateIfStatementCode(node, context);
+      default:
+        console.warn(`Unsupported node type in attribute value: ${node.type}`);
+        return '""';
+    }
+  });
+
+  return parts.join(' + ');
+}
+
+// Helper to generate code for IfStatement in attribute values
+generateIfStatementCode(ifNode, context = {}) {
+  const conditionCode = escodegen.generate(ifNode.test);
+  const consequentCode = this.generateAttributeValueCode(ifNode.consequent?.body || [], context);
+  const alternateCode = ifNode.alternate 
+    ? this.generateAttributeValueCode(ifNode.alternate?.body || [], context)
+    : '""';
+
+  return `(${conditionCode} ? ${consequentCode} : ${alternateCode})`;
+}
 
     TextNode(node, parentVar) {
         const varName = `text_node_${this.getUniqueId()}`;
