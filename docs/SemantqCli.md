@@ -1,8 +1,8 @@
 # Semantq CLI Commands Guide
 
-Welcome to the Semantq CLI Commands Guide! This document provides an overview of the available commands for the Semantq CLI tool, which helps you streamline your project setup and development process.
+Welcome to the Semantq CLI Commands Guide! This document provides a comprehensive overview of all available commands for the Semantq CLI tool.
 
-## Quick Summary of Available Commands (Overview)
+## Quick Summary of Available Commands
 
 ### Project Commands
 1. `semantq create <projectName>` - Generate new project structure
@@ -12,88 +12,207 @@ Welcome to the Semantq CLI Commands Guide! This document provides an overview of
 ### Resource Generation
 3. `semantq make:resource <name>` - Generate full resource (model+service+controller+route)
    - `-a, --adapter` - Specify database adapter (mongo/supabase)
-4. `semantq make:model <name>` - Generate model only
+   - `-p, --pylon` - Add Pylon feature guarding
+4. `semantq remove:resource <name>` - Remove backend resource
+   - `-y, --yes` - Skip confirmation prompt
+5. `semantq make:model <name>` - Generate model only
    - `-a, --adapter` - Specify database adapter
-5. `semantq make:service <name>` - Generate service only
+6. `semantq make:service <name>` - Generate service only
    - `-a, --adapter` - Specify database adapter
-6. `semantq make:controller <name>` - Generate controller only
-7. `semantq make:apiRoute <name>` - Generate route only
-
-### Installation Commands
-8. `semantq install:server` - Set up server directory
-9. `semantq install:supabase` - Configure Supabase
-10. `semantq install:tailwind` - Install Tailwind CSS
+7. `semantq make:controller <name>` - Generate controller only
+8. `semantq make:apiRoute <name>` - Generate route only
 
 ### Route System
-11. `semantq make:route <routeName>` - Create new route with templates
+9. `semantq make:route <routeName>` - Create new route with templates
    - `-l, --layout` - Include layout file @layout.smq
-   - `-c, --config` - Include config file config.js
+   - `-c, --crud` - Add CRUD operations template
+   - `-a, --auth` - Add authentication imports
    - `-s, --server` - Include server handlers server.js
-   - `-a, --all` - Create all resources (@page.smq,@layout.smq,config.js,server.js)
+   - `-A, --all` - Create all resources (@page.smq,@layout.smq,config.js,server.js)
+   - `--ac` - Shortcut for both auth and CRUD
+   - `-tw, --tailwind` - Add Tailwind CSS support
+10. `semantq remove:route <path>` - Remove route directory and contents
+    - `-y, --yes` - Skip confirmation prompt
 
-<!--
-### AI Commands
-12. `semantq ai <prompt>` - Generate code using AI
-   - `-r, --route` - Specify target route directory (required)
-   - `--full` - Wrap in Semantq tags
-   - `--js`/`--css`/`--html` - Generate specific code type
-   - `--append` - Append to existing file
--->
+### Component System
+11. `semantq make:component <name>` - Create reusable components
+    - `-p, --pylon` - Add Pylon feature guarding
+12. `semantq remove:component <name>` - Remove component files
+    - `-y, --yes` - Skip confirmation prompt
 
-#### Utility
-13. `semantq -v, --version` - Show version number
+### Installation Commands
+13. `semantq install:server` - Set up server directory
+14. `semantq install:supabase` - Configure Supabase
+15. `semantq install:tailwind` - Install Tailwind CSS
 
-The CLI handles everything from project scaffolding to AI-assisted development.
+### Utility
+16. `semantq -v, --version` - Show version number
 
+## Comprehensive Command Reference
 
-## Semantq CLI Commands (Comprehensive)
-
-The Semantq CLI provides a set of commands to quickly scaffold and configure your projects. Below is a list of available commands and their descriptions.
-
-### Available Commands
-
-| Command                     | Description                                                                 |
-|-----------------------------|-----------------------------------------------------------------------------|
-| `semantq create myapp`      | Creates a new project with required folders and files. Run this where you want to install the new project. |
-| `semantq install:tailwind`  | Installs Tailwind CSS and configures it. Run this inside the project root.  |
-| `semantq make:route myroute`| Creates a new route folder with `@page.smq`, `@layout.smq`, and `+server.js`. Run this inside the project root. |
-
-## Usage Examples
-
-### Creating a New Project
-
-To create a new project named `myapp`, run the following command in your desired directory:
-
+### Project Creation
 ```bash
 semantq create myapp
 ```
+Creates a new project with required folders and files. Run this where you want to install the new project.
 
-This will generate a new project with the required folder structure.
+### Resource Generation with Pylon Support
+Generate full backend resources with built-in Pylon feature guarding:
 
-### Tailwind CSS Installation
+```bash
+# Generate resource with Pylon feature guarding
+semantq make:resource Task --pylon
+semantq make:resource User -p
 
+# Standard resource (without Pylon)
+semantq make:resource Product
 
-With Semantq, you only need to run one command to install Tailwind CSS. Semantq will automatically install all required dependencies and set up the necessary configurations. However, if you prefer, you can manually install Tailwind CSS by following the guide below.
+# Specify database adapter
+semantq make:resource Product -a mongo
+semantq make:resource User --adapter supabase
+```
 
+**Pylon Resource Features:**
+- Automatic Pylon feature guarding on all protected routes
+- Pylon usage logging in service layer
+- Enhanced controller methods with user context
+- Support for all database adapters (MySQL, MongoDB, SQLite, Supabase)
 
-## One-Command Approach
+### Resource Removal
+Safely remove backend resources with confirmation:
+```bash
+# With confirmation prompt
+semantq remove:resource Task
 
-To install and configure Tailwind CSS, simply run the following command in your Semantq project:
+# Skip confirmation (force remove)
+semantq remove:resource Task --yes
+```
+
+**Safety Features:**
+- Shows all files that will be removed
+- Confirmation prompt by default
+- Clear next steps after removal
+
+### Advanced Route Management
+Create routes with nested directory structures:
+
+```bash
+# Simple route
+semantq make:route contact
+
+# Nested routes
+semantq make:route contact/asia
+semantq make:route contact/asia/east
+semantq make:route admin/users/list
+
+# Route with options
+semantq make:route projects --crud --auth
+semantq make:route admin --all --tailwind
+semantq make:route api/users --server --layout
+```
+
+**Route Options:**
+- `-l, --layout` - Include layout file
+- `-c, --crud` - Add CRUD operations template
+- `-a, --auth` - Add authentication imports
+- `-s, --server` - Include server handlers
+- `-A, --all` - Create all resources at once
+- `--ac` - Shortcut for both auth and CRUD
+- `-tw, --tailwind` - Add Tailwind CSS support
+
+### Route Removal
+Remove route directories and all nested contents:
+```bash
+# Remove with confirmation
+semantq remove:route contact/asia/east
+
+# Force remove without confirmation
+semantq remove:route admin/users --yes
+```
+
+### Component System
+Create reusable components with optional Pylon feature guarding:
+
+```bash
+# Standard components
+semantq make:component Project
+semantq make:component AddUser
+semantq make:component forms/ContactForm
+semantq make:component ui/Button
+
+# Pylon-enabled components (with feature guarding)
+semantq make:component Project --pylon
+semantq make:component UserManager -p
+semantq make:component admin/Dashboard --pylon
+```
+
+**Component Features:**
+- Support for nested paths (`folder/ComponentName`)
+- Automatic PascalCase conversion
+- Pylon components include feature permission checking and CRUD operation templates
+
+### Component Removal
+Safely remove component files:
+```bash
+# Remove with confirmation
+semantq remove:component Project
+semantq remove:component forms/ContactForm
+
+# Force remove
+semantq remove:component admin/UserManager --yes
+```
+
+## Usage Examples
+
+### Full-Stack Pylon Application
+```bash
+# Create Pylon-protected backend
+semantq make:resource Project --pylon
+semantq make:resource Task --pylon
+
+# Create Pylon-enabled frontend components
+semantq make:component ProjectList --pylon
+semantq make:component TaskManager --pylon
+
+# Create routes with auth and CRUD
+semantq make:route projects --ac --tailwind
+semantq make:route tasks --ac --tailwind
+```
+
+### Standard Application
+```bash
+# Standard backend resources
+semantq make:resource Product
+semantq make:resource Category
+
+# Standard components
+semantq make:component ProductCard
+semantq make:component CategoryList
+
+# Basic routes
+semantq make:route shop
+semantq make:route about
+```
+
+## Tailwind CSS Installation
+
+With Semantq, you only need to run one command to install Tailwind CSS:
 
 ```bash
 semantq install:tailwind
 ```
 
-This single command handles everything for you, from installing dependencies to configuring files. No manual setup is required.
+This single command handles everything for you:
+- Installs Tailwind CSS v3, PostCSS, and Autoprefixer
+- Generates and configures `tailwind.config.js` and `postcss.config.js`
+- Updates content paths for Semantq project structure
+- Adds Tailwind directives to `global.css`
 
+### Testing Your Tailwind Installation
 
-At this point you are done installing Tailwind CSS. 
+To verify that Tailwind CSS is working correctly:
 
-## Testing Your Tailwind Installation
-
-To verify that Tailwind CSS is working correctly, follow these steps:
-
-1. Add some HTML elements with Tailwind classes to your page or component. For example:
+1. Add HTML elements with Tailwind classes to your page:
    ```html
    <div class="p-6 bg-blue-500 text-white rounded-lg">
      <h1 class="text-2xl font-bold">Tailwind CSS is Working!</h1>
@@ -106,179 +225,71 @@ To verify that Tailwind CSS is working correctly, follow these steps:
    npm run dev
    ```
 
-3. Open your browser and navigate to your application. You should see the styled elements on the page.
+3. Open your browser and verify the styled elements appear correctly.
 
-4. **Inspect the Page Source**:
-   - Open your browser’s developer tools (right-click → Inspect).
-   - Navigate to the "Sources" tab and look for the `global.css` file.
-   - Verify that Tailwind’s utility classes are being applied.
+## Migration Notes
 
+### For Existing Projects
+If you have existing resources that need Pylon features:
 
-## What Happens During the One-Command Approach Installation ?
+1. Remove old resources:
+   ```bash
+   semantq remove:resource Task
+   ```
 
-When you run `semantq install:tailwind`, the following steps are executed automatically:
+2. Regenerate with Pylon:
+   ```bash
+   semantq make:resource Task --pylon
+   ```
 
-### 1. **Install Tailwind CSS and Dependencies**
-   - Tailwind CSS v3, PostCSS, and Autoprefixer are installed as development dependencies using npm.
-   - Command executed:
-     ```bash
-     npm install -D tailwindcss@3 postcss autoprefixer
-     ```
+3. Update Prisma schema and run migrations:
+   ```bash
+   npx prisma migrate dev --name add_task_model
+   ```
 
-### 2. **Initialize Tailwind CSS**
-   - A `tailwind.config.js` file and a `postcss.config.js` file are generated.
-   - Command executed:
-     ```bash
-     npx tailwindcss init -p
-     ```
+### Pylon Component Requirements
+Pylon components require:
+- User context from parent components
+- Configured Pylon feature flags
+- Authentication system setup
 
-### 3. **Configure Tailwind’s Content Paths**
-   - The `tailwind.config.js` file is updated to include the necessary content paths for your Semantq project.
-   - Example configuration:
-     ```javascript
-     export default {
-       content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx,html,smq}"],
-       theme: {
-         extend: {},
-       },
-       plugins: [],
-     };
-     ```
+## Next Steps After Generation
 
-### 4. **Create or Update `vite.config.js`**
-   - The `vite.config.js` file is created or updated to include PostCSS configuration for Tailwind CSS.
-   - Example configuration:
-     ```javascript
-import Inspect from 'vite-plugin-inspect';
-import { sync } from 'glob';
-import { resolve } from 'path';
-import fse from 'fs-extra';
+### For Pylon Resources:
+1. Configure feature flags in Pylon dashboard
+2. Add routes to main router
+3. Run database migrations
+4. Restart server
 
-export default {
-  plugins: [Inspect()],
-  build: {
-    rollupOptions: {
-      input: {
-        // Specify index.html as the entry point to be bundled
-        index: resolve(__dirname, 'index.html'),
-        // Add all HTML files from the build directory
-        ...Object.fromEntries(
-          sync('./build/**/*.html'.replace(/\\/g, '/')).map((file) => [
-            // Remove the `build/` prefix from the file path
-            file.replace(/^\.\/build\//, '').replace(/\.html$/, ''),
-            resolve(__dirname, file),
-          ])
-        ),
-      },
-    },
-    outDir: 'dist', // Set the output directory to the root of dist
-    emptyOutDir: true, // Clear the dist directory before building
-    assetsDir: 'assets', // Place assets in a dedicated 'assets' directory inside dist
-  },
-  async closeBundle() {
-  const buildDir = resolve(__dirname, 'build');
-  const distDir = resolve(__dirname, 'dist');
+### For Components:
+1. Import in routes: `import Component from './components/Component.smq'`
+2. Ensure parent components provide required context
+3. Restart dev server if needed
 
-  // Copy all files from build to dist root, excluding the build directory itself
-  await fse.copy(buildDir, distDir, {
-    overwrite: true,
-    recursive: true,
-    filter: (src) => !src.endsWith(buildDir), // Exclude the build directory itself
-  });
+### For Routes:
+1. Update `routes.js` with new route declarations
+2. Configure authentication if using `--auth`
+3. Implement CRUD operations if using `--crud`
 
-  console.log('Build files copied to dist root.');
-},
-};
-```
+## Command Summary Table
 
-### 5. **Add Tailwind Directives to `global.css`**
-   - Tailwind CSS directives (`@tailwind base`, `@tailwind components`, `@tailwind utilities`) are added to the `global.css` file.
-   - If `global.css` doesn’t exist, it is created with the Tailwind directives.
-   - Example content:
-     ```css
-     @tailwind base;
-     @tailwind components;
-     @tailwind utilities;
-     ```
-
----
-
-## Manual Installation (Optional)
-
-If you prefer to install Tailwind CSS manually, follow these steps:
-
-### 1. Install Tailwind CSS and Dependencies
-Run the following command to install Tailwind CSS, PostCSS, and Autoprefixer:
-```bash
-npm install -D tailwindcss@3 postcss autoprefixer
-```
-
-### 2. Initialize Tailwind CSS
-Generate the `tailwind.config.js` and `postcss.config.js` files:
-```bash
-npx tailwindcss init -p
-```
-
-### 3. Configure Tailwind’s Content Paths
-Open the `tailwind.config.js` file and update the `content` array to include your project’s file paths:
-```javascript
-export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx,html,smq}"],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};
-```
-
-### 4. Add Tailwind Directives to Your CSS File
-Create or update your `global.css` file (or any other CSS file) and add the following Tailwind directives:
-```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-```
-
----
-
-## Benefits of the One-Command Approach
-
-- **Saves Time**: No need to manually install dependencies or configure files.
-- **Eliminates Errors**: Automated setup reduces the risk of misconfiguration.
-- **Consistency**: Ensures Tailwind CSS is set up correctly for every Semantq project.
-
----
-
-## Post-Installation
-
-Once the installation is complete, you can start using Tailwind CSS classes in your Semantq project. Simply run your development server, and Tailwind will be ready to go!
-
-```bash
-npm run dev
-```
-
----
-
-## Troubleshooting
-
-If you encounter any issues during installation, check the following:
-1. Ensure you have Node.js and npm installed.
-2. Verify that your project is a valid Semantq JS Framework application.
-3. Check the console for any error messages and refer to the Tailwind CSS documentation if needed.
-
-
-### Creating a New Route
-
-To create a new route named `myroute`, navigate to the project root and run:
-
-```bash
-semantq make:route myroute
-```
-
-This will generate a new route folder with the following files:
-- `@page.smq`
-- `@layout.smq`
-- `server.js`
+| Command | Description | Options |
+|---------|-------------|---------|
+| `create <projectName>` | Create new project | |
+| `make:resource <name>` | Create backend resource | `-a, --adapter`, `-p, --pylon` |
+| `remove:resource <name>` | Remove backend resource | `-y, --yes` |
+| `make:model <name>` | Generate model only | `-a, --adapter` |
+| `make:service <name>` | Generate service only | `-a, --adapter` |
+| `make:controller <name>` | Generate controller only | |
+| `make:apiRoute <name>` | Generate route only | |
+| `make:route <path>` | Create route | `-l, -c, -a, -s, -A, --ac, -tw` |
+| `remove:route <path>` | Remove route | `-y, --yes` |
+| `make:component <name>` | Create component | `-p, --pylon` |
+| `remove:component <name>` | Remove component | `-y, --yes` |
+| `install:server` | Set up server directory | |
+| `install:supabase` | Configure Supabase | |
+| `install:tailwind` | Install Tailwind CSS | |
+| `-v, --version` | Show version number | |
 
 ## Contributing
 
@@ -286,9 +297,6 @@ If you have any suggestions or improvements for the Semantq CLI, feel free to op
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+This project is licensed under the MIT License.
 
----
-
-Thank you for using Semantq! Happy coding! 🚀
-```
+Thank you for using Semantq! Happy coding!
