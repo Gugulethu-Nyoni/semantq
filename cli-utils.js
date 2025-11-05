@@ -276,12 +276,90 @@ export default class ${namePascal}Model {
   return true;
 }
 
-// Generate Service function
-export function generateService(name, database, baseDir) {
-  const namePascal = toPascalCase(name); // For class name and model import
-  const nameCamel = toCamelCase(name); // For service instance variable name and file name
 
-  const serviceTemplate = `
+// Generate Service function
+export function generateService(name, database, baseDir, pylon = false) {
+  const namePascal = toPascalCase(name);
+  const nameCamel = toCamelCase(name);
+
+  // CHOOSE TEMPLATE BASED ON PYLON OPTION
+  const serviceTemplate = pylon ? 
+    generatePylonServiceTemplate(namePascal, nameCamel, database) : // ← PASS database parameter
+    generateStandardServiceTemplate(namePascal, nameCamel, database);
+
+  const serviceDir = path.join(baseDir, 'services');
+  ensureDirectoryExists(serviceDir);
+  const filePath = path.join(serviceDir, `${nameCamel}Service.js`);
+  writeFileIfNotExists(filePath, serviceTemplate);
+  console.log(`${SUCCESS_ICON} ${green(`Generated ${namePascal} service`)} ${pylon ? purple('(Pylon-enabled)') : ''}`);
+  return true;
+}
+
+// NEW: Pylon Service Template
+// NEW: Pylon Service Template - ADD database parameter
+function generatePylonServiceTemplate(namePascal, nameCamel, database) { // ← ADD database parameter
+  return `
+import ${namePascal}Model from '../models/${database}/${namePascal}.js';
+import pylonService from '../node_modules/@semantq/pylon/services/pylonService.js';
+
+class ${namePascal}Service {
+  
+  async create(req) {
+    const data = req.body;          
+    const userData = req.userData;
+
+    try {
+      const res = await ${namePascal}Model.create(data);
+      console.log("${namePascal} Creation Response:", res);
+
+      if (!res || !res.id) {
+        console.error("${namePascal} creation failed — no ID returned from DB.");
+        throw new Error("${namePascal} creation failed — invalid database response.");
+      }
+      
+      if (userData && userData.organizationId) {
+        console.log("1. inside metering");
+        const usageLog = await pylonService.logUsage(userData);
+        console.log("usageLog", usageLog);
+      }
+      
+      return res;
+    } catch (err) {
+      console.error("${namePascal} creation error:", {
+        message: err.message,
+        code: err.code,
+        meta: err.meta,
+      });
+      throw new Error(\`${namePascal} creation failed: \${err.message}\`);
+    }
+  }
+
+  async getById(id) {
+    return await ${namePascal}Model.findById(id);
+  }
+
+  async getAll() {
+    return await ${namePascal}Model.findAll();
+  }
+
+  async update(id, data) {
+    return await ${namePascal}Model.update(id, data);
+  }
+
+  async delete(id) {
+    return await ${namePascal}Model.delete(id);
+  }
+}
+
+export default new ${namePascal}Service();
+`;
+}
+
+
+
+// EXISTING: Standard Service Template (keep as is)
+function generateStandardServiceTemplate(namePascal, nameCamel, database) {
+  return `
 import ${namePascal}Model from '../models/${database}/${namePascal}.js';
 
 class ${namePascal}Service {
@@ -308,21 +386,109 @@ class ${namePascal}Service {
 
 export default new ${namePascal}Service();
 `;
-
-  const serviceDir = path.join(baseDir, 'services');
-  ensureDirectoryExists(serviceDir);
-  const filePath = path.join(serviceDir, `${nameCamel}Service.js`); // File name in camelCase
-  writeFileIfNotExists(filePath, serviceTemplate);
-  console.log(`${SUCCESS_ICON} ${green(`Generated ${namePascal} service`)}`);
-  return true;
 }
 
-// Generate Controller function
-export function generateController(name, baseDir) {
+
+
+// Generate Controller function - ADD pylon parameter
+export function generateController(name, baseDir, pylon = false) { // ← ADD pylon parameter
   const namePascal = toPascalCase(name); // For class name and method names
   const nameCamel = toCamelCase(name); // For service import name, service variable, and file name
 
-  const controllerTemplate = `
+  // CHOOSE TEMPLATE BASED ON PYLON OPTION
+  const controllerTemplate = pylon ? 
+    generatePylonControllerTemplate(namePascal, nameCamel) :
+    generateStandardControllerTemplate(namePascal, nameCamel);
+
+  const controllerDir = path.join(baseDir, 'controllers');
+  ensureDirectoryExists(controllerDir);
+  const filePath = path.join(controllerDir, `${nameCamel}Controller.js`);
+  writeFileIfNotExists(filePath, controllerTemplate);
+  console.log(`${SUCCESS_ICON} ${green(`Generated ${namePascal} controller`)} ${pylon ? purple('(Pylon-enabled)') : ''}`);
+  return true;
+}
+
+// NEW: Pylon Controller Template
+function generatePylonControllerTemplate(namePascal, nameCamel) {
+  return `
+import ${nameCamel}Service from '../services/${nameCamel}Service.js';
+
+class ${namePascal}Controller {
+  async create${namePascal}(req, res) {
+    try {
+      //console.log("User Data in Controller?", req.userData);
+      const result = await ${nameCamel}Service.create(req);
+      console.log("result", result);
+      res.status(201).json(result);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  }
+
+  async get${namePascal}ById(req, res) {
+    try {
+      const result = await ${nameCamel}Service.getById(req.params.id);
+      res.json(result);
+    } catch (err) {
+      res.status(404).json({ error: err.message });
+    }
+  }
+
+  async getAll${namePascal}s(req, res) {
+    try {
+      const result = await ${nameCamel}Service.getAll();
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  async update${namePascal}(req, res) {
+    try {
+      // Parse ID from string to integer (for sqlite/mysql; mongo uses string IDs)
+      const resourceId = parseInt(req.params.id, 10);
+
+      // Validate parsed ID
+      if (isNaN(resourceId)) {
+        return res.status(400).json({ error: 'Invalid ${namePascal} ID provided. Must be a number.' });
+      }
+
+      const result = await ${nameCamel}Service.update(resourceId, req.body);
+      res.json(result);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  }
+
+  async delete${namePascal}(req, res) {
+    try {
+      // Parse ID from string to integer (for sqlite/mysql; mongo uses string IDs)
+      const resourceId = parseInt(req.params.id, 10);
+
+      // Validate parsed ID
+      if (isNaN(resourceId)) {
+        return res.status(400).json({ error: 'Invalid ${namePascal} ID provided. Must be a number.' });
+      }
+
+      await ${nameCamel}Service.delete(resourceId);
+      res.status(204).send();
+    } catch (err) {
+      if (err.message.includes("Record to delete does not exist")) {
+        res.status(404).json({ error: "${namePascal} not found." });
+      } else {
+        res.status(400).json({ error: err.message });
+      }
+    }
+  }
+}
+
+export default new ${namePascal}Controller();
+`;
+}
+
+// EXISTING: Standard Controller Template (keep as is)
+function generateStandardControllerTemplate(namePascal, nameCamel) {
+  return `
 import ${nameCamel}Service from '../services/${nameCamel}Service.js';
 
 class ${namePascal}Controller {
@@ -394,22 +560,31 @@ class ${namePascal}Controller {
 
 export default new ${namePascal}Controller();
 `;
+}
 
-  const controllerDir = path.join(baseDir, 'controllers');
-  ensureDirectoryExists(controllerDir);
-  const filePath = path.join(controllerDir, `${nameCamel}Controller.js`); // File name in camelCase
-  writeFileIfNotExists(filePath, controllerTemplate);
-  console.log(`${SUCCESS_ICON} ${green(`Generated ${namePascal} controller`)}`);
+
+// Generate Route function
+export function generateRoute(name, baseDir, pylon = false) {
+  const namePascal = toPascalCase(name);
+  const nameCamel = toCamelCase(name);
+  const pluralNameCamel = pluralize(nameCamel);
+
+  // CHOOSE TEMPLATE BASED ON PYLON OPTION
+  const routeTemplate = pylon ? 
+    generatePylonRouteTemplate(namePascal, nameCamel, pluralNameCamel) :
+    generateStandardRouteTemplate(namePascal, nameCamel, pluralNameCamel);
+
+  const routeDir = path.join(baseDir, 'routes');
+  ensureDirectoryExists(routeDir);
+  const filePath = path.join(routeDir, `${nameCamel}Routes.js`);
+  writeFileIfNotExists(filePath, routeTemplate);
+  console.log(`${SUCCESS_ICON} ${green(`Generated ${namePascal} routes`)} ${pylon ? purple('(Pylon-enabled)') : ''}`);
   return true;
 }
 
-// Generate Route function
-export function generateRoute(name, baseDir) {
-  const namePascal = toPascalCase(name); // For comments and controller method calls
-  const nameCamel = toCamelCase(name); // For controller import name, route path, and file name
-  const pluralNameCamel = pluralize(nameCamel); // Pluralize the camelCase name for routes (e.g., driverLocations)
-
-  const routeTemplate = `
+// Standard Route Template (non-Pylon)
+function generateStandardRouteTemplate(namePascal, nameCamel, pluralNameCamel) {
+  return `
 import express from 'express';
 import ${nameCamel}Controller from '../controllers/${nameCamel}Controller.js';
 // Import authentication and authorization middleware
@@ -436,7 +611,7 @@ router.get('/${pluralNameCamel}', authenticateToken, ${nameCamel}Controller.getA
 router.get('/${pluralNameCamel}/:id', authenticateToken, ${nameCamel}Controller.get${namePascal}ById);
 router.post('/${pluralNameCamel}', authenticateToken, ${nameCamel}Controller.create${namePascal});
 router.put('/${pluralNameCamel}/:id', authenticateToken, ${nameCamel}Controller.update${namePascal});
-router.delete('/${pluralNameCamel}/:id', authenticateToken, ${nameCamel}Controller.delete${namePascal}); // 🆕 DELETE route added
+router.delete('/${pluralNameCamel}/:id', authenticateToken, ${nameCamel}Controller.delete${namePascal});
 
 // 🟠 AUTHORIZED - Specific user roles
 // For example, this route requires an access level of 2
@@ -453,32 +628,158 @@ router.delete('/${pluralNameCamel}/:id', authenticateToken, ${nameCamel}Controll
 
 export default router;
 `;
-
-  const routeDir = path.join(baseDir, 'routes');
-  ensureDirectoryExists(routeDir);
-  const filePath = path.join(routeDir, `${nameCamel}Routes.js`); // File name in camelCase, e.g., driverLocationRoutes.js
-  writeFileIfNotExists(filePath, routeTemplate);
-  console.log(`${SUCCESS_ICON} ${green(`Generated ${namePascal} resources`)}`);
-  return true;
 }
 
+// Pylon Route Template (with feature guarding)
+function generatePylonRouteTemplate(namePascal, nameCamel, pluralNameCamel) {
+  return `
+import express from 'express';
+import ${nameCamel}Controller from '../controllers/${nameCamel}Controller.js';
+// Import authentication and authorization middleware
+import { validateApiKey } from '../middleware/validateApiKey.js';
+import { authenticateToken } from '@semantq/auth/lib/middleware/authMiddleware.js';
+import { authorize } from '@semantq/auth/lib/middleware/authorize.js';
+import pylonService from '../node_modules/@semantq/pylon/services/pylonService.js';
+const dataModel = '${namePascal}';
+
+const router = express.Router();
+
+// =========================================================================
+// 🔵 API_KEY - Service-to-service communication - DIRECT MIDDLEWARE
+// THIS MUST COME FIRST to ensure it is not blocked by /${pluralNameCamel}/:id
+// For example:
+// router.get(
+//   '/${pluralNameCamel}/stats', 
+//   validateApiKey,
+//   pylonService.featureGuard(dataModel, 'read'),
+//   ${nameCamel}Controller.get${namePascal}Stats
+// );
+// =========================================================================
+
+// 🟢 PUBLIC - No authentication (No Pylon feature guarding)
+// For example:
+// router.get('/${pluralNameCamel}/public/:id', ${nameCamel}Controller.getPublic${namePascal}ById);
+// router.get('/${pluralNameCamel}/latest', ${nameCamel}Controller.getLatest${namePascal}s);
+
+// 🟡 AUTHENTICATED - Logged-in users only
+router.get(
+  '/${pluralNameCamel}',
+  authenticateToken,
+  pylonService.featureGuard(dataModel, 'read'),
+  ${nameCamel}Controller.getAll${namePascal}s
+);
+
+router.get(
+  '/${pluralNameCamel}/:id',
+  authenticateToken,
+  ${nameCamel}Controller.get${namePascal}ById
+);
+
+router.post(
+  '/${pluralNameCamel}',
+  authenticateToken,
+  pylonService.featureGuard(dataModel, 'create'),
+  ${nameCamel}Controller.create${namePascal}
+);
+
+router.put(
+  '/${pluralNameCamel}/:id',
+  authenticateToken,
+  pylonService.featureGuard(dataModel, 'update'),
+  ${nameCamel}Controller.update${namePascal}
+);
+
+router.delete(
+  '/${pluralNameCamel}/:id',
+  authenticateToken,
+  pylonService.featureGuard(dataModel, 'delete'),
+  ${nameCamel}Controller.delete${namePascal}
+);
+
+// 🟠 AUTHORIZED - Specific user roles
+// For example, this route requires an access level of 2
+// router.patch(
+//   '/${pluralNameCamel}/:id',
+//   authenticateToken,
+//   authorize(2),
+//   pylonService.featureGuard(dataModel, 'update'),
+//   ${nameCamel}Controller.patch${namePascal}
+// );
+//
+// router.delete(
+//   '/${pluralNameCamel}/:id/admin',
+//   authenticateToken,
+//   authorize(3),
+//   pylonService.featureGuard(dataModel, 'delete'),
+//   ${nameCamel}Controller.adminDelete${namePascal}
+// );
+
+// 🔴 FULLY_PROTECTED - API key + user authentication
+// For example:
+// router.post(
+//   '/${pluralNameCamel}/bulk',
+//   validateApiKey,
+//   authenticateToken,
+//   pylonService.featureGuard(dataModel, 'create'),
+//   ${nameCamel}Controller.bulkCreate${namePascal}s
+// );
+//
+// router.get(
+//   '/${pluralNameCamel}/system/stats',
+//   validateApiKey,
+//   authenticateToken,
+//   pylonService.featureGuard(dataModel, 'read'),
+//   ${nameCamel}Controller.getSystem${namePascal}Stats
+// );
+
+// 🚨 FULLY_AUTHORIZED - API key + user authentication + specific role
+// For example:
+// router.post(
+//   '/${pluralNameCamel}/system',
+//   validateApiKey,
+//   authenticateToken,
+//   authorize(3),
+//   pylonService.featureGuard(dataModel, 'create'),
+//   ${nameCamel}Controller.systemCreate${namePascal}
+// );
+//
+// router.delete(
+//   '/${pluralNameCamel}/system/:id',
+//   validateApiKey,
+//   authenticateToken,
+//   authorize(3),
+//   pylonService.featureGuard(dataModel, 'delete'),
+//   ${nameCamel}Controller.systemDelete${namePascal}
+// );
+
+export default router;
+`;
+}
+
+
+
 // Main generateResource function
-export async function generateResource(name, baseDir, database) {
-  const namePascal = toPascalCase(name); // Ensure consistent PascalCase for display
-  console.log(`\n${ROCKET_ICON} ${purpleBright(`Generating ${namePascal} resource files for:`)} ${blue(database)}\n`);
+// Main generateResource function - ADD pylon parameter
+export async function generateResource(name, baseDir, database, pylon = false) {
+  const namePascal = toPascalCase(name);
+  console.log(`\n${ROCKET_ICON} ${purpleBright(`Generating ${namePascal} resource files for:`)} ${blue(database)}`);
+  if (pylon) {
+    console.log(`${purpleBright('🛡️')} ${blue('With Pylon feature guarding')}`);
+  }
+  console.log(); // Empty line for spacing
 
   if (!(await generateModel(name, database, baseDir))) {
     console.error(`${ERROR_ICON} ${errorRed('Resource generation aborted due to unsupported database type.')}`);
     return;
   }
 
-  await generateService(name, database, baseDir);
-  await generateController(name, baseDir);
-  await generateRoute(name, baseDir);
+  // CORRECTED: Use the pylon parameter, don't hardcode to false
+  await generateService(name, database, baseDir, pylon); 
+  await generateController(name, baseDir, pylon);
+  await generateRoute(name, baseDir, pylon);
 
   console.log(`\n${SPARKLES_ICON} ${purpleBright(`Successfully generated ${namePascal} resource files!`)}\n`);
 }
-
 
 
 async function readServerConfig(projectRoot) {

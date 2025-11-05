@@ -18,6 +18,32 @@ import os from 'os'; // <--- Add this line
 // Load environment variables from .env file
 dotenv.config();
 
+
+// Icons
+// Color palette
+const purple = chalk.hex('#b56ef0');
+const purpleBright = chalk.hex('#d8a1ff');
+const blue = chalk.hex('#6ec7ff');
+const green = chalk.hex('#6ef0b5');
+const yellow = chalk.hex('#f0e66e');
+const errorRed = chalk.hex('#ff4d4d');
+const gray = chalk.hex('#aaaaaa');
+const cyan = chalk.hex('#6ef0e6');
+
+
+
+
+// Icons
+const SUCCESS_ICON = green('✓');
+const WARNING_ICON = yellow('⚠');
+const ERROR_ICON = errorRed('✗');
+const INFO_ICON = blue('ℹ');
+const FOLDER_ICON = purple('📁');
+const FILE_ICON = cyan('📄');
+const ROCKET_ICON = purpleBright('🚀');
+const SPARKLES_ICON = purple('✨');
+
+
 // Import utility functions (ensure these are available in ./cli-utils.js)
 // Assuming these are for resource generation, not directly used in the fullstack setup chain
 import { generateResource, generateModel, generateService, generateController, generateRoute } from './cli-utils.js';
@@ -55,14 +81,6 @@ const copyIfExists = async (source, destination) => {
   }
 };
 
-
-// Color palette (already defined in your CLI, ensuring consistency)
-const purple = chalk.hex('#b56ef0');
-const purpleBright = chalk.hex('#d8a1ff');
-const blue = chalk.hex('#6ec7ff');
-const errorRed = chalk.hex('#ff4d4d');
-const gray = chalk.hex('#aaaaaa');
-const yellow = chalk.hex('#ffff00'); 
 
 
 
@@ -427,7 +445,7 @@ export default {
   });
 
 // ===========================================
-// MAKE:ROUTE COMMAND - FULL RESOURCES
+// MAKE:ROUTE COMMAND
 // ===========================================
 program
   .command('make:route <routeName>')
@@ -601,6 +619,443 @@ ${blue('Troubleshooting:')}
     }
   });
 
+
+// ===============================
+// REMOVE:ROUTE COMMAND
+// ===============================
+program
+  .command('remove:route <routeName>')
+  .description('Remove a route directory and all its contents with confirmation')
+  .option('-y, --yes', 'Skip confirmation prompt')
+  .action(async (routeName, options) => {
+    const targetBaseDir = process.cwd();
+    const routePath = resolvePath(targetBaseDir, 'src/routes', routeName);
+    
+    try {
+      // Check if route directory exists
+      if (!fs.existsSync(routePath)) {
+        console.log(`${INFO_ICON} ${blue('Route')} ${purple(routeName)} ${blue('does not exist.')}`);
+        return;
+      }
+
+      // Get all files that will be removed
+      let filesToRemove = [];
+      function collectFiles(dir) {
+        const items = fs.readdirSync(dir);
+        items.forEach(item => {
+          const fullPath = path.join(dir, item);
+          if (fs.statSync(fullPath).isDirectory()) {
+            collectFiles(fullPath);
+          } else {
+            filesToRemove.push(fullPath);
+          }
+        });
+      }
+      
+      if (fs.existsSync(routePath)) {
+        collectFiles(routePath);
+      }
+
+      // Show what will be removed
+      console.log(`\n${WARNING_ICON} ${yellow('The following route will be removed:')}`);
+      console.log(`${errorRed('  ✖')} ${gray(routePath)}`);
+      
+      if (filesToRemove.length > 0) {
+        console.log(`\n${yellow('Including files:')}`);
+        filesToRemove.forEach(file => {
+          console.log(`${errorRed('    ✖')} ${gray(file)}`);
+        });
+      }
+
+      // Confirmation (unless --yes flag is used)
+      let confirmed = options.yes;
+      if (!confirmed) {
+        const { proceed } = await inquirer.prompt([{
+          type: 'confirm',
+          name: 'proceed',
+          message: `${errorRed(`This will permanently delete the ${routeName} route and all its contents. Proceed?`)}`,
+          default: false
+        }]);
+        confirmed = proceed;
+      }
+
+      if (!confirmed) {
+        console.log(`${INFO_ICON} ${blue('Operation cancelled.')}`);
+        return;
+      }
+
+      // Remove route directory and all contents
+      const spinner = ora(blue(`Removing route ${routeName}...`)).start();
+      
+      try {
+        fs.removeSync(routePath);
+        spinner.succeed(`${blue(`Removed route`)} ${purple(routeName)} ${blue(`and ${filesToRemove.length} files`)}`);
+
+        console.log(`\n${purpleBright('» Next steps:')}`);
+        console.log(`${purpleBright('›')} ${gray('Update your routes.js file to remove any references to this route')}`);
+        console.log(`${purpleBright('›')} ${gray('Restart your development server')}`);
+
+      } catch (error) {
+        spinner.fail(`${errorRed('Failed to remove route:')} ${error.message}`);
+      }
+
+    } catch (error) {
+      console.error(`${errorRed('✖')} ${blue('Error removing route:')} ${errorRed(error.message)}`);
+    }
+  });
+
+
+
+
+// ===========================================
+// MAKE:COMPONENT COMMAND
+// ===========================================
+program
+  .command('make:component <componentName>')
+  .description('Create a new component (standard or Pylon-enabled)')
+  .option('-p, --pylon', 'Create Pylon-enabled component with feature guarding')
+  .action(async (componentName, options) => {
+    try {
+      // Parse component path (handle nested paths like core/Project)
+      let componentPath;
+      const baseName = path.basename(componentName);
+      const dirName = path.dirname(componentName);
+      const componentPascal = toPascalCase(baseName);
+      const fileName = `${componentPascal}.smq`;
+
+      if (options.pylon) {
+        // Pylon components go to components/pylon/ subdirectory
+        // Handle nested paths like admin/User -> components/pylon/admin/User.smq
+        const pylonDir = dirName === '.' ? 'pylon' : path.join('pylon', dirName);
+        componentPath = resolvePath(process.cwd(), 'src/components', pylonDir, `${baseName}.smq`);
+      } else {
+        // Standard components go to regular components directory
+        componentPath = resolvePath(process.cwd(), 'src/components', `${componentName}.smq`);
+      }
+
+      const componentDir = path.dirname(componentPath);
+      
+      // Check if component already exists
+      if (fs.existsSync(componentPath)) {
+        console.log(`${ERROR_ICON} ${errorRed('Component already exists!')}`);
+        return;
+      }
+
+      // Create directory structure (only if it doesn't exist)
+      const dirSpinner = ora(purple('Creating component structure...')).start();
+      if (!fs.existsSync(componentDir)) {
+        fs.mkdirSync(componentDir, { recursive: true });
+        dirSpinner.succeed(purpleBright('Component directory created'));
+      } else {
+        dirSpinner.succeed(purpleBright('Component directory already exists'));
+      }
+
+      // Choose template based on Pylon option
+      let componentTemplate;
+      
+      if (options.pylon) {
+        // Pylon Component Template
+        componentTemplate = `@script
+const effectiveSettings = new Set(user.userSettings);
+let loadingStatus = $state(true);
+const dataModel = "${componentPascal}";
+const perms = Object.fromEntries(
+  ["create", "read", "update", "delete"].map(a => [
+    a,
+    effectiveSettings.has(\`\${dataModel.toLowerCase()}_\${a}\`)
+  ])
+);
+
+const { create, read, update, delete: deletem } = perms;
+
+// Initialize on component mount
+$onMount(async () => {
+  try {
+    // Run your DOM related await API calls here 
+    // Example: fetch users from the database
+    // and update an initialized object if needed
+    // e.g. let users; // then users = ...;
+  } catch (err) {
+    console.error("Unexpected error:", err);
+  } finally {
+    loadingStatus.value = false;
+  }
+});
+
+function can(action) {
+  const allowed = perms[action] === true;
+  console.log(\`can("\${action}") -> \${allowed}\`);
+  return allowed;
+}
+
+function canAny(actions) {
+  return actions.some(can);
+}
+
+function canAll(actions) {
+  return actions.every(can);
+}
+
+
+async function create${componentPascal}() {
+  const payload = {
+  name: \`IDP_\${Math.floor(Math.random() * 10000)}\`, // random number 0-9999
+  description: 'Integrated Development Plan',
+};
+
+  try {
+    const response = await api.post('/${componentPascal.toLowerCase()}/${componentPascal.toLowerCase()}s', payload);
+    if (response?._ok) {
+      Notification.show({
+        type: 'success',
+        message: \`\${dataModel} created successfully\`,
+        duration: 6000,
+      });
+    } else {
+      Notification.show({
+        type: 'error',
+        message: \`Failed to create \${dataModel}: \${response.message}\`,
+        duration: 6000,
+      });
+    }
+
+  } catch (error) {
+    console.error('Error creating ${componentPascal.toLowerCase()}:', error);
+    Notification.show({
+      type: 'error',
+      message: \`An unexpected error occurred while creating \${dataModel}\`,
+      duration: 4000,
+    });
+  }
+}
+
+@end
+
+@style
+/* PUT YOUR CSS HERE */
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #b56ef0;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@end
+
+@html
+
+@if(loadingStatus)
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading...</p>
+  </div>
+@else
+
+<!-- START MAIN CONTENT --> 
+
+@if(can("create"))
+<div class="smq-accordion smq-accordion-elevated">
+    <div class="smq-accordion-item">
+        <input type="checkbox" id="accordion-2" class="smq-accordion-toggle" />
+        <label for="accordion-2" class="smq-accordion-header">
+            Create Model Records (e.g. add a ${componentPascal}) 
+        </label>
+        <div class="smq-accordion-content">
+            <div id="" class="sqm-acc-content">
+                Record Creation Form Comes here <br/>
+                 Use Formique ((at)formique/semantq) (recommended)
+                 <a class="btn btn-primary" @click={create${componentPascal}}> 
+                     Create ${componentPascal} 
+                 </a>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+@if(can("read"))
+<div class="smq-accordion smq-accordion-elevated">
+    <div class="smq-accordion-item">
+        <input type="checkbox" id="accordion-1" class="smq-accordion-toggle" />
+        <label for="accordion-1" class="smq-accordion-header">
+            View Model Records (e.g. ${componentPascal}) 
+        </label>
+        <div class="smq-accordion-content">
+            <div id="" class="sqm-acc-content">
+                Records come here <br/>
+                 if you use AnyGrid you will have record editing and deleting enabled on the single UI
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+<!-- END MAIN CONTENT -->
+
+@endif
+`;
+      } else {
+        // Standard Component Template
+        componentTemplate = `@script
+// ${componentPascal} component JavaScript code here
+@end
+
+@style
+/* ${componentPascal} component CSS here */
+@end
+
+@html
+
+<h1>${componentPascal} Component</h1>
+
+`;
+      }
+
+      // Create component file
+      const fileSpinner = ora(purple(`Creating ${fileName}`)).start();
+      fs.writeFileSync(componentPath, componentTemplate.trim());
+      fileSpinner.succeed(`${purpleBright('✓')} ${purple(fileName)} ${blue('created')}`);
+
+      // Enhanced success message
+      const relativePath = path.relative(process.cwd(), componentPath);
+      console.log(`
+${purple.bold('» Component created successfully!')}
+
+${purpleBright.bold('Component created:')}
+${purpleBright('•')} ${purple(fileName)} ${options.pylon ? purple('(Pylon-enabled)') : gray('(Standard)')}
+${purpleBright('•')} ${gray('Location:')} ${purple(relativePath)}
+
+${blue.italic('Next steps:')}
+  ${purpleBright('›')} Import and use in your routes: ${purple(`import ${componentPascal} from '$components/${options.pylon ? 'pylon/' : ''}${componentName}';`)}
+  ${options.pylon ? `${purpleBright('›')} ${gray('Finalise your code base for for')} ${purple(componentPascal)}` : ''}
+  ${options.pylon ? `${purpleBright('›')} ${gray('Ensure user context is available in parent component')}` : ''}
+  ${purpleBright('›')} ${gray('Re-run the build to see the component in action')}
+`);
+
+    } catch (error) {
+      console.log(`
+${errorRed('✖ Error:')} ${error.message}
+
+${blue('Troubleshooting:')}
+  ${purpleBright('›')} Check directory permissions
+  ${purpleBright('›')} Verify disk space
+  ${purpleBright('›')} Ensure component name follows PascalCase convention
+`);
+      process.exit(1);
+    }
+  });
+
+// ===============================
+// REMOVE:COMPONENT COMMAND
+// ===============================
+program
+  .command('remove:component <componentName>')
+  .description('Remove a component file with confirmation')
+  .option('-p, --pylon', 'Remove Pylon component from pylon subdirectory')
+  .option('-y, --yes', 'Skip confirmation prompt')
+  .action(async (componentName, options) => {
+    const targetBaseDir = process.cwd();
+    
+    try {
+      // Determine component path based on Pylon option
+      let componentPath;
+      const baseName = path.basename(componentName);
+      const dirName = path.dirname(componentName);
+      
+      if (options.pylon) {
+        // Pylon components are in components/pylon/ subdirectory
+        const pylonDir = dirName === '.' ? 'pylon' : path.join('pylon', dirName);
+        componentPath = resolvePath(targetBaseDir, 'src/components', pylonDir, `${baseName}.smq`);
+      } else {
+        // Standard components are in regular components directory
+        componentPath = resolvePath(targetBaseDir, 'src/components', `${componentName}.smq`);
+      }
+
+      // Check if component file exists
+      if (!fs.existsSync(componentPath)) {
+        console.log(`${INFO_ICON} ${blue('Component')} ${purple(componentName)} ${blue('does not exist.')}`);
+        
+        // Suggest alternative location if not found
+        let alternativePath;
+        if (options.pylon) {
+          // Check if it exists in standard location
+          alternativePath = resolvePath(targetBaseDir, 'src/components', `${componentName}.smq`);
+        } else {
+          // Check if it exists in pylon location
+          const pylonDir = dirName === '.' ? 'pylon' : path.join('pylon', dirName);
+          alternativePath = resolvePath(targetBaseDir, 'src/components', pylonDir, `${baseName}.smq`);
+        }
+        
+        if (fs.existsSync(alternativePath)) {
+          const location = options.pylon ? 'standard components directory' : 'pylon subdirectory';
+          console.log(`${INFO_ICON} ${blue('Found component in')} ${purple(location)} ${blue('- try with')} ${options.pylon ? '' : '--pylon '}${blue('flag')}`);
+        }
+        return;
+      }
+
+      // Show what will be removed
+      const relativePath = path.relative(process.cwd(), componentPath);
+      console.log(`\n${WARNING_ICON} ${yellow('The following component will be removed:')}`);
+      console.log(`${errorRed('  ✖')} ${gray(relativePath)}`);
+
+      // Confirmation (unless --yes flag is used)
+      let confirmed = options.yes;
+      if (!confirmed) {
+        const { proceed } = await inquirer.prompt([{
+          type: 'confirm',
+          name: 'proceed',
+          message: `${errorRed(`This will permanently delete the ${componentName} component. Proceed?`)}`,
+          default: false
+        }]);
+        confirmed = proceed;
+      }
+
+      if (!confirmed) {
+        console.log(`${INFO_ICON} ${blue('Operation cancelled.')}`);
+        return;
+      }
+
+      // Remove component file
+      const spinner = ora(blue(`Removing component ${componentName}...`)).start();
+      
+      try {
+        fs.unlinkSync(componentPath);
+        spinner.succeed(`${blue(`Removed component`)} ${purple(componentName)} ${options.pylon ? purple('(Pylon)') : ''}`);
+
+        console.log(`\n${purpleBright('» Next steps:')}`);
+        console.log(`${purpleBright('›')} ${gray('Remove any imports of this component from your routes')}`);
+        console.log(`${purpleBright('›')} ${gray('Restart your development server')}`);
+
+      } catch (error) {
+        spinner.fail(`${errorRed('Failed to remove component:')} ${error.message}`);
+      }
+
+    } catch (error) {
+      console.error(`${errorRed('✖')} ${blue('Error removing component:')} ${errorRed(error.message)}`);
+    }
+  });
+
+
+
+
+
+
 // ===============================
 // SEMANTQ INSTALL SERVER (Standalone command)
 // ===============================
@@ -726,14 +1181,9 @@ program
 
 
 
-
-
 // ===============================
-// MAKE:RESOURCE COMMAND (MCSR - Model, Controller, Service, Route)
+// ADD THIS FUNCTION TO CLI.JS
 // ===============================
-
-// function to read the config
-// Use dynamic import to support JS config files
 async function readServerConfig(projectRoot) {
   // 1. Find server.config.js in projectRoot/semantqQL rather than in project root
   const configPath = path.join(projectRoot, 'semantqQL', 'server.config.js');
@@ -746,32 +1196,25 @@ async function readServerConfig(projectRoot) {
     // Return the default export, or the entire module if no default
     return config.default || config;
   } catch (error) {
-    // Check if chalk is available before using it
-    const logMessage = `⚠ Could not read server.config.js at ${configPath}: ${error.message}`;
-    
-    if (global.chalk && global.chalk.yellow) {
-      console.log(global.chalk.yellow(logMessage));
-    } else {
-      // Fallback console log if chalk is not available or imported
-      console.log(logMessage); 
-    }
+    console.log(chalk.yellow(`⚠Could not read server.config.js at ${configPath}: ${error.message}`));
     
     // Return a default configuration if the file cannot be read or imported
     return { database: { adapter: 'mysql' } };
   }
 }
 
+// ===============================
+// MAKE:RESOURCE COMMAND (MCSR - Model, Controller, Service, Route)
+// ===============================
 
 program
   .command('make:resource <resourceName>')
   .description('Generate full backend resource (Model, Controller, Service, Route)')
-  .action(async (resourceName) => {
+  .option('-p, --pylon', 'Generate Pylon-enabled resources with feature guarding')
+  .action(async (resourceName, options) => {
     const targetBaseDir = process.cwd();
     const serverDir = path.join(targetBaseDir, 'semantqQL');
     
-    // 💡 UPDATED: Use 'server.config.js' instead of 'semantq.config.js'
-    const configPath = path.join(serverDir, 'server.config.js'); 
-
     try {
       // Verify server directory exists
       if (!fs.existsSync(serverDir)) {
@@ -781,18 +1224,19 @@ program
         return;
       }
 
-      // Load the configuration. 
-      // The readServerConfig function should handle finding 'server.config.js' 
-      // inside 'semantqQL', so we still pass 'targetBaseDir' (projectRoot)
+      // Load the configuration using the function we just added above
       const serverConfig = await readServerConfig(targetBaseDir);
       
-      // Get the database adapter - this is the key fix
+      // Get the database adapter
       const databaseAdapter = serverConfig.database?.adapter || 'mysql';
 
       console.log(`${purpleBright('🚀')} ${blue('Generating')} ${purple(resourceName)} ${blue('resource for')} ${purple(databaseAdapter)}`);
+      if (options.pylon) {
+        console.log(`${purpleBright('🛡️')} ${blue('With Pylon feature guarding')}`);
+      }
 
-      // Generate all resource files
-      await generateResource(resourceName, serverDir, databaseAdapter);
+      // Call the main generateResource function with pylon option
+      await generateResource(resourceName, serverDir, databaseAdapter, options.pylon);
 
       console.log(`${purpleBright('✨')} ${blue('Resource generation complete!')}`);
       console.log(`
@@ -802,6 +1246,7 @@ ${purpleBright('» Next steps:')}
     `${purpleBright('›')} ${gray('Add the model to your schema.prisma')}
       ${purpleBright('›')} ${gray('Run:')} ${purple(`npx prisma migrate dev --name add_${resourceName.toLowerCase()}_model`)}`
   }
+  ${options.pylon ? `${purpleBright('›')} ${gray('Configure Pylon feature flags for')} ${purple(resourceName)}` : ''}
   ${purpleBright('›')} ${gray('Add the route to your main router if needed')}
   ${purpleBright('›')} ${gray('Restart your server to apply changes')}
 `);
@@ -813,6 +1258,114 @@ ${purpleBright('» Next steps:')}
       process.exit(1);
     }
   });
+
+
+
+
+
+/* REMOVE RESOURCE HELPERS */
+
+  // Add these utility functions to cli.js
+function toCamelCase(name) {
+  return name.charAt(0).toLowerCase() + name.slice(1);
+}
+
+function toPascalCase(name) {
+  return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
+// ===============================
+// REMOVE:RESOURCE COMMAND
+// ===============================
+// ===============================
+// REMOVE:RESOURCE COMMAND
+// ===============================
+program
+  .command('remove:resource <resourceName>')
+  .description('Remove all resource assets (Model, Controller, Service, Route) with confirmation')
+  .option('-y, --yes', 'Skip confirmation prompt')
+  .action(async (resourceName, options) => {
+    const targetBaseDir = process.cwd();
+    const serverDir = path.join(targetBaseDir, 'semantqQL');
+    
+    try {
+      // Verify server directory exists
+      if (!fs.existsSync(serverDir)) {
+        console.error(errorRed('✖ semantqQL directory not found.'));
+        return;
+      }
+
+      const namePascal = toPascalCase(resourceName);
+      const nameCamel = toCamelCase(resourceName);
+      
+      // Define files to remove
+      const filesToRemove = [
+        path.join(serverDir, 'models', 'mysql', `${namePascal}.js`),
+        path.join(serverDir, 'models', 'mongo', `${namePascal}.js`),
+        path.join(serverDir, 'models', 'sqlite', `${namePascal}.js`),
+        path.join(serverDir, 'models', 'supabase', `${namePascal}.js`),
+        path.join(serverDir, 'services', `${nameCamel}Service.js`),
+        path.join(serverDir, 'controllers', `${nameCamel}Controller.js`),
+        path.join(serverDir, 'routes', `${nameCamel}Routes.js`)
+      ];
+
+      // Filter to only existing files
+      const existingFiles = filesToRemove.filter(file => fs.existsSync(file));
+
+      if (existingFiles.length === 0) {
+        console.log(`${INFO_ICON} ${blue('No resource files found for')} ${purple(resourceName)}`);
+        return;
+      }
+
+      // Show what will be removed
+      console.log(`\n${WARNING_ICON} ${yellow('The following files will be removed:')}`);
+      existingFiles.forEach(file => {
+        console.log(`${errorRed('  ✖')} ${gray(file)}`);
+      });
+
+      // Confirmation (unless --yes flag is used)
+      let confirmed = options.yes;
+      if (!confirmed) {
+        const { proceed } = await inquirer.prompt([{
+          type: 'confirm',
+          name: 'proceed',
+          message: `${errorRed('This action cannot be undone. Proceed?')}`,
+          default: false
+        }]);
+        confirmed = proceed;
+      }
+
+      if (!confirmed) {
+        console.log(`${INFO_ICON} ${blue('Operation cancelled.')}`);
+        return;
+      }
+
+      // Remove files
+      const spinner = ora(blue('Removing resource files...')).start();
+      
+      let removedCount = 0;
+      for (const file of existingFiles) {
+        try {
+          fs.unlinkSync(file);
+          removedCount++;
+        } catch (error) {
+          spinner.warn(`${yellow('Could not remove:')} ${gray(file)}`);
+        }
+      }
+
+      spinner.succeed(`${blue(`Removed ${removedCount} files for`)} ${purple(resourceName)}`);
+
+      console.log(`\n${purpleBright('» Next steps:')}`);
+      //console.log(`${purpleBright('›')} ${gray('Also remove the model from your schema.prisma if using SQL database')}`);
+      //console.log(`${purpleBright('›')} ${gray('Remove any route registrations from your main router')}`);
+      console.log(`${purpleBright('›')} ${gray('Restart your server')}`);
+
+    } catch (error) {
+      console.error(`${errorRed('✖')} ${blue('Error removing resource:')} ${errorRed(error.message)}`);
+    }
+  });
+
+
 
 // ===============================
 // UPDATE COMMAND
