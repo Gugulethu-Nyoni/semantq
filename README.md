@@ -645,7 +645,8 @@ Suppose we have this items object (array):
 const items = [
   { name: "Alice", active: true },
   { name: "Bob", active: false },
-  { name: "Charlie", active: true }
+  { name: "Charlie", active: true },
+  { name: "Musa", active: true }
 ];
 ```
 
