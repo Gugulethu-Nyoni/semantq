@@ -1038,7 +1038,7 @@ For a comprehensive guide on **smQL features**, please visit:
 - [Semantq Config Guide](docs/SemantqConfig.md) - Manage app configuration
 - [Semantq State Guide](docs/SemantqState.md) - Reactive state management system
 - [Semantq Core State Guide](docs/SemantqStateCore.md) - Core state management
-- [Semantq Reactivity Guide](docs/SemantqCoreReactivity.md) - Semantq Reactivity Guide
+- [Semantq Reactivity Guide](docs/SemantqCoreReactivity.md) - Semantq Reactivity Guide (With Semantq Primitives)
 
 ### Template System
 - [Syntax Guide](docs/SemantqSyntaxComprehensive.md) - Comprehensive syntax reference
