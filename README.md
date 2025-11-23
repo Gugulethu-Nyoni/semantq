@@ -91,7 +91,7 @@ module.exports = {
   targetHost: process.env.TARGET_HOST || 'http://localhost:3000',
   pageTitle: 'My Awesome Website',
   metaDescription: 'My Awesome Website',
-  metaKeywords: 'Awesome this, awesome that',
+  metaKeywords: 'keyword one, keyword two, keyword three',
 
   sitemap: true,
 
