@@ -6,94 +6,270 @@ Welcome to the Semantq CLI Commands Guide! This document provides a comprehensiv
 
 ### Project Commands
 1. `semantq create <projectName>` - Generate new project structure
+   - `-fs, --fullstack` - Install full stack setup (client + server + auth)
 2. `semantq update` - Update Semantq to latest version
-   - `semantq --dry-run` - Preview changes without applying
+   - `--dry-run` - Preview changes without applying
+   - `--force` - Force update even if versions match
+   - `--restore` - Restore missing directories (docs/examples)
 
 ### Resource Generation
-3. `semantq make:resource <name>` - Generate full resource (model+service+controller+route)
-   - `-a, --adapter` - Specify database adapter (mongo/supabase)
-   - `-p, --pylon` - Add Pylon feature guarding
-4. `semantq remove:resource <name>` - Remove backend resource
+3. `semantq make:resource <name>` - Generate full backend resource (model+service+controller+route)
+   - `-p, --pylon` - Generate Pylon-enabled resources with feature guarding
+4. `semantq remove:resource <name>` - Remove all backend resource files
    - `-y, --yes` - Skip confirmation prompt
-5. `semantq make:model <name>` - Generate model only
-   - `-a, --adapter` - Specify database adapter
-6. `semantq make:service <name>` - Generate service only
-   - `-a, --adapter` - Specify database adapter
-7. `semantq make:controller <name>` - Generate controller only
-8. `semantq make:apiRoute <name>` - Generate route only
 
 ### Route System
-9. `semantq make:route <routeName>` - Create new route with templates
+5. `semantq make:route <routeName> [role]` - Create new route with templates
    - `-l, --layout` - Include layout file @layout.smq
    - `-c, --crud` - Add CRUD operations template
    - `-a, --auth` - Add authentication imports
    - `-s, --server` - Include server handlers server.js
-   - `-A, --all` - Create all resources (@page.smq,@layout.smq,config.js,server.js)
+   - `-A, --all` - Create all resources (@page.smq, @layout.smq, server.js)
    - `--ac` - Shortcut for both auth and CRUD
    - `-tw, --tailwind` - Add Tailwind CSS support
-10. `semantq remove:route <path>` - Remove route directory and contents
-    - `-y, --yes` - Skip confirmation prompt
+   - `-p, --pylon` - Create Pylon route with role-based structure (requires role argument)
+6. `semantq remove:route <routeName>` - Remove route directory and all contents
+   - `-y, --yes` - Skip confirmation prompt
 
 ### Component System
-11. `semantq make:component <name>` - Create reusable components
-    - `-p, --pylon` - Add Pylon feature guarding
-12. `semantq remove:component <name>` - Remove component files
-    - `-y, --yes` - Skip confirmation prompt
+7. `semantq make:component <name>` - Create reusable components
+   - `-p, --pylon` - Create Pylon-enabled component with feature guarding
+8. `semantq remove:component <name>` - Remove component files
+   - `-p, --pylon` - Remove Pylon component from pylon subdirectory
+   - `-y, --yes` - Skip confirmation prompt
 
 ### Installation Commands
-13. `semantq install:server` - Set up server directory
-14. `semantq install:supabase` - Configure Supabase
-15. `semantq install:tailwind` - Install Tailwind CSS
+9. `semantq install:server` - Install the Semantq server package into your project
+10. `semantq add:auth-ui` - Install the Semantq Auth UI into your project
+11. `semantq install:tailwind` - Install and configure Tailwind CSS for Semantq
+
+### AI Commands
+12. `semantq ai <prompt>` - Generate code using AI and save to route directory
+   - `-r, --route <route>` - Specify the route directory
+   - `--full` - Wrap response in Semantq custom tags (@script, @style, @html)
+   - `--js` - Generate only JavaScript
+   - `--css` - Generate only CSS
+   - `--html` - Generate only HTML
+   - `--append` - Append generated code to file instead of overwriting
 
 ### Utility
+13. `semantq add <moduleName>` - Add a Semantq module (e.g., @semantq/auth) to your project
+14. `semantq migrate` - Run database migrations for the project and its modules
+15. `semantq start` - Start the Semantq server in development mode
 16. `semantq -v, --version` - Show version number
 
-## Comprehensive Command Reference
+## Pylon Commands Reference
 
-### Project Creation
+Pylon is a SaaS feature guard and billing module that enables permission-driven UI components within the Semantq framework.
+
+### Pylon Route Management
+
+**Create Pylon Route:**
+Creates a role-based route with Pylon dashboard layout structure.
+
 ```bash
-semantq create myapp
+semantq make:route <routeName> <role> --pylon
 ```
-Creates a new project with required folders and files. Run this where you want to install the new project.
 
-### Resource Generation with Pylon Support
-Generate full backend resources with built-in Pylon feature guarding:
+**Examples:**
+```bash
+# Create a plan route for project-manager role
+semantq make:route plan project-manager --pylon
+
+# Create a user-add route for admin role (short flag)
+semantq make:route user-add admin -p
+
+# Create with server handlers
+semantq make:route master-plan project-manager --pylon -A
+```
+
+**What it creates:**
+- `src/routes/<role>/<routeName>/@page.smq` - Main route page with component imports
+- `src/routes/<role>/<routeName>/@layout.smq` - Dashboard layout with CSS imports
+- `src/routes/<role>/<routeName>/server.js` (if using `-s` or `-A` flag)
+
+**Key Features:**
+- Automatically converts route names to PascalCase (e.g., `user-add` → `UserAdd`)
+- Sets up dashboard container with Sidebar, Header, and Footer imports
+- Includes dashboard CSS and required external stylesheets
+- Enables authentication by default
+
+### Remove Route
+Removes an existing route directory and all its contents.
 
 ```bash
-# Generate resource with Pylon feature guarding
-semantq make:resource Task --pylon
-semantq make:resource User -p
+semantq remove:route <routeName>
+```
 
-# Standard resource (without Pylon)
+**Options:**
+- `-y, --yes`: Skip confirmation prompt
+
+**Example:**
+```bash
+# Remove a route with confirmation
+semantq remove:route contact
+
+# Remove without confirmation
+semantq remove:route about -y
+```
+
+**Notes:**
+- Works for both regular routes and Pylon routes
+- Shows all files that will be removed before deletion
+- Requires confirmation unless `-y` flag is used
+
+### Pylon Component Management
+
+**Create Pylon Component:**
+Creates a Pylon-enabled component with feature guarding and permission-based UI.
+
+```bash
+semantq make:component <componentName> --pylon
+```
+
+**Examples:**
+```bash
+# Create a basic Pylon component
+semantq make:component Project --pylon
+
+# Create nested Pylon component
+semantq make:component admin/User --pylon
+```
+
+**What it creates:**
+- `src/components/pylon/<componentName>.smq` (or nested path)
+- Includes complete permission system with `can()`, `canAny()`, `canAll()` functions
+- Formique configuration for CRUD operations
+- AnyGrid integration with permission-controlled features
+- Loading states and error handling
+- Accordion-based UI for create/view operations
+
+**Key Features:**
+- Automatic permission mapping from user settings
+- State management with `$state` and `$effect`
+- Integrated Formique forms with validation
+- AnyGrid data tables with export permissions
+- Role-based access control
+- Automatic data refresh on record creation
+
+### Remove Component
+Removes a component file from the project.
+
+```bash
+semantq remove:component <componentName>
+```
+
+**Options:**
+- `-p, --pylon`: Remove from Pylon components directory
+- `-y, --yes`: Skip confirmation prompt
+
+**Examples:**
+```bash
+# Remove regular component
+semantq remove:component Button
+
+# Remove Pylon component
+semantq remove:component Plan --pylon
+
+# Remove without confirmation
+semantq remove:component User -p -y
+```
+
+**Notes:**
+- Defaults to regular components directory
+- Use `--pylon` flag for Pylon components
+- Shows alternative location suggestions if not found
+
+### Pylon Resource Management
+
+**Create Pylon Resource:**
+Generates a complete backend resource with Pylon feature guarding.
+
+```bash
+semantq make:resource <resourceName> --pylon
+```
+
+**Examples:**
+```bash
+# Create Pylon resource for User model
+semantq make:resource User --pylon
+
+# Create regular resource (non-Pylon)
 semantq make:resource Product
-
-# Specify database adapter
-semantq make:resource Product -a mongo
-semantq make:resource User --adapter supabase
 ```
 
-**Pylon Resource Features:**
-- Automatic Pylon feature guarding on all protected routes
-- Pylon usage logging in service layer
-- Enhanced controller methods with user context
-- Support for all database adapters (MySQL, MongoDB, SQLite, Supabase)
+**What it creates:**
+- **Model**: Database model with Pylon permission fields
+- **Controller**: CRUD operations with permission checks
+- **Service**: Business logic layer
+- **Routes**: API endpoints with middleware
 
-### Resource Removal
-Safely remove backend resources with confirmation:
+**Key Features:**
+- Database adapter-aware (MySQL, MongoDB, SQLite, Supabase)
+- Automatic Pylon permission integration in controllers
+- Feature flag system for SaaS capabilities
+- Role-based access middleware
+- Consistent naming conventions
+
+### Remove Resource
+Removes all backend resource files for a given resource.
+
 ```bash
-# With confirmation prompt
-semantq remove:resource Task
-
-# Skip confirmation (force remove)
-semantq remove:resource Task --yes
+semantq remove:resource <resourceName>
 ```
 
-**Safety Features:**
-- Shows all files that will be removed
-- Confirmation prompt by default
-- Clear next steps after removal
+**Options:**
+- `-y, --yes`: Skip confirmation prompt
 
-### Advanced Route Management
+**Example:**
+```bash
+# Remove User resource with confirmation
+semantq remove:resource User
+
+# Remove without confirmation
+semantq remove:resource Product -y
+```
+
+**What it removes:**
+- Model files across all database adapters
+- Controller file
+- Service file
+- Route file
+
+**Notes:**
+- Only removes files that exist
+- Shows list of files before deletion
+- Requires server directory (`semantqQL`) to exist
+
+## Common Workflow Examples
+
+### Complete Pylon Feature Creation
+```bash
+# 1. Create the backend resource
+semantq make:resource Invoice --pylon
+
+# 2. Create the Pylon component
+semantq make:component Invoice --pylon
+
+# 3. Create the route for admin role
+semantq make:route invoice admin --pylon
+```
+
+This creates:
+- Backend: `Invoice` model, controller, service, routes
+- Frontend: `Invoice.smq` Pylon component with permission UI
+- Route: `/admin/invoice` dashboard route
+
+### Cleanup Example
+```bash
+# Remove everything
+semantq remove:resource Invoice -y
+semantq remove:component Invoice --pylon -y
+semantq remove:route invoice -y
+```
+
+## Advanced Route Management
+
 Create routes with nested directory structures:
 
 ```bash
@@ -109,28 +285,14 @@ semantq make:route admin/users/list
 semantq make:route projects --crud --auth
 semantq make:route admin --all --tailwind
 semantq make:route api/users --server --layout
+
+# Pylon routes
+semantq make:route plan project-manager --pylon
+semantq make:route user-add admin -p
 ```
 
-**Route Options:**
-- `-l, --layout` - Include layout file
-- `-c, --crud` - Add CRUD operations template
-- `-a, --auth` - Add authentication imports
-- `-s, --server` - Include server handlers
-- `-A, --all` - Create all resources at once
-- `--ac` - Shortcut for both auth and CRUD
-- `-tw, --tailwind` - Add Tailwind CSS support
+## Component System
 
-### Route Removal
-Remove route directories and all nested contents:
-```bash
-# Remove with confirmation
-semantq remove:route contact/asia/east
-
-# Force remove without confirmation
-semantq remove:route admin/users --yes
-```
-
-### Component System
 Create reusable components with optional Pylon feature guarding:
 
 ```bash
@@ -151,17 +313,6 @@ semantq make:component admin/Dashboard --pylon
 - Automatic PascalCase conversion
 - Pylon components include feature permission checking and CRUD operation templates
 
-### Component Removal
-Safely remove component files:
-```bash
-# Remove with confirmation
-semantq remove:component Project
-semantq remove:component forms/ContactForm
-
-# Force remove
-semantq remove:component admin/UserManager --yes
-```
-
 ## Usage Examples
 
 ### Full-Stack Pylon Application
@@ -174,9 +325,9 @@ semantq make:resource Task --pylon
 semantq make:component ProjectList --pylon
 semantq make:component TaskManager --pylon
 
-# Create routes with auth and CRUD
-semantq make:route projects --ac --tailwind
-semantq make:route tasks --ac --tailwind
+# Create Pylon routes with auth and CRUD
+semantq make:route projects project-manager --pylon --all
+semantq make:route tasks project-manager --pylon --tailwind
 ```
 
 ### Standard Application
@@ -261,34 +412,64 @@ Pylon components require:
 3. Run database migrations
 4. Restart server
 
-### For Components:
-1. Import in routes: `import Component from './components/Component.smq'`
-2. Ensure parent components provide required context
-3. Restart dev server if needed
+### For Pylon Components:
+1. Import in routes: `import Component from './components/pylon/Component.smq'`
+2. Ensure parent components provide user context
+3. Configure user permissions in database
+4. Restart dev server if needed
 
-### For Routes:
+### For Pylon Routes:
+1. Create the corresponding Pylon component first
+2. Ensure role-based components (Sidebar, Header, Footer) exist
+3. Verify dashboard.css exists at `/public/dashboard/css/dashboard.css`
+4. Test access with different user permissions
+
+### For Standard Routes:
 1. Update `routes.js` with new route declarations
 2. Configure authentication if using `--auth`
 3. Implement CRUD operations if using `--crud`
+
+## Notes & Best Practices
+
+1. **Naming Conventions:**
+   - Routes: lowercase, hyphenated (e.g., `user-add`)
+   - Components: PascalCase (e.g., `UserAdd`)
+   - Resources: Singular, PascalCase (e.g., `User`)
+
+2. **Directory Structure:**
+   - Pylon components: `src/components/pylon/`
+   - Pylon routes: `src/routes/<role>/`
+   - Resources: `semantqQL/` (models, controllers, services, routes)
+
+3. **Permission System:**
+   - Uses `user.userSettings` Set for permission checks
+   - Supports CRUD operations (`create`, `read`, `update`, `delete`)
+   - Includes DataGrid features (`datagrid_csvexport`, `datagrid_excelexport`)
+
+4. **File Generation:**
+   - All commands check for existing files first
+   - Provide helpful error messages for conflicts
+   - Include clear "next steps" after creation
 
 ## Command Summary Table
 
 | Command | Description | Options |
 |---------|-------------|---------|
-| `create <projectName>` | Create new project | |
-| `make:resource <name>` | Create backend resource | `-a, --adapter`, `-p, --pylon` |
+| `create <projectName>` | Create new project | `-fs, --fullstack` |
+| `make:resource <name>` | Create backend resource | `-p, --pylon` |
 | `remove:resource <name>` | Remove backend resource | `-y, --yes` |
-| `make:model <name>` | Generate model only | `-a, --adapter` |
-| `make:service <name>` | Generate service only | `-a, --adapter` |
-| `make:controller <name>` | Generate controller only | |
-| `make:apiRoute <name>` | Generate route only | |
-| `make:route <path>` | Create route | `-l, -c, -a, -s, -A, --ac, -tw` |
+| `make:route <routeName> [role]` | Create route | `-l, -c, -a, -s, -A, --ac, -tw, -p` |
 | `remove:route <path>` | Remove route | `-y, --yes` |
 | `make:component <name>` | Create component | `-p, --pylon` |
-| `remove:component <name>` | Remove component | `-y, --yes` |
+| `remove:component <name>` | Remove component | `-p, --pylon`, `-y, --yes` |
 | `install:server` | Set up server directory | |
-| `install:supabase` | Configure Supabase | |
+| `add:auth-ui` | Install Auth UI | |
 | `install:tailwind` | Install Tailwind CSS | |
+| `ai <prompt>` | Generate code using AI | `-r, --route`, `--full`, `--js`, `--css`, `--html`, `--append` |
+| `add <moduleName>` | Add Semantq module | |
+| `migrate` | Run database migrations | |
+| `start` | Start development server | |
+| `update` | Update Semantq | `--dry-run`, `--force`, `--restore` |
 | `-v, --version` | Show version number | |
 
 ## Contributing

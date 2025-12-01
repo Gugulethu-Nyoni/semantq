@@ -445,11 +445,13 @@ export default {
   });
 
 // ===========================================
-// MAKE:ROUTE COMMAND
+// MAKE:ROUTE COMMAND (Updated with Pylon support)
 // ===========================================
 program
-  .command('make:route <routeName>')
+  .command('make:route')
   .description('Create a new route with stylish feedback')
+  .argument('<routeName>', 'Name of the route to create')
+  .argument('[role]', 'Role for Pylon routes (optional)')
   .option('-l, --layout', 'Add layout file')
   .option('-c, --crud', 'Add CRUD operations')
   .option('-a, --auth', 'Add auth import to page template')
@@ -457,10 +459,35 @@ program
   .option('-A, --all', 'Create all resources at once')
   .option('--ac', 'Shortcut for both --auth and --crud')
   .option('-tw, --tailwind', 'Add Tailwind CSS support')
-  .action(async (routeName, options) => {
+  .option('-p, --pylon', 'Create a Pylon route with role-based structure')
+  .action(async (routeName, role, options) => {
     const { createSpinner } = await import('nanospinner');
 
     try {
+      // Handle Pylon route creation
+      if (options.pylon) {
+        if (!role) {
+          console.log(errorRed('Error: Pylon route requires a role. Use: semantq make:route plan project-manager --pylon'));
+          return;
+        }
+        
+        // Apply -A (all) flag logic to Pylon routes
+        if (options.all) {
+          options.layout = true;
+          options.server = true;
+        }
+        
+        await createPylonRoute(routeName, role, options);
+        return;
+      }
+
+      // If role is provided without --pylon flag, show error
+      if (role) {
+        console.log(errorRed('Error: Role specified but --pylon flag missing. Use: semantq make:route plan project-manager --pylon'));
+        return;
+      }
+
+      // Existing regular route creation logic
       const routePath = resolvePath(process.cwd(), 'src/routes', routeName);
 
       if (fs.existsSync(routePath)) {
@@ -469,7 +496,7 @@ program
         return;
       }
 
-      // Handle shortcut options
+      // Handle shortcut options for regular routes
       if (options.ac) {
         options.auth = true;
         options.crud = true;
@@ -477,7 +504,6 @@ program
 
       if (options.all) {
         options.layout = true;
-        options.config = true;
         options.server = true;
       }
 
@@ -517,10 +543,9 @@ program
 
         basePageTemplate += `// DELETE \n`;
         basePageTemplate += `// const productId = 42; \n`;
-        basePageTemplate += `// const response = await api.delete(\`\${baseOrigin}/product/products/\${productId}\`, { log: false });\n`;      } else if (options.auth) {
-
+        basePageTemplate += `// const response = await api.delete(\`\${baseOrigin}/product/products/\${productId}\`, { log: false });\n`;
+      } else if (options.auth) {
         basePageTemplate += `// See complete smQL docs here: https://github.com/Gugulethu-Nyoni/smQL \n\n`;
-
       }
       
       if (options.tailwind) {
@@ -528,43 +553,25 @@ program
       }
       basePageTemplate += `@end\n\n@style\n\n@end\n\n@html\n ${routeName} Page\n`;
 
-    // Layout content
-    const layoutContent = options.crud ? 
-      `@head\n` +
-      `<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />\n` +
-      `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />\n` +
-      `<link rel="stylesheet" href="https://unpkg.com/formique-css@1.0.13/formique-css.css" />\n` +
-      `<link rel="stylesheet" href="https://unpkg.com/anygridcss@1.0.4/anyGrid.css" />\n` +
-      `@end\n` +
-      `@body\n\n@end\n` +
-      `@footer\n\n@end\n`
-    : 
-      `@head\n@end\n` +
-      `@body\n\n@end\n` +
-      `@footer\n\n@end\n`;
+      // Layout content
+      const layoutContent = options.crud ? 
+        `@head\n` +
+        `<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />\n` +
+        `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />\n` +
+        `<link rel="stylesheet" href="https://unpkg.com/formique-css@1.0.13/formique-css.css" />\n` +
+        `<link rel="stylesheet" href="https://unpkg.com/anygridcss@1.0.4/anyGrid.css" />\n` +
+        `@end\n` +
+        `@body\n\n@end\n` +
+        `@footer\n\n@end\n`
+      : 
+        `@head\n@end\n` +
+        `@body\n\n@end\n` +
+        `@footer\n\n@end\n`;
 
-
-    const files = {
+      // Define files to create
+      const files = {
         '@page.smq': basePageTemplate,
         '@layout.smq': options.layout ? layoutContent : null,
-        'config.js': options.config ? `export default {
-  meta: {
-    title: '${routeName}',
-    description: '',
-    keywords: '',
-    author: '',
-    viewport: 'width=device-width, initial-scale=1'
-  },
-  seo: {
-    canonicalUrl: '',
-    ogImage: ''
-  },
-  transition: {
-    type: 'fade',
-    duration: 300
-  },
-  middleware: []${options.auth ? `,\n  auth: true` : ''}
-}` : null,
         'server.js': options.server ? `export default {\n  get() { /* ... */ }` + 
           (options.crud ? `,\n  post() { /* ... */ },\n  put() { /* ... */ },\n  delete() { /* ... */ }` : '') + 
           `\n};` : null
@@ -592,7 +599,6 @@ ${options.auth ? `${purpleBright('  →')} ${gray('With auth support')}\n` : ''}
 ${options.crud ? `${purpleBright('  →')} ${gray('With CRUD operations')}\n` : ''}
 ${options.tailwind ? `${purpleBright('  →')} ${gray('With Tailwind CSS support')}\n` : ''}
 ${options.layout ? `${purpleBright('•')} ${purple('@layout.smq')}` : ''}
-${options.config ? `${purpleBright('•')} ${purple('config.js')}` : ''}
 ${options.server ? `${purpleBright('•')} ${purple('server.js')}` : ''}
 
 ${blue.italic('Next steps:')}
@@ -618,6 +624,179 @@ ${blue('Troubleshooting:')}
       process.exit(1);
     }
   });
+
+
+
+// ===========================================
+// PYLON ROUTE CREATION FUNCTION
+// ===========================================
+async function createPylonRoute(routeName, role, options) {
+  const { createSpinner } = await import('nanospinner');
+  
+  try {
+    // Convert route name to proper formats
+    const routeDirName = routeName.toLowerCase(); 
+    const componentName = pylonToPascalCase(routeName);
+    
+    // Create role-based directory structure
+    const rolePath = resolvePath(process.cwd(), 'src/routes', role);
+    const routePath = resolvePath(rolePath, routeDirName);
+    
+    // Check if route already exists
+    if (fs.existsSync(routePath)) {
+      const spinner = createSpinner(purple(`Checking route ${role}/${routeDirName}...`)).start();
+      spinner.error({ text: errorRed('Route already exists!') });
+      return;
+    }
+    
+    // Create directories
+    const dirSpinner = createSpinner(purple('Creating Pylon route structure...')).start();
+    fs.mkdirSync(routePath, { recursive: true });
+    dirSpinner.success({ text: purpleBright(`Route directory created in ${role}/`) });
+    
+    // Generate @page.smq content
+    const pageContent = `@script
+import Sidebar from '$components/${role}/Sidebar';
+import Header from '$components/${role}/Header';
+import ${componentName} from '$components/${role}/${componentName}';
+import Footer from '$components/${role}/Footer';
+
+@end
+
+@style
+
+@end
+
+@html
+
+<div class="dashboard-container">
+  <Sidebar />
+
+  <main class="main-content">
+    <Header />
+
+    <div class="content-area">
+      <${componentName} />
+    </div>
+
+    <Footer />
+  </main>
+</div>
+`;
+    
+    // Generate @layout.smq content
+    const layoutContent = `@head
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/formique-css@1.0.13/formique-css.css" />
+<link rel="stylesheet" href="https://unpkg.com/anygridcss@1.0.4/anyGrid.css" />
+<link rel="stylesheet" href="../../../dashboard/css/dashboard.css" />
+@end
+
+@body
+
+@end
+
+@footer
+
+@end
+`;
+    
+    // Define files to create (config.js is optional)
+    const files = {
+      '@page.smq': pageContent,
+      '@layout.smq': layoutContent,
+      'config.js': options.config ? `export default {
+  meta: {
+    title: '${componentName}',
+    description: '',
+    keywords: '',
+    author: '',
+    viewport: 'width=device-width, initial-scale=1'
+  },
+  seo: {
+    canonicalUrl: '',
+    ogImage: ''
+  },
+  transition: {
+    type: 'fade',
+    duration: 300
+  },
+  middleware: [],
+  auth: true
+}` : null
+    };
+    
+    // Create files
+    for (const [filename, content] of Object.entries(files)) {
+      if (content) {
+        const spinner = createSpinner(purple(`Creating ${filename}`)).start();
+        await new Promise(resolve => setTimeout(resolve, 200));
+        fs.writeFileSync(resolvePath(routePath, filename), content.trim());
+        spinner.success({
+          text: `${purpleBright('✓')} ${purple(filename)} ${blue('created')}`
+        });
+      }
+    }
+    
+    // Build success message
+    let successMessage = `
+${purple.bold('» Pylon Route created successfully!')}
+
+${purpleBright.bold('Structure:')}
+${purpleBright('•')} ${purple('src/routes/')}${role}/${routeDirName}/
+${purpleBright('  ├─')} ${purple('@page.smq')}
+${purpleBright('  ├─')} ${purple('@layout.smq')}`;
+    
+    if (options.config) {
+      successMessage += `
+${purpleBright('  └─')} ${purple('config.js')}`;
+    }
+    
+    successMessage += `
+
+${purpleBright.bold('Component imports:')}
+${purpleBright('•')} Sidebar from ${purple(`'$components/${role}/Sidebar'`)}
+${purpleBright('•')} Header from ${purple(`'$components/${role}/Header'`)}
+${purpleBright('•')} ${componentName} from ${purple(`'$components/${role}/${componentName}'`)}
+${purpleBright('•')} Footer from ${purple(`'$components/${role}/Footer'`)}
+
+${blue.italic('Next steps:')}
+  ${purpleBright('›')} Create the ${purple(componentName)} component: ${purple(`semantq make:component ${componentName} --role ${role}`)}
+  ${purpleBright('›')} Ensure ${purple('Sidebar')}, ${purple('Header')}, and ${purple('Footer')} components exist in ${purple(`src/components/${role}/`)}
+  ${purpleBright('›')} Verify ${purple('dashboard.css')} exists at ${purple('/public/dashboard/css/dashboard.css')}
+  ${purpleBright('›')} Run ${purple('npm run dev')} and visit ${purple(`/${role}/${routeDirName}`)}`;
+    
+    console.log(successMessage);
+    
+  } catch (error) {
+    console.log(`
+${errorRed('✖ Error creating Pylon route:')} ${error.message}
+
+${blue('Troubleshooting:')}
+  ${purpleBright('›')} Check directory permissions
+  ${purpleBright('›')} Ensure role directory can be created
+  ${purpleBright('›')} Verify component name transformation
+`);
+    process.exit(1);
+  }
+}
+
+// ===========================================
+// CASE CONVERSION HELPER FUNCTION
+// ===========================================
+
+function pylonToPascalCase(str) {
+  if (!str) return '';
+  
+  return str
+    // Split by dash, underscore, or space
+    .split(/[-_\s]+/)
+    // Capitalize first letter of each part
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join('');
+}
+
 
 
 // ===============================
@@ -705,6 +884,9 @@ program
   });
 
 
+  
+
+
 
 
 // ===========================================
@@ -754,27 +936,173 @@ program
       let componentTemplate;
       
       if (options.pylon) {
-        // Pylon Component Template
-        componentTemplate = `@script
+        // Pylon Component Template:
+componentTemplate = `@script
 const effectiveSettings = new Set(user.userSettings);
 let loadingStatus = $state(true);
 const dataModel = "${componentPascal}";
-const perms = Object.fromEntries(
-  ["create", "read", "update", "delete"].map(a => [
+let gridData = [];
+let newRecordAdded = $state(false);
+const routeSlug = dataModel.charAt(0).toLowerCase() + dataModel.slice(1);
+const viewTitle = dataModel.replace(/([A-Z])/g, ' $1').trim();
+
+const dataModelFormId = \`add-\${dataModel.toLowerCase()}\`;
+
+const perms = Object.fromEntries([
+  // CRUD permissions (dataModel-based)
+  ...["create", "read", "update", "delete"].map(a => [
     a,
     effectiveSettings.has(\`\${dataModel.toLowerCase()}_\${a}\`)
+  ]),
+  
+  // DataGrid feature permissions (use full keys directly)
+  // Data grid edit or delete will be validated against CRUD update and delete
+  ...[
+    "datagrid_csvexport",
+    "datagrid_excelexport"
+  ].map(a => [
+    a,
+    effectiveSettings.has(a)
   ])
-);
+]);
 
-const { create, read, update, delete: deletem } = perms;
+const { create, read, update, delete: deletem, datagrid_csvexport, datagrid_excelexport } = perms;
+
+/* FORMIQUE CONFIGURATION - Customize per component */
+const formSchema = [
+  ['text', 'name', 'Name', { required: true }, { placeholder: 'Enter name' }],
+  ['submit', 'submit', 'Save Record']
+];
+
+const formSettings = {
+  theme: 'light',
+};
+
+const formParams = {
+  method: 'POST',
+  id: dataModelFormId
+};
+
+/* ANYGRID CONFIGURATION - Customize per component */
+const gridColumns = [
+  { name: 'id', header: 'ID', sortable: true },
+  { name: 'name', header: 'NAME', sortable: true },
+  { name: 'createdAt', header: 'CREATED AT', sortable: true },
+  {
+    name: 'updatedAt',
+    header: 'UPDATED AT',
+    sortable: true,
+    actions: [
+      { label: 'EDIT', url: '/${componentPascal.toLowerCase()}/edit/{id}', class: 'edit', id: 'edit-{id}' },
+      { label: 'DELETE', url: '/${componentPascal.toLowerCase()}/delete/{id}', class: 'delete', id: 'delete-{id}', confirm: true },
+    ],
+  },
+];
+
+/* ANYGRID CONFIGURATION - Base features template */
+const gridBaseFeatures = {
+  csvExport: true,
+  excelExport: true,
+  theme: 'light',
+  gridModal: true,
+  modalConfig: {
+    editable: true,
+    deletable: true,
+    nonEditableFields: ['id', 'organizationId', 'createdAt', 'updatedAt'],
+    hiddenFields: ['id', 'organizationId'],
+  },
+};
+
+/* ANYGRID CONFIGURATION - Permission-controlled features */
+const gridFeatures = {
+  ...gridBaseFeatures,
+  csvExport: !!datagrid_csvexport,
+  excelExport: !!datagrid_excelexport,
+  modalConfig: {
+    ...gridBaseFeatures.modalConfig,
+    editable: !!update,
+    deletable: !!deletem,
+  },
+};
+
+function renderDataGrid() {
+  const gridElement = document.getElementById('anygrid');
+  if (gridElement) {
+    gridElement.innerHTML = '';
+    const dataGrid = new AnyGrid(gridData, gridColumns, gridFeatures);
+  }
+}
 
 // Initialize on component mount
 $onMount(async () => {
   try {
-    // Run your DOM related await API calls here 
-    // Example: fetch users from the database
-    // and update an initialized object if needed
-    // e.g. let users; // then users = ...;
+    // Initialize UI components after DOM is ready
+    if (can("read")) {
+      const response = await api.get(\`/\${routeSlug}/\${routeSlug}s\`);
+      
+      if (!response._ok) {
+        Notification.show({
+          type: 'error',
+          message: \`Failed to fetch \${dataModel}s: \${response.message}\`,
+          duration: 6000,
+        });
+      }
+
+      const errorElement = document.getElementById('error'); 
+      if (errorElement && response?.message) {
+        errorElement.innerHTML = \`
+          <div class="card card-error" style="margin-bottom: 1rem!important;">
+            <div class="card-header">
+              <div class="card-title">
+                <h4>Alert!</h4>
+              </div>
+              <div class="card-actions">
+                <div class="status-indicator error">
+                  <i class="fas fa-exclamation-circle"></i>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              \${response.message}
+            </div>
+          </div>
+        \`;
+      }
+
+      gridData = api.getData(response);
+      renderDataGrid();  
+    }
+
+    if (can("create")) {
+      const form = new Formique(formSchema, formSettings, formParams);
+      const formSubmission = new Form(dataModelFormId);
+
+      formSubmission.form.addEventListener('form:captured', async (event) => {
+        try {
+          const payload = event.detail;
+          payload.organizationId = parseInt(user.organizationId, 10);
+
+          const response = await api.post(\`/\${routeSlug}/\${routeSlug}s\`, payload);
+
+          if (response?._ok) {
+            Notification.show({
+              type: 'success',
+              message: \`\${dataModel} created successfully\`,
+              duration: 6000,
+            });
+            newRecordAdded.value = true;
+          } else {
+            Notification.show({
+              type: 'error',
+              message: \`Failed to create \${dataModel}: \${response.message}\`,
+              duration: 6000,
+            });
+          }
+        } catch (error) {
+          console.error('Failed to create record:', error);
+        }
+      });
+    }
   } catch (err) {
     console.error("Unexpected error:", err);
   } finally {
@@ -782,9 +1110,25 @@ $onMount(async () => {
   }
 });
 
+$effect(async () => {
+  if (newRecordAdded.value) {
+    const response = await api.get(\`/\${routeSlug}/\${routeSlug}s\`);
+    if (response._ok) {
+      gridData = api.getData(response);
+      renderDataGrid();
+    } else {
+      Notification.show({
+        type: 'error',
+        message: \`Failed to refresh \${dataModel}s: \${response.message}\`,
+        duration: 6000,
+      });
+    }
+    newRecordAdded.value = false;
+  }
+});
+
 function can(action) {
   const allowed = perms[action] === true;
-  console.log(\`can("\${action}") -> \${allowed}\`);
   return allowed;
 }
 
@@ -796,12 +1140,11 @@ function canAll(actions) {
   return actions.every(can);
 }
 
-
 async function create${componentPascal}() {
   const payload = {
-  name: \`IDP_\${Math.floor(Math.random() * 10000)}\`, // random number 0-9999
-  description: 'Integrated Development Plan',
-};
+    name: \`IDP_\${Math.floor(Math.random() * 10000)}\`,
+    description: 'Integrated Development Plan',
+  };
 
   try {
     const response = await api.post('/${componentPascal.toLowerCase()}/${componentPascal.toLowerCase()}s', payload);
@@ -811,6 +1154,7 @@ async function create${componentPascal}() {
         message: \`\${dataModel} created successfully\`,
         duration: 6000,
       });
+      newRecordAdded.value = true;
     } else {
       Notification.show({
         type: 'error',
@@ -818,7 +1162,6 @@ async function create${componentPascal}() {
         duration: 6000,
       });
     }
-
   } catch (error) {
     console.error('Error creating ${componentPascal.toLowerCase()}:', error);
     Notification.show({
@@ -869,20 +1212,18 @@ async function create${componentPascal}() {
 
 <!-- START MAIN CONTENT --> 
 
+<div id="error"></div>
+
 @if(can("create"))
 <div class="smq-accordion smq-accordion-elevated">
     <div class="smq-accordion-item">
         <input type="checkbox" id="accordion-2" class="smq-accordion-toggle" />
         <label for="accordion-2" class="smq-accordion-header">
-            Create Model Records (e.g. add a ${componentPascal}) 
+            Create ${viewTitle} Records
         </label>
         <div class="smq-accordion-content">
-            <div id="" class="sqm-acc-content">
-                Record Creation Form Comes here <br/>
-                 Use Formique ((at)formique/semantq) (recommended)
-                 <a class="btn btn-primary" @click={create${componentPascal}}> 
-                     Create ${componentPascal} 
-                 </a>
+            <div id="${dataModelFormId}" class="sqm-acc-content">
+                <!-- Form will be rendered here by Formique -->
             </div>
         </div>
     </div>
@@ -892,14 +1233,13 @@ async function create${componentPascal}() {
 @if(can("read"))
 <div class="smq-accordion smq-accordion-elevated">
     <div class="smq-accordion-item">
-        <input type="checkbox" id="accordion-1" class="smq-accordion-toggle" />
+        <input type="checkbox" id="accordion-1" class="smq-accordion-toggle" checked />
         <label for="accordion-1" class="smq-accordion-header">
-            View Model Records (e.g. ${componentPascal}) 
+            View ${viewTitle} Records
         </label>
         <div class="smq-accordion-content">
-            <div id="" class="sqm-acc-content">
-                Records come here <br/>
-                 if you use AnyGrid you will have record editing and deleting enabled on the single UI
+            <div class="sqm-acc-content">
+                <div id="anygrid"></div>
             </div>
         </div>
     </div>
@@ -1274,9 +1614,7 @@ function toPascalCase(name) {
   return name.charAt(0).toUpperCase() + name.slice(1);
 }
 
-// ===============================
-// REMOVE:RESOURCE COMMAND
-// ===============================
+
 // ===============================
 // REMOVE:RESOURCE COMMAND
 // ===============================
