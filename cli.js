@@ -943,8 +943,36 @@ let loadingStatus = $state(true);
 const dataModel = "${componentPascal}";
 let gridData = [];
 let newRecordAdded = $state(false);
-const routeSlug = dataModel.charAt(0).toLowerCase() + dataModel.slice(1);
-const viewTitle = dataModel.replace(/([A-Z])/g, ' $1').trim();
+//
+const routeSlug = toCamelCase(dataModel);
+const viewTitle = separateByCaps(dataModel);
+
+
+
+/**
+ * Helper functions
+ */
+function toCamelCase(term) {
+  if (!term) return "";
+  return term
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .split(/[\s-_]+/)
+    .map((word, index) =>
+      index === 0
+        ? word.toLowerCase()
+        : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    )
+    .join('');
+}
+
+function separateByCaps(term) {
+  if (!term || typeof term !== 'string') {
+    return term;
+  }
+  return term
+    .replace(/([A-Z])/g, ' $1')
+    .trim();
+}
 
 const dataModelFormId = \`add-\${dataModel.toLowerCase()}\`;
 
@@ -988,15 +1016,7 @@ const gridColumns = [
   { name: 'id', header: 'ID', sortable: true },
   { name: 'name', header: 'NAME', sortable: true },
   { name: 'createdAt', header: 'CREATED AT', sortable: true },
-  {
-    name: 'updatedAt',
-    header: 'UPDATED AT',
-    sortable: true,
-    actions: [
-      { label: 'EDIT', url: '/${componentPascal.toLowerCase()}/edit/{id}', class: 'edit', id: 'edit-{id}' },
-      { label: 'DELETE', url: '/${componentPascal.toLowerCase()}/delete/{id}', class: 'delete', id: 'delete-{id}', confirm: true },
-    ],
-  },
+  { name: 'updatedAt', header: 'UPDATED AT', sortable: true }
 ];
 
 /* ANYGRID CONFIGURATION - Base features template */
@@ -1210,43 +1230,39 @@ async function create${componentPascal}() {
   </div>
 @else
 
-<!-- START MAIN CONTENT --> 
-
-<div id="error"></div>
+<div id="error"> </div>
 
 @if(can("create"))
 <div class="smq-accordion smq-accordion-elevated">
-    <div class="smq-accordion-item">
-        <input type="checkbox" id="accordion-2" class="smq-accordion-toggle" />
-        <label for="accordion-2" class="smq-accordion-header">
-            Create ${viewTitle} Records
-        </label>
-        <div class="smq-accordion-content">
-            <div id="${dataModelFormId}" class="sqm-acc-content">
-                <!-- Form will be rendered here by Formique -->
-            </div>
-        </div>
+  <div class="smq-accordion-item">
+    <input type="checkbox" id="accordion-create" class="smq-accordion-toggle" />
+    <label for="accordion-create" class="smq-accordion-header">
+      Create {viewTitle}
+    </label>
+    <div class="smq-accordion-content">
+      <div id="\${dataModelFormId}" class="sqm-acc-content">
+          <!-- Form will be rendered here by Formique -->
+      </div>
     </div>
+  </div>
 </div>
 @endif
 
 @if(can("read"))
 <div class="smq-accordion smq-accordion-elevated">
-    <div class="smq-accordion-item">
-        <input type="checkbox" id="accordion-1" class="smq-accordion-toggle" checked />
-        <label for="accordion-1" class="smq-accordion-header">
-            View ${viewTitle} Records
-        </label>
-        <div class="smq-accordion-content">
-            <div class="sqm-acc-content">
-                <div id="anygrid"></div>
-            </div>
-        </div>
+  <div class="smq-accordion-item">
+    <input type="checkbox" id="accordion-view" class="smq-accordion-toggle" checked/>
+    <label for="accordion-view" class="smq-accordion-header">
+      {viewTitle}s
+    </label>
+    <div class="smq-accordion-content">
+      <div id="anygrid" class="sqm-acc-content">
+          <!-- Anygrid data grid will be inserted here -->
+      </div>
     </div>
+  </div>
 </div>
 @endif
-
-<!-- END MAIN CONTENT -->
 
 @endif
 `;
