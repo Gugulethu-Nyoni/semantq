@@ -1969,5 +1969,461 @@ program
   });
 
 
+
+// ===============================
+// MAKE:MAIL COMMAND
+// ===============================
+program
+ .command('make:mail <serviceName>')
+ .description('Generate a custom email service')
+ .option('-m, --methods <methods>', 'Comma-separated method names')
+ .option('--skip-templates', 'Skip creating template files')
+ .option('-t, --templates <names>', 'Create specific template files (comma-separated)')
+ .option('--dry-run', 'Show what would be created without making changes')
+ .action(async (serviceName, options) => {
+  const targetBaseDir = process.cwd();
+  const serverDir = path.join(targetBaseDir, 'semantqQL');
+ 
+  try {
+   // Check if we're in a SemantQ project
+   if (!fs.existsSync(serverDir)) {
+    console.error(`${errorRed('✖')} ${blue('semantqQL directory not found.')}`);
+    console.log(`${yellow('⚠')} ${gray('› Run this command from your project root with semantqQL installed.')}`);
+    console.log(`${yellow('⚠')} ${gray('› To install the server, run:')} ${purple('semantq install:server')}`);
+    return;
+   }
+  
+   console.log(`${purpleBright('🚀')} ${blue('Generating email service:')} ${purple(serviceName)}`);
+  
+   // Generate service
+   await generateMailService(serviceName, serverDir, options);
+  
+   const namePascal = toPascalCase(serviceName);
+   const nameCamel = toCamelCase(serviceName);
+  
+   console.log(`${purple('✨')} ${purpleBright('Email service generated successfully!')}`);
+   console.log(`
+${purpleBright('» Next steps:')}
+ ${purpleBright('›')} ${gray('Install the mail package:')} ${purple('npm install @semantq/mail')}
+ ${purpleBright('›')} ${gray('Configure email in your')} ${purple('server.config.js')}
+ ${purpleBright('›')} ${gray('Use your new service:')} ${purple(`import ${nameCamel} from '../services/${namePascal}.js'`)}
+ ${purpleBright('›')} ${gray('Initialize before use:')} ${purple(`await ${nameCamel}.init()`)}
+ ${purpleBright('›')} ${gray('Send emails:')} ${purple(`await ${nameCamel}.send${namePascal}('user@example.com', { subject: 'Test', data: { message: 'Hello!' } })`)}
+ ${purpleBright('›')} ${gray('Test your service:')} ${purple(`node semantqQL/mail/test-${nameCamel}.js`)}
+`);
+  
+  } catch (error) {
+   console.error(`${errorRed('✖')} ${blue('Error generating mail service:')} ${errorRed(error.message)}`);
+   process.exit(1);
+  }
+ });
+
+
+// ===============================
+// MAIL GENERATION HELPER FUNCTIONS
+// ===============================
+
+
+/**
+ * Generate a mail service file - FIXED
+ */
+async function generateMailService(serviceName, baseDir, options) {
+  const namePascal = toPascalCase(serviceName);
+  const nameCamel = toCamelCase(serviceName);
+  const serviceFileName = `${namePascal}`;
+  const templateDirName = nameCamel.toLowerCase();
+  
+  // Parse methods
+  let methods = ['send' + namePascal];
+  if (options.methods) {
+    methods = options.methods.split(',').map(m => m.trim());
+  }
+  
+  // Determine template files to create
+  let templateFiles = [];
+  
+  if (options.skipTemplates) {
+    templateFiles = [];
+  } else if (options.templates) {
+    templateFiles = options.templates.split(',').map(t => t.trim());
+  } else {
+    // Create template for each method (one template per service)
+    templateFiles = [nameCamel.toLowerCase()];
+  }
+  
+  // Show dry run if requested
+  if (options.dryRun) {
+    console.log(`${blue('ℹ')} ${blue('Dry run - would create:')}`);
+    console.log(`${purple('📁')} ${gray('semantqQL/services/')}${serviceFileName}.js`);
+    console.log(`${purple('📁')} ${gray('semantqQL/mail/')}test-${nameCamel}.js`);
+    
+    if (templateFiles.length > 0) {
+      console.log(`${purple('📁')} ${gray('semantqQL/mail/templates/')}${templateDirName}/`);
+      templateFiles.forEach(template => {
+        console.log(`${cyan('📄')}   ${gray(template)}.js`);
+      });
+    }
+    return;
+  }
+  
+  // Create service file
+  const serviceDir = path.join(baseDir, 'services');
+  ensureDirectoryExists(serviceDir);
+  
+  const serviceContent = generateServiceContent(namePascal, nameCamel, methods, templateDirName);
+  const servicePath = path.join(serviceDir, `${serviceFileName}.js`);
+  
+  if (writeFileIfNotExists(servicePath, serviceContent)) {
+    console.log(`${green('✓')} ${cyan('📄')} ${green('Created:')} ${gray(`semantqQL/services/${serviceFileName}.js`)}`);
+  } else {
+    console.log(`${yellow('⚠')} ${yellow('Skipped:')} ${gray(`semantqQL/services/${serviceFileName}.js (already exists)`)}`);
+  }
+  
+  // Create test script
+  const mailDir = path.join(baseDir, 'mail');
+  ensureDirectoryExists(mailDir);
+  
+  const testScriptContent = generateTestScriptContent(namePascal, nameCamel);
+  const testScriptPath = path.join(mailDir, `test-${nameCamel}.js`);
+  
+  if (writeFileIfNotExists(testScriptPath, testScriptContent)) {
+    console.log(`${green('✓')} ${cyan('📄')} ${green('Created:')} ${gray(`semantqQL/mail/test-${nameCamel}.js`)}`);
+  } else {
+    console.log(`${yellow('⚠')} ${yellow('Skipped:')} ${gray(`semantqQL/mail/test-${nameCamel}.js (already exists)`)}`);
+  }
+  
+  // Create template files (just one per service)
+  if (templateFiles.length > 0) {
+    const templateDir = path.join(mailDir, 'templates', templateDirName);
+    ensureDirectoryExists(templateDir);
+    
+    for (const templateName of templateFiles) {
+      const templateContent = generateTemplateContent(templateName, namePascal);
+      const normalizedTemplateName = templateName.toLowerCase();
+      const templatePath = path.join(templateDir, `${normalizedTemplateName}.js`);
+      
+      if (writeFileIfNotExists(templatePath, templateContent)) {
+        console.log(`${green('✓')} ${cyan('📄')} ${green('Created:')} ${gray(`semantqQL/mail/templates/${templateDirName}/${normalizedTemplateName}.js`)}`);
+      } else {
+        console.log(`${yellow('⚠')} ${yellow('Skipped:')} ${gray(`semantqQL/mail/templates/${templateDirName}/${normalizedTemplateName}.js (already exists)`)}`);
+      }
+    }
+  }
+  
+  return true;
+}
+/**
+ * Generate service file content - FIXED
+ */
+function generateServiceContent(namePascal, nameCamel, methods, templateDirName = null) {
+    const className = `${namePascal}`;
+    const instanceName = `${nameCamel}`;
+    const templateDir = templateDirName || nameCamel.toLowerCase();
+    const templateIdentifier = `${templateDir}/${nameCamel.toLowerCase()}`;
+
+    const methodsCode = methods.map(method => {
+        const methodName = method.trim();
+        
+        if (methodName === `send${namePascal}`) {
+            return `
+    /**
+     * Send ${namePascal} email
+     * @param {Object} payload - Email payload
+     * @param {string[]} payload.recipients - Recipient emails
+     * @param {string} payload.subject - Email subject
+     * @param {string} payload.template - Template identifier
+     * @param {string} [payload.text] - Plain text content
+     * @param {string} [payload.html] - HTML content
+     * @param {string} [payload.body] - Simple text/HTML
+     * @param {Object} [payload.templateData] - Additional template data
+     * @param {string[]} [payload.cc] - CC recipients
+     * @param {string[]} [payload.bcc] - BCC recipients
+     * @param {string} [payload.replyTo] - Reply-to address
+     * @param {string} [payload.from] - From address
+     * @param {string} [payload.fromName] - From name
+     * @param {Object[]} [payload.attachments] - File attachments
+     */
+    async ${methodName}(payload) {
+        // Ensure template is set
+        if (!payload.template) {
+            payload.template = '${templateIdentifier}';
+        }
+        
+        return this.mail.send(payload);
+    }`;
+        } else {
+            const customTemplateName = methodName.toLowerCase().replace(/^send/, '');
+            return `
+    async ${methodName}(payload) {
+        // Set default template if not provided
+        if (!payload.template) {
+            payload.template = '${templateDir}/${customTemplateName}';
+        }
+        
+        return this.mail.send(payload);
+    }`;
+        }
+    }).join('\n\n');
+    
+    return `import { MailService } from '@semantq/mail';
+
+/**
+ * ${className} - Email service for ${namePascal} related emails.
+ */
+class ${className} { 
+    constructor() {
+        this.mail = null;
+        this.initialized = false;
+    }
+
+    async init() {
+        if (this.initialized) return this;
+        
+        try {
+            this.mail = await MailService.create();
+            this.initialized = true;
+        } catch (error) {
+            console.error('Failed to initialize ${className}:', error);
+            this.mail = new MailService({
+                email: { driver: 'log' },
+                brand: { name: 'Our Service' }
+            });
+            this.initialized = true;
+        }
+        
+        return this;
+    }
+${methodsCode}
+
+    getBrandName() {
+        return this.mail?.config?.brand?.name || 'Our Service';
+    }
+
+    isRealDriver() {
+        return this.mail?.isRealDriver?.() || false;
+    }
+
+    getConfig() {
+        return this.mail?.getConfig?.() || {};
+    }
+}
+
+const ${instanceName} = new ${className}(); 
+export { ${className} };
+export default ${instanceName};
+`;
+}
+/**
+ * Generate template content
+ */
+function generateTemplateContent(templateName, serviceName) {
+    const templateNamePascal = toPascalCase(templateName);
+    const normalizedTemplateName = templateName.toLowerCase();
+    
+    return `// ${templateNamePascal} Email Template
+// This template returns EMPTY content since content comes from payload
+
+/**
+ * Template object with subject, html, and text functions.
+ * Each function receives: { data, brand, recipient }
+ */
+export default {
+    subject: ({ data, brand }) => {
+        return data.subject || \`Message from \${brand?.name || 'Our Service'}\`;
+    },
+
+    html: ({ data, recipient, brand }) => {
+        // This template returns EMPTY because content comes from payload
+        // If you want template-specific content, use a different template
+        return '';
+    },
+
+    text: ({ data, recipient, brand }) => {
+        return '';
+    }
+};
+`;
+}
+
+/**
+ * Generate a minimal, dev-friendly test script for the mail service.
+ * @param {string} namePascal - The service name in PascalCase (e.g., 'Welcome').
+ * @param {string} nameCamel - The service name in camelCase (e.g., 'welcome').
+ * @returns {string} The content for the test script file.
+ */
+function generateTestScriptContent(namePascal, nameCamel) {
+  const testFileName = `test-${nameCamel}.js`;
+  const sendMethod = `send${namePascal}`;
+
+  return `// ${testFileName}
+// Minimal test script for ${namePascal} email service
+// Run: cd semantqQL && node mail/${testFileName}
+
+import ${nameCamel} from '../services/${namePascal}.js';
+
+/**
+ * Tests the basic ${namePascal} email functionality.
+ */
+async function test${namePascal}Email() {
+  
+  try {
+    // 1. Initialize service
+    await ${nameCamel}.init();
+    console.log('[STATUS] Service ready | Driver: ' + ${nameCamel}.mail?.getDriverName());
+
+    // ============================================
+    // CONFIGURATION: EDIT EMAIL ADDRESS BELOW
+    // ============================================
+    
+    // BASIC EXAMPLE - Simple text email
+    const emailData = {
+      recipients: ['test@example.com'], // <--- Replace with your email
+      subject: 'Basic ${namePascal} Test',
+      template: '${nameCamel.toLowerCase()}/${nameCamel.toLowerCase()}',
+      recipient: {  // ← Recipient info with name
+        email: 'test@example.com',
+        name: 'Test User'  // ← Customize name here
+      },
+      text: 'This is a test email from the ${namePascal} service.'
+      // templateData: { themeColor: '#667eea' } // Optional: Additional template data
+    };
+    
+    // ============================================
+    // CORE FUNCTION: DO NOT ALTER
+    // ============================================
+    console.log('\\n[SENDING] Dispatching email...');
+    const result = await ${nameCamel}.${sendMethod}(emailData);
+    
+    if (result.success) {
+      console.log('[RESULT] Basic test: PASS');
+    } else {
+      console.log(\`[RESULT] Basic test: FAIL - \${result.message || 'Unknown Error'}\`);
+    }
+
+    // ============================================
+    // FULL FEATURED EXAMPLE (Uncomment to use)
+    // ============================================
+    /*
+    const fullOptions = {
+      // REQUIRED: Core email fields
+      recipients: ['customer@example.com', 'backup@example.com'],
+      subject: 'Full Featured ${namePascal}',
+      template: '${nameCamel.toLowerCase()}/${nameCamel.toLowerCase()}',
+      
+      // OPTIONAL: Content (use one or more)
+      text: 'Plain text version of the email',
+      html: '<p>HTML <strong>version</strong> of the email</p>',
+      // body: 'Simple text or HTML that works for both',
+      
+      // OPTIONAL: Email routing
+      cc: ['team@example.com'],
+      bcc: ['analytics@example.com'],
+      replyTo: 'support@example.com',
+      from: 'noreply@example.com',
+      fromName: '${namePascal} Team',
+      
+      // OPTIONAL: Attachments
+      attachments: [
+        {
+          filename: 'test.txt',
+          content: 'This is a test attachment',
+          contentType: 'text/plain'
+        }
+      ],
+      
+      // OPTIONAL: Additional template data
+      templateData: {
+        features: ['Feature 1', 'Feature 2'],
+        customField: 'Any data you need',
+        themeColor: '#667eea'
+      }
+    };
+
+    console.log('\\n[SENDING] Full featured example...');
+    const fullResult = await ${nameCamel}.${sendMethod}(fullOptions);
+    */
+    
+    // ============================================
+    // ALTERNATIVE: HTML EMAIL EXAMPLE
+    // ============================================
+    /*
+    const htmlEmail = {
+      recipients: ['user@example.com'],
+      subject: 'HTML ${namePascal} Test',
+      template: '${nameCamel.toLowerCase()}/${nameCamel.toLowerCase()}',
+      html: '<h1>${namePascal} Email</h1><p>This is an HTML test email.</p>',
+      text: '${namePascal} Email - This is a plain text version.'
+    };
+    */
+    
+    // ============================================
+    // ALTERNATIVE: SIMPLE BODY EMAIL
+    // ============================================
+    /*
+    const simpleEmail = {
+      recipients: ['admin@example.com'],
+      subject: 'Simple ${namePascal} Notification',
+      template: '${nameCamel.toLowerCase()}/${nameCamel.toLowerCase()}',
+      body: 'Simple text notification from ${namePascal} service.'
+    };
+    */
+
+    // ============================================
+    // DOCUMENTATION
+    // ============================================
+    /*
+    ---
+    For full parameter details and setup instructions, see:
+    https://github.com/semantq/mail
+    */
+
+    return result.success;
+
+  } catch (error) {
+    console.error('\\n[ERROR] Setup/Runtime Failure:', error.message);
+    return false;
+  }
+}
+
+// Run test
+test${namePascal}Email()
+  .then(success => {
+    process.exit(success ? 0 : 1);
+  })
+  .catch(() => {
+    process.exit(1);
+  });
+`;
+}
+// ===============================
+// UTILITY FUNCTIONS FOR MAKE:MAIL
+// ===============================
+
+/**
+ * Ensure directory exists
+ */
+function ensureDirectoryExists(dirPath) {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Write file if it doesn't exist
+ */
+function writeFileIfNotExists(filePath, content) {
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, content.trim());
+    return true;
+  }
+  return false;
+}
+
+
+
+
+
 // Parse CLI arguments
 program.parse(process.argv);
