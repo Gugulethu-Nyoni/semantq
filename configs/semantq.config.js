@@ -8,7 +8,7 @@ export default {
   metaDescription: 'My Awesome Website',
   metaKeywords: 'Awesome this, awesome that',
   envFilePath: path.join(rootDir, '.env'),
-  sitemap: true,
+  sitemap: false,
   base: '/',
 
   components: {
@@ -28,7 +28,7 @@ export default {
     fileBasedRoutes: path.join(rootDir, 'build/routes/fileBasedRoutes.js'),
   },
   semantqNav: {
-    enable: true,
+    enable: false,
     containerClass: 'semantq-nav-container',
     ulClass: 'semantq-nav-list',
     liClass: 'semantq-nav-item',
