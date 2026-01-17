@@ -2423,6 +2423,234 @@ function writeFileIfNotExists(filePath, content) {
 
 
 
+// ===============================
+// MODULES:MOVE COMMAND
+// ===============================
+program
+  .command('modules:move [moduleName]')
+  .description('Move Semantq modules from node_modules to packages directory')
+  .option('--all', 'Move all Semantq modules')
+  .option('-d, --dry-run', 'Show what would be moved without actually moving')
+  .option('-f, --force', 'Overwrite existing packages')
+  .option('-s, --symlink', 'Create symlink in node_modules after move')
+  .action(async (moduleName, options) => {
+    const projectRoot = process.cwd();
+    const packagesDir = path.join(projectRoot, 'packages');
+    const nodeModulesDir = path.join(projectRoot, 'node_modules');
+    
+    // Validate environment
+    if (!fs.existsSync(nodeModulesDir)) {
+      console.error(`${ERROR_ICON} ${red('node_modules directory not found in current project')}`);
+      console.log(`${gray('Run this command from your project root directory')}`);
+      process.exit(1);
+    }
+
+    // Ensure packages directory exists
+    fs.ensureDirSync(packagesDir);
+
+    try {
+      const spinner = ora(blue('Discovering Semantq modules...')).start();
+      
+      // Discover all Semantq modules in node_modules
+      const modules = await discoverSemantqModules(nodeModulesDir);
+      
+      if (modules.length === 0) {
+        spinner.stop();
+        console.log(`${INFO_ICON} ${yellow('No Semantq modules found in node_modules')}`);
+        return;
+      }
+
+      spinner.succeed(`${green(`Found ${modules.length} Semantq module(s)`)}`);
+
+      let modulesToMove = [];
+      
+      if (options.all) {
+        // Move all modules
+        modulesToMove = modules;
+        console.log(`${INFO_ICON} ${blue('Moving all Semantq modules to packages/')}`);
+      } else if (moduleName) {
+        // Move specific module
+        const targetModule = modules.find(m => 
+          m.name === moduleName || 
+          m.name === `@semantq/${moduleName}` ||
+          m.scopedName === moduleName
+        );
+        
+        if (!targetModule) {
+          console.error(`${ERROR_ICON} ${red(`Module "${moduleName}" not found in node_modules`)}`);
+          console.log(`${gray('Available modules:')}`);
+          modules.forEach(m => console.log(`${purple('  •')} ${m.name}`));
+          process.exit(1);
+        }
+        
+        modulesToMove = [targetModule];
+        console.log(`${INFO_ICON} ${blue(`Moving module "${targetModule.name}" to packages/`)}`);
+      } else {
+        // No module name provided and no --all flag
+        console.error(`${ERROR_ICON} ${red('Specify a module name or use --all flag')}`);
+        console.log(`${gray('Examples:')}`);
+        console.log(`${purple('  •')} semantq modules:move @semantq/auth`);
+        console.log(`${purple('  •')} semantq modules:move --all`);
+        process.exit(1);
+      }
+
+      // Process each module
+      for (const module of modulesToMove) {
+        await moveModule(module, projectRoot, packagesDir, options);
+      }
+
+      console.log(`${SUCCESS_ICON} ${green('Module move completed successfully!')}`);
+      
+    } catch (error) {
+      console.error(`${ERROR_ICON} ${red('Error moving modules:')} ${error.message}`);
+      process.exit(1);
+    }
+  });
+
+// Helper function to discover Semantq modules
+async function discoverSemantqModules(nodeModulesDir) {
+  const modules = [];
+  
+  if (!fs.existsSync(nodeModulesDir)) return modules;
+  
+  const entries = fs.readdirSync(nodeModulesDir, { withFileTypes: true });
+  
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      const fullPath = path.join(nodeModulesDir, entry.name);
+      
+      if (entry.name.startsWith('@')) {
+        // Scoped packages
+        try {
+          const scopedEntries = fs.readdirSync(fullPath, { withFileTypes: true });
+          for (const scopedEntry of scopedEntries) {
+            if (scopedEntry.isDirectory()) {
+              const scopedPath = path.join(fullPath, scopedEntry.name);
+              await processModulePackage(scopedPath, modules, entry.name, scopedEntry.name);
+            }
+          }
+        } catch (error) {
+          // Skip permission errors
+          if (error.code !== 'EACCES') {
+            console.warn(`${WARNING_ICON} ${yellow(`Error reading ${entry.name}: ${error.message}`)}`);
+          }
+        }
+      } else {
+        // Regular packages
+        await processModulePackage(fullPath, modules, null, entry.name);
+      }
+    }
+  }
+  
+  return modules;
+}
+
+// Helper to process a package.json file
+async function processModulePackage(modulePath, modules, scope, scopedName) {
+  const pkgPath = path.join(modulePath, 'package.json');
+  
+  if (fs.existsSync(pkgPath)) {
+    try {
+      const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+      if (pkg['semantq-module']) {
+        modules.push({
+          name: pkg.name,
+          path: modulePath,
+          scope: scope,
+          scopedName: scopedName,
+          version: pkg.version
+        });
+      }
+    } catch (error) {
+      console.warn(`${WARNING_ICON} ${yellow(`Error reading package.json in ${modulePath}: ${error.message}`)}`);
+    }
+  }
+}
+
+// Helper function to move a single module
+async function moveModule(module, projectRoot, packagesDir, options) {
+  const { dryRun, force, symlink } = options;
+  
+  const targetPath = module.scope 
+    ? path.join(packagesDir, module.scope, module.scopedName)
+    : path.join(packagesDir, module.scopedName);
+  
+  const sourcePath = module.path;
+  
+  console.log(`${INFO_ICON} ${blue('Processing:')} ${purple(module.name)} ${gray(`(v${module.version})`)}`);
+  
+  // Check if target already exists
+  if (fs.existsSync(targetPath)) {
+    if (force) {
+      console.log(`${WARNING_ICON} ${yellow(`Target exists, overwriting due to --force flag`)}`);
+      if (!dryRun) {
+        fs.removeSync(targetPath);
+      }
+    } else {
+      console.log(`${WARNING_ICON} ${yellow(`Module already exists in packages/, skipping (use --force to overwrite)`)}`);
+      return;
+    }
+  }
+  
+  // Create target directory structure
+  if (!dryRun) {
+    fs.ensureDirSync(path.dirname(targetPath));
+  }
+  
+  if (dryRun) {
+    console.log(`${INFO_ICON} ${gray(`Would move: ${path.relative(projectRoot, sourcePath)} → ${path.relative(projectRoot, targetPath)}`)}`);
+  } else {
+    // Move the module
+    try {
+      fs.moveSync(sourcePath, targetPath, { overwrite: true });
+      console.log(`${SUCCESS_ICON} ${green(`Moved to: ${path.relative(projectRoot, targetPath)}`)}`);
+      
+      // Create symlink back to node_modules if requested
+      if (symlink) {
+        const nodeModulesPath = module.scope 
+          ? path.join(projectRoot, 'node_modules', module.scope, module.scopedName)
+          : path.join(projectRoot, 'node_modules', module.scopedName);
+        
+        fs.ensureDirSync(path.dirname(nodeModulesPath));
+        
+        try {
+          // Remove if exists (could be broken symlink)
+          if (fs.existsSync(nodeModulesPath) || fs.lstatSync(nodeModulesPath).isSymbolicLink()) {
+            fs.removeSync(nodeModulesPath);
+          }
+          
+          // Create symlink
+          fs.ensureSymlinkSync(targetPath, nodeModulesPath);
+          console.log(`${SUCCESS_ICON} ${green(`Created symlink in node_modules`)}`);
+        } catch (symlinkError) {
+          console.warn(`${WARNING_ICON} ${yellow(`Failed to create symlink: ${symlinkError.message}`)}`);
+        }
+      }
+      
+      // Update package.json if needed (remove from dependencies if it was there)
+      const projectPackageJsonPath = path.join(projectRoot, 'package.json');
+      if (fs.existsSync(projectPackageJsonPath)) {
+        try {
+          const projectPkg = JSON.parse(fs.readFileSync(projectPackageJsonPath, 'utf8'));
+          const deps = projectPkg.dependencies || {};
+          
+          if (deps[module.name]) {
+            console.log(`${INFO_ICON} ${gray(`Note: Module "${module.name}" is still listed in package.json dependencies`)}`);
+            console.log(`${gray('  You may want to remove it with:')} ${purple(`npm uninstall ${module.name}`)}`);
+          }
+        } catch (error) {
+          // Silent fail on package.json update
+        }
+      }
+      
+    } catch (error) {
+      console.error(`${ERROR_ICON} ${red(`Failed to move ${module.name}: ${error.message}`)}`);
+      throw error;
+    }
+  }
+}
+
+
 
 
 // Parse CLI arguments
