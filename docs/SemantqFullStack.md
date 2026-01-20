@@ -426,8 +426,104 @@ To **delete** a record, use the **Delete** button located at the bottom of the m
 
 The cool part is that AnyGrid handles database and UI updates for your data grid and modal seamlessly - without any page reloads. 
 
+To ensure your decoupled frontend and backend communicate securely and reliably—especially on mobile browsers like Safari and in Incognito mode—add this section to your README, likely between **Step 3 (Database Initialization)** and **Step 4 (Creating a CRUD Model)**.
 
-### 🎉 You're CRUD-Ready!
+
+### Live Deployment: Configuring Auth for Decoupled Environments
+
+When your frontend and backend are hosted on different domains (e.g., frontend on `example.com` and backend on `render.com`), standard browser security often blocks the authentication cookies. This results in users being logged out immediately after a successful login.
+
+Semantq handles this using **Subdomain Alignment**, ensuring your session cookies are treated as "First-Party" and trusted by all browsers.
+
+#### 1. The Subdomain Strategy
+
+The industry best practice is to point a subdomain of your main site to your backend.
+
+* **Frontend:** `https://example.com`
+* **Backend API:** `https://api.example.com`
+
+> **Note:** Create a **CNAME** record in your DNS manager (cPanel/GoDaddy/Cloudflare) pointing `api` to your Render/Server URL.
+
+#### 2. Configure Backend Cookie Scope
+
+Update your backend configuration to allow the cookie to be shared across the root domain. In Semantq, this is handled in the `cookies.js` config.
+
+**File:** `projectroot/packages/@semantq/auth/config/cookies.js`
+
+```javascript
+export const getCookieOptions = () => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  if (isProduction) {
+    return {
+      httpOnly: true,    // Prevents XSS: Cookie is invisible to JavaScript
+      secure: true,      // Required: Must be sent over HTTPS
+      sameSite: 'lax',   // Standard security for subdomain sharing
+      maxAge: 24 * 60 * 60 * 1000, 
+      path: '/',
+      // IMPORTANT: The leading dot allows sharing between app. and api.
+      domain: '.example.com', 
+    };
+  }
+  // ... development settings
+};
+
+```
+
+#### 3. Update Frontend API Endpoint
+
+Update your frontend configuration to target the new secure subdomain.
+
+**File:** `projectroot/public/auth/js/config.js`
+
+```javascript
+const AppConfig = {
+    // ...
+    BASE_URLS: {
+      development: 'http://localhost:3003/@semantq/auth',
+      // Ensure this matches your new subdomain
+      production: 'https://api.example.com/@semantq/auth'
+    },
+    // ...
+};
+
+```
+
+
+#### 4. Update CORS Allowed Domains 
+
+
+```javascript
+allowedOrigins: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:3000',
+    'http://localhost:3003',
+    // PRODUCTION ORIGINS
+    'https://example.com',
+    'https://www.example.com', // Standardize to include www if users use it
+    'https://api.example.com'   // Helpful for internal API testing/tools
+  ],
+```
+
+
+#### 5. Security Layers Recap
+
+Semantq doesn't just rely on cookies. The auth system provides a multi-layered guard that can be applied to any route:
+
+* **HTTP-Only Cookies:** Protects against session hijacking.
+* **CORS Protection:** Restricts API access to your specific frontend domains.
+* **Access Level Guards:** Granular authorization (e.g., `authorize(3)` for SuperAdmins).
+* **API Key Validation:** For secure service-to-service communication.
+
+```javascript
+// Example of a fully guarded Semantq route
+router.post('/system/reset', validateApiKey, authenticateToken, authorize(3), controller.reset);
+
+```
+
+### You're CRUD-Ready!
 
 You’ve now learned how to **create, read, update, and delete** records using Semantq. With the `gridModal`'s built-in edit and delete features, your entire CRUD workflow is handled on a single page—efficient and seamless.
 
@@ -436,5 +532,3 @@ You’ve now learned how to **create, read, update, and delete** records using S
 Semantq is open-source software licensed under the **MIT License**.
 
 ## Semantq Main Documentation: [Semantq](https://github.com/Gugulethu-Nyoni/semantq).
-
-Danko! Ngyabonga!. 

@@ -3,6 +3,12 @@
 docker run --name my-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -p 3306:3306 -d mysql:8
 
 
+Dump (export)
+
+docker exec my-mysql mysqldump -u root -pmy-secret-pw diva > diva.sql
+
+
+
 2. Check running containers
 docker ps
 
