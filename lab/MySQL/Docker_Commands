@@ -7,6 +7,9 @@ Dump (export)
 
 docker exec my-mysql mysqldump -u root -pmy-secret-pw diva > diva.sql
 
+docker exec my-mysql mysqldump -u root -pmy-secret-pw kwazinto > kwazinto.sql
+
+
 
 
 2. Check running containers
@@ -30,6 +33,8 @@ docker stop my-mysql
 
 DUMP
 
-docker exec my-mysql mysqldump -u root -pmy-secret-pw botaniq > botaniq.sql
+docker exec my-mysql mysqldump -u root -pmy-secret-pw lapeng > lapeng3Feb.sql
+https://meet.google.com/bzo-gnei-uwa
+
 
 

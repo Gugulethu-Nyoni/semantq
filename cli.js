@@ -451,7 +451,7 @@ program
   .command('make:route')
   .description('Create a new route with stylish feedback')
   .argument('<routeName>', 'Name of the route to create')
-  .argument('[role]', 'Role for Pylon routes (optional)')
+  .argument('[model]', 'Model for Pylon routes (optional)')
   .option('-l, --layout', 'Add layout file')
   .option('-c, --crud', 'Add CRUD operations')
   .option('-a, --auth', 'Add auth import to page template')
@@ -467,7 +467,7 @@ program
       // Handle Pylon route creation
       if (options.pylon) {
         if (!role) {
-          console.log(errorRed('Error: Pylon route requires a role. Use: semantq make:route plan project-manager --pylon'));
+          console.log(errorRed('Error: Pylon route requires a model. Use: semantq make:route model project-manager --pylon'));
           return;
         }
         
@@ -1538,23 +1538,48 @@ program
 
 
 // ===============================
-// ADD THIS FUNCTION TO CLI.JS
+// here
+// ===============================
+// ===============================
+// FIXED: readServerConfig - SURGICAL UPDATE
 // ===============================
 async function readServerConfig(projectRoot) {
-  // 1. Find server.config.js in projectRoot/semantqQL rather than in project root
+  // SURGICAL FIX: Look for server.config.js in semantqQL directory
   const configPath = path.join(projectRoot, 'semantqQL', 'server.config.js');
   
   try {
-    // Dynamically import the config file
-    // Note: dynamic 'import()' requires a file URL (pathToFileURL) for local files
-    const config = await import(pathToFileURL(configPath).href);
+    // Dynamic import of the config file
+    const configModule = await import(pathToFileURL(configPath).href);
+    const rawConfig = configModule.default || configModule;
     
-    // Return the default export, or the entire module if no default
-    return config.default || config;
+    // Extract adapter from your nested connection structure
+    let adapter = 'mysql'; // Default fallback
+    
+    if (rawConfig.database) {
+      // Case 1: Direct adapter property (transformed by config_loader)
+      if (rawConfig.database.adapter) {
+        adapter = rawConfig.database.adapter;
+      } 
+      // Case 2: Your actual nested config structure
+      else if (rawConfig.database.connections && rawConfig.database.default) {
+        const defaultDb = rawConfig.database.default;
+        const defaultConnection = rawConfig.database.connections[defaultDb];
+        if (defaultConnection && defaultConnection.adapter) {
+          adapter = defaultConnection.adapter;
+        }
+      }
+    }
+    
+    // Return config in the format expected by make:resource
+    return { 
+      database: { 
+        adapter 
+      } 
+    };
+    
   } catch (error) {
-    console.log(chalk.yellow(`⚠Could not read server.config.js at ${configPath}: ${error.message}`));
-    
-    // Return a default configuration if the file cannot be read or imported
+    // Silent fail - just log and return default
+    console.log(chalk.yellow(`⚠ Could not read server.config.js: ${error.message}`));
     return { database: { adapter: 'mysql' } };
   }
 }

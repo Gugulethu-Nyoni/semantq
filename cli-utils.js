@@ -82,9 +82,23 @@ function toPascalCase(name) {
 // --- Resource Generation Functions ---
 
 // Generate Model function
+// Generate Model function - FIXED for PostgreSQL
 export function generateModel(name, database, baseDir) {
-  const namePascal = toPascalCase(name); // Use PascalCase for model file, class, and Mongoose model name
-  const nameCamel = toCamelCase(name); // Use camelCase for Prisma model name in queries (e.g., prisma.driverLocation)
+  const namePascal = toPascalCase(name);
+  const nameCamel = toCamelCase(name);
+  
+  // SURGICAL FIX: Normalize database adapter name to directory name
+  // Map 'postgresql' → 'postgresql' (keep as is for directory)
+  // Map 'mysql' → 'mysql'
+  // Map 'supabase' → 'supabase'
+  // Map 'postgres' → 'postgresql' (if needed)
+  let modelDirName = database;
+  
+  // Handle common variations
+  if (database === 'postgres') {
+    modelDirName = 'postgresql';
+  }
+  
   let modelTemplate = '';
 
   switch (database) {
@@ -103,6 +117,8 @@ export default mongoose.model('${namePascal}', ${nameCamel}Schema);
 
     case 'supabase':
     case 'mysql':
+    case 'postgresql': // ADDED: PostgreSQL case
+    case 'postgres':   // ADDED: Alternative name
       modelTemplate = `
 // Add to your schema.prisma:
 /*
@@ -126,7 +142,7 @@ export default class ${namePascal}Model {
    * @returns {Promise<object>} The created ${nameCamel} object.
    */
   static async create(data) {
-    const prisma = await getPrismaClient(); // Get the initialized Prisma client
+    const prisma = await getPrismaClient();
     return prisma.${nameCamel}.create({ data });
   }
 
@@ -136,7 +152,7 @@ export default class ${namePascal}Model {
    * @returns {Promise<object|null>} The found ${nameCamel} object, or null if not found.
    */
   static async findById(id) {
-    const prisma = await getPrismaClient(); // Get the initialized Prisma client
+    const prisma = await getPrismaClient();
     return prisma.${nameCamel}.findUnique({ where: { id } });
   }
 
@@ -145,7 +161,7 @@ export default class ${namePascal}Model {
    * @returns {Promise<Array<object>>} An array of all ${nameCamel} objects.
    */
   static async findAll() {
-    const prisma = await getPrismaClient(); // Get the initialized Prisma client
+    const prisma = await getPrismaClient();
     return prisma.${nameCamel}.findMany();
   }
 
@@ -156,7 +172,7 @@ export default class ${namePascal}Model {
    * @returns {Promise<object>} The updated ${nameCamel} object.
    */
   static async update(id, data) {
-    const prisma = await getPrismaClient(); // Get the initialized Prisma client
+    const prisma = await getPrismaClient();
     return prisma.${nameCamel}.update({
       where: { id },
       data,
@@ -169,7 +185,7 @@ export default class ${namePascal}Model {
    * @returns {Promise<object>} The deleted ${nameCamel} object.
    */
   static async delete(id) {
-    const prisma = await getPrismaClient(); // Get the initialized Prisma client
+    const prisma = await getPrismaClient();
     return prisma.${nameCamel}.delete({ where: { id } });
   }
 
@@ -180,11 +196,11 @@ export default class ${namePascal}Model {
    * @returns {Promise<Array<object>>} An array of ${nameCamel} objects for the given pagination.
    */
   static async findWithPagination(skip = 0, take = 10) {
-    const prisma = await getPrismaClient(); // Get the initialized Prisma client
+    const prisma = await getPrismaClient();
     return prisma.${nameCamel}.findMany({
       skip,
       take,
-      orderBy: { createdAt: 'desc' }, // Assuming 'createdAt' field exists for ordering
+      orderBy: { createdAt: 'desc' },
     });
   }
 }
@@ -207,56 +223,31 @@ model ${namePascal} {
 import getPrismaClient from '../../lib/prisma.js';
 
 export default class ${namePascal}Model {
-  /**
-   * Creates a new ${nameCamel} in the database.
-   * @param {object} data - The data for the new ${nameCamel}.
-   * @returns {Promise<object>} The created ${nameCamel} object.
-   */
   static async create(data) {
-    const prisma = await getPrismaClient(); // Get the initialized Prisma client
+    const prisma = await getPrismaClient();
     return prisma.${nameCamel}.create({ data });
   }
 
-  /**
-   * Finds a ${nameCamel} by its unique ID.
-   * @param {string} id - The ID of the ${nameCamel} to find.
-   * @returns {Promise<object|null>} The found ${nameCamel} object, or null if not found.
-   */
   static async findById(id) {
-    const prisma = await getPrismaClient(); // Get the initialized Prisma client
+    const prisma = await getPrismaClient();
     return prisma.${nameCamel}.findUnique({ where: { id } });
   }
 
-  /**
-   * Retrieves all ${nameCamel}s from the database.
-   * @returns {Promise<Array<object>>} An array of all ${nameCamel} objects.
-   */
   static async findAll() {
-    const prisma = await getPrismaClient(); // Get the initialized Prisma client
+    const prisma = await getPrismaClient();
     return prisma.${nameCamel}.findMany();
   }
 
-  /**
-   * Updates an existing ${nameCamel} by its ID.
-   * @param {string} id - The ID of the ${nameCamel} to update.
-   * @param {object} data - The data to update the ${nameCamel} with.
-   * @returns {Promise<object>} The updated ${nameCamel} object.
-   */
   static async update(id, data) {
-    const prisma = await getPrismaClient(); // Get the initialized Prisma client
+    const prisma = await getPrismaClient();
     return prisma.${nameCamel}.update({
       where: { id },
       data,
     });
   }
 
-  /**
-   * Deletes a ${nameCamel} by its ID.
-   * @param {string} id - The ID of the ${nameCamel} to delete.
-   * @returns {Promise<object>} The deleted ${nameCamel} object.
-   */
   static async delete(id) {
-    const prisma = await getPrismaClient(); // Get the initialized Prisma client
+    const prisma = await getPrismaClient();
     return prisma.${nameCamel}.delete({ where: { id } });
   }
 }
@@ -268,11 +259,12 @@ export default class ${namePascal}Model {
       return false;
   }
 
-  const modelDir = path.join(baseDir, 'models', database);
+  // SURGICAL FIX: Use normalized directory name
+  const modelDir = path.join(baseDir, 'models', modelDirName);
   ensureDirectoryExists(modelDir);
-  const filePath = path.join(modelDir, `${namePascal}.js`); // File name in PascalCase
+  const filePath = path.join(modelDir, `${namePascal}.js`);
   writeFileIfNotExists(filePath, modelTemplate);
-  console.log(`${SUCCESS_ICON} ${green(`Generated ${namePascal} model for`)} ${blue(database)}`);
+  console.log(`${SUCCESS_ICON} ${green(`Generated ${namePascal} model for`)} ${blue(database)} ${gray(`→ ${modelDirName}/`)}`);
   return true;
 }
 
@@ -782,63 +774,3 @@ export async function generateResource(name, baseDir, database, pylon = false) {
 }
 
 
-async function readServerConfig(projectRoot) {
-  const configPath = path.join(projectRoot, 'semantq_server', 'semantq.config.js');
-  try {
-    const fileUrl = typeof pathToFileURL !== 'undefined'
-      ? pathToFileURL(configPath).href
-      : 'file://' + configPath.replace(/\\/g, '/');
-
-    const config = await import(fileUrl);
-    return config.default || config;
-  } catch (error) {
-    console.log(chalk.yellow(`⚠ Could not read semantq.config.js: ${error.message}`));
-    return { database: { adapter: 'mysql' } };
-  }
-}
-
-const program = new Command();
-
-program
-  .command('make:resource <resourceName>')
-  .description('Generate full backend resource (Model, Controller, Service, Route)')
-  .action(async (resourceName) => {
-    const targetBaseDir = process.cwd();
-    const serverDir = path.join(targetBaseDir, 'semantq_server');
-
-    try {
-      if (!fs.existsSync(serverDir)) {
-        console.error(errorRed('✖ semantq_server directory not found.'));
-        console.log(chalk.yellow('› Run this command from your project root with semantq_server installed.'));
-        console.log(chalk.yellow('› To install the server, run: semantq install:server'));
-        return;
-      }
-
-      const serverConfig = await readServerConfig(targetBaseDir);
-      const databaseAdapter = serverConfig.database?.adapter || 'mysql';
-
-      // Ensure the display name is PascalCase
-      const displayResourceName = toPascalCase(resourceName);
-      console.log(`${purpleBright('🚀')} ${blue('Generating')} ${purple(displayResourceName)} ${blue('resource for')} ${purple(databaseAdapter)}`);
-
-      await generateResource(resourceName, serverDir, databaseAdapter);
-
-      console.log(`${purpleBright('✨')} ${blue('Resource generation complete!')}`);
-      console.log(`
-${purpleBright('» Next steps:')}
-  ${databaseAdapter === 'mongo' ?
-    `${purpleBright('›')} ${gray('Your MongoDB model is ready to use')}` :
-    `${purpleBright('›')} ${gray('Add the model to your schema.prisma')}
-      ${purpleBright('›')} ${gray('Run:')} ${purple(`npx prisma migrate dev --name add_${toCamelCase(resourceName)}_model`)}`
-  }
-  ${purpleBright('›')} ${gray('Add the route to your main router if needed')}
-  ${purpleBright('›')} ${gray('Restart your server to apply changes')}
-`);
-    } catch (error) {
-      console.error(`${errorRed('✖')} ${blue('Error generating resource:')} ${errorRed(error.message)}`);
-      if (error.stack) console.error(`${purpleBright('›')} ${gray('Stack trace:')} ${gray(error.stack)}`);
-      process.exit(1);
-    }
-  });
-
-export default program;

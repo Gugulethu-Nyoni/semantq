@@ -1,0 +1,15 @@
+docker run -d \
+  --name my_postgres \
+  -v my_dbdata:/var/lib/postgresql/data \
+  -p 54320:5432 \
+  -e POSTGRES_PASSWORD=my_password \
+  postgres:15-alpine
+
+
+
+ docker exec -it my_postgres psql -U postgres
+
+psql (15.15)
+Type "help" for help.
+
+postgres=# 
