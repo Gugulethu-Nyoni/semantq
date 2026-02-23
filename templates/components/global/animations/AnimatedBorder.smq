@@ -1,0 +1,130 @@
+@script
+
+@end
+
+@style
+/* ===== CONFIGURABLE CSS VARIABLES ===== */
+:root {
+  /* Border configuration */
+  --border-thickness: 3px;
+  --border-radius: 16px;
+  --inner-radius: 14px;
+  
+  /* Color configuration */
+  --bg-dark: #05051e;
+  --border-fallback: rgba(46, 46, 46, 0.3);
+  
+  /* Gradient configuration */
+  --gradient-start: #ffbd7a;
+  --gradient-mid-1: #fe8bbb;
+  --gradient-mid-2: #9e7aff;
+  --gradient-end: #7a5aff;
+  --gradient-transparent: transparent;
+  
+  /* Animation configuration */
+  --animation-speed: 4s;
+  --gradient-size: 200%;
+  --gradient-offset: 30%;
+}
+
+body { background-color: #05051e;}
+/* ===== ANIMATED CARD COMPONENT ===== */
+.animated-card {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  min-height: 500px;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  padding: var(--border-thickness);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--border-fallback);
+}
+
+/* The Spinning Gradient */
+.animated-card::before {
+  content: '';
+  position: absolute;
+  z-index: -2;
+  left: -50%;
+  top: -50%;
+  width: var(--gradient-size);
+  height: var(--gradient-size);
+  background-image: conic-gradient(
+    var(--gradient-transparent),
+    var(--gradient-start),
+    var(--gradient-mid-1),
+    var(--gradient-mid-2),
+    var(--gradient-end),
+    var(--gradient-transparent) var(--gradient-offset)
+  );
+  animation: rotate var(--animation-speed) linear infinite;
+}
+
+/* The Inner Mask (Card Body) */
+.animated-card::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: var(--border-thickness);
+  top: var(--border-thickness);
+  width: calc(100% - (var(--border-thickness) * 2));
+  height: calc(100% - (var(--border-thickness) * 2));
+  background: var(--bg-dark);
+  border-radius: var(--inner-radius);
+}
+
+/* Rotation Animation */
+@keyframes rotate {
+  100% { transform: rotate(1turn); }
+}
+
+/* ===== CONTENT CONTAINER (Optional) ===== */
+.card-content {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+  z-index: 1;
+  position: relative;
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+  .card-content {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+
+@end
+
+@html
+
+
+  <div class="animated-card">
+    <div class="card-content">
+      Your content here
+    </div>
+  </div>
+
+  Custom color scheme:
+  <div class="animated-card" style="
+    --gradient-start: #ff6b6b;
+    --gradient-mid-1: #ffd93d;
+    --gradient-mid-2: #6bcbff;
+    --gradient-end: #b983ff;
+    --bg-dark: #1a1a2e;
+    --animation-speed: 6s;
+  ">
+    <div class="card-content">Content</div>
+  </div>
+
+  Minimal usage (just the border effect):
+  <div class="animated-card">
+    <img src="image.jpg" style="width:100%; height:100%; object-fit:cover;">
+  </div>
