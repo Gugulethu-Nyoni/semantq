@@ -370,7 +370,7 @@ productData = response.data;
 const columns = [
   { name: 'id', header: 'ID' },
   { name: 'name', header: 'Title' },
-  { name: 'description', header: 'Description' },
+  { name: 'description', header: 'Description', noModal: true },
   { name: 'price', header: 'Price' }
 ];
 
