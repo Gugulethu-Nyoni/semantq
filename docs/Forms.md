@@ -18,9 +18,9 @@ The HTML form must use three specific attributes to enable file upload:
 
 ```html
 <form id="excel-form" action="/students/upload/1" method="POST" enctype="multipart/form-data">
-    <input type="file" name="exceldata" required> 
-    <input type="hidden" name="eventId" value="1"> 
-    <input type="submit" value="Upload">
+    <input type="file" name="exceldata" required /> 
+    <input type="hidden" name="eventId" value="1" /> 
+    <input type="submit" value="Upload" />
 </form>
 ```
 
