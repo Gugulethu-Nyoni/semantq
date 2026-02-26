@@ -2,7 +2,7 @@
 
 Semantq is a lightweight, expressive grammar and declarative syntax for writing Semantq JS Framework components with dynamic capabilities. It supports standard HTML elements, logic blocks, event handlers, and custom attributes. This documentation outlines the syntax and features supported by the Semantq grammar.
 
----
+
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -21,7 +21,7 @@ Semantq is a lightweight, expressive grammar and declarative syntax for writing 
 6. [Usage](#usage)
 7. [License](#license)
 
----
+
 
 ## Introduction
 
@@ -34,14 +34,14 @@ Semantq simplifies templating and dynamic HTML generation with:
 
 This makes it ideal for creating structured, dynamic content efficiently.
 
----
+
 
 
 # Component Structure in SemantQ
 
 A component in Semantq is composed of **JavaScript**, **CSS**, and **HTML**. All of these are optional, meaning you can include only what your component needs.
 
----
+
 
 ## JavaScript Tags
 
@@ -55,7 +55,7 @@ console.log("Hello World");
 @end
 ```
 
----
+
 
 ## CSS Tags
 
@@ -69,7 +69,7 @@ h1 { color: red; }
 @end
 ```
 
----
+
 
 ## HTML Tag (Optional)
 
@@ -82,7 +82,7 @@ The HTML content is marked with the `@html` tag. This tag is optional but helps 
 <h1>Hello World</h1>
 ```
 
----
+
 
 ## Using Regular HTML Tags
 
@@ -102,7 +102,7 @@ You are also free to use standard HTML `<script>` and `<style>` tags if you pref
 <h1>Hello World</h1>
 ```
 
----
+
 
 ## Important Notes
 
@@ -122,7 +122,7 @@ You are also free to use standard HTML `<script>` and `<style>` tags if you pref
 3. **Flexibility**:
    - You can include only the parts your component needs (e.g., just HTML, or HTML + CSS, or all three).
 
----
+
 
 ## Full Example
 
@@ -201,7 +201,7 @@ Self-closing HTML elements are also supported. For example:
 <img src="image.jpg" alt="An image" />
 ```
 
----
+
 
 ### Dynamic Content
 
@@ -219,7 +219,7 @@ The ternary operator (`? :`) is supported for conditional rendering within musta
 <button>Clicked: {counter} {counter > 1 ? 'times' : 'time'}</button>
 ```
 
----
+
 
 ### Event Handlers
 Event handlers are defined using the `@` symbol followed by the event name. The handler is specified using mustache syntax (`{...}`).
@@ -234,7 +234,7 @@ Event handlers are defined using the `@` symbol followed by the event name. The 
 <input type="text" @click={rejuice} value={counter} disabled />
 ```
 
----
+
 
 ### Slot Prop Attributes
 Slot prop attributes are used to pass data to slots in custom components. The syntax is `let:propName`.
@@ -251,7 +251,7 @@ Slot prop attributes are used to pass data to slots in custom components. The sy
 </div>
 ```
 
----
+
 
 ## Syntax Blocks to Be Added
 
@@ -294,7 +294,7 @@ You can combine logic blocks for more complex scenarios.
 {@endif}
 ```
 
----
+
 
 ### Async/Await Support
 Semantq makes it easy to handle asynchronous operations directly in templates.
@@ -309,7 +309,7 @@ Semantq makes it easy to handle asynchronous operations directly in templates.
 {@endawait}
 ```
 
----
+
 
 ### Keyed Lists
 For performance optimization, Semantq offers a `key` attribute for lists.
@@ -322,7 +322,7 @@ For performance optimization, Semantq offers a `key` attribute for lists.
 </ul>
 ```
 
----
+
 
 ### Async Blocks with Fallbacks
 For async blocks, you can provide a fallback UI while waiting for data.
@@ -339,7 +339,7 @@ For async blocks, you can provide a fallback UI while waiting for data.
 {@endawait}
 ```
 
----
+
 
 ## Examples
 
@@ -387,7 +387,7 @@ For async blocks, you can provide a fallback UI while waiting for data.
 </div>
 ```
 
----
+
 
 ## Grammar Rules
 The grammar is defined using Peggy.js and supports the following constructs:
@@ -397,7 +397,7 @@ The grammar is defined using Peggy.js and supports the following constructs:
 - **Dynamic Content**: Mustache syntax (`{...}`) and ternary operators.
 - **Slot Prop Attributes**: `let:propName` syntax for passing data to slots.
 
----
+
 
 ## Usage
 To use the Semantq grammar, include the Peggy.js parser in your project and parse templates using the provided grammar rules.
@@ -417,13 +417,13 @@ const result = parser.parse(template);
 console.log(result);
 ```
 
----
+
 
 ### Semantq Syntax Philosophy:
 
 Consistency, intuition, flexibility, elegance and efficiency. 
 
----
+
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
