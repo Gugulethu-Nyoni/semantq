@@ -1,6 +1,6 @@
-# Semantq Grammar Documentation
+# semantq Grammar Documentation
 
-Semantq is a lightweight, expressive grammar and declarative syntax for writing Semantq JS Framework components with dynamic capabilities. It supports standard HTML elements, logic blocks, event handlers, and custom attributes. This documentation outlines the syntax and features supported by the Semantq grammar.
+semantq is a lightweight, expressive grammar and declarative syntax for writing semantq JS Framework components with dynamic capabilities. It supports standard HTML elements, logic blocks, event handlers, and custom attributes. This documentation outlines the syntax and features supported by the semantq grammar.
 
 
 
@@ -25,7 +25,7 @@ Semantq is a lightweight, expressive grammar and declarative syntax for writing 
 
 ## Introduction
 
-Semantq simplifies templating and dynamic HTML generation with:
+semantq simplifies templating and dynamic HTML generation with:
 - Standard HTML elements
 - Self-closing tags
 - Mustache syntax for data binding
@@ -37,15 +37,15 @@ This makes it ideal for creating structured, dynamic content efficiently.
 
 
 
-# Component Structure in SemantQ
+# Component Structure in semantq
 
-A component in Semantq is composed of **JavaScript**, **CSS**, and **HTML**. All of these are optional, meaning you can include only what your component needs.
+A component in semantq is composed of **JavaScript**, **CSS**, and **HTML**. All of these are optional, meaning you can include only what your component needs.
 
 
 
 ## JavaScript Tags
 
-In Semantq, JavaScript code is enclosed within `@script` and `@end` tags. These tags act as markers for the beginning and end of the script block.
+In semantq, JavaScript code is enclosed within `@script` and `@end` tags. These tags act as markers for the beginning and end of the script block.
 
 ### Example: `Card.smq` or `+page.smq`
 
@@ -77,7 +77,7 @@ The HTML content is marked with the `@html` tag. This tag is optional but helps 
 
 ### Example: `Card.smq` or `+page.smq`
 
-```Semantq
+```semantq
 @html
 <h1>Hello World</h1>
 ```
@@ -86,7 +86,7 @@ The HTML content is marked with the `@html` tag. This tag is optional but helps 
 
 ## Using Regular HTML Tags
 
-You are also free to use standard HTML `<script>` and `<style>` tags if you prefer. This approach is fully supported in Semantq.
+You are also free to use standard HTML `<script>` and `<style>` tags if you prefer. This approach is fully supported in semantq.
 
 ### Example:
 
@@ -113,7 +113,7 @@ You are also free to use standard HTML `<script>` and `<style>` tags if you pref
    ```semantq
    @script
    console.log("Hello World");
-   <script> // This is invalid!
+   <script> // This is invalid (won't work)!
    ```
 
 2. **Optional HTML Marker**:
@@ -126,15 +126,15 @@ You are also free to use standard HTML `<script>` and `<style>` tags if you pref
 
 ## Full Example
 
-Here’s a complete example of a Semantq component using the custom syntax:
+Here’s a complete example of a semantq component using the custom syntax:
 
-```Semantq
+```semantq
 @script
 console.log("Component script loaded!");
 @end
 ```
 
-```Semantq
+```semantq
 @style
 h1 {
   color: blue;
@@ -143,24 +143,24 @@ h1 {
 @end
 ```
 
-```Semantq
+```semantq
 @html
-<h1>Welcome to Semantq</h1>
+<h1>Welcome to semantq</h1>
 <p>This is a sample component.</p>
 ```
 
 ## Example Project Structure
 
-Here’s an example of how a Semantq project is organized:
+Here’s an example of how a semantq project is organized:
 
 
 ```bash
 src/
 ├── components/            # Shared components (available for import)
-│   ├── global/            # Default Semantq-provided components
+│   ├── global/            # Default semantq-provided components
 │   │   ├── Theme.smq      # Theme handling (light/dark modes, etc.)
-│   │   ├── Button.smq     # Semantq-provided button component
-│   │   ├── Modal.smq      # Semantq-provided modal component
+│   │   ├── Button.smq     # semantq-provided button component
+│   │   ├── Modal.smq      # semantq-provided modal component
 │   ├── Card.smq           # Custom reusable Card component
 │   ├── Header.smq         # Custom reusable Header component
 │   ├── Footer.smq         # Custom reusable Footer component
@@ -184,7 +184,7 @@ src/
 ### HTML Elements
 
 #### Open and Close Tags
-Semantq supports standard HTML open and close tags. For example:
+semantq supports standard HTML open and close tags. For example:
 
 ```html
 <div>
@@ -258,7 +258,7 @@ Slot prop attributes are used to pass data to slots in custom components. The sy
 ### Logic Blocks
 
 #### Conditional Blocks (`@if`)
-Semantq supports conditional logic using the `@if` block.
+semantq supports conditional logic using the `@if` block.
 
 ```html
 {@if user.loggedIn}
@@ -269,7 +269,7 @@ Semantq supports conditional logic using the `@if` block.
 ```
 
 #### Loops (`@for`)
-Semantq introduces a loop syntax for rendering lists.
+semantq introduces a loop syntax for rendering lists.
 
 ```html
 <ul>
@@ -297,7 +297,7 @@ You can combine logic blocks for more complex scenarios.
 
 
 ### Async/Await Support
-Semantq makes it easy to handle asynchronous operations directly in templates.
+semantq makes it easy to handle asynchronous operations directly in templates.
 
 ```html
 {@await fetchData()}
@@ -312,7 +312,7 @@ Semantq makes it easy to handle asynchronous operations directly in templates.
 
 
 ### Keyed Lists
-For performance optimization, Semantq offers a `key` attribute for lists.
+For performance optimization, semantq offers a `key` attribute for lists.
 
 ```html
 <ul>
@@ -400,7 +400,7 @@ The grammar is defined using Peggy.js and supports the following constructs:
 
 
 ## Usage
-To use the Semantq grammar, include the Peggy.js parser in your project and parse templates using the provided grammar rules.
+To use the semantq grammar, include the Peggy.js parser in your project and parse templates using the provided grammar rules.
 
 ```javascript
 import parser from './semantq-grammar.js';
@@ -419,7 +419,7 @@ console.log(result);
 
 
 
-### Semantq Syntax Philosophy:
+### semantq Syntax Philosophy:
 
 Consistency, intuition, flexibility, elegance and efficiency. 
 
@@ -428,13 +428,13 @@ Consistency, intuition, flexibility, elegance and efficiency.
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-Check out the comprehensive syntax guide here: [Semantq Comprehensive Syntax Guide](Semantq-Syntax-Comprehensive.md) 
+Check out the comprehensive syntax guide here: [semantq Comprehensive Syntax Guide](semantq-Syntax-Comprehensive.md) 
 
 
 
 
 
-# Semantq Parser Syntax Capabilities
+# semantq Parser Syntax Capabilities
 
 ## Table of Contents
 1. [Basic HTML Elements](#basic-html-elements)
@@ -590,6 +590,6 @@ Standard HTML tags with attributes and content:
 
 ## **License**
 
-Semantq is open-source software licensed under the **MIT License**.
+semantq is open-source software licensed under the **MIT License**.
 
-## Semantq Main Documentation: [Semantq](https://github.com/Gugulethu-Nyoni/semantq).
+## semantq Main Documentation: [semantq](https://github.com/Gugulethu-Nyoni/semantq).
