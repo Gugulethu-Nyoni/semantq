@@ -186,11 +186,12 @@ Semantq supports pluggable modules:
 npm run install:module <package-name>
 ```
 
-Modules are stored here:
+Modules or packages are stored here:
 
 ```
 semantqQL/packages/
 ```
+
 
 > Semantq auto-detects these packages on server boot.
 
