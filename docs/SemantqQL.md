@@ -193,7 +193,7 @@ semantqQL/packages/
 ```
 
 
-> Semantq auto-detects these packages on server boot.
+>> Semantq auto-detects these packages on server boot.
 
 
 ## Optional: Install Server Manually
