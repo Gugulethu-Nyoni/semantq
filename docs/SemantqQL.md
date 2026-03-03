@@ -204,7 +204,7 @@ If needed as a fallback or to integrate into an existing app:
 semantq install:server
 ```
 
-This installs only the server in `semantqQL/`.  
+This installs only the semantq server in `semantqQL/`.  
 
 You can add all other related modules such as: `npm i @semantq/auth` and `semantq add: auth-ui` if you prefer to install these individually. 
 
