@@ -309,19 +309,17 @@ semantq makes it easy to handle asynchronous operations directly in templates.
 {@endawait}
 ```
 
-
-
+<!--
 ### Keyed Lists
 For performance optimization, semantq offers a `key` attribute for lists.
 
 ```html
 <ul>
-  {@for item in items key="id"}
+  @for item in items key="id"
     <li>{item.name}</li>
   {@endfor}
 </ul>
 ```
-
 
 
 ### Async Blocks with Fallbacks
@@ -338,6 +336,7 @@ For async blocks, you can provide a fallback UI while waiting for data.
   <p>No data available.</p>
 {@endawait}
 ```
+-->
 
 
 
@@ -372,9 +371,9 @@ For async blocks, you can provide a fallback UI while waiting for data.
 ### Example 2: Conditional Logic and Event Handlers
 ```html
 <div>
-  {@if isAdmin > 2}
+  @if isAdmin > 2
     <p>Clicked: {counter > 1 ? 'times' : 'time'}</p>
-  {@endif}
+  @endif
 
   <input type="text" @click={rejuice} value={counter} disabled />
 </div>
