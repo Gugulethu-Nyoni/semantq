@@ -86,7 +86,7 @@ export default async function transformASTs(jsAST, cssCode, customSyntaxAST, fil
         await writeOutputFiles(filePath, finalJsCode, cssCode, fileName, appRootId);
 
     } catch (error) {
-        console.error('❌ Transformation pipeline failed:', error);
+        console.error('Transformation pipeline failed:', error);
         throw error;
     }
 }
@@ -192,7 +192,7 @@ function extractLayoutContent(layoutAST) {
  */
 function generateLayoutJS(layoutHTML) {
     return `
-// Async layout initialization
+// Async layout initialization - CSS already loaded!
 async function layoutInit() {
     return new Promise((resolve) => {
         const layoutBlocks = {
@@ -201,94 +201,61 @@ async function layoutInit() {
             footer: \`${layoutHTML.footer}\`
         };
 
-        // --- CRITICAL FIX TRACKERS ---
         let scriptsToLoad = 0;
         let scriptsLoaded = 0;
 
         const checkCompletion = () => {
-            // Resolve only when all tracked scripts are loaded (or if there were none).
             if (scriptsToLoad === scriptsLoaded) {
                 resolve(); 
             }
         };
-        // ------------------------------
-
         
-function updateHead(html) {
-    const tempContainer = document.createElement("div");
-    tempContainer.innerHTML = html;
-    const head = document.head;
-    
-    // Use a stable array for all nodes
-    const allNodes = Array.from(tempContainer.children); 
-    
-    // 1. Separate CSS/Links from Scripts
-    const linkNodes = allNodes.filter(node => node.tagName === 'LINK');
-    const scriptNodes = allNodes.filter(node => node.tagName === 'SCRIPT');
-    const otherNodes = allNodes.filter(node => node.tagName !== 'LINK' && node.tagName !== 'SCRIPT');
-
-    // 2. PASS 1: Append all CSS and other Link elements first (FOUC prevention)
-    for (const node of linkNodes) {
-        if (node.rel === 'stylesheet') {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
+        function updateHead(html) {
+            const tempContainer = document.createElement("div");
+            tempContainer.innerHTML = html;
+            const head = document.head;
             
-            // Copy all attributes
-            for (const attr of node.attributes) {
-                link.setAttribute(attr.name, attr.value);
-            }
-            head.appendChild(link);
-        } else {
-            // Handle other link tags (preload, prefetch, etc.)
-            const link = document.createElement('link');
-            for (const attr of node.attributes) {
-                link.setAttribute(attr.name, attr.value);
-            }
-            head.appendChild(link);
-        }
-    }
-    
-    // Append any other non-script, non-link elements (e.g., <meta>, <title>, etc.)
-    for (const node of otherNodes) {
-        head.appendChild(node);
-    }
-
-    // 3. PASS 2: Append all Script elements (Dependency loading)
-    for (const node of scriptNodes) {
-        // Handle script tags specially to ensure execution
-        const script = document.createElement('script');
-        
-        // Copy all attributes
-        for (const attr of node.attributes) {
-            script.setAttribute(attr.name, attr.value);
-        }
-        
-        // Copy inline script content
-        if (node.src) {
-            // External script - MUST wait for it to load
-            scriptsToLoad++;
-            script.src = node.src;
+            const allNodes = Array.from(tempContainer.children);
             
-            // *** CRITICAL: Wait for external script to load ***
-            script.onload = () => {
-                scriptsLoaded++;
-                checkCompletion();
-            };
-            script.onerror = (e) => {
-                console.error("[Anatomique] Failed to load CDN script:", node.src, e);
-                scriptsLoaded++; // Prevent hang on error
-                checkCompletion();
-            };
-        } else {
-            // Inline script - preserve content
-            script.textContent = node.textContent;
-        }
-        
-        // Append to head
-        head.appendChild(script);
-    }
-}
+            // ONLY handle scripts - CSS is already in HTML
+            const scriptNodes = allNodes.filter(node => node.tagName === 'SCRIPT');
+            const otherNodes = allNodes.filter(node => node.tagName !== 'SCRIPT');
+            
+            // Add non-script elements (meta, title, etc.)
+            for (const node of otherNodes) {
+                // Skip LINK tags - they're already in the HTML
+                if (node.tagName !== 'LINK') {
+                    head.appendChild(node);
+                }
+            }
 
+            // Handle scripts (these still need async loading)
+            for (const node of scriptNodes) {
+                const script = document.createElement('script');
+                
+                for (const attr of node.attributes) {
+                    script.setAttribute(attr.name, attr.value);
+                }
+                
+                if (node.src) {
+                    scriptsToLoad++;
+                    script.src = node.src;
+                    script.onload = () => {
+                        scriptsLoaded++;
+                        checkCompletion();
+                    };
+                    script.onerror = (e) => {
+                        console.error("[Anatomique] Failed to load script:", node.src, e);
+                        scriptsLoaded++;
+                        checkCompletion();
+                    };
+                } else {
+                    script.textContent = node.textContent;
+                }
+                
+                head.appendChild(script);
+            }
+        }
 
         function updateBody(html) {
             document.body.innerHTML = '';
@@ -301,54 +268,35 @@ function updateHead(html) {
             const tempContainer = document.createElement("div");
             tempContainer.innerHTML = html;
             
-            const nodes = Array.from(tempContainer.children); // Use a stable array to iterate
+            const nodes = Array.from(tempContainer.children);
 
             for (const node of nodes) {
-                // Handle script tags specially to ensure execution
                 if (node.tagName === 'SCRIPT') {
                     const script = document.createElement('script');
                     
-                    // Copy all attributes
                     for (const attr of node.attributes) {
                         script.setAttribute(attr.name, attr.value);
                     }
                     
-                    // Copy inline script content
                     if (node.src) {
-                        // External script - MUST wait for it to load
                         scriptsToLoad++;
                         script.src = node.src;
-
-                        // *** CRITICAL: Wait for external script to load ***
                         script.onload = () => {
                             scriptsLoaded++;
                             checkCompletion();
                         };
                         script.onerror = (e) => {
-                            console.error("[Anatomique] Failed to load CDN script:", node.src, e);
-                            scriptsLoaded++; // Prevent hang on error
+                            console.error("[Anatomique] Failed to load script:", node.src, e);
+                            scriptsLoaded++;
                             checkCompletion();
                         };
                     } else {
                         script.textContent = node.textContent;
                     }
                     
-                    // Append to body
                     document.body.appendChild(script);
                 }
-                // Handle link tags in footer 
-                else if (node.tagName === 'LINK') {
-                    const link = document.createElement('link');
-                    
-                    // Copy all attributes
-                    for (const attr of node.attributes) {
-                        link.setAttribute(attr.name, attr.value);
-                    }
-                    
-                    document.head.appendChild(link); // Links should go to head, even if found in footer HTML
-                }
                 else {
-                    // Regular elements can be appended normally
                     document.body.appendChild(node);
                 }
             }
@@ -358,7 +306,6 @@ function updateHead(html) {
         if (layoutBlocks.body) updateBody(layoutBlocks.body);
         if (layoutBlocks.footer) appendFooter(layoutBlocks.footer);
         
-        // If no scripts were found, resolve immediately
         if (scriptsToLoad === 0) {
             resolve();
         }
@@ -503,21 +450,24 @@ async function formatCode(code, parser) {
  * @param {string} fileName - The base name for the output JS and CSS files.
  * @param {string} appRootId - The ID of the root HTML element.
  */
+
+
 async function writeOutputFiles(originalFilePath, jsCode, cssCode, fileName, appRootId) {
     const outputDir = path.dirname(originalFilePath);
     const jsPath = path.join(outputDir, `${fileName}.js`);
     const cssPath = path.join(outputDir, `${fileName}.css`);
     const htmlPath = path.join(outputDir, 'index.html');
 
-    // Ensure output directory exists
     await mkdir(outputDir, { recursive: true });
 
-    // Generate the minimal HTML shell.
     const config = await import('../../../semantq.config.js');
     const { brand, pageTitle, metaDescription } = config.default;
 
-// removed: ${cssCode ? `<link rel="stylesheet" href="./${fileName}.css">` : ''}
-   const htmlContent = await formatCode(`
+    // Get ALL CSS links from layout
+    const layoutHTML = await processLayoutFile(originalFilePath);
+    const allCSSLinks = extractAllCSSLinks(layoutHTML);
+    
+    const htmlContent = await formatCode(`
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -527,6 +477,13 @@ async function writeOutputFiles(originalFilePath, jsCode, cssCode, fileName, app
     <meta name="description" content="${metaDescription}">
     <meta name="robots" content="index, follow">
     <meta name="author" content="${brand}">
+    
+    <!-- ALL CSS loaded at build time - NO FOUC -->
+    ${allCSSLinks}
+    ${cssCode ? `<link rel="stylesheet" href="./${fileName}.css">` : ''}
+    
+    <!-- Preload all CSS for priority -->
+    ${extractPreloadLinks(layoutHTML)}
 </head>
 <body>
     <div id="${appRootId}"></div>
@@ -539,5 +496,32 @@ async function writeOutputFiles(originalFilePath, jsCode, cssCode, fileName, app
         cssCode && fs.writeFile(cssPath, cssCode),
         fs.writeFile(htmlPath, htmlContent)
     ]);
-    //console.log(`✨ Generated files for ${fileName}: ${jsPath}, ${htmlPath}${cssCode ? `, ${cssPath}` : ''}`);
+}
+
+function extractAllCSSLinks(layoutHTML) {
+    if (!layoutHTML || !layoutHTML.head) return '';
+    
+    const links = [];
+    
+    // Extract ALL link tags from head
+    const linkRegex = /<link[^>]+>/g;
+    const allLinks = layoutHTML.head.match(linkRegex) || [];
+    
+    // Keep ALL links - let the browser prioritize
+    return allLinks.join('\n    ');
+}
+
+function extractPreloadLinks(layoutHTML) {
+    if (!layoutHTML || !layoutHTML.head) return '';
+    
+    const links = [];
+    const linkRegex = /<link[^>]+href="([^"]+\.css)"[^>]*>/g;
+    let match;
+    
+    while ((match = linkRegex.exec(layoutHTML.head)) !== null) {
+        const href = match[1];
+        links.push(`<link rel="preload" href="${href}" as="style" onload="this.onload=null;this.rel='stylesheet'">`);
+    }
+    
+    return links.join('\n    ');
 }
