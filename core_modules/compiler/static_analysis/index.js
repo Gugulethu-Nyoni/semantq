@@ -431,7 +431,6 @@ async function formatCode(code, parser) {
  * @param {string} appRootId - The ID of the root HTML element.
  */
 
-
 async function writeOutputFiles(originalFilePath, jsCode, cssCode, fileName, appRootId) {
     const outputDir = path.dirname(originalFilePath);
     const jsPath = path.join(outputDir, `${fileName}.js`);
@@ -443,15 +442,37 @@ async function writeOutputFiles(originalFilePath, jsCode, cssCode, fileName, app
     const config = await import('../../../semantq.config.js');
     const { brand, pageTitle, metaDescription } = config.default;
 
-    // Get layout HTML and extract ONLY the CSS links
+    // Get layout HTML and extract CSS links
     const layoutHTML = await processLayoutFile(originalFilePath);
     const layoutCSSLinks = extractCSSLinks(layoutHTML);
     
-    // Component CSS link - ALWAYS included if there's CSS, regardless of JS loading
+    // Component CSS link
     const componentCSSLink = cssCode ? `<link rel="stylesheet" href="./${fileName}.css">` : '';
     
-    // Optional: Add preload for critical CSS
-    const preloadLink = cssCode ? `<link rel="preload" href="./${fileName}.css" as="style">` : '';
+    // Theme initialization script - runs BEFORE any CSS
+    const themeScript = `
+    <script>
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('theme');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+                
+                // Set the attribute immediately so CSS picks it up before rendering
+                document.documentElement.setAttribute('data-theme', theme);
+                
+                // Backward compatibility for your body class
+                if (theme === 'light') {
+                    document.addEventListener('DOMContentLoaded', () => {
+                        document.body.classList.add('light');
+                    });
+                }
+            } catch (e) {
+                // Fail silently
+            }
+        })();
+    </script>
+    `;
     
     const htmlContent = await formatCode(`
 <!DOCTYPE html>
@@ -464,13 +485,13 @@ async function writeOutputFiles(originalFilePath, jsCode, cssCode, fileName, app
     <meta name="robots" content="index, follow">
     <meta name="author" content="${brand}">
     
-    <!-- Preload critical CSS -->
-    ${preloadLink}
+    <!-- Theme initialization - runs before any CSS -->
+    ${themeScript}
     
-    <!-- Layout CSS - loaded at build time -->
+    <!-- Layout CSS -->
     ${layoutCSSLinks}
     
-    <!-- Component CSS - loads independently of JS -->
+    <!-- Component CSS -->
     ${componentCSSLink}
 </head>
 <body>
