@@ -192,7 +192,7 @@ function extractLayoutContent(layoutAST) {
  */
 function generateLayoutJS(layoutHTML) {
     return `
-// Async layout initialization - CSS already loaded!
+// Async layout initialization - CSS already loaded in HTML!
 async function layoutInit() {
     return new Promise((resolve) => {
         const layoutBlocks = {
@@ -219,16 +219,7 @@ async function layoutInit() {
             
             // ONLY handle scripts - CSS is already in HTML
             const scriptNodes = allNodes.filter(node => node.tagName === 'SCRIPT');
-            const otherNodes = allNodes.filter(node => node.tagName !== 'SCRIPT');
             
-            // Add non-script elements (meta, title, etc.)
-            for (const node of otherNodes) {
-                // Skip LINK tags - they're already in the HTML
-                if (node.tagName !== 'LINK') {
-                    head.appendChild(node);
-                }
-            }
-
             // Handle scripts (these still need async loading)
             for (const node of scriptNodes) {
                 const script = document.createElement('script');
@@ -295,8 +286,7 @@ async function layoutInit() {
                     }
                     
                     document.body.appendChild(script);
-                }
-                else {
+                } else {
                     document.body.appendChild(node);
                 }
             }
@@ -335,24 +325,14 @@ async function layoutInit() {
  */
 async function generateFinalJsBundle(importsAST, jsAST, componentCodeString, hasLayout, layoutJS, cssCode, fileName) {
     
-
     const transpiledJSCode = componentCodeString;
     let allImports = generateBaseImports();
 
-    //console.log("fileName 2",fileName);
-
-    if (cssCode !== '') {
-        const cssImportNode = {
-            type: 'ImportDeclaration',
-            specifiers: [],
-            source: {
-                type: 'Literal',
-                value: `./${fileName}.css`,
-                raw: `'./${fileName}.css'`
-            }
-        };
-        importsAST.unshift(cssImportNode);
-    }
+    // ✅ REMOVED: No longer adding CSS import to JS bundle
+    // if (cssCode !== '') {
+    //     const cssImportNode = { ... };
+    //     importsAST.unshift(cssImportNode);
+    // }
 
     if (importsAST.length > 0) {
         allImports += escodegen.generate({
@@ -362,6 +342,7 @@ async function generateFinalJsBundle(importsAST, jsAST, componentCodeString, has
         });
     }
 
+    // Rest of the function remains the same...
     const wrappedTranspiledCode = hasLayout ? `
 ${transpiledJSCode}
 
@@ -404,7 +385,6 @@ ${wrappedTranspiledCode}
 
     return finalJsBundle;
 }
-
 
 /**
  * Separates import declarations from other JavaScript code.
@@ -463,9 +443,15 @@ async function writeOutputFiles(originalFilePath, jsCode, cssCode, fileName, app
     const config = await import('../../../semantq.config.js');
     const { brand, pageTitle, metaDescription } = config.default;
 
-    // Get ALL CSS links from layout
+    // Get layout HTML and extract ONLY the CSS links
     const layoutHTML = await processLayoutFile(originalFilePath);
-    const allCSSLinks = extractAllCSSLinks(layoutHTML);
+    const layoutCSSLinks = extractCSSLinks(layoutHTML);
+    
+    // Component CSS link - ALWAYS included if there's CSS, regardless of JS loading
+    const componentCSSLink = cssCode ? `<link rel="stylesheet" href="./${fileName}.css">` : '';
+    
+    // Optional: Add preload for critical CSS
+    const preloadLink = cssCode ? `<link rel="preload" href="./${fileName}.css" as="style">` : '';
     
     const htmlContent = await formatCode(`
 <!DOCTYPE html>
@@ -478,16 +464,18 @@ async function writeOutputFiles(originalFilePath, jsCode, cssCode, fileName, app
     <meta name="robots" content="index, follow">
     <meta name="author" content="${brand}">
     
-    <!-- ALL CSS loaded at build time - NO FOUC -->
-    ${allCSSLinks}
-    ${cssCode ? `<link rel="stylesheet" href="./${fileName}.css">` : ''}
+    <!-- Preload critical CSS -->
+    ${preloadLink}
     
-    <!-- Preload all CSS for priority -->
-    ${extractPreloadLinks(layoutHTML)}
+    <!-- Layout CSS - loaded at build time -->
+    ${layoutCSSLinks}
+    
+    <!-- Component CSS - loads independently of JS -->
+    ${componentCSSLink}
 </head>
 <body>
     <div id="${appRootId}"></div>
-    <script type="module" src="./${fileName}.js"></script>
+    <script type="module" src="./${fileName}.js" defer></script>
 </body>
 </html>`, 'html');
 
@@ -498,19 +486,18 @@ async function writeOutputFiles(originalFilePath, jsCode, cssCode, fileName, app
     ]);
 }
 
-function extractAllCSSLinks(layoutHTML) {
+function extractCSSLinks(layoutHTML) {
     if (!layoutHTML || !layoutHTML.head) return '';
     
-    const links = [];
+    // Extract all <link rel="stylesheet"> tags from layout head
+    const linkRegex = /<link[^>]+rel="stylesheet"[^>]*>/g;
+    const matches = layoutHTML.head.match(linkRegex) || [];
     
-    // Extract ALL link tags from head
-    const linkRegex = /<link[^>]+>/g;
-    const allLinks = layoutHTML.head.match(linkRegex) || [];
-    
-    // Keep ALL links - let the browser prioritize
-    return allLinks.join('\n    ');
+    return matches.join('\n    ');
 }
 
+
+/*
 function extractPreloadLinks(layoutHTML) {
     if (!layoutHTML || !layoutHTML.head) return '';
     
@@ -525,3 +512,5 @@ function extractPreloadLinks(layoutHTML) {
     
     return links.join('\n    ');
 }
+
+*/
