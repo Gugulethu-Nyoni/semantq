@@ -292,7 +292,7 @@ export function generateService(name, database, baseDir, pylon = false) {
 function generatePylonServiceTemplate(namePascal, nameCamel, database) { // ← ADD database parameter
   return `
 import ${namePascal}Model from '../models/${database}/${namePascal}.js';
-import pylonService from '../node_modules/@semantq/pylon/services/pylonService.js';
+import pylonService from '../packages/@semantq/pylon/services/pylonService.js';
 
 class ${namePascal}Service {
   
@@ -631,7 +631,7 @@ import ${nameCamel}Controller from '../controllers/${nameCamel}Controller.js';
 import { validateApiKey } from '../middleware/validateApiKey.js';
 import { authenticateToken } from '@semantq/auth/lib/middleware/authMiddleware.js';
 import { authorize } from '@semantq/auth/lib/middleware/authorize.js';
-import pylonService from '../node_modules/@semantq/pylon/services/pylonService.js';
+import pylonService from '../packages/@semantq/pylon/services/pylonService.js';
 const dataModel = '${namePascal}';
 
 const router = express.Router();
