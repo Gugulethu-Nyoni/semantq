@@ -13,7 +13,7 @@
 
 ## Introduction
 
-**Semantq** is a lightweight JavaScript framework designed to simplify modern web development. Its declarative syntax, built-in state management, reactive logic blocks, and seamless full-stack integration make it ideal for both frontend and full-stack projects.
+**Semantq** is a modern full-stack JavaScript framework engineered for rapid application development. Combining a declarative syntax, built-in state management, reactive programming constructs, and seamless integration with the MCSR backend, it enables developers to build scalable, maintainable, and performant frontend and full-stack applications with speed.
 
 
 # Semantq Developer Guide
