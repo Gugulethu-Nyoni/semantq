@@ -38,6 +38,14 @@ async function mapDirectories(sourceDir, destDir) {
     // Ensure the destination directory exists
     await fse.ensureDir(destDir);
 
+    // Check if source directory exists before trying to read it
+    const sourceExists = await fse.pathExists(sourceDir);
+    if (!sourceExists) {
+      // Still ensure destination exists even if source doesn't
+      await fse.ensureDir(destDir);
+      return;
+    }
+
     // Read the contents of the source directory
     const items = await fs.readdir(sourceDir, { withFileTypes: true });
 
@@ -268,6 +276,8 @@ async function main(sourceDir, destDir, destDirBase) {
     await cleanupDirectory(destDirBase);
     //await moveFilesToBuild(destDirBase);
 
+    // Ensure components destination directory exists before mapping
+    await fse.ensureDir(componentsDest);
 
     await mapDirectories(sourceDir, destDir);
 
@@ -290,25 +300,31 @@ async function main(sourceDir, destDir, destDirBase) {
 
     // Step 4: Compile custom tags
     await compileCustomTags(sourceDir);
-    await compileCustomTags(componentsSrc);
+    if (await fse.pathExists(componentsSrc)) {
+      await compileCustomTags(componentsSrc);
+    }
     await compileLayoutCustomTags(sourceDir);
 
 
     // Step 5: Parse components
     await componentParser(destDir);
-    await componentParser(componentsDest);
+    if (await fse.pathExists(componentsDest)) {
+      await componentParser(componentsDest);
+    }
     await layoutComponentParser(destDir);
 
 
 
     // Step 6: Transform text nodes
     await transformTextNodes(destDir);
-    await transformTextNodes(componentsDest);
+    if (await fse.pathExists(componentsDest)) {
+      await transformTextNodes(componentsDest);
+    }
 
 
 
     // Step 7: Resolve imports and slots @components
-   //await importsResolution(componentsDest);
+   // await importsResolution(componentsDest);
    //await slotsResolution(componentsDest);
 
 
@@ -328,10 +344,12 @@ async function main(sourceDir, destDir, destDirBase) {
     await slotsResolution(destDir);
 
 
-
     // Step 10: Transform components
   await transformer(destDir);
-  await transformer(componentsDest);
+  if (await fse.pathExists(componentsDest)) {
+    await transformer(componentsDest);
+  }
+
 
      if (config.sitemap) {
        await sitemapGenerator();
@@ -343,6 +361,7 @@ async function main(sourceDir, destDir, destDirBase) {
     console.error('\x1b[31mError during compilation:\x1b[0m', error);
   }
 }
+
 
 // Execute the main function
 main(sourceDir, destDir, destDirBase);
