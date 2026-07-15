@@ -2,13 +2,10 @@ import Inspect from 'vite-plugin-inspect';
 import { sync } from 'glob';
 import { resolve } from 'path';
 import fse from 'fs-extra';
-import postcss from 'postcss';
 
 export default {
   plugins: [Inspect()],
-  css: {
-    postcss, // Tailwind CSS uses PostCSS
-  },
+
   build: {
     rollupOptions: {
       input: {
@@ -24,17 +21,21 @@ export default {
     outDir: 'dist',
     emptyOutDir: true,
     assetsDir: 'assets',
+    cssMinify: false, // Temporary for debugging
   },
+
   async closeBundle() {
     const buildDir = resolve(__dirname, 'build');
     const distDir = resolve(__dirname, 'dist');
 
-    await fse.copy(buildDir, distDir, {
-      overwrite: true,
-      recursive: true,
-      filter: (src) => !src.endsWith(buildDir),
-    });
+    const htmlFiles = sync(`${buildDir}/**/*.html`);
 
-    console.log('Build files copied to dist root.');
+    for (const file of htmlFiles) {
+      const relative = file.replace(buildDir, '');
+      const destination = resolve(distDir, relative.substring(1));
+      await fse.copy(file, destination, { overwrite: true });
+    }
+
+    console.log('✅ HTML files copied to dist root.');
   },
 };

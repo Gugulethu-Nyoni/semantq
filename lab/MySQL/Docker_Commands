@@ -13,6 +13,8 @@ docker exec my-mysql mysqldump -u root -pmy-secret-pw kwazinto > kwazinto.sql
 docker exec my-mysql mysqldump -u root -pmy-secret-pw eventique > eventique.sql
 
 
+IMPORT
+docker exec -i my-mysql mysql -u root -pmy-secret-pw diva < diva1July.sql
 
 
 2. Check running containers

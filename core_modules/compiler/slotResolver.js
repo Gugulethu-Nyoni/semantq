@@ -18,9 +18,14 @@ class SlotResolver {
     this.componentName = "";
 
     //
-    const { components, globalComponents } = config;
-    const actualComponentsPath = components['$components'];
-    const actualGlobalComponentsPath = globalComponents['$global'];
+   // const { components, globalComponents } = config;
+   // const actualComponentsPath = components['$components'];
+   // const actualGlobalComponentsPath = globalComponents['$global'];
+
+  const { components, globalComponents } = config;
+  this.actualComponentsPath = components['$components'];
+  this.actualGlobalComponentsPath = globalComponents['$global'];
+
 
     
     const fileName = path.basename(filePath, ".merged.ast");
