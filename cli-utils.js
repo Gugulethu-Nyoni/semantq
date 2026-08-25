@@ -287,20 +287,50 @@ export function generateService(name, database, baseDir, pylon = false) {
   return true;
 }
 
-// NEW: Pylon Service Template
 // NEW: Pylon Service Template - ADD database parameter
 function generatePylonServiceTemplate(namePascal, nameCamel, database) { // ← ADD database parameter
   return `
 import ${namePascal}Model from '../models/${database}/${namePascal}.js';
 import pylonService from '../packages/@semantq/pylon/services/pylonService.js';
+import typeCaster from '../lib/typecaster.js';
 
 class ${namePascal}Service {
   
   async create(req) {
-    const data = req.body;          
     const userData = req.userData;
 
     try {
+      const data = typeCaster.formToDbModel(
+        req.body,
+        '${namePascal}'
+      );
+
+      // =========================================================
+      // BUSINESS LOGIC
+      // =========================================================
+
+      // BASIC MUTATION
+      // data.someIntField = data.someIntField + 1;
+      // data.someStringField = data.someStringField.trim();
+
+      // EXTENDED BUSINESS LOGIC
+      // if (data.someStatusField === 'DISCHARGED' && !data.someDateField) {
+      //   throw new Error(
+      //     'A date is required when status is DISCHARGED.'
+      //   );
+      // }
+      //
+      // if (data.someIntField > 25) {
+      //   throw new Error(
+      //     'Value cannot exceed 25.'
+      //   );
+      // }
+
+      typeCaster.assert(
+        data,
+        '${namePascal}'
+      );
+
       const res = await ${namePascal}Model.create(data);
       console.log("${namePascal} Creation Response:", res);
 
@@ -315,7 +345,10 @@ class ${namePascal}Service {
         console.log("usageLog", usageLog);
       }
       
-      return res;
+      return typeCaster.dbToFormModel(
+        res,
+        '${namePascal}'
+      );
     } catch (err) {
       console.error("${namePascal} creation error:", {
         message: err.message,
@@ -327,19 +360,79 @@ class ${namePascal}Service {
   }
 
   async getById(id) {
-    return await ${namePascal}Model.findById(id);
+    const resource =
+      await ${namePascal}Model.findById(id);
+
+    if (!resource) {
+      return null;
+    }
+
+    return typeCaster.dbToFormModel(
+      resource,
+      '${namePascal}'
+    );
   }
 
   async getAll() {
-    return await ${namePascal}Model.findAll();
+    const resources =
+      await ${namePascal}Model.findAll();
+
+    return resources.map((resource) =>
+      typeCaster.dbToFormModel(
+        resource,
+        '${namePascal}'
+      )
+    );
   }
 
   async update(id, data) {
-    return await ${namePascal}Model.update(id, data);
+    const dbData =
+      typeCaster.formToDbModel(
+        data,
+        '${namePascal}'
+      );
+
+    // =========================================================
+    // BUSINESS LOGIC
+    // =========================================================
+
+    // BASIC MUTATION
+    // dbData.someIntField = dbData.someIntField + 1;
+    // dbData.someStringField = dbData.someStringField.trim();
+
+    // EXTENDED BUSINESS LOGIC
+    // if (dbData.someStatusField === 'DISCHARGED' && !dbData.someDateField) {
+    //   throw new Error(
+    //     'A date is required when status is DISCHARGED.'
+    //   );
+    // }
+    //
+    // if (dbData.someIntField > 25) {
+    //   throw new Error(
+    //     'Value cannot exceed 25.'
+    //   );
+    // }
+
+    typeCaster.assert(
+      dbData,
+      '${namePascal}'
+    );
+
+    const resource = await ${namePascal}Model.update(id, dbData);
+
+    return typeCaster.dbToFormModel(
+      resource,
+      '${namePascal}'
+    );
   }
 
   async delete(id) {
-    return await ${namePascal}Model.delete(id);
+    const resource = await ${namePascal}Model.delete(id);
+
+    return typeCaster.dbToFormModel(
+      resource,
+      '${namePascal}'
+    );
   }
 }
 
@@ -353,26 +446,129 @@ export default new ${namePascal}Service();
 function generateStandardServiceTemplate(namePascal, nameCamel, database) {
   return `
 import ${namePascal}Model from '../models/${database}/${namePascal}.js';
+import typeCaster from '../lib/typecaster.js';
 
 class ${namePascal}Service {
   async create(data) {
-    return await ${namePascal}Model.create(data);
+    const typedData =
+      typeCaster.formToDbModel(
+        data,
+        '${namePascal}'
+      );
+
+    // =========================================================
+    // BUSINESS LOGIC
+    // =========================================================
+
+    // BASIC MUTATION
+    // typedData.someIntField = typedData.someIntField + 1;
+    // typedData.someStringField = typedData.someStringField.trim();
+
+    // EXTENDED BUSINESS LOGIC
+    // if (typedData.someStatusField === 'DISCHARGED' && !typedData.someDateField) {
+    //   throw new Error(
+    //     'A date is required when status is DISCHARGED.'
+    //   );
+    // }
+    //
+    // if (typedData.someIntField > 25) {
+    //   throw new Error(
+    //     'Value cannot exceed 25.'
+    //   );
+    // }
+
+    typeCaster.assert(
+      typedData,
+      '${namePascal}'
+    );
+
+    const resource =
+      await ${namePascal}Model.create(
+        typedData
+      );
+
+    return typeCaster.dbToFormModel(
+      resource,
+      '${namePascal}'
+    );
   }
 
   async getById(id) {
-    return await ${namePascal}Model.findById(id);
+    const resource =
+      await ${namePascal}Model.findById(id);
+
+    if (!resource) {
+      return null;
+    }
+
+    return typeCaster.dbToFormModel(
+      resource,
+      '${namePascal}'
+    );
   }
 
   async getAll() {
-    return await ${namePascal}Model.findAll();
+    const resources =
+      await ${namePascal}Model.findAll();
+
+    return resources.map((resource) =>
+      typeCaster.dbToFormModel(
+        resource,
+        '${namePascal}'
+      )
+    );
   }
 
   async update(id, data) {
-    return await ${namePascal}Model.update(id, data);
+    const dbData =
+      typeCaster.formToDbModel(
+        data,
+        '${namePascal}'
+      );
+
+    // =========================================================
+    // BUSINESS LOGIC
+    // =========================================================
+
+    // BASIC MUTATION
+    // dbData.someIntField = dbData.someIntField + 1;
+    // dbData.someStringField = dbData.someStringField.trim();
+
+    // EXTENDED BUSINESS LOGIC
+    // if (dbData.someStatusField === 'DISCHARGED' && !dbData.someDateField) {
+    //   throw new Error(
+    //     'A date is required when status is DISCHARGED.'
+    //   );
+    // }
+    //
+    // if (dbData.someIntField > 25) {
+    //   throw new Error(
+    //     'Value cannot exceed 25.'
+    //   );
+    // }
+
+    typeCaster.assert(
+      dbData,
+      '${namePascal}'
+    );
+
+    const resource =
+      await ${namePascal}Model.update(id, dbData);
+
+    return typeCaster.dbToFormModel(
+      resource,
+      '${namePascal}'
+    );
   }
 
   async delete(id) {
-    return await ${namePascal}Model.delete(id);
+    const resource =
+      await ${namePascal}Model.delete(id);
+
+    return typeCaster.dbToFormModel(
+      resource,
+      '${namePascal}'
+    );
   }
 }
 
@@ -581,8 +777,8 @@ import express from 'express';
 import ${nameCamel}Controller from '../controllers/${nameCamel}Controller.js';
 // Import authentication and authorization middleware
 import { validateApiKey } from '../middleware/validateApiKey.js';
-import { authenticateToken } from '@semantq/auth/lib/middleware/authMiddleware.js';
-import { authorize } from '@semantq/auth/lib/middleware/authorize.js';
+import { authenticateToken } from '../packages/@semantq/auth/lib/middleware/authMiddleware.js';
+import { authorize } from '../packages/@semantq/auth/lib/middleware/authorize.js';
 
 const router = express.Router();
 
@@ -629,8 +825,8 @@ import express from 'express';
 import ${nameCamel}Controller from '../controllers/${nameCamel}Controller.js';
 // Import authentication and authorization middleware
 import { validateApiKey } from '../middleware/validateApiKey.js';
-import { authenticateToken } from '@semantq/auth/lib/middleware/authMiddleware.js';
-import { authorize } from '@semantq/auth/lib/middleware/authorize.js';
+import { authenticateToken } from '../packages/@semantq/auth/lib/middleware/authMiddleware.js';
+import { authorize } from '../packages/@semantq/auth/lib/middleware/authorize.js';
 import pylonService from '../packages/@semantq/pylon/services/pylonService.js';
 const dataModel = '${namePascal}';
 
@@ -750,7 +946,6 @@ export default router;
 
 
 
-// Main generateResource function
 // Main generateResource function - ADD pylon parameter
 export async function generateResource(name, baseDir, database, pylon = false) {
   const namePascal = toPascalCase(name);
@@ -772,5 +967,3 @@ export async function generateResource(name, baseDir, database, pylon = false) {
 
   console.log(`\n${SPARKLES_ICON} ${purpleBright(`Successfully generated ${namePascal} resource files!`)}\n`);
 }
-
-
