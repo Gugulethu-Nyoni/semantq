@@ -1,0 +1,239 @@
+# Skeletal Outline of `cli-utils.js` - Semantq Resource Generation Module
+
+## Overview
+This module provides the core functionality for generating backend resources (Model, Service, Controller, Route) for Semantq projects. It supports multiple database adapters and includes Pylon (feature-guarding) capabilities.
+
+---
+
+## 1. **Imports & Setup**
+- **Purpose:** Import necessary Node.js modules and configure CLI styling.
+- **Key Imports:** `path`, `fs`, `pathToFileURL`, `commander`, `chalk`
+- **Styling:** Color palette and icon definitions for CLI output
+
+---
+
+## 2. **Utility Functions**
+
+| Function | Purpose |
+|----------|---------|
+| `ensureDirectoryExists(dirPath)` | Creates a directory recursively if it doesn't exist |
+| `writeFileIfNotExists(filePath, content)` | Writes a file only if it doesn't already exist (prevents overwriting) |
+| `pluralize(word)` | Converts a word to its plural form (handles common English rules) |
+| `toCamelCase(name)` | Converts string to camelCase (e.g., "ProductCategory" → "productCategory") |
+| `toPascalCase(name)` | Converts string to PascalCase (e.g., "productCategory" → "ProductCategory") |
+
+---
+
+## 3. **Core Resource Generation Functions**
+
+### 3.1. `generateModel(name, database, baseDir)`
+**Purpose:** Creates a database model file for the specified resource.
+
+**Supported Databases:**
+| Database | Template Type | Output Location |
+|----------|---------------|-----------------|
+| `mongo` | Mongoose schema | `models/mongo/{Name}.js` |
+| `supabase` | Prisma model class | `models/supabase/{Name}.js` |
+| `mysql` | Prisma model class | `models/mysql/{Name}.js` |
+| `postgresql` | Prisma model class | `models/postgresql/{Name}.js` |
+| `sqlite` | Prisma model class | `models/sqlite/{Name}.js` |
+
+**Key Features:**
+- Normalizes database adapter names (e.g., `postgres` → `postgresql`)
+- Generates appropriate model structure for each database type
+- For Prisma-based databases: includes CRUD methods (create, findById, findAll, update, delete, findWithPagination)
+- For MongoDB: uses Mongoose schema with timestamps
+
+---
+
+### 3.2. `generateService(name, database, baseDir, pylon = false)`
+**Purpose:** Creates a service layer that handles business logic and database interactions.
+
+**Two Template Types:**
+
+#### **Standard Service Template**
+```javascript
+// Standard CRUD service
+class {Name}Service {
+  async create(data)    // Create new record
+  async getById(id)     // Get record by ID
+  async getAll()        // Get all records
+  async update(id, data)// Update record
+  async delete(id)      // Delete record
+}
+```
+
+#### **Pylon Service Template**
+```javascript
+// Pylon-enabled service with usage logging
+class {Name}Service {
+  async create(req) {
+    // Creates record
+    // Logs usage via pylonService.logUsage(userData)
+  }
+  // ... other CRUD methods
+}
+```
+
+**Key Features:**
+- Imports the generated model
+- Pylon version includes integration with `pylonService` for usage metering
+- Exports a singleton instance
+
+---
+
+### 3.3. `generateController(name, baseDir, pylon = false)`
+**Purpose:** Creates a controller that handles HTTP requests/responses.
+
+**Two Template Types:**
+
+#### **Standard Controller Template**
+```javascript
+class {Name}Controller {
+  async create{Name}(req, res)    // POST - Create
+  async get{Name}ById(req, res)   // GET - Read one
+  async getAll{Name}s(req, res)   // GET - Read all
+  async update{Name}(req, res)    // PUT - Update
+  async delete{Name}(req, res)    // DELETE - Delete
+}
+```
+
+#### **Pylon Controller Template**
+```javascript
+class {Name}Controller {
+  async create{Name}(req, res) {
+    // Passes req object (with userData) to service
+    const result = await {name}Service.create(req);
+  }
+  // ... other CRUD methods with request object
+}
+```
+
+**Key Features:**
+- Imports the generated service
+- Handles HTTP status codes (201, 200, 204, 400, 404, 500)
+- Validates ID parsing (converts string to integer where needed)
+- Error handling with appropriate responses
+
+---
+
+### 3.4. `generateRoute(name, baseDir, pylon = false)`
+**Purpose:** Creates Express.js route definitions with middleware.
+
+**Two Template Types:**
+
+#### **Standard Route Template**
+```javascript
+// Routes with security levels:
+// 🟢 PUBLIC - No authentication
+// 🟡 AUTHENTICATED - authenticateToken middleware
+// 🟠 AUTHORIZED - authenticateToken + authorize(level)
+// 🔴 FULLY_PROTECTED - validateApiKey + authenticateToken
+// 🚨 FULLY_AUTHORIZED - validateApiKey + authenticateToken + authorize(level)
+```
+
+#### **Pylon Route Template**
+```javascript
+// Adds Pylon feature guarding:
+router.get(
+  '/{plural}s',
+  authenticateToken,
+  pylonService.featureGuard(dataModel, 'read'),
+  controller.getAll{Name}s
+);
+
+// Each CRUD operation has corresponding feature guard:
+// create → 'create'
+// read → 'read'
+// update → 'update'
+// delete → 'delete'
+```
+
+**Key Features:**
+- Imports controller and middleware
+- Defines RESTful routes with appropriate HTTP methods
+- Integrates authentication (`authenticateToken`, `authorize`)
+- Pylon version includes `pylonService.featureGuard()` middleware
+- Includes commented examples for advanced security patterns
+
+---
+
+## 4. **Main Orchestration Function**
+
+### `generateResource(name, baseDir, database, pylon = false)`
+**Purpose:** Orchestrates the generation of all resource files.
+
+**Process Flow:**
+1. Logs the generation process with styling
+2. Calls `generateModel()` - Aborts if unsupported database
+3. Calls `generateService()` with pylon flag
+4. Calls `generateController()` with pylon flag
+5. Calls `generateRoute()` with pylon flag
+6. Logs success message
+
+---
+
+## 5. **Database Support Matrix**
+
+| Database | Model Type | Service Type | Controller | Routes |
+|----------|-----------|--------------|------------|--------|
+| **MongoDB** | Mongoose Schema | CRUD methods | HTTP handlers | RESTful |
+| **MySQL** | Prisma Class | CRUD methods | HTTP handlers | RESTful |
+| **PostgreSQL** | Prisma Class | CRUD methods | HTTP handlers | RESTful |
+| **Supabase** | Prisma Class | CRUD methods | HTTP handlers | RESTful |
+| **SQLite** | Prisma Class | CRUD methods | HTTP handlers | RESTful |
+
+---
+
+## 6. **Generated File Structure**
+
+```
+semantqQL/
+├── models/
+│   ├── mysql/
+│   │   └── {Name}.js          # Prisma model class
+│   ├── postgresql/
+│   │   └── {Name}.js          # Prisma model class
+│   ├── mongo/
+│   │   └── {Name}.js          # Mongoose schema
+│   └── supabase/
+│       └── {Name}.js          # Prisma model class
+├── services/
+│   └── {name}Service.js       # Business logic layer
+├── controllers/
+│   └── {name}Controller.js    # HTTP request handlers
+└── routes/
+    └── {name}Routes.js        # Route definitions
+```
+
+---
+
+## 7. **Pylon Feature Guarding Summary**
+
+When `pylon = true`, the generated files include:
+
+| Component | Pylon Enhancement |
+|-----------|------------------|
+| **Model** | No change (same as standard) |
+| **Service** | Usage logging via `pylonService.logUsage()` |
+| **Controller** | Receives full `req` object (with `userData`) |
+| **Route** | `pylonService.featureGuard(dataModel, action)` middleware on CRUD routes |
+
+**Available Feature Guards:**
+- `'create'` - Allows creating records
+- `'read'` - Allows reading records
+- `'update'` - Allows updating records
+- `'delete'` - Allows deleting records
+
+---
+
+## 8. **Key Dependencies Referenced**
+- **Prisma Client:** Used for SQL databases (`lib/prisma.js`)
+- **Mongoose:** Used for MongoDB
+- **@semantq/auth:** Authentication middleware (`authenticateToken`, `authorize`)
+- **@semantq/pylon:** Feature guarding service (`pylonService`)
+- **Express.js:** Routing and middleware
+
+---
+
+This skeletal outline summarizes the structure and functionality of the `cli-utils.js` module, demonstrating how each function contributes to generating complete backend resources for Semantq projects.

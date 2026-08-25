@@ -633,15 +633,11 @@ class ${namePascal}Controller {
 
   async update${namePascal}(req, res) {
     try {
-      // Parse ID from string to integer (for sqlite/mysql; mongo uses string IDs)
-      const resourceId = parseInt(req.params.id, 10);
+      const result = await ${nameCamel}Service.update(
+        req.params.id,
+        req.body
+      );
 
-      // Validate parsed ID
-      if (isNaN(resourceId)) {
-        return res.status(400).json({ error: 'Invalid ${namePascal} ID provided. Must be a number.' });
-      }
-
-      const result = await ${nameCamel}Service.update(resourceId, req.body);
       res.json(result);
     } catch (err) {
       res.status(400).json({ error: err.message });
@@ -650,21 +646,23 @@ class ${namePascal}Controller {
 
   async delete${namePascal}(req, res) {
     try {
-      // Parse ID from string to integer (for sqlite/mysql; mongo uses string IDs)
-      const resourceId = parseInt(req.params.id, 10);
+      await ${nameCamel}Service.delete(
+        req.params.id
+      );
 
-      // Validate parsed ID
-      if (isNaN(resourceId)) {
-        return res.status(400).json({ error: 'Invalid ${namePascal} ID provided. Must be a number.' });
-      }
-
-      await ${nameCamel}Service.delete(resourceId);
       res.status(204).send();
     } catch (err) {
-      if (err.message.includes("Record to delete does not exist")) {
-        res.status(404).json({ error: "${namePascal} not found." });
+      if (
+        err.message.includes("Record to delete does not exist") ||
+        err.code === "P2025"
+      ) {
+        res.status(404).json({
+          error: "${namePascal} not found."
+        });
       } else {
-        res.status(400).json({ error: err.message });
+        res.status(400).json({
+          error: err.message
+        });
       }
     }
   }
@@ -709,15 +707,11 @@ class ${namePascal}Controller {
 
   async update${namePascal}(req, res) {
     try {
-      // Parse ID from string to integer (for sqlite/mysql; mongo uses string IDs)
-      const resourceId = parseInt(req.params.id, 10);
+      const result = await ${nameCamel}Service.update(
+        req.params.id,
+        req.body
+      );
 
-      // Validate parsed ID
-      if (isNaN(resourceId)) {
-        return res.status(400).json({ error: 'Invalid ${namePascal} ID provided. Must be a number.' });
-      }
-
-      const result = await ${nameCamel}Service.update(resourceId, req.body);
       res.json(result);
     } catch (err) {
       res.status(400).json({ error: err.message });
@@ -726,21 +720,23 @@ class ${namePascal}Controller {
 
   async delete${namePascal}(req, res) {
     try {
-      // Parse ID from string to integer (for sqlite/mysql; mongo uses string IDs)
-      const resourceId = parseInt(req.params.id, 10);
+      await ${nameCamel}Service.delete(
+        req.params.id
+      );
 
-      // Validate parsed ID
-      if (isNaN(resourceId)) {
-        return res.status(400).json({ error: 'Invalid ${namePascal} ID provided. Must be a number.' });
-      }
-
-      await ${nameCamel}Service.delete(resourceId);
       res.status(204).send();
     } catch (err) {
-      if (err.message.includes("Record to delete does not exist")) {
-        res.status(404).json({ error: "${namePascal} not found." });
+      if (
+        err.message.includes("Record to delete does not exist") ||
+        err.code === "P2025"
+      ) {
+        res.status(404).json({
+          error: "${namePascal} not found."
+        });
       } else {
-        res.status(400).json({ error: err.message });
+        res.status(400).json({
+          error: err.message
+        });
       }
     }
   }

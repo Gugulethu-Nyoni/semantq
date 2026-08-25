@@ -1,0 +1,206 @@
+Based on the provided CLI script, here is a skeletal outline summarizing its structure, the methods involved, and their purposes.
+
+---
+
+### **Skeletal Outline of `semantq` CLI Script**
+
+#### **1. Core Setup & Imports**
+- **Purpose:** Initializes the CLI tool, sets up the environment, and loads dependencies.
+- **Key Actions:**
+  - Imports libraries (commander, fs-extra, path, execSync, etc.).
+  - Loads environment variables from `.env`.
+  - Defines a color palette and icons for styled terminal output.
+  - Reads the `package.json` to set the CLI version.
+
+#### **2. Utility Functions**
+- **Purpose:** Provides helper functions for filesystem operations and path resolution.
+- **Key Functions:**
+  - `resolvePath(baseDir, ...paths)` – Resolves paths relative to a base directory.
+  - `safeCopySync(source, destination)` – Copies directories recursively with error handling.
+  - `copyIfExists(source, destination)` – Copies a file only if it exists.
+  - `toCamelCase(name)` & `toPascalCase(name)` – Converts strings between naming conventions.
+  - `ensureDirectoryExists(dirPath)` & `writeFileIfNotExists(filePath, content)` – Filesystem utilities for directory/file creation.
+
+#### **3. Project Creation & Setup Commands**
+
+##### **3.1. `create <projectName>`**
+- **Purpose:** Generates a new Semantq project structure, with an option to install a full-stack setup.
+- **Key Steps:**
+  - Creates directory structure (e.g., `src/routes`, `public`, `docs`).
+  - Copies core modules, templates, and configuration files.
+  - Installs npm dependencies.
+  - **If `--fullstack` flag is used:**
+    - Calls `installSemantqServer()` to clone and set up the server.
+    - Installs `@semantq/auth` in the server.
+    - Calls `addSemantqAuthUI()` to set up authentication UI in the client.
+    - Provides post-installation instructions.
+
+##### **3.2. `install:server`**
+- **Purpose:** Standalone command to install the Semantq server package.
+- **Key Function:** Calls `installSemantqServer()`.
+
+##### **3.3. `add:auth-ui`**
+- **Purpose:** Standalone command to install the Semantq Authentication UI.
+- **Key Function:** Calls `addSemantqAuthUI()`.
+
+#### **4. Module Management Commands**
+
+##### **4.1. `add <moduleName>`**
+- **Purpose:** Adds a Semantq module (e.g., `@semantq/auth`) to the current project.
+- **Key Steps:**
+  - Prepends `@semantq/` if not provided.
+  - Runs `npm install` in the project root.
+  - Suggests running migrations after installation.
+
+##### **4.2. `modules:move [moduleName]`**
+- **Purpose:** Moves Semantq modules from `node_modules` to a local `packages/` directory.
+- **Options:** `--all`, `--dry-run`, `--force`, `--symlink`.
+- **Key Steps:**
+  - Discovers modules by checking `package.json` for the `semantq-module` property.
+  - Moves selected modules to `packages/`.
+  - Optionally creates symlinks in `node_modules` to maintain imports.
+
+#### **5. Resource & Scaffolding Commands**
+
+##### **5.1. `make:route <routeName> [model]`**
+- **Purpose:** Creates a new route (page) with optional features.
+- **Key Options:**
+  - `--layout` – Adds a layout file.
+  - `--crud` – Adds CRUD operations (with smQL, Formique, AnyGrid).
+  - `--auth` – Adds authentication imports.
+  - `--tailwind` – Adds Tailwind CSS support.
+  - `--pylon` – Creates a role-based (Pylon) route with a specific model/role.
+  - `--all` – Adds all features.
+- **Key Steps:**
+  - Creates the route directory and files (`@page.smq`, `@layout.smq`, `server.js`).
+  - Generates appropriate templates based on options.
+
+##### **5.2. `remove:route <routeName>`**
+- **Purpose:** Deletes a route directory and its contents after confirmation.
+- **Key Steps:**
+  - Lists files to be deleted.
+  - Prompts for confirmation (unless `--yes` flag is used).
+  - Removes the directory and prints next steps.
+
+##### **5.3. `make:component <componentName>`**
+- **Purpose:** Creates a new component file (standard or Pylon-enabled).
+- **Key Options:**
+  - `--pylon` – Creates a Pylon-enabled component with feature-guarding logic (e.g., permission checks, CRUD templates).
+- **Key Steps:**
+  - Determines the correct path (standard or `pylon/` subdirectory).
+  - Writes the component template.
+  - Provides import instructions.
+
+##### **5.4. `remove:component <componentName>`**
+- **Purpose:** Deletes a component file after confirmation.
+- **Key Options:** `--pylon`, `--yes`.
+- **Key Steps:**
+  - Locates the component in either standard or `pylon/` directory.
+  - Confirms deletion (unless `--yes`).
+  - Removes the file and prints next steps.
+
+##### **5.5. `make:resource <resourceName>`**
+- **Purpose:** Generates a full backend resource (Model, Controller, Service, Route) using the `generateResource()` function from `cli-utils.js`.
+- **Key Options:** `--pylon` – Adds feature-guarding logic.
+- **Key Steps:**
+  - Reads server configuration (`server.config.js`) to determine database adapter.
+  - Calls the imported `generateResource()` function.
+  - Provides post-generation instructions (e.g., Prisma migration for SQL).
+
+##### **5.6. `remove:resource <resourceName>`**
+- **Purpose:** Deletes all files belonging to a resource.
+- **Key Steps:**
+  - Compiles a list of expected file paths (Model, Service, Controller, Route).
+  - Confirms deletion (unless `--yes`).
+  - Removes the files.
+
+#### **6. Server & Database Commands**
+
+##### **6.1. `migrate`**
+- **Purpose:** Runs database migrations (executes `npm run migrate` in the project root).
+- **Key Action:** Executes the `migrate` npm script.
+
+##### **6.2. `start`**
+- **Purpose:** Starts the Semantq development server (executes `npm run dev`).
+- **Key Action:** Executes the `dev` npm script.
+
+#### **7. Styling & UI Commands**
+
+##### **7.1. `install:tailwind`**
+- **Purpose:** Installs and configures Tailwind CSS for the Semantq project.
+- **Key Steps:**
+  - Installs Tailwind CSS, PostCSS, and Autoprefixer.
+  - Initializes Tailwind (`tailwind.config.js`, `postcss.config.js`).
+  - Writes configuration to `tailwind.config.js`.
+  - Injects PostCSS configuration into `vite.config.js`.
+  - Adds Tailwind directives to `global.css`.
+
+#### **8. AI-Powered Code Generation Command**
+
+##### **8.1. `ai <prompt>`**
+- **Purpose:** Uses a Hugging Face model (DeepSeek-R1) to generate code and saves it to the specified route directory.
+- **Key Options:** `--route <route>`, `--full`, `--js`, `--css`, `--html`, `--append`.
+- **Key Steps:**
+  - Dynamically imports the Hugging Face Inference client.
+  - Modifies the prompt based on flags (e.g., wrap in Semantq tags).
+  - Calls the API and extracts the code block.
+  - Writes/appends the code to `src/routes/<route>/@page.smq`.
+
+#### **9. Email Service Commands**
+
+##### **9.1. `make:mail <serviceName>`**
+- **Purpose:** Generates a custom email service with templates and a test script.
+- **Key Options:** `--methods`, `--skip-templates`, `--templates`, `--dry-run`.
+- **Key Functions:**
+  - `generateMailService()` – Creates the service file, test script, and template files.
+  - `generateServiceContent()` – Produces the service class with specified email methods.
+  - `generateTemplateContent()` – Creates a template file.
+  - `generateTestScriptContent()` – Creates a runnable test script.
+
+#### **10. Update Command**
+
+##### **10.1. `update`**
+- **Purpose:** Updates Semantq to the latest version by fetching the latest package from GitHub and updating core directories.
+- **Key Options:** `--dry-run`, `--force`, `--restore`.
+- **Key Steps:**
+  - Fetches the latest version from GitHub.
+  - Compares with the current version.
+  - Creates a backup of `core_modules/`.
+  - Installs the latest npm package.
+  - Uses `degit` to download and update core directories (`core_modules`, `docs`, `examples`).
+  - Preserves user configuration (`semantq.config.js`).
+
+#### **11. Internal Helper Functions (Not Directly Exposed as Commands)**
+
+- **`installSemantqServer(targetBaseDir)`**
+  - **Purpose:** Clones the Semantq server repository (`semantqQL`) using `degit` and installs its dependencies.
+  - Sets execute permissions for `bin/init.js`.
+
+- **`addSemantqAuthUI(projectRoot)`**
+  - **Purpose:** Clones the `semantq_auth_ui` repository and copies its assets (public, routes, components) into the project.
+
+- **`readServerConfig(projectRoot)`**
+  - **Purpose:** Dynamically loads `server.config.js` from the `semantqQL` directory to extract the database adapter (used by `make:resource`).
+
+- **`createPylonRoute(routeName, role, options)`**
+  - **Purpose:** Generates a role-based (Pylon) route with a structured directory and pre-configured components.
+  - Uses `pylonToPascalCase()` to format component names.
+
+---
+
+### **Summary of Key Command Groups**
+
+| **Category**               | **Commands**                                                                                     | **Purpose**                                                                 |
+|----------------------------|--------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| **Project Setup**          | `create`, `install:server`, `add:auth-ui`                                                       | Initializes projects and installs server/auth components.                   |
+| **Module Management**      | `add`, `modules:move`                                                                           | Adds or relocates Semantq modules.                                          |
+| **Scaffolding**            | `make:route`, `remove:route`, `make:component`, `remove:component`, `make:resource`, `remove:resource` | Generate/remove routes, components, and backend resources.                  |
+| **Server & Database**      | `migrate`, `start`                                                                              | Run migrations and start the development server.                            |
+| **Styling**                | `install:tailwind`                                                                              | Configure Tailwind CSS.                                                     |
+| **AI Code Generation**     | `ai`                                                                                            | Generate code via AI and save it to a route.                                |
+| **Email Services**         | `make:mail`                                                                                     | Create email services with templates and test scripts.                      |
+| **Updates**                | `update`                                                                                        | Update Semantq to the latest version.                                       |
+
+---
+
+This outline provides a high-level understanding of the CLI's structure and the role of each command and helper function, omitting the extensive implementation details present in the original script.
