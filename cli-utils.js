@@ -363,10 +363,6 @@ class ${namePascal}Service {
     const resource =
       await ${namePascal}Model.findById(id);
 
-    if (!resource) {
-      return null;
-    }
-
     return typeCaster.dbToFormModel(
       resource,
       '${namePascal}'
@@ -496,10 +492,6 @@ class ${namePascal}Service {
   async getById(id) {
     const resource =
       await ${namePascal}Model.findById(id);
-
-    if (!resource) {
-      return null;
-    }
 
     return typeCaster.dbToFormModel(
       resource,
